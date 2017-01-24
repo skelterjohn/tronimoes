@@ -62,13 +62,25 @@ type Layer interface {
 type sillyPainter struct {
 	touchX   float32
 	touchY   float32
-	green    float32
 	buf      gl.Buffer
 	program  gl.Program
 	position gl.Attrib
 	offset   gl.Uniform
+	size     gl.Uniform
 	color    gl.Uniform
 }
+
+var triangleData = f32.Bytes(binary.LittleEndian,
+	-1.0, 1.0, 0.0, // top left
+	-1.0, -1.0, 0.0, // bottom left
+	1.0, 1.0, 0.0, // top right
+	1.0, -1.0, 0.0, // bottom right
+)
+
+const (
+	coordsPerVertex = 3
+	vertexCount     = 4
+)
 
 func (sp *sillyPainter) init(glctx gl.Context) {
 	sp.buf = glctx.CreateBuffer()
@@ -77,12 +89,13 @@ func (sp *sillyPainter) init(glctx gl.Context) {
 
 	const vertexShader = `#version 100
 uniform vec2 offset;
+uniform vec2 size;
 
 attribute vec4 position;
 void main() {
-	// offset comes in with x/y values between 0 and 1.
+	// offset comes in with x/y values between 0 and w/h.
 	// position bounds are -1 to 1.
-	vec4 offset4 = vec4(2.0*offset.x-1.0, 1.0-2.0*offset.y, 0, 0);
+	vec4 offset4 = vec4(2.0*offset.x/size.x-1.0, 1.0-2.0*offset.y/size.y, 0, 0);
 	gl_Position = position + offset4;
 }`
 
@@ -103,6 +116,7 @@ void main() {
 	sp.position = glctx.GetAttribLocation(sp.program, "position")
 	sp.color = glctx.GetUniformLocation(sp.program, "color")
 	sp.offset = glctx.GetUniformLocation(sp.program, "offset")
+	sp.size = glctx.GetUniformLocation(sp.program, "size")
 
 }
 
@@ -115,18 +129,15 @@ func (sp *sillyPainter) Paint(glctx gl.Context, sz size.Event) {
 	glctx.ClearColor(1, 0, 0, 1)
 	glctx.Clear(gl.COLOR_BUFFER_BIT)
 	glctx.UseProgram(sp.program)
-	sp.green += 0.01
-	if sp.green > 1 {
-		sp.green = 0
-	}
-	glctx.Uniform4f(sp.color, 0, sp.green, 0, 1)
 
-	glctx.Uniform2f(sp.offset, sp.touchX/float32(sz.WidthPx), sp.touchY/float32(sz.HeightPx))
+	glctx.Uniform4f(sp.color, 0, 1, 0, 1)
+	glctx.Uniform2f(sp.size, float32(sz.WidthPx), float32(sz.HeightPx))
+	glctx.Uniform2f(sp.offset, sp.touchX, sp.touchY)
 
 	glctx.BindBuffer(gl.ARRAY_BUFFER, sp.buf)
 	glctx.EnableVertexAttribArray(sp.position)
 	glctx.VertexAttribPointer(sp.position, coordsPerVertex, gl.FLOAT, false, 0, 0)
-	glctx.DrawArrays(gl.TRIANGLES, 0, vertexCount)
+	glctx.DrawArrays(gl.TRIANGLE_STRIP, 0, vertexCount)
 	glctx.DisableVertexAttribArray(sp.position)
 
 }
@@ -141,14 +152,3 @@ func (sp *sillyPainter) Event(e interface{}) {
 		sp.touchY = float32(e.HeightPx / 2)
 	}
 }
-
-var triangleData = f32.Bytes(binary.LittleEndian,
-	0.0, 0.4, 0.0, // top left
-	0.0, 0.0, 0.0, // bottom left
-	0.4, 0.0, 0.0, // bottom right
-)
-
-const (
-	coordsPerVertex = 3
-	vertexCount     = 3
-)

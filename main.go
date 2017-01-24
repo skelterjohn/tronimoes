@@ -80,18 +80,22 @@ func main() {
 	})
 }
 
+var (
+	title   *titleLayer
+	painter *sillyPainter
+)
+
 func onStart(glctx gl.Context) {
-
-	sp := &sillyPainter{}
-	sp.init(glctx)
-	s.Push(sp)
-
 	images = glutil.NewImages(glctx)
 	fps = debug.NewFPS(images)
+
+	title = &titleLayer{s: s}
+	title.init(glctx)
+	s.Push(title)
 }
 
 func onStop(glctx gl.Context) {
 	fps.Release()
 	images.Release()
-	s.Pop()
+	title.Release(glctx)
 }
