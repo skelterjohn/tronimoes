@@ -1,4 +1,4 @@
-package com.skelterjohn.tronimoes.com.skelterjohn.tronimoes.board
+package com.skelterjohn.tronimoes.board
 
 import kotlin.random.Random
 
@@ -17,13 +17,19 @@ class V2(_x: Int, _y: Int) {
     val y = _y
 }
 
+enum class Rank {
+    LINE, LEADER, ROUND_LEADER
+}
+
 class Tile(_left: Int, _right: Int) {
     // The number of pips on the left side.
     val left = _left
     // The number of pips on the right side.
     val right = _right
+    // The rank for this tile.
+    var rank: Rank? = null
 
-    // The player who placed this tile.
+    // For LINE tiles, the player who owns it.
     var player: String? = null
 
     // The position of the left and right sides.
@@ -32,6 +38,8 @@ class Tile(_left: Int, _right: Int) {
 
     // The tile this one led from, if any.
     var parent: Tile? = null
+    // This tile's child, or children if it has rank ROUND_LEADER
+    var children = mutableSetOf<Tile>()
 }
 
 class Pile(maxPips:Int) {
