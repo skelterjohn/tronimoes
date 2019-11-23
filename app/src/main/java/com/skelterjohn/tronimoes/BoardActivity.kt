@@ -27,7 +27,7 @@ class BoardView @JvmOverloads constructor(context: Context,
     var centerY: Float = 0F
     // How many tile units fit between the center and the edge of the screen, in the smaller
     // dimension.
-    var scaleFactor = 1F
+    var scaleFactor = 5F
 
 
     private val redPaint =
@@ -64,7 +64,7 @@ class BoardView @JvmOverloads constructor(context: Context,
             return
         }
         var span = canvas.width
-        if (canvas.height > span) {
+        if (canvas.height < span) {
             span = canvas.height
         }
         Log.i("drawTIle", "canvas stretch ${canvas.width}, ${canvas.height}")
@@ -72,20 +72,21 @@ class BoardView @JvmOverloads constructor(context: Context,
         var leftX = tile.leftCoord?.x?.toFloat() ?: 0F
         var leftY = tile.leftCoord?.y?.toFloat() ?: 0F
         Log.i("drawTile", "leftX, leftY = ${leftX}, ${leftY}")
-        var leftMinX = mapCoord(leftX-0.5F, centerX, span)
-        var leftMaxX = mapCoord(leftX+0.5F, centerX, span)
+        var leftMinX = mapCoord(leftX-0.5F, centerX, canvas.width/2, span)
+        var leftMaxX = mapCoord(leftX+0.5F, centerX, canvas.width/2, span)
         Log.i("drawTile", "leftMinX, leftMaxX = ${leftMinX}, ${leftMaxX}")
-        var leftMinY = mapCoord(leftY-0.5F, centerY, span)
-        var leftMaxY = mapCoord(leftY+0.5F, centerY, span)
+        var leftMinY = mapCoord(leftY-0.5F, centerY, canvas.height/2, span)
+        var leftMaxY = mapCoord(leftY+0.5F, centerY, canvas.height/2, span)
         Log.i("drawTile", "leftMinY, leftMaxY = ${leftMinY}, ${leftMaxY}")
-        canvas.drawRect(RectF(leftMinX, leftMaxX, leftMinY, leftMaxY), blackPaint)
+        canvas.drawRect(RectF(leftMinX, leftMinY, leftMaxX, leftMaxY), blackPaint)
     }
 
-    fun mapCoord(point: Float, center: Float, span: Int): Float {
+    fun mapCoord(point: Float, center: Float, canvasCenter: Int, span: Int): Float {
         // distance from the center to the edge.
-        var radius = span.toFloat()/2
+        var radius = canvasCenter
         var offset = point - center
-        return radius + offset * radius / scaleFactor
+        var mappedPoint = radius + (offset * (span/2) / scaleFactor)
+        return mappedPoint
     }
 }
 
