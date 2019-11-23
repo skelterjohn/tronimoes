@@ -15,6 +15,10 @@ class Board(_width: Int, _height: Int) {
 class V2(_x: Int, _y: Int) {
     val x = _x
     val y = _y
+
+    operator fun plus(o: V2): V2 {
+        return V2(x+o.x, y+o.y)
+    }
 }
 
 enum class Rank {
@@ -33,8 +37,8 @@ class Tile(_left: Int, _right: Int) {
     var player: String? = null
 
     // The position of the left and right sides.
-    var leftCoord: V2? = null
-    var rightCoord: V2? = null
+    var origin: V2? = null
+    var delta: V2? = null
 
     // The tile this one led from, if any.
     var parent: Tile? = null

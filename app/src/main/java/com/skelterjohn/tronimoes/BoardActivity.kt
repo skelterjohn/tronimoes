@@ -45,7 +45,9 @@ class BoardView @JvmOverloads constructor(context: Context,
     // Called when the view should render its content.
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-
+        if (canvas == null) {
+            return
+        }
         // DRAW STUFF HERE
         var color = redPaint
         if (board != null) {
@@ -55,26 +57,25 @@ class BoardView @JvmOverloads constructor(context: Context,
         for (t in board?.tiles ?: mutableSetOf<Tile>()) {
             drawTile(canvas, t)
         }
-        canvas?.drawCircle(100f, 100f, 30f, color)
     }
 
-    fun drawTile(canvas: Canvas?, tile: Tile) {
-        if (canvas == null) {
-            return
-        }
+    fun drawTile(canvas: Canvas, tile: Tile) {
+
         var span = canvas.width
         if (canvas.height < span) {
             span = canvas.height
         }
-        var leftX = tile.leftCoord?.x?.toFloat() ?: 0F
-        var leftY = tile.leftCoord?.y?.toFloat() ?: 0F
+        val origin: V2 = tile.origin?: V2(0, 0)
+        val delta: V2 = tile.delta?: V2(0, 0)
+        var leftX = origin.x.toFloat()
+        var leftY = origin.y.toFloat()
         var leftMinX = mapX(leftX-0.5F, centerX, canvas.width/2, span)
         var leftMaxX = mapX(leftX+0.5F, centerX, canvas.width/2, span)
         var leftMinY = mapY(leftY-0.5F, centerY, canvas.height/2, span)
         var leftMaxY = mapY(leftY+0.5F, centerY, canvas.height/2, span)
         canvas.drawRect(RectF(leftMinX, leftMaxY, leftMaxX, leftMinY), blackPaint)
-        var rightX = tile.rightCoord?.x?.toFloat() ?: 0F
-        var rightY = tile.rightCoord?.y?.toFloat() ?: 0F
+        var rightX = (origin+delta).x.toFloat()
+        var rightY = (origin+delta).y.toFloat()
         var rightMinX = mapX(rightX-0.5F, centerX, canvas.width/2, span)
         var rightMaxX = mapX(rightX+0.5F, centerX, canvas.width/2, span)
         var rightMinY = mapY(rightY-0.5F, centerY, canvas.height/2, span)
@@ -106,14 +107,14 @@ class BoardActivity : AppCompatActivity() {
 
         var p = Pile(5)
         var t1 = p.draw("john")
-        t1.leftCoord = V2(0, 0)
-        t1.rightCoord = V2(1, 0)
+        t1.origin = V2(0, 0)
+        t1.delta = V2(1, 0)
         var t2 = p.draw("stef")
-        t2.leftCoord = V2(0, 1)
-        t2.rightCoord = V2(0, 2)
+        t2.origin= V2(0, 1)
+        t2.delta = V2(0, 1)
         var t3 = p.draw("john")
-        t3.leftCoord = V2(2, 0)
-        t3.rightCoord = V2(3, 0)
+        t3.origin = V2(2, 0)
+        t3.delta = V2(1, 0)
 
         b.tiles.add(t1)
         b.tiles.add(t2)
