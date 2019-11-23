@@ -65,22 +65,24 @@ class BoardView @JvmOverloads constructor(context: Context,
         if (canvas.height < span) {
             span = canvas.height
         }
-        val origin: V2 = tile.origin?: V2(0, 0)
-        val delta: V2 = tile.delta?: V2(0, 0)
-        var leftX = origin.x.toFloat()
-        var leftY = origin.y.toFloat()
-        var leftMinX = mapX(leftX-0.5F, centerX, canvas.width/2, span)
-        var leftMaxX = mapX(leftX+0.5F, centerX, canvas.width/2, span)
-        var leftMinY = mapY(leftY-0.5F, centerY, canvas.height/2, span)
-        var leftMaxY = mapY(leftY+0.5F, centerY, canvas.height/2, span)
-        canvas.drawRect(RectF(leftMinX, leftMaxY, leftMaxX, leftMinY), blackPaint)
-        var rightX = (origin+delta).x.toFloat()
-        var rightY = (origin+delta).y.toFloat()
-        var rightMinX = mapX(rightX-0.5F, centerX, canvas.width/2, span)
-        var rightMaxX = mapX(rightX+0.5F, centerX, canvas.width/2, span)
-        var rightMinY = mapY(rightY-0.5F, centerY, canvas.height/2, span)
-        var rightMaxY = mapY(rightY+0.5F, centerY, canvas.height/2, span)
-        canvas.drawRect(RectF(rightMinX, rightMaxY, rightMaxX, rightMinY), blackPaint)
+        val origin: V2 = tile.origin ?: V2(0, 0)
+        val delta: V2 = tile.delta ?: V2(0, 0)
+        var origin_gx = origin.x.toFloat()
+        var origin_gy = origin.y.toFloat()
+        var origin_dminx = mapX(origin_gx-0.5F, centerX, canvas.width/2, span)
+        var origin_dmaxx = mapX(origin_gx+0.5F, centerX, canvas.width/2, span)
+        var origin_dminy = mapY(origin_gy-0.5F, centerY, canvas.height/2, span)
+        var origin_dmaxy = mapY(origin_gy+0.5F, centerY, canvas.height/2, span)
+        canvas.drawRect(RectF(origin_dminx, origin_dmaxy, origin_dmaxx, origin_dminy), blackPaint)
+        var end_gx = (origin+delta).x.toFloat()
+        var end_gy = (origin+delta).y.toFloat()
+        var end_dminx = mapX(end_gx-0.5F, centerX, canvas.width/2, span)
+        var end_dmaxx = mapX(end_gx+0.5F, centerX, canvas.width/2, span)
+        var end_dminy = mapY(end_gy-0.5F, centerY, canvas.height/2, span)
+        var end_dmaxy = mapY(end_gy+0.5F, centerY, canvas.height/2, span)
+        canvas.drawRect(RectF(end_dminx, end_dmaxy, end_dmaxx, end_dminy), blackPaint)
+
+        canvas.drawLine((origin_dminx+origin_dmaxx)/2, (origin_dminy+origin_dmaxy)/2, (end_dminx+end_dmaxx)/2, (end_dminy+end_dmaxy)/2, redPaint)
     }
 
     fun mapX(gx: Float, gcx: Float, dcx: Int, span: Int): Float {
