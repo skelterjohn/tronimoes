@@ -29,7 +29,6 @@ class BoardView @JvmOverloads constructor(context: Context,
     // dimension.
     var scaleFactor = 5F
 
-
     private val redPaint =
         Paint().apply {
             isAntiAlias = true
@@ -67,26 +66,33 @@ class BoardView @JvmOverloads constructor(context: Context,
         if (canvas.height < span) {
             span = canvas.height
         }
-        Log.i("drawTIle", "canvas stretch ${canvas.width}, ${canvas.height}")
-        Log.i("drawTile", "tile left ${tile.leftCoord?.x} ${tile.leftCoord?.y}")
         var leftX = tile.leftCoord?.x?.toFloat() ?: 0F
         var leftY = tile.leftCoord?.y?.toFloat() ?: 0F
-        Log.i("drawTile", "leftX, leftY = ${leftX}, ${leftY}")
-        var leftMinX = mapCoord(leftX-0.5F, centerX, canvas.width/2, span)
-        var leftMaxX = mapCoord(leftX+0.5F, centerX, canvas.width/2, span)
-        Log.i("drawTile", "leftMinX, leftMaxX = ${leftMinX}, ${leftMaxX}")
-        var leftMinY = mapCoord(leftY-0.5F, centerY, canvas.height/2, span)
-        var leftMaxY = mapCoord(leftY+0.5F, centerY, canvas.height/2, span)
-        Log.i("drawTile", "leftMinY, leftMaxY = ${leftMinY}, ${leftMaxY}")
-        canvas.drawRect(RectF(leftMinX, leftMinY, leftMaxX, leftMaxY), blackPaint)
+        var leftMinX = mapX(leftX-0.5F, centerX, canvas.width/2, span)
+        var leftMaxX = mapX(leftX+0.5F, centerX, canvas.width/2, span)
+        var leftMinY = mapY(leftY-0.5F, centerY, canvas.height/2, span)
+        var leftMaxY = mapY(leftY+0.5F, centerY, canvas.height/2, span)
+        canvas.drawRect(RectF(leftMinX, leftMaxY, leftMaxX, leftMinY), blackPaint)
+        var rightX = tile.rightCoord?.x?.toFloat() ?: 0F
+        var rightY = tile.rightCoord?.y?.toFloat() ?: 0F
+        var rightMinX = mapX(rightX-0.5F, centerX, canvas.width/2, span)
+        var rightMaxX = mapX(rightX+0.5F, centerX, canvas.width/2, span)
+        var rightMinY = mapY(rightY-0.5F, centerY, canvas.height/2, span)
+        var rightMaxY = mapY(rightY+0.5F, centerY, canvas.height/2, span)
+        canvas.drawRect(RectF(rightMinX, rightMaxY, rightMaxX, rightMinY), blackPaint)
     }
 
-    fun mapCoord(point: Float, center: Float, canvasCenter: Int, span: Int): Float {
+    fun mapX(gx: Float, gcx: Float, dcx: Int, span: Int): Float {
         // distance from the center to the edge.
-        var radius = canvasCenter
-        var offset = point - center
-        var mappedPoint = radius + (offset * (span/2) / scaleFactor)
-        return mappedPoint
+        var offset = gx - gcx
+        var dx = dcx + (offset * (span/2) / scaleFactor)
+        return dx
+    }
+    fun mapY(gy: Float, gcy: Float, dcy: Int, span: Int): Float {
+        // distance from the center to the edge.
+        var offset = gy - gcy
+        var dy = dcy - (offset * (span/2) / scaleFactor)
+        return dy
     }
 }
 
