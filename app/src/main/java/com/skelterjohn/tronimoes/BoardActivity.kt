@@ -65,24 +65,43 @@ class BoardView @JvmOverloads constructor(context: Context,
         if (canvas.height < span) {
             span = canvas.height
         }
-        val origin: V2 = tile.origin ?: V2(0, 0)
-        val delta: V2 = tile.delta ?: V2(0, 0)
-        var origin_gx = origin.x.toFloat()
-        var origin_gy = origin.y.toFloat()
-        var origin_dminx = mapX(origin_gx-0.5F, centerX, canvas.width/2, span)
-        var origin_dmaxx = mapX(origin_gx+0.5F, centerX, canvas.width/2, span)
-        var origin_dminy = mapY(origin_gy-0.5F, centerY, canvas.height/2, span)
-        var origin_dmaxy = mapY(origin_gy+0.5F, centerY, canvas.height/2, span)
-        canvas.drawRect(RectF(origin_dminx, origin_dmaxy, origin_dmaxx, origin_dminy), blackPaint)
-        var end_gx = (origin+delta).x.toFloat()
-        var end_gy = (origin+delta).y.toFloat()
-        var end_dminx = mapX(end_gx-0.5F, centerX, canvas.width/2, span)
-        var end_dmaxx = mapX(end_gx+0.5F, centerX, canvas.width/2, span)
-        var end_dminy = mapY(end_gy-0.5F, centerY, canvas.height/2, span)
-        var end_dmaxy = mapY(end_gy+0.5F, centerY, canvas.height/2, span)
-        canvas.drawRect(RectF(end_dminx, end_dmaxy, end_dmaxx, end_dminy), blackPaint)
+        val origin = G2(tile.origin ?: V2(0, 0))
+        val delta = G2(tile.delta ?: V2(0, 0))
+        val end = origin + delta
+        drawGRect(GRect(origin, origin + G2(1F, 1F)), canvas, span, blackPaint)
+        drawGRect(GRect(end, end + G2(1F, 1F)), canvas, span, blackPaint)
 
-        canvas.drawLine((origin_dminx+origin_dmaxx)/2, (origin_dminy+origin_dmaxy)/2, (end_dminx+end_dmaxx)/2, (end_dminy+end_dmaxy)/2, redPaint)
+        drawGLine(origin+G2(0.5F, 0.5F), end+G2(0.5F, 0.5F), canvas, span, redPaint)
+    }
+
+
+    data class G2(val gx: Float, val gy: Float) {
+        constructor(v: V2) : this(v.x.toFloat(), v.y.toFloat())
+        operator fun plus(o: G2): G2 {
+            return G2(gx+o.gx, gy+o.gy)
+        }
+    }
+
+    data class GRect(val tl: G2, val br: G2)
+
+    fun drawGRect(r: GRect, canvas: Canvas, span: Int, paint: Paint) {
+        val tl = mapG2(r.tl, canvas, span)
+        val br = mapG2(r.br, canvas, span)
+        canvas.drawRect(tl.dx, tl.dy, br.dx, br.dy, paint)
+    }
+
+    fun drawGLine(start: G2, end: G2, canvas:Canvas, span: Int, paint: Paint) {
+        val dStart = mapG2(start, canvas, span)
+        val dEnd = mapG2(end, canvas, span)
+        canvas.drawLine(dStart.dx, dStart.dy, dEnd.dx, dEnd.dy, paint)
+    }
+
+    data class D2(val dx: Float, val dy: Float)
+
+    fun mapG2(g: G2, canvas: Canvas, span: Int): D2 {
+        return D2(
+            mapX(g.gx, centerX, canvas.width/2, span),
+            mapY(g.gy, centerY, canvas.height/2, span))
     }
 
     fun mapX(gx: Float, gcx: Float, dcx: Int, span: Int): Float {
