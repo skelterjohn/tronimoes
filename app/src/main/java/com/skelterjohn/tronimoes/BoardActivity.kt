@@ -49,29 +49,36 @@ class BoardView @JvmOverloads constructor(context: Context,
             return
         }
         // DRAW STUFF HERE
-        var color = redPaint
-        if (board != null) {
-            color = blackPaint
-        }
-
-        for (t in board?.tiles ?: mutableSetOf<Tile>()) {
-            drawTile(canvas, t)
-        }
-    }
-
-    fun drawTile(canvas: Canvas, tile: Tile) {
-
         var span = canvas.width
         if (canvas.height < span) {
             span = canvas.height
         }
+
+        for (t in board?.tiles ?: mutableSetOf<Tile>()) {
+            drawTile(t, canvas, span)
+        }
+    }
+
+    fun drawTile(tile: Tile, canvas: Canvas, span: Int) {
         val origin = G2(tile.origin ?: V2(0, 0))
         val delta = G2(tile.delta ?: V2(0, 0))
-        val end = origin + delta
-        drawGRect(GRect(origin, origin + G2(1F, 1F)), canvas, span, blackPaint)
-        drawGRect(GRect(end, end + G2(1F, 1F)), canvas, span, blackPaint)
 
-        drawGLine(origin+G2(0.5F, 0.5F), end+G2(0.5F, 0.5F), canvas, span, redPaint)
+        var tl = origin
+        var br = origin+delta+G2(1F, 1F)
+        if (delta.gx < 0 || delta.gy < 0) {
+            tl = origin+delta
+            br = origin+G2(1F, 1F)
+        }
+        drawGRect(GRect(tl, br),canvas, span, blackPaint)
+
+        drawPips(origin, delta, tile.left, canvas, span)
+        drawPips(origin+delta, delta,tile.right, canvas, span)
+
+        if (delta.gx == 0F) {
+            drawGLine(G2(0.2F*tl.gx + 0.8F*br.gx,(tl.gy+br.gy)/2), G2(0.8F*tl.gx + 0.2F*br.gx,(tl.gy+br.gy)/2), canvas, span, redPaint)
+        } else {
+            drawGLine(G2((tl.gx+br.gx)/2, 0.2F*tl.gy + 0.8F*br.gy), G2((tl.gx+br.gx)/2, 0.8F*tl.gy + 0.2F*br.gy), canvas, span, redPaint)
+        }
     }
 
 
@@ -79,6 +86,9 @@ class BoardView @JvmOverloads constructor(context: Context,
         constructor(v: V2) : this(v.x.toFloat(), v.y.toFloat())
         operator fun plus(o: G2): G2 {
             return G2(gx+o.gx, gy+o.gy)
+        }
+        fun turn(): G2 {
+            return G2(gy, -gx)
         }
     }
 
@@ -116,6 +126,52 @@ class BoardView @JvmOverloads constructor(context: Context,
         var dy = dcy - (offset * (span/2) / scaleFactor)
         return dy
     }
+    fun scale(distance: Float, span: Int): Float {
+        return distance * (span/2) / scaleFactor
+    }
+
+    val pipLocatoinSet = arrayOf<Array<G2>>(
+        arrayOf<G2>(), // 0
+        arrayOf<G2>(G2(0F, 0F)), // 1
+        arrayOf<G2>(G2(-0.2F, -0.2F),
+                    G2(0.2F, 0.2F)), // 2
+        arrayOf<G2>(G2(-0.2F, -0.2F),
+                    G2(0F, 0F),
+                    G2(0.2F, 0.2F)), // 3
+        arrayOf<G2>(G2(-0.2F, -0.2F),
+                    G2(0.2F, -0.2F),
+                    G2(-0.2F, 0.2F),
+                    G2(0.2F, 0.2F)), // 4
+        arrayOf<G2>(G2(-0.2F, -0.2F),
+                    G2(0.2F, -0.2F),
+                    G2(0F, 0F),
+                    G2(-0.2F, 0.2F),
+                    G2(0.2F, 0.2F)), // 5
+        arrayOf<G2>(G2(-0.25F, -0.2F),
+                    G2(0.25F, -0.2F),
+                    G2(0F, -0.2F),
+                    G2(0F, 0.2F),
+                    G2(-0.25F, 0.2F),
+                    G2(0.25F, 0.2F)) // 6
+    )
+
+    fun drawPips(loc: G2, delta: G2, pips: Int, canvas: Canvas, span: Int) {
+        val pipLocs = pipLocatoinSet[pips]
+        for (i in 0..pipLocs.size-1) {
+            var pl = pipLocs[i]
+            when(delta) {
+                G2(0F, 1F) -> pl = pl.turn()
+                G2(1F, 0F) -> pl = pl.turn().turn()
+                G2(0F, -1F) -> pl = pl.turn().turn().turn()
+            }
+            drawPip(loc+G2(0.5F, 0.5F)+pl, canvas, span, redPaint)
+        }
+    }
+
+    fun drawPip(loc: G2, canvas: Canvas, span: Int, paint: Paint) {
+        val pc = mapG2(loc, canvas, span)
+        canvas.drawCircle(pc.dx, pc.dy, scale(0.1F, span), redPaint)
+    }
 }
 
 class BoardActivity : AppCompatActivity() {
@@ -126,7 +182,7 @@ class BoardActivity : AppCompatActivity() {
         var b = Board(50, 50)
         board_view.board = b
 
-        var p = Pile(5)
+        var p = Pile(6)
         var t1 = p.draw("john")
         t1.origin = V2(0, 0)
         t1.delta = V2(1, 0)
