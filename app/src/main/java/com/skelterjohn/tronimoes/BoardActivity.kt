@@ -38,7 +38,7 @@ class BoardView @JvmOverloads constructor(context: Context,
         // DRAW STUFF HERE
         var pd = ProjectionDraw(canvas, G2(centerX, centerY), scaleFactor)
         for (t in board?.tiles ?: mutableSetOf<Tile>()) {
-            pd.drawTile(t)
+            pd.tile(t)
         }
     }
 
@@ -60,13 +60,25 @@ class BoardView @JvmOverloads constructor(context: Context,
         private val redPaint =
             Paint().apply {
                 isAntiAlias = true
-                color = Color.RED
+                color = Color.parseColor("#FF0000")
                 style = Paint.Style.STROKE
             }
         private val blackPaint =
             Paint().apply {
                 isAntiAlias = true
-                color = Color.BLACK
+                color = Color.parseColor("#000000")
+                style = Paint.Style.STROKE
+            }
+        private val grayPaint =
+            Paint().apply {
+                isAntiAlias = true
+                color = Color.parseColor("#888888")
+                style = Paint.Style.STROKE
+            }
+        private val bluePaint =
+            Paint().apply {
+                isAntiAlias = true
+                color = Color.parseColor("#0000FF")
                 style = Paint.Style.STROKE
             }
         var canvas: Canvas
@@ -89,35 +101,52 @@ class BoardView @JvmOverloads constructor(context: Context,
             }
         }
 
-        fun drawTile(tile: Tile) {
+        fun tile(tile: Tile) {
             val origin = G2(tile.origin ?: V2(0, 0))
             val delta = G2(tile.delta ?: V2(0, 0))
 
-            var tl = origin
-            var br = origin+delta+G2(1F, 1F)
+            var min = origin
+            var max = origin+delta+G2(1F, 1F)
             if (delta.gx < 0 || delta.gy < 0) {
-                tl = origin+delta
-                br = origin+G2(1F, 1F)
+                min = origin+delta
+                max = origin+G2(1F, 1F)
             }
-            drawGRect(GRect(tl, br), blackPaint)
+            rect(GRect(min, max), Paint().apply {
+                isAntiAlias = true
+                color = Color.parseColor("#EEEEEE")
+                style = Paint.Style.FILL
+            })
+            line(G2(min.gx, min.gy), G2(max.gx, min.gy), Paint().apply {
+                isAntiAlias = true
+                color = Color.GRAY
+                style = Paint.Style.STROKE
+                strokeWidth = 3F
+            })
+            line(G2(max.gx, min.gy), G2(max.gx, max.gy), Paint().apply {
+                isAntiAlias = true
+                color = Color.GRAY
+                style = Paint.Style.STROKE
+                strokeWidth = 3F
 
-            drawPips(origin, delta, tile.left)
-            drawPips(origin+delta, delta,tile.right)
+            })
+
+            pips(origin, delta, tile.left)
+            pips(origin+delta, delta,tile.right)
 
             if (delta.gx == 0F) {
-                drawGLine(G2(0.2F*tl.gx + 0.8F*br.gx,(tl.gy+br.gy)/2), G2(0.8F*tl.gx + 0.2F*br.gx,(tl.gy+br.gy)/2), redPaint)
+                line(G2(0.2F*min.gx + 0.8F*max.gx,(min.gy+max.gy)/2), G2(0.8F*min.gx + 0.2F*max.gx,(min.gy+max.gy)/2), grayPaint)
             } else {
-                drawGLine(G2((tl.gx+br.gx)/2, 0.2F*tl.gy + 0.8F*br.gy), G2((tl.gx+br.gx)/2, 0.8F*tl.gy + 0.2F*br.gy), redPaint)
+                line(G2((min.gx+max.gx)/2, 0.2F*min.gy + 0.8F*max.gy), G2((min.gx+max.gx)/2, 0.8F*min.gy + 0.2F*max.gy), grayPaint)
             }
         }
 
-        fun drawGRect(r: GRect, paint: Paint) {
+        fun rect(r: GRect, paint: Paint) {
             val tl = mapG2(r.tl)
             val br = mapG2(r.br)
             canvas.drawRect(tl.dx, tl.dy, br.dx, br.dy, paint)
         }
 
-        fun drawGLine(start: G2, end: G2, paint: Paint) {
+        fun line(start: G2, end: G2, paint: Paint) {
             val dStart = mapG2(start)
             val dEnd = mapG2(end)
             canvas.drawLine(dStart.dx, dStart.dy, dEnd.dx, dEnd.dy, paint)
@@ -147,33 +176,35 @@ class BoardView @JvmOverloads constructor(context: Context,
             return distance * (span/2) / scaleFactor
         }
 
-        val pipLocatoinSet = arrayOf<Array<G2>>(
-            arrayOf<G2>(), // 0
-            arrayOf<G2>(G2(0F, 0F)), // 1
-            arrayOf<G2>(G2(-0.2F, -0.2F),
-                        G2(0.2F, 0.2F)), // 2
-            arrayOf<G2>(G2(-0.2F, -0.2F),
+        data class PipsDesc(val offsets: Array<G2>, val color: Int)
+        val pipLocatoinSet = arrayOf<PipsDesc>(
+            PipsDesc(arrayOf<G2>(), Color.BLACK), // 0
+            PipsDesc(arrayOf<G2>(G2(0F, 0F)), Color.BLUE), // 1
+            PipsDesc(arrayOf<G2>(G2(-0.2F, -0.2F),
+                        G2(0.2F, 0.2F)), Color.GREEN), // 2
+            PipsDesc(arrayOf<G2>(G2(-0.2F, -0.2F),
                         G2(0F, 0F),
-                        G2(0.2F, 0.2F)), // 3
-            arrayOf<G2>(G2(-0.2F, -0.2F),
+                        G2(0.2F, 0.2F)), Color.YELLOW), // 3
+            PipsDesc(arrayOf<G2>(G2(-0.2F, -0.2F),
                         G2(0.2F, -0.2F),
                         G2(-0.2F, 0.2F),
-                        G2(0.2F, 0.2F)), // 4
-            arrayOf<G2>(G2(-0.2F, -0.2F),
+                        G2(0.2F, 0.2F)), Color.CYAN), // 4
+            PipsDesc(arrayOf<G2>(G2(-0.2F, -0.2F),
                         G2(0.2F, -0.2F),
                         G2(0F, 0F),
                         G2(-0.2F, 0.2F),
-                        G2(0.2F, 0.2F)), // 5
-            arrayOf<G2>(G2(-0.25F, -0.2F),
+                        G2(0.2F, 0.2F)), Color.GRAY), // 5
+            PipsDesc(arrayOf<G2>(G2(-0.25F, -0.2F),
                         G2(0.25F, -0.2F),
                         G2(0F, -0.2F),
                         G2(0F, 0.2F),
                         G2(-0.25F, 0.2F),
-                        G2(0.25F, 0.2F)) // 6
+                        G2(0.25F, 0.2F)), Color.MAGENTA) // 6
         )
 
-        fun drawPips(loc: G2, delta: G2, pips: Int) {
-            val pipLocs = pipLocatoinSet[pips]
+        fun pips(loc: G2, delta: G2, pips: Int) {
+            val pipsDesc = pipLocatoinSet[pips]
+            val pipLocs = pipsDesc.offsets
             for (i in 0..pipLocs.size-1) {
                 var pl = pipLocs[i]
                 when(delta) {
@@ -181,14 +212,15 @@ class BoardView @JvmOverloads constructor(context: Context,
                     G2(1F, 0F) -> pl = pl.turn().turn()
                     G2(0F, -1F) -> pl = pl.turn().turn().turn()
                 }
-                drawPip(loc+G2(0.5F, 0.5F)+pl, redPaint)
+                val pc = mapG2(loc+G2(0.5F, 0.5F)+pl)
+                canvas.drawCircle(pc.dx, pc.dy, scale(0.1F), Paint().apply {
+                    isAntiAlias = true
+                    color = pipsDesc.color
+                    style = Paint.Style.FILL
+                })
             }
         }
 
-        fun drawPip(loc: G2, paint: Paint) {
-            val pc = mapG2(loc)
-            canvas.drawCircle(pc.dx, pc.dy, scale(0.1F), redPaint)
-        }
     }
 }
 
