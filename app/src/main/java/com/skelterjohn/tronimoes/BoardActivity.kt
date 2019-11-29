@@ -127,7 +127,6 @@ class BoardView @JvmOverloads constructor(context: Context,
                 color = Color.GRAY
                 style = Paint.Style.STROKE
                 strokeWidth = 3F
-
             })
 
             pips(origin, delta, tile.left)
@@ -217,6 +216,11 @@ class BoardView @JvmOverloads constructor(context: Context,
                     isAntiAlias = true
                     color = pipsDesc.color
                     style = Paint.Style.FILL
+                })
+                canvas.drawCircle(pc.dx, pc.dy, scale(0.1F), Paint().apply {
+                    isAntiAlias = true
+                    color = Color.WHITE
+                    style = Paint.Style.STROKE
                 })
             }
         }
