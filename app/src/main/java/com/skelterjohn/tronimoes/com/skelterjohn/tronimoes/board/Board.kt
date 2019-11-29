@@ -12,12 +12,9 @@ class Board(_width: Int, _height: Int) {
     var leaders = mutableSetOf<Tile>()
 }
 
-class V2(_x: Int, _y: Int) {
-    val x = _x
-    val y = _y
-
+data class V2(val x: Int, val y: Int) {
     operator fun plus(o: V2): V2 {
-        return V2(x+o.x, y+o.y)
+        return V2(x + o.x, y + o.y)
     }
 }
 
