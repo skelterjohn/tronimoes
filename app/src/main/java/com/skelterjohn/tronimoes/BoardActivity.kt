@@ -102,8 +102,8 @@ class BoardView @JvmOverloads constructor(context: Context,
         }
 
         fun tile(tile: Tile) {
-            val origin = G2(tile.origin ?: V2(0, 0))
-            val delta = G2(tile.delta ?: V2(0, 0))
+            val origin = G2(tile.placement?.origin ?: V2(0, 0))
+            val delta = G2(tile.placement?.delta ?: V2(0, 0))
 
             var min = origin
             var max = origin+delta+G2(1F, 1F)
@@ -237,19 +237,9 @@ class BoardActivity : AppCompatActivity() {
         board_view.board = b
 
         var p = Pile(6)
-        var t1 = p.draw("john")
-        t1.origin = V2(0, 0)
-        t1.delta = V2(1, 0)
-        var t2 = p.draw("stef")
-        t2.origin= V2(0, 1)
-        t2.delta = V2(0, 1)
-        var t3 = p.draw("john")
-        t3.origin = V2(2, 0)
-        t3.delta = V2(1, 0)
-
-        b.tiles.add(t1)
-        b.tiles.add(t2)
-        b.tiles.add(t3)
+        b.place(p.draw("john"), Placement(V2(0, 0), V2(1, 0)))
+        b.place(p.draw("stef"), Placement(V2(0, 1), V2(0, 1)))
+        b.place(p.draw("john"), Placement(V2(2, 0), V2(1, 0)))
     }
 
 }

@@ -10,6 +10,29 @@ class Board(_width: Int, _height: Int) {
     var tiles = mutableSetOf<Tile>()
     // All tiles that are currently available leaders.
     var leaders = mutableSetOf<Tile>()
+    // All the players who are chickenfooted.
+    var chickenFeet = mutableSetOf<String>()
+
+    var grid = Array<Tile?>(width*height) { i -> null }
+
+    fun tile(loc: V2): Tile? {
+        val i = loc.x + width*loc.y
+        return grid[i]
+    }
+
+    //
+    //fun canPlace(tile: Tile, loc: V2): Array<V2> {
+//
+  //  }
+
+    fun place(tile: Tile, placement: Placement): Boolean {
+        grid[placement.origin.x+placement.origin.y*width] = tile
+        val rloc = placement.origin + placement.delta
+        grid[rloc.x+rloc.y*width] = tile
+        tile.placement = placement
+        tiles.add(tile)
+        return true
+    }
 }
 
 data class V2(val x: Int, val y: Int) {
@@ -21,6 +44,8 @@ data class V2(val x: Int, val y: Int) {
 enum class Rank {
     LINE, LEADER, ROUND_LEADER
 }
+
+data class Placement(val origin: V2, val delta: V2)
 
 class Tile(_left: Int, _right: Int) {
     // The number of pips on the left side.
@@ -34,8 +59,7 @@ class Tile(_left: Int, _right: Int) {
     var player: String? = null
 
     // The position of the left and right sides.
-    var origin: V2? = null
-    var delta: V2? = null
+    var placement: Placement? = null
 
     // The tile this one led from, if any.
     var parent: Tile? = null
@@ -48,7 +72,7 @@ class Pile(maxPips:Int) {
 
     init {
         for (left in 0..maxPips) {
-            for (right in 0..maxPips) {
+            for (right in left..maxPips) {
                 tiles.add(Tile(left, right))
             }
         }
