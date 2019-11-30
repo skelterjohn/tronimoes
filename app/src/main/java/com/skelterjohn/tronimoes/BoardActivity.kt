@@ -10,6 +10,8 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import kotlin.math.min
+import kotlin.math.max
 
 import com.skelterjohn.tronimoes.board.*
 import kotlinx.android.synthetic.main.activity_board.*
@@ -47,6 +49,9 @@ class BoardView @JvmOverloads constructor(context: Context,
         constructor(v: V2) : this(v.x.toFloat(), v.y.toFloat())
         operator fun plus(o: G2): G2 {
             return G2(gx+o.gx, gy+o.gy)
+        }
+        operator fun minus(o: G2): G2 {
+            return G2(gx-o.gx, gy-o.gy)
         }
         fun turn(): G2 {
             return G2(gy, -gx)
@@ -102,40 +107,48 @@ class BoardView @JvmOverloads constructor(context: Context,
         }
 
         fun tile(tile: Tile) {
-            val origin = G2(tile.placement?.origin ?: V2(0, 0))
-            val delta = G2(tile.placement?.delta ?: V2(0, 0))
+            val p = tile.placement ?: return
 
-            var min = origin
-            var max = origin+delta+G2(1F, 1F)
-            if (delta.gx < 0 || delta.gy < 0) {
-                min = origin+delta
-                max = origin+G2(1F, 1F)
-            }
-            rect(GRect(min, max), Paint().apply {
+            Log.i("tile", "placement: ${p}")
+
+            val left = G2(p.left)
+            val right = G2(p.right)
+
+            val tmin = G2(min(left.gx, right.gx), min(left.gy, right.gy))
+            val tmax = G2(max(left.gx, right.gx), max(left.gy, right.gy)) + G2(1F, 1F)
+
+
+            rect(GRect(tmin, tmax), Paint().apply {
                 isAntiAlias = true
                 color = Color.parseColor("#EEEEEE")
                 style = Paint.Style.FILL
             })
-            line(G2(min.gx, min.gy), G2(max.gx, min.gy), Paint().apply {
+            line(tmin, G2(tmax.gx, tmin.gy), Paint().apply {
                 isAntiAlias = true
                 color = Color.GRAY
                 style = Paint.Style.STROKE
                 strokeWidth = 3F
             })
-            line(G2(max.gx, min.gy), G2(max.gx, max.gy), Paint().apply {
+            line(G2(tmax.gx, tmin.gy), tmax, Paint().apply {
                 isAntiAlias = true
                 color = Color.GRAY
                 style = Paint.Style.STROKE
                 strokeWidth = 3F
             })
 
-            pips(origin, delta, tile.left)
-            pips(origin+delta, delta,tile.right)
+            pips(left, right-left, tile.left)
+            pips(right, right-left, tile.right)
 
-            if (delta.gx == 0F) {
-                line(G2(0.2F*min.gx + 0.8F*max.gx,(min.gy+max.gy)/2), G2(0.8F*min.gx + 0.2F*max.gx,(min.gy+max.gy)/2), grayPaint)
+            if (left.gx == right.gx) {
+                val midy = (tmin.gy + tmax.gy) / 2
+                val minx = 0.8F*tmin.gx + 0.2F*tmax.gx
+                val maxx = 0.2F*tmin.gx + 0.8F*tmax.gx
+                line(G2(minx, midy), G2(maxx, midy), grayPaint)
             } else {
-                line(G2((min.gx+max.gx)/2, 0.2F*min.gy + 0.8F*max.gy), G2((min.gx+max.gx)/2, 0.8F*min.gy + 0.2F*max.gy), grayPaint)
+                val midx = (tmin.gx + tmax.gx) / 2
+                val miny = 0.8F*tmin.gy + 0.2F*tmax.gy
+                val maxy = 0.2F*tmin.gy + 0.8F*tmax.gy
+                line(G2(midx, maxy), G2(midx, miny), grayPaint)
             }
         }
 
@@ -237,9 +250,9 @@ class BoardActivity : AppCompatActivity() {
         board_view.board = b
 
         var p = Pile(6)
-        b.place(p.draw("john"), Placement(V2(0, 0), V2(1, 0)))
-        b.place(p.draw("stef"), Placement(V2(0, 1), V2(0, 1)))
-        b.place(p.draw("john"), Placement(V2(2, 0), V2(1, 0)))
+        b.place(null, p.draw("john"), Placement(V2(0, 0), V2(1, 0)))
+        b.place(null, p.draw("stef"), Placement(V2(0, 1), V2(0, 2)))
+        b.place(null, p.draw("john"), Placement(V2(2, 0), V2(3, 0)))
     }
 
 }

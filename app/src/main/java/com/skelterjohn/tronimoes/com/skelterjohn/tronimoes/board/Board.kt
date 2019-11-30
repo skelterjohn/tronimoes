@@ -25,10 +25,9 @@ class Board(_width: Int, _height: Int) {
 //
   //  }
 
-    fun place(tile: Tile, placement: Placement): Boolean {
-        grid[placement.origin.x+placement.origin.y*width] = tile
-        val rloc = placement.origin + placement.delta
-        grid[rloc.x+rloc.y*width] = tile
+    fun place(parent: Tile?, tile: Tile, placement: Placement): Boolean {
+        grid[placement.left.x+placement.left.y*width] = tile
+        grid[placement.right.x+placement.right.y*width] = tile
         tile.placement = placement
         tiles.add(tile)
         return true
@@ -39,13 +38,16 @@ data class V2(val x: Int, val y: Int) {
     operator fun plus(o: V2): V2 {
         return V2(x + o.x, y + o.y)
     }
+    operator fun minus(o: V2): V2 {
+        return V2(x - o.x, y - o.y)
+    }
 }
 
 enum class Rank {
     LINE, LEADER, ROUND_LEADER
 }
 
-data class Placement(val origin: V2, val delta: V2)
+data class Placement(val left: V2, val right: V2)
 
 class Tile(_left: Int, _right: Int) {
     // The number of pips on the left side.
