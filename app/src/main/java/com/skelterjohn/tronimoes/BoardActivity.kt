@@ -25,8 +25,7 @@ class BoardView @JvmOverloads constructor(context: Context,
     /// Position and scale factors for drawing.
     // The board coordinate that appears in the exact middle of the display. The round leader is
     // always at board coordinate 0,0-1,0.
-    var centerX: Float = 0F
-    var centerY: Float = 0F
+    var center: G2 = G2(0F, 0F)
     // How many tile units fit between the center and the edge of the screen, in the smaller
     // dimension.
     var scaleFactor = 5F
@@ -38,7 +37,7 @@ class BoardView @JvmOverloads constructor(context: Context,
             return
         }
         // DRAW STUFF HERE
-        var pd = ProjectionDraw(canvas, G2(centerX, centerY), scaleFactor)
+        var pd = ProjectionDraw(canvas, center, scaleFactor)
         for (t in board?.tiles ?: mutableSetOf<Tile>()) {
             pd.tile(t)
         }
@@ -88,8 +87,7 @@ class BoardView @JvmOverloads constructor(context: Context,
             }
         var canvas: Canvas
         /// Position and scale factors for drawing.
-        // The board coordinate that appears in the exact middle of the display. The round leader is
-        // always at board coordinate 0,0-1,0.
+        // The board coordinate that appears in the exact middle of the display.
         var center: G2
         // How many tile units fit between the center and the edge of the screen, in the smaller
         // dimension.
@@ -109,14 +107,11 @@ class BoardView @JvmOverloads constructor(context: Context,
         fun tile(tile: Tile) {
             val p = tile.placement ?: return
 
-            Log.i("tile", "placement: ${p}")
-
             val left = G2(p.left)
             val right = G2(p.right)
 
             val tmin = G2(min(left.gx, right.gx), min(left.gy, right.gy))
             val tmax = G2(max(left.gx, right.gx), max(left.gy, right.gy)) + G2(1F, 1F)
-
 
             rect(GRect(tmin, tmax), Paint().apply {
                 isAntiAlias = true
@@ -246,13 +241,23 @@ class BoardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_board)
-        var b = Board(50, 50)
-        board_view.board = b
+        var b = Board(10, 11)
 
-        var p = Pile(6)
-        b.place(null, p.draw("john"), Placement(V2(0, 0), V2(1, 0)))
-        b.place(null, p.draw("stef"), Placement(V2(0, 1), V2(0, 2)))
-        b.place(null, p.draw("john"), Placement(V2(2, 0), V2(3, 0)))
+        board_view.board = b
+        board_view.center = BoardView.G2(5F, 5F)
+
+        var t1 = Tile(6, 6)
+        t1.player = "John"
+        t1.rank = Rank.ROUND_LEADER
+        var t1Placed = b.place(t1, Placement(V2(4, 5), V2(5, 5)))
+        var t2 = Tile(6, 1)
+        t2.player = "Stef"
+        t2.rank = Rank.LINE
+        var t2placed = b.place(t2, Placement(V2(6, 5), V2(7, 5)))
+        var t3 = Tile(6, 3)
+        t3.player = "John"
+        t3.rank = Rank.LINE
+        var t3placed = b.place(t3, Placement(V2(4, 6), V2(3, 6)))
     }
 
 }
