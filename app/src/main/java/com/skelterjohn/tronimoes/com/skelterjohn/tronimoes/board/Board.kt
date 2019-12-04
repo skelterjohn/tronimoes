@@ -41,8 +41,9 @@ class Face(_pips: Int) {
     }
 }
 
-class Player(_name: String) {
-    val name = _name
+data class Player(val name: String) {
+    var living = true
+    var victims = mutableSetOf<Player>()
 }
 
 class Board(_width: Int, _height: Int) {
@@ -51,6 +52,7 @@ class Board(_width: Int, _height: Int) {
 
     // All the players who are chickenfooted.
     var chickenFeet = mutableSetOf<Player>()
+    var players = mutableSetOf<Player>()
 
     var grid = Array<Face?>(width*height) { null }
     var tiles = mutableSetOf<Tile>()
@@ -108,7 +110,6 @@ class Board(_width: Int, _height: Int) {
 
     fun placeFace(player: Player, face: Face, loc: V2, rank: Rank): Boolean {
         face.loc = loc
-        face.player = player
         face.rank = rank
 
         if (rank == Rank.LINE) {
@@ -156,10 +157,46 @@ class Board(_width: Int, _height: Int) {
             c.connections.add(tile.right)
         }
 
+        if (rank == Rank.LINE) {
+            var connections = tile.left.connections + tile.right.connections
+            // Only LINE tiles inherit the player.
+            if (connections.size == 1) {
+                var parent = connections.elementAt(0)
+                tile.left.player = parent.player
+                tile.right.player = parent.player
+            } else {
+                // More than one connection is il ouroboros. Everyone involved dies.
+                kill(player, player)
+                for (face in connections) {
+                    kill(player, face.player)
+                }
+            }
+        }
+
         put(tile.left, placement.left)
         put(tile.right, placement.right)
         tiles.add(tile)
+
+        // Identify the freshly killed.
+        for (p in players) {
+            if (!p.living) {
+                continue
+            }
+            if (!canPlay(p)) {
+                kill(player, p)
+            }
+        }
+
         return true
+    }
+
+    fun canPlay(player: Player): Boolean {
+        return true
+    }
+
+    fun kill(victor: Player, victim: Player?) {
+        victor.victims.add(victim ?: return)
+        victim.living = false
     }
 }
 
