@@ -71,6 +71,11 @@ class Board(_width: Int, _height: Int) {
         // No tile? Nothing is open.
         val f = at(loc) ?: return null
 
+        // You can't connect to a start marker (only replace it).
+        if (f.rank == Rank.START_MARKER) {
+            return null
+        }
+
         // If it's the round leader, this player can't already have a connected tile.
         if (f.rank == Rank.ROUND_LEADER) {
             for (connection in f.connections + f.twin!!.connections) {
@@ -89,9 +94,7 @@ class Board(_width: Int, _height: Int) {
         // If not this player's tile, that tile must be a leader or round leaader, or that
         // player must be chickenfooted.
         if (player != f.player) {
-            if (f.player !in chickenFeet) {
-                return null
-            } else if (f.rank != Rank.ROUND_LEADER) {
+            if (f.rank == Rank.LINE && f.player !in chickenFeet) {
                 return null
             }
         }
@@ -112,11 +115,11 @@ class Board(_width: Int, _height: Int) {
             // Find what this tile links to. All valid parents will be used.
             for (adjLoc in loc.adjacent()) {
                 if (face.pips == openPips(player, adjLoc)) {
-                    var parent: Face = at(loc) ?: continue
+                    var parent: Face = at(adjLoc) ?: continue
                     face.connections.add(parent)
                 }
             }
-            return face.connections.isEmpty()
+            return !face.connections.isEmpty()
         }
         // If we didn't find any connections, this needs to be a leader.
         if (rank == Rank.ROUND_LEADER) {
@@ -138,10 +141,10 @@ class Board(_width: Int, _height: Int) {
             return false
         }
 
-        if (!placeFace(player, tile.left, placement.left, rank)) {
-            return false
-        }
-        if (!placeFace(player, tile.right, placement.right, rank)) {
+        // At least one of the faces has to be successfully placed.
+        val placedLeft = placeFace(player, tile.left, placement.left, rank)
+        val placedRight = placeFace(player, tile.right, placement.right, rank)
+        if (!placedLeft && !placedRight) {
             return false
         }
 
@@ -181,4 +184,9 @@ enum class Rank {
     LINE, LEADER, ROUND_LEADER, START_MARKER
 }
 
-data class Placement(val left: V2, val right: V2)
+data class Placement(val left: V2, val right: V2) {
+    init {
+        val delta = left - right
+        assert(delta == V2(0, 1) || delta == V2(0, -1) || delta == V2(-1, 0) || delta == V2(1, 0))
+    }
+}
