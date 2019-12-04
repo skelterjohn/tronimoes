@@ -1,130 +1,160 @@
 package com.skelterjohn.tronimoes.board
 
-import kotlin.random.Random
+import android.util.Log
+
+data class Tile(val left: Face, val right: Face) {
+    init {
+        left.twin = right
+        right.twin = left
+    }
+}
+
+class Face(_pips: Int) {
+    val pips = _pips
+
+    var loc: V2? = null
+
+    var twin: Face? = null
+    var connections: MutableSet<Face> = mutableSetOf<Face>()
+
+    var player: Player? = null
+
+    var rank: Rank? = null
+
+    fun open(): Boolean {
+
+        if (rank == Rank.ROUND_LEADER) {
+            return connections.size < 3
+        }
+        if (rank == Rank.LEADER) {
+            return connections.isEmpty()
+        }
+        if (rank == Rank.LINE) {
+            // Can play off either side of a double.
+            if (pips == twin!!.pips) {
+                return (connections + twin!!.connections).size == 1
+            }
+            // If this side is empty, the other must have a connection.
+            return connections.isEmpty()
+        }
+        return false
+    }
+}
+
+class Player(_name: String) {
+    val name = _name
+}
 
 class Board(_width: Int, _height: Int) {
     val width = _width
     val height = _height
 
-    // All tiles played on this board.
-    var tiles = mutableSetOf<Tile>()
-    // All tiles that are currently available leaders.
-    var leaders = mutableSetOf<Tile>()
     // All the players who are chickenfooted.
-    var chickenFeet = mutableSetOf<String>()
+    var chickenFeet = mutableSetOf<Player>()
 
-    var grid = Array<Tile?>(width*height) { i -> null }
+    var grid = Array<Face?>(width*height) { null }
+    var tiles = mutableSetOf<Tile>()
 
-    fun tile(loc: V2): Tile? {
+    fun at(loc: V2): Face? {
         if (loc.x < 0 || loc.y < 0 || loc.x >= width || loc.y >= width) {
             return null
         }
         val i = loc.x + width*loc.y
         return grid[i]
     }
+    fun put(face: Face, loc: V2) {
+        val i = loc.x + width*loc.y
+        grid[i] = face
+    }
 
-    fun openPips(player: String, loc: V2): Int? {
+    fun openPips(player: Player, loc: V2): Int? {
         // No tile? Nothing is open.
-        val t = tile(loc) ?: return null
-        val tplayer = t.player ?: ""
-        val tplacement = t.placement ?: return null
+        val f = at(loc) ?: return null
 
         // If it's the round leader, this player can't already have a connected tile.
-        if (t.rank == Rank.ROUND_LEADER) {
-            for (connection in t.leftConnections + t.rightConnections) {
-                var cplayer = connection?.player ?: continue
+        if (f.rank == Rank.ROUND_LEADER) {
+            for (connection in f.connections + f.twin!!.connections) {
+                var cplayer = connection.player ?: continue
                 if (cplayer == player) return null
             }
         }
 
         // If it's a leader, no one can have played off this tile.
-        if (t.rank == Rank.LEADER) {
-            if (!t.leftConnections.isEmpty() || !t.rightConnections.isEmpty()) {
+        if (f.rank == Rank.LEADER) {
+            if (!f.connections.isEmpty() || !f.twin!!.connections.isEmpty()) {
                 return null
             }
         }
 
-        // If you're chickenfooted it needs to be your own tile or the round leader.
-        if (player in chickenFeet && t.rank != Rank.ROUND_LEADER && player != t.player) return null
-
-        // If it's another player's tile, that tile must be a leader or round leaader, or that
+        // If not this player's tile, that tile must be a leader or round leaader, or that
         // player must be chickenfooted.
-        if (tplayer != "" && player != tplayer) {
-            if (tplayer !in chickenFeet) {
-                if (t.rank != Rank.ROUND_LEADER && t.rank != Rank.LEADER) {
-                    return null
-                }
+        if (player != f.player) {
+            if (f.player !in chickenFeet) {
+                return null
+            } else if (f.rank != Rank.ROUND_LEADER) {
+                return null
             }
         }
 
-        // Make sure the tile is open at loc.
-        val ol = t.openLeft()
-        val or = t.openRight()
-        if (!ol && !or) return null
-        if (loc == tplacement.left && !ol) return null
-        if (loc == tplacement.right && !or) return null
-
-        if (loc == tplacement.left) return t.left
-        if (loc == tplacement.right) return t.right
+        if (f.open()) {
+            return f.pips
+        }
 
         return null
     }
 
-    // Connect a tile to a parent.
-    fun connect(tile: Tile, tileLoc: V2, parent: Tile, parentLoc: V2) {
-        if (tile.placement!!.left == tileLoc) {
-            tile.leftConnections.add(parent)
-        }
-        if (tile.placement!!.right == tileLoc) {
-            tile.rightConnections.add(parent)
-        }
-        if (parent.placement!!.left == parentLoc) {
-            parent.leftConnections.add(tile)
-        }
-        if (parent.placement!!.right == parentLoc) {
-            parent.rightConnections.add(tile)
-        }
-    }
+    fun placeFace(player: Player, face: Face, loc: V2, rank: Rank): Boolean {
+        face.loc = loc
+        face.player = player
+        face.rank = rank
 
-    fun place(tile: Tile, placement: Placement): Boolean {
-        tile.placement = placement
-        // Ensure these locations are not occupied.
-        if (tile(placement.left) != null && tile(placement.right) != null) {
-            return false
-        }
-        val player = tile.player ?: return false
-        if (tile.rank == Rank.LINE) {
+        if (rank == Rank.LINE) {
             // Find what this tile links to. All valid parents will be used.
-            for (loc in placement.left.adjacent()) {
-                if (tile.left == openPips(player, loc)) {
-                    var parent: Tile = tile(loc) ?: continue
-                    connect(tile, placement.left, parent, loc)
+            for (adjLoc in loc.adjacent()) {
+                if (face.pips == openPips(player, adjLoc)) {
+                    var parent: Face = at(loc) ?: continue
+                    face.connections.add(parent)
                 }
             }
-            for (loc in placement.right.adjacent()) {
-                if (tile.right == openPips(player, loc)) {
-                    var parent: Tile = tile(loc) ?: continue
-                    connect(tile, placement.right, parent, loc)
-                }
-            }
-            if (tile.leftConnections.isEmpty() && tile.rightConnections.isEmpty()) {
-                return false
-            }
+            return face.connections.isEmpty()
         }
         // If we didn't find any connections, this needs to be a leader.
-        if (tile.rank == Rank.ROUND_LEADER) {
-            if (placement != Placement(V2(width/2-1, height/2), V2(width/2, height/2))) {
-                return false
-            }
+        if (rank == Rank.ROUND_LEADER) {
+            // It must be in the center of the board.
+            return (loc == V2(width/2-1, height/2) || loc == V2(width/2, height/2))
         }
-        if (tile.rank == Rank.LEADER) {
+        if (rank == Rank.LEADER) {
 
         }
-        if (tile.rank == Rank.START_MARKER) {
+        if (rank == Rank.START_MARKER) {
 
         }
-        grid[placement.left.x+placement.left.y*width] = tile
-        grid[placement.right.x+placement.right.y*width] = tile
+        return false
+    }
+
+    fun place(player: Player, tile: Tile, placement: Placement, rank: Rank): Boolean {
+        // Ensure these locations are not occupied.
+        if (at(placement.left) != null && at(placement.right) != null) {
+            return false
+        }
+
+        if (!placeFace(player, tile.left, placement.left, rank)) {
+            return false
+        }
+        if (!placeFace(player, tile.right, placement.right, rank)) {
+            return false
+        }
+
+        for (c in tile.left.connections) {
+            c.connections.add(tile.left)
+        }
+
+        for (c in tile.right.connections) {
+            c.connections.add(tile.right)
+        }
+
+        put(tile.left, placement.left)
+        put(tile.right, placement.right)
         tiles.add(tile)
         return true
     }
@@ -152,66 +182,3 @@ enum class Rank {
 }
 
 data class Placement(val left: V2, val right: V2)
-
-class Tile(_left: Int, _right: Int) {
-    // The number of pips on the left side.
-    val left = _left
-    // The number of pips on the right side.
-    val right = _right
-    // The rank for this tile.
-    var rank: Rank? = null
-
-    // For LINE tiles, the player who owns it.
-    var player: String? = null
-
-    // The position of the left and right sides.
-    var placement: Placement? = null
-
-    // Which sides of this tile are open for children.
-    fun open(connections: Set<Tile>, otherSideConnections: Set<Tile>): Boolean {
-        if (rank == Rank.ROUND_LEADER) {
-            return connections.size < 3
-        }
-        if (rank == Rank.LEADER) {
-            return connections.isEmpty()
-        }
-        if (rank == Rank.LINE) {
-            // Can play off either side of a double.
-            if (left == right) {
-                return connections.isEmpty() || otherSideConnections.isEmpty()
-            }
-            // If this side is empty, the other must have a connection.
-            return connections.isEmpty()
-        }
-        return false
-    }
-    fun openLeft(): Boolean {
-        return open(leftConnections, rightConnections)
-    }
-    fun openRight(): Boolean {
-        return open(rightConnections, leftConnections)
-    }
-
-    // The tiles connected to the left.
-    var leftConnections = mutableSetOf<Tile>()
-    // The tiles connected to the right.
-    var rightConnections = mutableSetOf<Tile>()
-}
-
-class Pile(maxPips:Int) {
-    var tiles: MutableList<Tile> = mutableListOf<Tile>()
-
-    init {
-        for (left in 0..maxPips) {
-            for (right in left..maxPips) {
-                tiles.add(Tile(left, right))
-            }
-        }
-    }
-
-    fun draw(player: String): Tile {
-        var t = tiles.removeAt(Random.nextInt(0, tiles.size))
-        t.player = player
-        return t
-    }
-}

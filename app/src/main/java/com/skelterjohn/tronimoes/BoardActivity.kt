@@ -105,10 +105,8 @@ class BoardView @JvmOverloads constructor(context: Context,
         }
 
         fun tile(tile: Tile) {
-            val p = tile.placement ?: return
-
-            val left = G2(p.left)
-            val right = G2(p.right)
+            val left = G2(tile.left.loc ?: return)
+            val right = G2(tile.right.loc ?: return)
 
             val tmin = G2(min(left.gx, right.gx), min(left.gy, right.gy))
             val tmax = G2(max(left.gx, right.gx), max(left.gy, right.gy)) + G2(1F, 1F)
@@ -131,8 +129,8 @@ class BoardView @JvmOverloads constructor(context: Context,
                 strokeWidth = 3F
             })
 
-            pips(left, right-left, tile.left)
-            pips(right, right-left, tile.right)
+            pips(left, right-left, tile.left.pips)
+            pips(right, left-right, tile.right.pips)
 
             if (left.gx == right.gx) {
                 val midy = (tmin.gy + tmax.gy) / 2
@@ -246,18 +244,16 @@ class BoardActivity : AppCompatActivity() {
         board_view.board = b
         board_view.center = BoardView.G2(5F, 5F)
 
-        var t1 = Tile(6, 6)
-        t1.player = "John"
-        t1.rank = Rank.ROUND_LEADER
-        var t1Placed = b.place(t1, Placement(V2(4, 5), V2(5, 5)))
-        var t2 = Tile(6, 1)
-        t2.player = "Stef"
-        t2.rank = Rank.LINE
-        var t2placed = b.place(t2, Placement(V2(6, 5), V2(7, 5)))
-        var t3 = Tile(6, 3)
-        t3.player = "John"
-        t3.rank = Rank.LINE
-        var t3placed = b.place(t3, Placement(V2(4, 6), V2(3, 6)))
+        var john = Player("john")
+        var stef = Player("stef")
+
+        var t1 = Tile(Face(6), Face(6))
+        var t1placed = b.place(john, t1, Placement(V2(4, 5), V2(5, 5)), Rank.ROUND_LEADER)
+        var t2 = Tile(Face(6), Face(1))
+        var t2placed = b.place(stef, t2, Placement(V2(6, 5), V2(7, 5)), Rank.LINE)
+        var t3 = Tile(Face(6), Face(3))
+        var t3placed = b.place(john, t3, Placement(V2(4, 6), V2(3, 6)), Rank.LINE)
+        Log.i("onCreate", "${t1placed} ${t2placed} ${t3placed}")
     }
 
 }
