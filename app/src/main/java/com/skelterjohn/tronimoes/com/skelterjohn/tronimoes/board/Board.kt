@@ -1,7 +1,5 @@
 package com.skelterjohn.tronimoes.board
 
-import android.util.Log
-
 data class Tile(val left: Face, val right: Face) {
     init {
         left.twin = right
@@ -162,8 +160,13 @@ class Board(_width: Int, _height: Int) {
             // Only LINE tiles inherit the player.
             if (connections.size == 1) {
                 var parent = connections.elementAt(0)
-                tile.left.player = parent.player
-                tile.right.player = parent.player
+                if (parent.rank == Rank.LINE) {
+                    tile.left.player = parent.player
+                    tile.right.player = parent.player
+                } else {
+                    tile.left.player = player
+                    tile.right.player = player
+                }
             } else {
                 // More than one connection is il ouroboros. Everyone involved dies.
                 kill(player, player)

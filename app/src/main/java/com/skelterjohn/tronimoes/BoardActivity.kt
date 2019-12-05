@@ -20,7 +20,8 @@ class BoardView @JvmOverloads constructor(context: Context,
                                            attrs: AttributeSet? = null, defStyleAttr: Int = 0)
     : View(context, attrs, defStyleAttr) {
 
-    public var board: Board? = null
+    var board: Board? = null
+    var shades = mutableMapOf<Player, Int>()
 
     /// Position and scale factors for drawing.
     // The board coordinate that appears in the exact middle of the display. The round leader is
@@ -37,7 +38,15 @@ class BoardView @JvmOverloads constructor(context: Context,
             return
         }
         // DRAW STUFF HERE
-        var pd = ProjectionDraw(canvas, center, scaleFactor)
+
+        canvas.drawRect(RectF(0F, 0F, this.width.toFloat(), this.height.toFloat()),
+            Paint().apply {
+                isAntiAlias = true
+                color = Color.parseColor("#CCFFCC")
+                style = Paint.Style.FILL
+            })
+
+        var pd = ProjectionDraw(canvas, this)
         for (t in board?.tiles ?: mutableSetOf<Tile>()) {
             pd.tile(t)
         }
@@ -59,7 +68,7 @@ class BoardView @JvmOverloads constructor(context: Context,
 
     data class GRect(val tl: G2, val br: G2)
 
-    class ProjectionDraw(canvas: Canvas, center: G2, scaleFactor: Float) {
+    class ProjectionDraw(canvas: Canvas, boardView: BoardView) { //center: G2, scaleFactor: Float) {
 
         private val redPaint =
             Paint().apply {
@@ -85,19 +94,18 @@ class BoardView @JvmOverloads constructor(context: Context,
                 color = Color.parseColor("#0000FF")
                 style = Paint.Style.STROKE
             }
-        var canvas: Canvas
+        var canvas: Canvas = canvas
         /// Position and scale factors for drawing.
         // The board coordinate that appears in the exact middle of the display.
-        var center: G2
+        var center: G2 = boardView.center
         // How many tile units fit between the center and the edge of the screen, in the smaller
         // dimension.
-        var scaleFactor: Float
+        var scaleFactor: Float = boardView.scaleFactor
         var span: Int
 
+        var playerShades: Map<Player,Int> = boardView.shades
+
         init {
-            this.canvas = canvas
-            this.center = center
-            this.scaleFactor = scaleFactor
             span = canvas.width
             if (canvas.height < span) {
                 span = canvas.height
@@ -111,9 +119,10 @@ class BoardView @JvmOverloads constructor(context: Context,
             val tmin = G2(min(left.gx, right.gx), min(left.gy, right.gy))
             val tmax = G2(max(left.gx, right.gx), max(left.gy, right.gy)) + G2(1F, 1F)
 
+            var tileShade: Int = playerShades[tile.left.player] ?: Color.parseColor("#EEEEEE")
             rect(GRect(tmin, tmax), Paint().apply {
                 isAntiAlias = true
-                color = Color.parseColor("#EEEEEE")
+                color = tileShade
                 style = Paint.Style.FILL
             })
             line(tmin, G2(tmax.gx, tmin.gy), Paint().apply {
@@ -246,6 +255,8 @@ class BoardActivity : AppCompatActivity() {
 
         var john = Player("john")
         var stef = Player("stef")
+        board_view.shades[john] = Color.parseColor("#FFAAAA")
+        board_view.shades[stef] = Color.parseColor("#AAFFAA")
 
         var t1 = Tile(Face(6), Face(6))
         var t1placed = b.place(john, t1, Placement(V2(4, 5), V2(5, 5)), Rank.ROUND_LEADER)
