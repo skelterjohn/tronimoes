@@ -1,5 +1,7 @@
 package com.skelterjohn.tronimoes.board
 
+import kotlin.random.Random
+
 data class Tile(val left: Face, val right: Face) {
     init {
         left.twin = right
@@ -42,6 +44,7 @@ class Face(_pips: Int) {
 data class Player(val name: String) {
     var living = true
     var victims = mutableSetOf<Player>()
+    var hand = mutableSetOf<Tile>()
 }
 
 class Board(_width: Int, _height: Int) {
@@ -54,6 +57,8 @@ class Board(_width: Int, _height: Int) {
 
     var grid = Array<Face?>(width*height) { null }
     var tiles = mutableSetOf<Tile>()
+
+    var pile = Pile(6)
 
     fun at(loc: V2): Face? {
         if (loc.x < 0 || loc.y < 0 || loc.x >= width || loc.y >= width) {
@@ -228,5 +233,22 @@ data class Placement(val left: V2, val right: V2) {
     init {
         val delta = left - right
         assert(delta == V2(0, 1) || delta == V2(0, -1) || delta == V2(-1, 0) || delta == V2(1, 0))
+    }
+}
+
+class Pile(maxPips:Int) {
+    var tiles: MutableList<Tile> = mutableListOf<Tile>()
+
+    init {
+        for (left in 0..maxPips) {
+            for (right in left..maxPips) {
+                tiles.add(Tile(Face(left), Face(right)))
+            }
+        }
+    }
+
+    fun draw(): Tile {
+        var t = tiles.removeAt(Random.nextInt(0, tiles.size))
+        return t
     }
 }
