@@ -5,26 +5,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BoardActivity">
-
-    <com.skelterjohn.tronimoes.BoardView
-        android:id="@+id/board_view"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context=".BoardActivity"
+        tools:showIn="@layout/activity_board">
 
-    <com.skelterjohn.tronimoes.HandView
-        android:id="@+id/hand_view"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_gravity="bottom"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <com.skelterjohn.tronimoes.BoardView
+            android:id="@+id/board_view"
+            android:layout_width="match_parent"
+            app:layout_constraintBottom_toTopOf="@+id/hand_view"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    <include layout="@layout/content_board" />
+        <com.skelterjohn.tronimoes.HandView
+            android:id="@+id/hand_view"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_gravity="bottom"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBOttomOf="@+id/board_view" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
