@@ -21,12 +21,21 @@ class HandView @JvmOverloads constructor(context: Context,
     : View(context, attrs, defStyleAttr) {
 
     var board: Board? = null
+    var shades = mutableMapOf<Player, Int>()
 
     // Called when the view should render its content.
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         if (canvas == null) {
             return
+        }
+
+        val board = board ?: return
+        val tilesToDraw = board.players[board.turn].hand
+
+        var pd = ProjectionDraw(canvas, G2(0F, 0F), 1F, shades)
+        for (t in tilesToDraw) {
+            pd.drawTile(t)
         }
     }
 }
@@ -37,8 +46,6 @@ class BoardView @JvmOverloads constructor(context: Context,
 
     var board: Board? = null
     var shades = mutableMapOf<Player, Int>()
-    var turn: Int = 0
-    var players = arrayOf<Player>()
 
     /// Position and scale factors for drawing.
     // The board coordinate that appears in the exact middle of the display. The round leader is
@@ -63,7 +70,7 @@ class BoardView @JvmOverloads constructor(context: Context,
                 style = Paint.Style.FILL
             })
 
-        var pd = ProjectionDraw(canvas, this)
+        var pd = ProjectionDraw(canvas, center, scaleFactor, shades)
         for (t in board?.tiles ?: mutableSetOf<Tile>()) {
             pd.drawTile(t)
         }
@@ -86,17 +93,17 @@ data class G2(val gx: Float, val gy: Float) {
 
 data class GRect(val tl: G2, val br: G2)
 
-class ProjectionDraw(canvas: Canvas, boardView: BoardView) {
+class ProjectionDraw(canvas: Canvas, center: G2, scaleFactor: Float, shades: Map<Player,Int>) {
     var canvas: Canvas = canvas
     /// Position and scale factors for drawing.
     // The board coordinate that appears in the exact middle of the display.
-    var center: G2 = boardView.center
+    var center: G2 = center
     // How many tile units fit between the center and the edge of the screen, in the smaller
     // dimension.
-    var scaleFactor: Float = boardView.scaleFactor
+    var scaleFactor: Float = scaleFactor
     var span: Int
 
-    var playerShades: Map<Player,Int> = boardView.shades
+    var playerShades: Map<Player,Int> = shades
 
     init {
         span = canvas.width
