@@ -1,0 +1,15 @@
+package skelterjohn.tronimoes
+
+syntax = "proto3";
+
+service Game {
+	rpc Hello (HelloRequest) returns (HelloResponse);
+}
+
+message HelloRequest {
+	string message = 0;
+}
+
+message HelloResponse {
+	string message = 0;
+}
