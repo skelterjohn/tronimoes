@@ -9,6 +9,8 @@ import (
 type Game struct {
 }
 
-func (g *Game) Hello(context.Context, *tpb.HelloRequest) (*tpb.HelloResponse, error) {
-	return nil, nil
+func (g *Game) Hello(ctx context.Context, req *tpb.HelloRequest) (*tpb.HelloResponse, error) {
+	return &tpb.HelloResponse{
+		Message: "Echo: " + req.Message,
+	}, nil
 }
