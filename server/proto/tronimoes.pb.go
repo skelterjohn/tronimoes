@@ -4,8 +4,12 @@
 package proto
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -117,4 +121,84 @@ var fileDescriptor_786f716abeafd7fa = []byte{
 	0x5d, 0x0f, 0xd9, 0x6a, 0x29, 0x15, 0xfc, 0x8a, 0x20, 0xb6, 0x3a, 0xb1, 0x47, 0xb1, 0x82, 0x3d,
 	0x94, 0xc4, 0x06, 0xa6, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x73, 0x8a, 0x3f, 0x13, 0xea,
 	0x00, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConnInterface
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion6
+
+// GameClient is the client API for Game service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type GameClient interface {
+	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+}
+
+type gameClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewGameClient(cc grpc.ClientConnInterface) GameClient {
+	return &gameClient{cc}
+}
+
+func (c *gameClient) Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
+	out := new(HelloResponse)
+	err := c.cc.Invoke(ctx, "/skelterjohn.tronimoes.Game/Hello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// GameServer is the server API for Game service.
+type GameServer interface {
+	Hello(context.Context, *HelloRequest) (*HelloResponse, error)
+}
+
+// UnimplementedGameServer can be embedded to have forward compatible implementations.
+type UnimplementedGameServer struct {
+}
+
+func (*UnimplementedGameServer) Hello(ctx context.Context, req *HelloRequest) (*HelloResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+}
+
+func RegisterGameServer(s *grpc.Server, srv GameServer) {
+	s.RegisterService(&_Game_serviceDesc, srv)
+}
+
+func _Game_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HelloRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).Hello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/skelterjohn.tronimoes.Game/Hello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).Hello(ctx, req.(*HelloRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Game_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "skelterjohn.tronimoes.Game",
+	HandlerType: (*GameServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Hello",
+			Handler:    _Game_Hello_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "tronimoes.proto",
 }

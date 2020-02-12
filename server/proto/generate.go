@@ -1,3 +1,3 @@
 package proto
 
-//go:generate protoc -I=. --go_out=. tronimoes.proto
+//go:generate protoc -I=. --go_out=plugins=grpc:. tronimoes.proto
