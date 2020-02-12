@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package skelterjohn.tronimoes;
+option go_package = "tronimoespb";
 
 service Game {
 	rpc Hello (HelloRequest) returns (HelloResponse);
