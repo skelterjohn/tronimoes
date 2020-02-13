@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
-	"os"
 	"time"
 
 	"google.golang.org/grpc"
@@ -17,7 +17,8 @@ const (
 )
 
 func main() {
-	address := os.Getenv("ADDR")
+	flag.Parse()
+	address := flag.Arg(0)
 
 	creds, err := credentials.NewClientTLSFromFile("/etc/ssl/certs/ca-certificates.crt", "")
 	if err != nil {
@@ -36,7 +37,7 @@ func main() {
 	defer cancel()
 	r, err := c.Hello(ctx, &tpb.HelloRequest{Message: "test"})
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("could not say hello: %v", err)
 	}
-	log.Printf("Greeting: %s", r.GetMessage())
+	log.Printf("Response: %s", r.GetMessage())
 }
