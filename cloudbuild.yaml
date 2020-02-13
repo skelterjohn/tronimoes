@@ -4,7 +4,7 @@ steps:
   env: ['PROJECT_ROOT=github.com/skelterjohn/tronimoes']
   dir: 'server'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/tronimoes', '.']
+  args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/server', '.']
   dir: 'server'
 images:
-- 'gcr.io/$PROJECT_ID/tronimoes'
+- 'gcr.io/$PROJECT_ID/server'
