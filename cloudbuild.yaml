@@ -1,8 +1,10 @@
 steps:
 - name: 'gcr.io/cloud-builders/go'
   args: ['install', './tronimoes_server']
-  env: ['PROJECT_ROOT=github.com/skelterjohn/tronimoes/server']
+  env: ['PROJECT_ROOT=github.com/skelterjohn/tronimoes']
+  dir: 'server'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/tronimoes', '.']
+  dir: 'server'
 images:
 - 'gcr.io/$PROJECT_ID/tronimoes'
