@@ -16,6 +16,10 @@ const (
 	defaultName = "world"
 )
 
+var (
+	tls = flag.Bool("tls", true, "Use TLS")
+)
+
 func main() {
 	flag.Parse()
 	address := flag.Arg(0)
@@ -25,8 +29,15 @@ func main() {
 		log.Fatalf("failed to load credentials: %v", err)
 	}
 
+	_ = creds
+
+	opt := grpc.WithTransportCredentials(creds)
+	if !*tls {
+		opt = grpc.WithInsecure()
+	}
+
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds))
+	conn, err := grpc.Dial(address, opt)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
