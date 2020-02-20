@@ -22,3 +22,5 @@ steps:
   - 'autopush'
 images:
 - 'gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
+options:
+  requestedVerifyOption: VERIFIED
