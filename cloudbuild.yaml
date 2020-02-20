@@ -16,6 +16,6 @@ steps:
   - '--image=gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
   - '--platform=managed'
   - '--region=us-east4'
-  - '$SHORT_SHA'
+  - 'v$SHORT_SHA'
 images:
 - 'gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
