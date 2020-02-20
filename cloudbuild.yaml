@@ -4,7 +4,7 @@ steps:
   env: ['PROJECT_ROOT=github.com/skelterjohn/tronimoes']
   dir: 'server'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/server:$SHORT_SHA', '.']
+  args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/server:v$SHORT_SHA', '.']
   dir: 'server'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/server:v$SHORT_SHA']
