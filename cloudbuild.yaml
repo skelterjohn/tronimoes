@@ -7,7 +7,7 @@ steps:
   args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/server:$SHORT_SHA', '.']
   dir: 'server'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/server:$SHORT_SHA']
+  args: ['push', 'gcr.io/$PROJECT_ID/server:v$SHORT_SHA']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: 
   - '-q'
