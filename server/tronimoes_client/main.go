@@ -50,5 +50,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("could not say hello: %v", err)
 	}
-	log.Printf("Response: %q", r.GetMessage())
+	log.Printf("Response: %q from %s", r.GetMessage(), r.GetRevision())
 }
