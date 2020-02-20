@@ -4,7 +4,18 @@ steps:
   env: ['PROJECT_ROOT=github.com/skelterjohn/tronimoes']
   dir: 'server'
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/server', '.']
+  args: ['build', '--file=Dockerfile.server', '--tag=gcr.io/$PROJECT_ID/server:$SHORT_SHA', '.']
   dir: 'server'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/server:$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: 
+  - '-q'
+  - 'run'
+  - 'deploy'
+  - '--image=gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
+  - '--platform=managed'
+  - '--region=us-east4'
+  - '$SHORT_SHA'
 images:
-- 'gcr.io/$PROJECT_ID/server'
+- 'gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
