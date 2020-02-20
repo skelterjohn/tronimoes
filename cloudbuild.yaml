@@ -16,6 +16,9 @@ steps:
   - '--image=gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
   - '--platform=managed'
   - '--region=us-east4'
-  - 'v$SHORT_SHA'
+  - '--set-env-vars=SHORT_SHA=$SHORT_SHA'
+  - '--allow-unauthenticated'
+  - '--revision-suffix=v$SHORT_SHA'
+  - 'autopush'
 images:
 - 'gcr.io/$PROJECT_ID/server:v$SHORT_SHA'
