@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
 	"github.com/skelterjohn/tronimoes/server"
@@ -40,6 +41,8 @@ func main() {
 	}
 
 	tpb.RegisterTronimoesServer(s, tronimoes)
+	reflection.Register(s)
+
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
