@@ -26,6 +26,9 @@ message CreateGameRequest {
 	int min_players = 4;
 
 	int max_players = 5;
+
+	// The name of the player attempting to create a game.
+	string player_self = 6;
 }
 
 message JoinResponse {

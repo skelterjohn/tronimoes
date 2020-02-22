@@ -48,7 +48,7 @@ func main() {
 	defer cancel()
 	r, err := c.CreateGame(ctx, &tpb.CreateGameRequest{})
 	if err != nil {
-		log.Fatalf("could not say hello: %v", err)
+		log.Fatalf("could not create game: %v", err)
 	}
 	log.Printf("Response: %q", r.GetOperationId())
 }

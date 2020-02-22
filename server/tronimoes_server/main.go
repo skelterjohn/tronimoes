@@ -35,7 +35,8 @@ func main() {
 	)
 
 	tronimoes := &server.Tronimoes{
-		Ops: &server.InMemoryOperations{},
+		Ops:   &server.InMemoryOperations{},
+		Queue: &server.InMemoryQueue{},
 	}
 
 	tpb.RegisterTronimoesServer(s, tronimoes)

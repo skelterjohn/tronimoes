@@ -22,7 +22,7 @@ func (o *InMemoryOperations) WriteOperation(ctx context.Context, op *tpb.Operati
 	if o.ops == nil {
 		o.ops = map[string]*tpb.Operation{}
 	}
-	o.ops[op.OperationId] = op
+	o.ops[op.GetOperationId()] = op
 	return nil
 }
 
