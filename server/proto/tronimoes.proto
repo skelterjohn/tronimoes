@@ -14,14 +14,14 @@ service Tronimoes {
 }
 
 message CreateGameRequest {
-	// If pickup is true, allow connections with random players.
-	bool pickup = 1;
+	// If discoverable is true, players can join you without knowing you.
+	bool discoverable = 1;
 
-	// Only look for games that involve players with these emails.
-	repeated string emails = 2;
+	// Only look for games that involve one of these players.
+	repeated string players = 2;
 
-	// If allow_any is true, any player that lists your email can join.
-	bool allow_any = 3;
+	// If private is true, don't join a game with a player not requested.
+	bool private = 3;
 }
 
 message JoinResponse {
@@ -46,4 +46,6 @@ message GetGameRequest {
 
 message Game {
 	string game_id = 1;
+
+	repeated string players = 2;
 }
