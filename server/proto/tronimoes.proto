@@ -22,6 +22,10 @@ message CreateGameRequest {
 
 	// If private is true, don't join a game with a player not requested.
 	bool private = 3;
+
+	int min_players = 4;
+
+	int max_players = 5;
 }
 
 message JoinResponse {

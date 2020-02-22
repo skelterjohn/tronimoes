@@ -34,7 +34,11 @@ func main() {
 		grpc.UnaryInterceptor(RPCSummary),
 	)
 
-	tpb.RegisterTronimoesServer(s, &server.Tronimoes{})
+	tronimoes := &server.Tronimoes{
+		Ops: &server.InMemoryOperations{},
+	}
+
+	tpb.RegisterTronimoesServer(s, tronimoes)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
