@@ -7,6 +7,7 @@ import (
 	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	any "github.com/golang/protobuf/ptypes/any"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,112 +25,311 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type HelloRequest struct {
-	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+type CreateGameRequest struct {
+	// If pickup is true, allow connections with random players.
+	Pickup bool `protobuf:"varint,1,opt,name=pickup,proto3" json:"pickup,omitempty"`
+	// Only look for games that involve players with these emails.
+	Emails []string `protobuf:"bytes,2,rep,name=emails,proto3" json:"emails,omitempty"`
+	// If allow_any is true, any player that lists your email can join.
+	AllowAny             bool     `protobuf:"varint,3,opt,name=allow_any,json=allowAny,proto3" json:"allow_any,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *HelloRequest) Reset()         { *m = HelloRequest{} }
-func (m *HelloRequest) String() string { return proto.CompactTextString(m) }
-func (*HelloRequest) ProtoMessage()    {}
-func (*HelloRequest) Descriptor() ([]byte, []int) {
+func (m *CreateGameRequest) Reset()         { *m = CreateGameRequest{} }
+func (m *CreateGameRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateGameRequest) ProtoMessage()    {}
+func (*CreateGameRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_786f716abeafd7fa, []int{0}
 }
 
-func (m *HelloRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_HelloRequest.Unmarshal(m, b)
+func (m *CreateGameRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateGameRequest.Unmarshal(m, b)
 }
-func (m *HelloRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_HelloRequest.Marshal(b, m, deterministic)
+func (m *CreateGameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateGameRequest.Marshal(b, m, deterministic)
 }
-func (m *HelloRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HelloRequest.Merge(m, src)
+func (m *CreateGameRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateGameRequest.Merge(m, src)
 }
-func (m *HelloRequest) XXX_Size() int {
-	return xxx_messageInfo_HelloRequest.Size(m)
+func (m *CreateGameRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateGameRequest.Size(m)
 }
-func (m *HelloRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_HelloRequest.DiscardUnknown(m)
+func (m *CreateGameRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateGameRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_HelloRequest proto.InternalMessageInfo
+var xxx_messageInfo_CreateGameRequest proto.InternalMessageInfo
 
-func (m *HelloRequest) GetMessage() string {
+func (m *CreateGameRequest) GetPickup() bool {
 	if m != nil {
-		return m.Message
+		return m.Pickup
 	}
-	return ""
+	return false
 }
 
-type HelloResponse struct {
-	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Revision             string   `protobuf:"bytes,2,opt,name=revision,proto3" json:"revision,omitempty"`
+func (m *CreateGameRequest) GetEmails() []string {
+	if m != nil {
+		return m.Emails
+	}
+	return nil
+}
+
+func (m *CreateGameRequest) GetAllowAny() bool {
+	if m != nil {
+		return m.AllowAny
+	}
+	return false
+}
+
+type JoinResponse struct {
+	Operation            *Operation `protobuf:"bytes,1,opt,name=operation,proto3" json:"operation,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *JoinResponse) Reset()         { *m = JoinResponse{} }
+func (m *JoinResponse) String() string { return proto.CompactTextString(m) }
+func (*JoinResponse) ProtoMessage()    {}
+func (*JoinResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_786f716abeafd7fa, []int{1}
+}
+
+func (m *JoinResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_JoinResponse.Unmarshal(m, b)
+}
+func (m *JoinResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_JoinResponse.Marshal(b, m, deterministic)
+}
+func (m *JoinResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_JoinResponse.Merge(m, src)
+}
+func (m *JoinResponse) XXX_Size() int {
+	return xxx_messageInfo_JoinResponse.Size(m)
+}
+func (m *JoinResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_JoinResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_JoinResponse proto.InternalMessageInfo
+
+func (m *JoinResponse) GetOperation() *Operation {
+	if m != nil {
+		return m.Operation
+	}
+	return nil
+}
+
+type GetOperationRequest struct {
+	OperationId          string   `protobuf:"bytes,1,opt,name=operation_id,json=operationId,proto3" json:"operation_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *HelloResponse) Reset()         { *m = HelloResponse{} }
-func (m *HelloResponse) String() string { return proto.CompactTextString(m) }
-func (*HelloResponse) ProtoMessage()    {}
-func (*HelloResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_786f716abeafd7fa, []int{1}
+func (m *GetOperationRequest) Reset()         { *m = GetOperationRequest{} }
+func (m *GetOperationRequest) String() string { return proto.CompactTextString(m) }
+func (*GetOperationRequest) ProtoMessage()    {}
+func (*GetOperationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_786f716abeafd7fa, []int{2}
 }
 
-func (m *HelloResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_HelloResponse.Unmarshal(m, b)
+func (m *GetOperationRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetOperationRequest.Unmarshal(m, b)
 }
-func (m *HelloResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_HelloResponse.Marshal(b, m, deterministic)
+func (m *GetOperationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetOperationRequest.Marshal(b, m, deterministic)
 }
-func (m *HelloResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HelloResponse.Merge(m, src)
+func (m *GetOperationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetOperationRequest.Merge(m, src)
 }
-func (m *HelloResponse) XXX_Size() int {
-	return xxx_messageInfo_HelloResponse.Size(m)
+func (m *GetOperationRequest) XXX_Size() int {
+	return xxx_messageInfo_GetOperationRequest.Size(m)
 }
-func (m *HelloResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_HelloResponse.DiscardUnknown(m)
+func (m *GetOperationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetOperationRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_HelloResponse proto.InternalMessageInfo
+var xxx_messageInfo_GetOperationRequest proto.InternalMessageInfo
 
-func (m *HelloResponse) GetMessage() string {
+func (m *GetOperationRequest) GetOperationId() string {
 	if m != nil {
-		return m.Message
+		return m.OperationId
 	}
 	return ""
 }
 
-func (m *HelloResponse) GetRevision() string {
+type Operation struct {
+	OperationId          string   `protobuf:"bytes,1,opt,name=operation_id,json=operationId,proto3" json:"operation_id,omitempty"`
+	Done                 bool     `protobuf:"varint,2,opt,name=done,proto3" json:"done,omitempty"`
+	Payload              *any.Any `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Operation) Reset()         { *m = Operation{} }
+func (m *Operation) String() string { return proto.CompactTextString(m) }
+func (*Operation) ProtoMessage()    {}
+func (*Operation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_786f716abeafd7fa, []int{3}
+}
+
+func (m *Operation) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Operation.Unmarshal(m, b)
+}
+func (m *Operation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Operation.Marshal(b, m, deterministic)
+}
+func (m *Operation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Operation.Merge(m, src)
+}
+func (m *Operation) XXX_Size() int {
+	return xxx_messageInfo_Operation.Size(m)
+}
+func (m *Operation) XXX_DiscardUnknown() {
+	xxx_messageInfo_Operation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Operation proto.InternalMessageInfo
+
+func (m *Operation) GetOperationId() string {
 	if m != nil {
-		return m.Revision
+		return m.OperationId
+	}
+	return ""
+}
+
+func (m *Operation) GetDone() bool {
+	if m != nil {
+		return m.Done
+	}
+	return false
+}
+
+func (m *Operation) GetPayload() *any.Any {
+	if m != nil {
+		return m.Payload
+	}
+	return nil
+}
+
+type GetGameRequest struct {
+	GameId               string   `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetGameRequest) Reset()         { *m = GetGameRequest{} }
+func (m *GetGameRequest) String() string { return proto.CompactTextString(m) }
+func (*GetGameRequest) ProtoMessage()    {}
+func (*GetGameRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_786f716abeafd7fa, []int{4}
+}
+
+func (m *GetGameRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetGameRequest.Unmarshal(m, b)
+}
+func (m *GetGameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetGameRequest.Marshal(b, m, deterministic)
+}
+func (m *GetGameRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetGameRequest.Merge(m, src)
+}
+func (m *GetGameRequest) XXX_Size() int {
+	return xxx_messageInfo_GetGameRequest.Size(m)
+}
+func (m *GetGameRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetGameRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetGameRequest proto.InternalMessageInfo
+
+func (m *GetGameRequest) GetGameId() string {
+	if m != nil {
+		return m.GameId
+	}
+	return ""
+}
+
+type Game struct {
+	GameId               string   `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Game) Reset()         { *m = Game{} }
+func (m *Game) String() string { return proto.CompactTextString(m) }
+func (*Game) ProtoMessage()    {}
+func (*Game) Descriptor() ([]byte, []int) {
+	return fileDescriptor_786f716abeafd7fa, []int{5}
+}
+
+func (m *Game) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Game.Unmarshal(m, b)
+}
+func (m *Game) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Game.Marshal(b, m, deterministic)
+}
+func (m *Game) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Game.Merge(m, src)
+}
+func (m *Game) XXX_Size() int {
+	return xxx_messageInfo_Game.Size(m)
+}
+func (m *Game) XXX_DiscardUnknown() {
+	xxx_messageInfo_Game.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Game proto.InternalMessageInfo
+
+func (m *Game) GetGameId() string {
+	if m != nil {
+		return m.GameId
 	}
 	return ""
 }
 
 func init() {
-	proto.RegisterType((*HelloRequest)(nil), "skelterjohn.tronimoes.HelloRequest")
-	proto.RegisterType((*HelloResponse)(nil), "skelterjohn.tronimoes.HelloResponse")
+	proto.RegisterType((*CreateGameRequest)(nil), "skelterjohn.tronimoes.CreateGameRequest")
+	proto.RegisterType((*JoinResponse)(nil), "skelterjohn.tronimoes.JoinResponse")
+	proto.RegisterType((*GetOperationRequest)(nil), "skelterjohn.tronimoes.GetOperationRequest")
+	proto.RegisterType((*Operation)(nil), "skelterjohn.tronimoes.Operation")
+	proto.RegisterType((*GetGameRequest)(nil), "skelterjohn.tronimoes.GetGameRequest")
+	proto.RegisterType((*Game)(nil), "skelterjohn.tronimoes.Game")
 }
 
 func init() { proto.RegisterFile("tronimoes.proto", fileDescriptor_786f716abeafd7fa) }
 
 var fileDescriptor_786f716abeafd7fa = []byte{
-	// 165 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2f, 0x29, 0xca, 0xcf,
-	0xcb, 0xcc, 0xcd, 0x4f, 0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x2d, 0xce, 0x4e,
-	0xcd, 0x29, 0x49, 0x2d, 0xca, 0xca, 0xcf, 0xc8, 0xd3, 0x83, 0x4b, 0x2a, 0x69, 0x70, 0xf1, 0x78,
-	0xa4, 0xe6, 0xe4, 0xe4, 0x07, 0xa5, 0x16, 0x96, 0xa6, 0x16, 0x97, 0x08, 0x49, 0x70, 0xb1, 0xe7,
-	0xa6, 0x16, 0x17, 0x27, 0xa6, 0xa7, 0x4a, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0xc1, 0xb8, 0x4a,
-	0xae, 0x5c, 0xbc, 0x50, 0x95, 0xc5, 0x05, 0xf9, 0x79, 0xc5, 0xa9, 0xb8, 0x95, 0x0a, 0x49, 0x71,
-	0x71, 0x14, 0xa5, 0x96, 0x65, 0x16, 0x67, 0xe6, 0xe7, 0x49, 0x30, 0x81, 0xa5, 0xe0, 0x7c, 0xa3,
-	0x28, 0x2e, 0x16, 0xf7, 0xc4, 0xdc, 0x54, 0xa1, 0x20, 0x2e, 0x56, 0xb0, 0x71, 0x42, 0xca, 0x7a,
-	0x58, 0x5d, 0xa6, 0x87, 0xec, 0x2c, 0x29, 0x15, 0xfc, 0x8a, 0x20, 0x2e, 0x72, 0x62, 0x8f, 0x62,
-	0x05, 0x7b, 0x36, 0x89, 0x0d, 0x4c, 0x19, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0xa5, 0xb9, 0x86,
-	0x4b, 0x06, 0x01, 0x00, 0x00,
+	// 364 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0xcb, 0x4b, 0xc3, 0x40,
+	0x10, 0xc6, 0xe9, 0xc3, 0xa6, 0x99, 0x16, 0xc5, 0xf5, 0x15, 0xdb, 0x83, 0x35, 0x20, 0x54, 0x0f,
+	0x5b, 0xa8, 0x17, 0x4f, 0x42, 0xf5, 0x50, 0x2a, 0xa8, 0xb0, 0x78, 0x10, 0x11, 0xea, 0x6a, 0xc6,
+	0x1a, 0x9b, 0xec, 0xc6, 0x64, 0x8b, 0xe4, 0xdf, 0xf0, 0x2f, 0x96, 0x6e, 0xf3, 0x28, 0xd8, 0x60,
+	0x4f, 0xc9, 0xcc, 0x7e, 0xdf, 0xb7, 0xb3, 0xbf, 0x81, 0x2d, 0x15, 0x4a, 0xe1, 0xfa, 0x12, 0x23,
+	0x1a, 0x84, 0x52, 0x49, 0xb2, 0x17, 0x4d, 0xd1, 0x53, 0x18, 0x7e, 0xca, 0x0f, 0x41, 0xb3, 0xc3,
+	0xd6, 0xe1, 0x44, 0xca, 0x89, 0x87, 0x3d, 0x2d, 0x7a, 0x9d, 0xbd, 0xf7, 0xb8, 0x88, 0x17, 0x0e,
+	0xfb, 0x05, 0xb6, 0xaf, 0x43, 0xe4, 0x0a, 0x87, 0xdc, 0x47, 0x86, 0x5f, 0x33, 0x8c, 0x14, 0xd9,
+	0x87, 0x5a, 0xe0, 0xbe, 0x4d, 0x67, 0x81, 0x55, 0xea, 0x94, 0xba, 0x75, 0x96, 0x54, 0xf3, 0x3e,
+	0xfa, 0xdc, 0xf5, 0x22, 0xab, 0xdc, 0xa9, 0x74, 0x4d, 0x96, 0x54, 0xa4, 0x0d, 0x26, 0xf7, 0x3c,
+	0xf9, 0x3d, 0xe6, 0x22, 0xb6, 0x2a, 0xda, 0x52, 0xd7, 0x8d, 0x81, 0x88, 0xed, 0x3b, 0x68, 0xde,
+	0x48, 0x57, 0x30, 0x8c, 0x02, 0x29, 0x22, 0x24, 0x97, 0x60, 0xca, 0x00, 0x43, 0xae, 0x5c, 0x29,
+	0x74, 0x7e, 0xa3, 0xdf, 0xa1, 0x2b, 0xe7, 0xa6, 0xf7, 0xa9, 0x8e, 0xe5, 0x16, 0xfb, 0x02, 0x76,
+	0x86, 0xa8, 0xf2, 0xa3, 0x64, 0xe6, 0x63, 0x68, 0x66, 0x9a, 0xb1, 0xeb, 0xe8, 0x64, 0x93, 0x35,
+	0xb2, 0xde, 0xc8, 0xb1, 0x43, 0x30, 0x33, 0xdb, 0x1a, 0x7a, 0x42, 0xa0, 0xea, 0x48, 0x81, 0x56,
+	0x59, 0xbf, 0x48, 0xff, 0x13, 0x0a, 0x46, 0xc0, 0x63, 0x4f, 0x72, 0x47, 0x3f, 0xb4, 0xd1, 0xdf,
+	0xa5, 0x0b, 0xb8, 0x34, 0x85, 0x4b, 0x07, 0x22, 0x66, 0xa9, 0xc8, 0x3e, 0x85, 0xcd, 0x21, 0xaa,
+	0x65, 0xb8, 0x07, 0x60, 0x4c, 0xb8, 0x8f, 0xf9, 0x9d, 0xb5, 0x79, 0x39, 0x72, 0xec, 0x23, 0xa8,
+	0xce, 0x75, 0x85, 0x82, 0xfe, 0x4f, 0x19, 0xcc, 0x87, 0x14, 0x0e, 0x79, 0x04, 0xc8, 0x37, 0x47,
+	0xba, 0x05, 0x08, 0xff, 0x2c, 0xb7, 0xf5, 0x2f, 0x6c, 0xf2, 0x0c, 0xcd, 0x65, 0xc2, 0xe4, 0xac,
+	0xc0, 0xb1, 0x62, 0x0d, 0x6b, 0xa4, 0xdf, 0x82, 0x91, 0x10, 0x21, 0x27, 0xc5, 0xc1, 0xcb, 0x13,
+	0xb7, 0x8b, 0x64, 0xdc, 0xc7, 0x2b, 0xe3, 0x69, 0x63, 0x41, 0xbe, 0xa6, 0x3f, 0xe7, 0xbf, 0x01,
+	0x00, 0x00, 0xff, 0xff, 0x9f, 0xf4, 0xf3, 0x3b, 0x15, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -140,72 +340,144 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// GameClient is the client API for Game service.
+// TronimoesClient is the client API for Tronimoes service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type GameClient interface {
-	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
+type TronimoesClient interface {
+	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*Operation, error)
+	GetOperation(ctx context.Context, in *GetOperationRequest, opts ...grpc.CallOption) (*Operation, error)
+	GetGame(ctx context.Context, in *GetGameRequest, opts ...grpc.CallOption) (*Game, error)
 }
 
-type gameClient struct {
+type tronimoesClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewGameClient(cc grpc.ClientConnInterface) GameClient {
-	return &gameClient{cc}
+func NewTronimoesClient(cc grpc.ClientConnInterface) TronimoesClient {
+	return &tronimoesClient{cc}
 }
 
-func (c *gameClient) Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
-	out := new(HelloResponse)
-	err := c.cc.Invoke(ctx, "/skelterjohn.tronimoes.Game/Hello", in, out, opts...)
+func (c *tronimoesClient) CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*Operation, error) {
+	out := new(Operation)
+	err := c.cc.Invoke(ctx, "/skelterjohn.tronimoes.Tronimoes/CreateGame", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// GameServer is the server API for Game service.
-type GameServer interface {
-	Hello(context.Context, *HelloRequest) (*HelloResponse, error)
+func (c *tronimoesClient) GetOperation(ctx context.Context, in *GetOperationRequest, opts ...grpc.CallOption) (*Operation, error) {
+	out := new(Operation)
+	err := c.cc.Invoke(ctx, "/skelterjohn.tronimoes.Tronimoes/GetOperation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedGameServer can be embedded to have forward compatible implementations.
-type UnimplementedGameServer struct {
+func (c *tronimoesClient) GetGame(ctx context.Context, in *GetGameRequest, opts ...grpc.CallOption) (*Game, error) {
+	out := new(Game)
+	err := c.cc.Invoke(ctx, "/skelterjohn.tronimoes.Tronimoes/GetGame", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func (*UnimplementedGameServer) Hello(ctx context.Context, req *HelloRequest) (*HelloResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+// TronimoesServer is the server API for Tronimoes service.
+type TronimoesServer interface {
+	CreateGame(context.Context, *CreateGameRequest) (*Operation, error)
+	GetOperation(context.Context, *GetOperationRequest) (*Operation, error)
+	GetGame(context.Context, *GetGameRequest) (*Game, error)
 }
 
-func RegisterGameServer(s *grpc.Server, srv GameServer) {
-	s.RegisterService(&_Game_serviceDesc, srv)
+// UnimplementedTronimoesServer can be embedded to have forward compatible implementations.
+type UnimplementedTronimoesServer struct {
 }
 
-func _Game_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+func (*UnimplementedTronimoesServer) CreateGame(ctx context.Context, req *CreateGameRequest) (*Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGame not implemented")
+}
+func (*UnimplementedTronimoesServer) GetOperation(ctx context.Context, req *GetOperationRequest) (*Operation, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOperation not implemented")
+}
+func (*UnimplementedTronimoesServer) GetGame(ctx context.Context, req *GetGameRequest) (*Game, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGame not implemented")
+}
+
+func RegisterTronimoesServer(s *grpc.Server, srv TronimoesServer) {
+	s.RegisterService(&_Tronimoes_serviceDesc, srv)
+}
+
+func _Tronimoes_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GameServer).Hello(ctx, in)
+		return srv.(TronimoesServer).CreateGame(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/skelterjohn.tronimoes.Game/Hello",
+		FullMethod: "/skelterjohn.tronimoes.Tronimoes/CreateGame",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServer).Hello(ctx, req.(*HelloRequest))
+		return srv.(TronimoesServer).CreateGame(ctx, req.(*CreateGameRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Game_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "skelterjohn.tronimoes.Game",
-	HandlerType: (*GameServer)(nil),
+func _Tronimoes_GetOperation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOperationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TronimoesServer).GetOperation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/skelterjohn.tronimoes.Tronimoes/GetOperation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TronimoesServer).GetOperation(ctx, req.(*GetOperationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Tronimoes_GetGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGameRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TronimoesServer).GetGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/skelterjohn.tronimoes.Tronimoes/GetGame",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TronimoesServer).GetGame(ctx, req.(*GetGameRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _Tronimoes_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "skelterjohn.tronimoes.Tronimoes",
+	HandlerType: (*TronimoesServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Hello",
-			Handler:    _Game_Hello_Handler,
+			MethodName: "CreateGame",
+			Handler:    _Tronimoes_CreateGame_Handler,
+		},
+		{
+			MethodName: "GetOperation",
+			Handler:    _Tronimoes_GetOperation_Handler,
+		},
+		{
+			MethodName: "GetGame",
+			Handler:    _Tronimoes_GetGame_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

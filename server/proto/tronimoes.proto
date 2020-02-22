@@ -3,15 +3,47 @@ syntax = "proto3";
 package skelterjohn.tronimoes;
 option go_package = "proto";
 
-service Game {
-	rpc Hello (HelloRequest) returns (HelloResponse);
+import "google/protobuf/any.proto";
+
+service Tronimoes {
+	rpc CreateGame(CreateGameRequest) returns (Operation);
+
+	rpc GetOperation(GetOperationRequest) returns (Operation);
+
+	rpc GetGame(GetGameRequest) returns (Game);
 }
 
-message HelloRequest {
-	string message = 1;
+message CreateGameRequest {
+	// If pickup is true, allow connections with random players.
+	bool pickup = 1;
+
+	// Only look for games that involve players with these emails.
+	repeated string emails = 2;
+
+	// If allow_any is true, any player that lists your email can join.
+	bool allow_any = 3;
 }
 
-message HelloResponse {
-	string message = 1;
-	string revision = 2;
+message JoinResponse {
+	Operation operation = 1;
+}
+
+message GetOperationRequest {
+	string operation_id = 1;
+}
+
+message Operation {
+	string operation_id = 1;
+
+	bool done = 2;
+
+	google.protobuf.Any payload = 3;
+}
+
+message GetGameRequest {
+	string game_id = 1;
+}
+
+message Game {
+	string game_id = 1;
 }

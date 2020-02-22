@@ -2,19 +2,27 @@ package server
 
 import (
 	"context"
-	"log"
-	"os"
 
 	tpb "github.com/skelterjohn/tronimoes/server/proto"
 )
 
-type Game struct {
+type Tronimoes struct {
 }
 
-func (g *Game) Hello(ctx context.Context, req *tpb.HelloRequest) (*tpb.HelloResponse, error) {
-	log.Printf("Returning response for %q from v%s", req.Message, os.Getenv("SHORT_SHA"))
-	return &tpb.HelloResponse{
-		Message:  "Echo: " + req.Message,
-		Revision: "v" + os.Getenv("SHORT_SHA"),
+func (t *Tronimoes) CreateGame(ctx context.Context, req *tpb.CreateGameRequest) (*tpb.Operation, error) {
+	return &tpb.Operation{
+		OperationId: "abc123",
+	}, nil
+}
+
+func (t *Tronimoes) GetOperation(ctx context.Context, req *tpb.GetOperationRequest) (*tpb.Operation, error) {
+	return &tpb.Operation{
+		OperationId: "abc123",
+	}, nil
+}
+
+func (t *Tronimoes) GetGame(ctx context.Context, req *tpb.GetGameRequest) (*tpb.Game, error) {
+	return &tpb.Game{
+		GameId: "abc123",
 	}, nil
 }

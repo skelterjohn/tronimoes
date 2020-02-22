@@ -22,7 +22,7 @@ func main() {
 
 	s := grpc.NewServer()
 
-	tpb.RegisterGameServer(s, &server.Game{})
+	tpb.RegisterTronimoesServer(s, &server.Tronimoes{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

@@ -42,13 +42,13 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := tpb.NewGameClient(conn)
+	c := tpb.NewTronimoesClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.Hello(ctx, &tpb.HelloRequest{Message: "test"})
+	r, err := c.CreateGame(ctx, &tpb.CreateGameRequest{})
 	if err != nil {
 		log.Fatalf("could not say hello: %v", err)
 	}
-	log.Printf("Response: %q from %s", r.GetMessage(), r.GetRevision())
+	log.Printf("Response: %q", r.GetOperationId())
 }
