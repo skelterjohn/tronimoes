@@ -35,9 +35,14 @@ func main() {
 		grpc.UnaryInterceptor(RPCSummary),
 	)
 
+	operations := &server.InMemoryOperations{}
+
 	tronimoes := &server.Tronimoes{
-		Ops:   &server.InMemoryOperations{},
-		Queue: &server.InMemoryQueue{},
+		Operations: operations,
+		GameQueue: &server.InMemoryQueue{
+			Games:      &server.InMemoryGames{},
+			Operations: operations,
+		},
 	}
 
 	tpb.RegisterTronimoesServer(s, tronimoes)

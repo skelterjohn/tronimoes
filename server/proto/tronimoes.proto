@@ -23,9 +23,9 @@ message CreateGameRequest {
 	// If private is true, don't join a game with a player not requested.
 	bool private = 3;
 
-	int min_players = 4;
+	int32 min_players = 4;
 
-	int max_players = 5;
+	int32 max_players = 5;
 
 	// The name of the player attempting to create a game.
 	string player_self = 6;
@@ -45,6 +45,13 @@ message Operation {
 	bool done = 2;
 
 	google.protobuf.Any payload = 3;
+
+	enum Status {
+		UNKNOWN = 0;
+		SUCCESS = 1;
+		FAILURE = 2;
+	}
+	Status status = 4;
 }
 
 message GetGameRequest {

@@ -3,7 +3,9 @@ package server
 import (
 	"context"
 	"fmt"
+	"log"
 
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	tpb "github.com/skelterjohn/tronimoes/server/proto"
@@ -22,27 +24,32 @@ type Operations interface {
 
 type GameQueue interface {
 	AddPlayer(ctx context.Context, req *tpb.CreateGameRequest, operationID string) error
-	FindGame(ctx context.Context) (*tpb.Game, error)
+	MakeNextGame(ctx context.Context) error
 }
 
 type Tronimoes struct {
-	Ops   Operations
-	Queue GameQueue
+	Operations Operations
+	GameQueue  GameQueue
 }
 
 func (t *Tronimoes) CreateGame(ctx context.Context, req *tpb.CreateGameRequest) (*tpb.Operation, error) {
-	op, err := t.Ops.NewOperation(ctx)
+	op, err := t.Operations.NewOperation(ctx)
 	if err != nil {
 		return nil, annotatef(err, "could not create operation")
 	}
-	if err := t.Queue.AddPlayer(ctx, req, op.GetOperationId()); err != nil {
+	if err := t.GameQueue.AddPlayer(ctx, req, op.GetOperationId()); err != nil {
 		return nil, annotatef(err, "could not create queue player")
 	}
+
+	if err := t.GameQueue.MakeNextGame(ctx); err != nil && status.Code(err) != codes.NotFound {
+		log.Printf("Error finding the next game: %v", err)
+	}
+
 	return op, nil
 }
 
 func (t *Tronimoes) GetOperation(ctx context.Context, req *tpb.GetOperationRequest) (*tpb.Operation, error) {
-	return t.Ops.ReadOperation(ctx, req.GetOperationId())
+	return t.Operations.ReadOperation(ctx, req.GetOperationId())
 }
 
 func (t *Tronimoes) GetGame(ctx context.Context, req *tpb.GetGameRequest) (*tpb.Game, error) {
