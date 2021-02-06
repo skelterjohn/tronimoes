@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package skelterjohn.tronimoes.tiles;
+option go_package = "tiles";
+
+message Tile {
+    Side alpha = 1;
+
+    Side beta = 2;
+}
+
+message Side {
+    int8 pips = 1;
+}
+
+message Coord {
+    x int8 = 1;
+
+    y int8 = 1;
+}
+
+message Placement {
+    Tile tile = 1;
+
+    Coord alpha = 2;
+
+    Coord beta = 3;
+}
+
+message Line {
+    repeated Placement placements = 1;
+
+    string owner = 2;
+}
+
+message Board {
+    Placement round_leader = 1;
+
+    repeated Line lines = 2;
+}
