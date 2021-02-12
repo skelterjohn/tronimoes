@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package skelterjohn.tronimoes.tiles;
-option go_package = "tiles";
+option go_package = ".;tiles";
 
 message Tile {
     Side alpha = 1;
@@ -10,13 +10,13 @@ message Tile {
 }
 
 message Side {
-    int8 pips = 1;
+    int32 pips = 1;
 }
 
 message Coord {
-    x int8 = 1;
+    int32 x = 1;
 
-    y int8 = 1;
+    int32 y = 2;
 }
 
 message Placement {
