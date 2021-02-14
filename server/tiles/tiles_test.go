@@ -204,6 +204,7 @@ func TestSetupBoard(t *testing.T) {
 }
 
 func TestLegalMoves(t *testing.T) {
+	Debug = true
 	ctx := context.Background()
 	emptyBoard := &tpb.Board{
 		Players: []*tpb.Player{{
@@ -371,6 +372,139 @@ func TestLegalMoves(t *testing.T) {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 7, Y: 5},
 			B:    &tpb.Coord{X: 6, Y: 5},
+		}},
+	}, {
+		label: "next move",
+		board: &tpb.Board{
+			Bag: newBoard.GetBag(),
+			Players: []*tpb.Player{{
+				PlayerId: "jt",
+				Hand: []*tpb.Tile{{
+					A: 10,
+					B: 11,
+				}},
+			}},
+			NextPlayerId: "jt",
+			Width:        11,
+			Height:       10,
+			PlayerLines: []*tpb.Line{{
+				PlayerId: "jt",
+				Placements: []*tpb.Placement{{
+					Tile: &tpb.Tile{A: 12, B: 12},
+					A:    &tpb.Coord{X: 4, Y: 5},
+					B:    &tpb.Coord{X: 5, Y: 5},
+				}, {
+					Tile: &tpb.Tile{A: 11, B: 12},
+					A:    &tpb.Coord{X: 2, Y: 5},
+					B:    &tpb.Coord{X: 3, Y: 5},
+				}},
+			}},
+		},
+		want: []*tpb.Placement{{
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 2, Y: 7},
+			B:    &tpb.Coord{X: 2, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 3, Y: 6},
+			B:    &tpb.Coord{X: 2, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 1, Y: 6},
+			B:    &tpb.Coord{X: 2, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 2, Y: 3},
+			B:    &tpb.Coord{X: 2, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 3, Y: 4},
+			B:    &tpb.Coord{X: 2, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 1, Y: 4},
+			B:    &tpb.Coord{X: 2, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 1, Y: 6},
+			B:    &tpb.Coord{X: 1, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 1, Y: 4},
+			B:    &tpb.Coord{X: 1, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 10, B: 11},
+			A:    &tpb.Coord{X: 0, Y: 5},
+			B:    &tpb.Coord{X: 1, Y: 5},
+		}},
+	}, {
+		label: "next move adjacent",
+		board: &tpb.Board{
+			Bag: newBoard.GetBag(),
+			Players: []*tpb.Player{{
+				PlayerId: "jt",
+				Hand: []*tpb.Tile{{
+					A: 10,
+					B: 8,
+				}},
+			}, {
+				PlayerId: "stef",
+				Hand: []*tpb.Tile{{
+					A: 11,
+					B: 9,
+				}},
+			}},
+			NextPlayerId: "stef",
+			Width:        11,
+			Height:       10,
+			PlayerLines: []*tpb.Line{{
+				PlayerId: "jt",
+				Placements: []*tpb.Placement{{
+					Tile: &tpb.Tile{A: 12, B: 12},
+					A:    &tpb.Coord{X: 4, Y: 5},
+					B:    &tpb.Coord{X: 5, Y: 5},
+				}, {
+					Tile: &tpb.Tile{A: 11, B: 12},
+					A:    &tpb.Coord{X: 4, Y: 6},
+					B:    &tpb.Coord{X: 4, Y: 7},
+				}, {
+					Tile: &tpb.Tile{A: 11, B: 10},
+					A:    &tpb.Coord{X: 4, Y: 8},
+					B:    &tpb.Coord{X: 4, Y: 9},
+				}},
+			}, {
+				PlayerId: "stef",
+				Placements: []*tpb.Placement{{
+					Tile: &tpb.Tile{A: 12, B: 12},
+					A:    &tpb.Coord{X: 4, Y: 5},
+					B:    &tpb.Coord{X: 5, Y: 5},
+				}, {
+					Tile: &tpb.Tile{A: 12, B: 11},
+					A:    &tpb.Coord{X: 5, Y: 6},
+					B:    &tpb.Coord{X: 5, Y: 7},
+				}},
+			}},
+		},
+		want: []*tpb.Placement{{
+			Tile: &tpb.Tile{A: 11, B: 9},
+			A:    &tpb.Coord{X: 5, Y: 8},
+			B:    &tpb.Coord{X: 5, Y: 9},
+		}, {
+			Tile: &tpb.Tile{A: 11, B: 9},
+			A:    &tpb.Coord{X: 5, Y: 8},
+			B:    &tpb.Coord{X: 6, Y: 8},
+		}, {
+			Tile: &tpb.Tile{A: 11, B: 9},
+			A:    &tpb.Coord{X: 6, Y: 7},
+			B:    &tpb.Coord{X: 6, Y: 8},
+		}, {
+			Tile: &tpb.Tile{A: 11, B: 9},
+			A:    &tpb.Coord{X: 6, Y: 7},
+			B:    &tpb.Coord{X: 6, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 11, B: 9},
+			A:    &tpb.Coord{X: 6, Y: 7},
+			B:    &tpb.Coord{X: 7, Y: 7},
 		}},
 	}} {
 		t.Run(tc.label, func(t *testing.T) {

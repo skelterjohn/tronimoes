@@ -13,6 +13,15 @@ const (
 	handSize = 10
 )
 
+var Debug = false
+
+func debug(format string, items ...interface{}) {
+	if !Debug {
+		return
+	}
+	fmt.Printf(format, items...)
+}
+
 func SetupBoard(ctx context.Context, b *tpb.Board, lastLeaderPips int32) (*tpb.Board, error) {
 	if lastLeaderPips < 2 {
 		return nil, errors.New("last leader must be at least 2")
@@ -193,7 +202,7 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 		availableLines = append(availableLines, b.GetFreeLines()...)
 	}
 
-	fmt.Printf("lines available: %d\n", len(availableLines))
+	debug("lines available: %d\n", len(availableLines))
 
 	// Build a mask of the board so we can easily tell where a tile can be placed.
 	mask := maskForBoard(ctx, b)
@@ -213,7 +222,7 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 			starts = append(starts, getAdjacent(ctx, lp.GetA())...)
 			starts = append(starts, getAdjacent(ctx, lp.GetB())...)
 			pips = lp.GetTile().GetA()
-			fmt.Printf("line %d starts with double %d\n", i, pips)
+			debug("line %d starts with double %d\n", i, pips)
 		} else {
 			// Otherwise, start from the beginning and follow the line until the end
 			// to be sure we have the right pips and start point.
@@ -235,14 +244,16 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 			starts = getAdjacent(ctx, curSide)
 		}
 
-		fmt.Printf("Line %d can start at any of %q\n", i, starts)
+		debug("Line %d can start with %d pips at any of %q\n", i, pips, starts)
 
 		// We consider any tile that can place `pips` in one of the `starts`.
 		for _, t := range p.GetHand() {
 			// Unfortunate duplication.
+			debug("Looking at tile %q\n", t)
 			if t.GetA() == pips {
-				fmt.Printf("%q matches on the A side\n", t)
+				debug("%q matches on the A side\n", t)
 				for _, a := range starts {
+					debug("Checking when A=%q\n", a)
 					bs := getAdjacent(ctx, a)
 					for _, b := range bs {
 						nextPlacement := &tpb.Placement{
@@ -251,16 +262,17 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 							B:    b,
 						}
 						if !mask.getp(nextPlacement) {
-							fmt.Printf("%q doesn't hit the mask\n", nextPlacement)
+							debug("%q doesn't hit the mask\n", nextPlacement)
 							moves = append(moves, nextPlacement)
 						}
-						fmt.Printf("%q hits the mask\n", nextPlacement)
+						debug("%q hits the mask\n", nextPlacement)
 					}
 				}
 			}
 			if t.GetB() == pips {
-				fmt.Printf("%q matches on the B side\n", t)
+				debug("%q matches on the B side\n", t)
 				for _, b := range starts {
+					debug("Checking when B=%q\n", b)
 					as := getAdjacent(ctx, b)
 					for _, a := range as {
 						nextPlacement := &tpb.Placement{
@@ -269,10 +281,10 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 							B:    b,
 						}
 						if !mask.getp(nextPlacement) {
-							fmt.Printf("%q doesn't hit the mask\n", nextPlacement)
+							debug("%q doesn't hit the mask\n", nextPlacement)
 							moves = append(moves, nextPlacement)
 						}
-						fmt.Printf("%q hits the mask\n", nextPlacement)
+						debug("%q hits the mask\n", nextPlacement)
 					}
 				}
 			}
