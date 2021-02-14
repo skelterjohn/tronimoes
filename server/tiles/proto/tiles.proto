@@ -1,16 +1,12 @@
 syntax = "proto3";
 
 package skelterjohn.tronimoes.tiles;
-option go_package = ".;tiles";
+option go_package = ".;proto";
 
 message Tile {
-    Side alpha = 1;
+    int32 a = 1;
 
-    Side beta = 2;
-}
-
-message Side {
-    int32 pips = 1;
+    int32 b = 2;
 }
 
 message Coord {
@@ -22,19 +18,49 @@ message Coord {
 message Placement {
     Tile tile = 1;
 
-    Coord alpha = 2;
+    Coord a = 2;
 
-    Coord beta = 3;
+    Coord b = 3;
+
+    enum Type {
+        TYPE_UNKNOWN = 0;
+        PLAYER_LEADER = 1;
+        PLAYER_CONTINUATION = 2;
+        FREE_LEADER = 3;
+        FREE_CONTINUATION = 4;
+    }
+    Type type = 4;
 }
 
 message Line {
+    // The first placement in a line is always the leader, including the round leader.
     repeated Placement placements = 1;
 
-    string owner = 2;
+    string player_id = 2;
+}
+
+message Player {
+    string name = 1;
+
+    string player_id = 2;
+
+    bool chicken_footed = 3;
+
+    repeated Tile hand = 4;
 }
 
 message Board {
-    Placement round_leader = 1;
+    repeated Player players = 1;
 
-    repeated Line lines = 2;
+    repeated Line player_lines = 2;
+
+    repeated Line free_lines = 3;
+
+    string next_player_id = 4;
+
+    repeated Tile bag = 5;
+
+    int32 width = 6;
+
+    int32 height = 7;
 }
