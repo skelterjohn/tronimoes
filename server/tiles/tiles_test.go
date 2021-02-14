@@ -1,6 +1,7 @@
 package tiles
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"testing"
@@ -22,7 +23,7 @@ func sortedBag(upTo int32) []*tpb.Tile {
 	return b
 }
 
-func TestNewBoard(t *testing.T) {
+func TestSetupBoard(t *testing.T) {
 	for _, tc := range []struct {
 		label      string
 		board      *tpb.Board
@@ -202,6 +203,194 @@ func TestNewBoard(t *testing.T) {
 	}
 }
 
+func TestLegalMoves(t *testing.T) {
+	ctx := context.Background()
+	emptyBoard := &tpb.Board{
+		Players: []*tpb.Player{{
+			PlayerId: "jt",
+		}, {
+			PlayerId: "stef",
+		}},
+		Bag:    sortedBag(12),
+		Width:  11,
+		Height: 10,
+	}
+	newBoard, err := SetupBoard(ctx, emptyBoard, 13)
+	if err != nil {
+		t.Fatalf("Problem making new board: %v", err)
+	}
+
+	for _, tc := range []struct {
+		label string
+		board *tpb.Board
+		want  []*tpb.Placement
+	}{{
+		label: "firstmove",
+		board: newBoard,
+		want: []*tpb.Placement{{
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 7},
+			B:    &tpb.Coord{X: 4, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 6},
+			B:    &tpb.Coord{X: 4, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 6},
+			B:    &tpb.Coord{X: 4, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 3},
+			B:    &tpb.Coord{X: 4, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 4},
+			B:    &tpb.Coord{X: 4, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 4},
+			B:    &tpb.Coord{X: 4, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 6},
+			B:    &tpb.Coord{X: 3, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 4},
+			B:    &tpb.Coord{X: 3, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 2, Y: 5},
+			B:    &tpb.Coord{X: 3, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 7},
+			B:    &tpb.Coord{X: 5, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 6},
+			B:    &tpb.Coord{X: 5, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 6},
+			B:    &tpb.Coord{X: 5, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 3},
+			B:    &tpb.Coord{X: 5, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 4},
+			B:    &tpb.Coord{X: 5, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 4},
+			B:    &tpb.Coord{X: 5, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 6},
+			B:    &tpb.Coord{X: 6, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 4},
+			B:    &tpb.Coord{X: 6, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 8, B: 12},
+			A:    &tpb.Coord{X: 7, Y: 5},
+			B:    &tpb.Coord{X: 6, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 7},
+			B:    &tpb.Coord{X: 4, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 6},
+			B:    &tpb.Coord{X: 4, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 6},
+			B:    &tpb.Coord{X: 4, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 3},
+			B:    &tpb.Coord{X: 4, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 4},
+			B:    &tpb.Coord{X: 4, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 4},
+			B:    &tpb.Coord{X: 4, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 6},
+			B:    &tpb.Coord{X: 3, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 3, Y: 4},
+			B:    &tpb.Coord{X: 3, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 2, Y: 5},
+			B:    &tpb.Coord{X: 3, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 7},
+			B:    &tpb.Coord{X: 5, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 6},
+			B:    &tpb.Coord{X: 5, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 6},
+			B:    &tpb.Coord{X: 5, Y: 6},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 5, Y: 3},
+			B:    &tpb.Coord{X: 5, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 4},
+			B:    &tpb.Coord{X: 5, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 4, Y: 4},
+			B:    &tpb.Coord{X: 5, Y: 4},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 6},
+			B:    &tpb.Coord{X: 6, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 6, Y: 4},
+			B:    &tpb.Coord{X: 6, Y: 5},
+		}, {
+			Tile: &tpb.Tile{A: 7, B: 12},
+			A:    &tpb.Coord{X: 7, Y: 5},
+			B:    &tpb.Coord{X: 6, Y: 5},
+		}},
+	}} {
+		t.Run(tc.label, func(t *testing.T) {
+			got, err := LegalMoves(ctx, tc.board)
+			if err != nil {
+				t.Fatalf("Could not get legal moves: %v", err)
+			}
+			if len(got) != len(tc.want) {
+				t.Errorf("Wrong number of placements; got %d, want %d", len(got), len(tc.want))
+				t.Fatalf("Bad placements;\n got: %s\nwant: %s\n", goCodeForPlacements(got), goCodeForPlacements(tc.want))
+			}
+			for i := range tc.want {
+				if !proto.Equal(tc.want[i], got[i]) {
+					t.Fatalf("Bad placements;\n got: %s\nwant: %s\n", goCodeForPlacements(got), goCodeForPlacements(tc.want))
+				}
+			}
+		})
+	}
+}
+
 func assertBoardsEqual(t *testing.T, got, want *tpb.Board) {
 	t.Helper()
 	if proto.Equal(got, want) {
@@ -276,4 +465,19 @@ func assertLinesEqual(t *testing.T, which string, got, want *tpb.Line) {
 	}
 
 	t.Errorf("Line %s wrong placements;\n got: %q\nwant: %q", which, got.GetPlacements(), want.GetPlacements())
+}
+
+func goCodeForPlacements(placements []*tpb.Placement) string {
+	buf := &bytes.Buffer{}
+	fmt.Fprintf(buf, "[]*tpb.Placement{{\n")
+	for i, p := range placements {
+		if i != 0 {
+			fmt.Fprint(buf, "},{\n")
+		}
+		fmt.Fprintf(buf, "\tTile: &tpb.Tile{A: %d, B: %d},\n", p.GetTile().GetA(), p.GetTile().GetB())
+		fmt.Fprintf(buf, "\tA: &tpb.Coord{X: %d, Y: %d},\n", p.GetA().GetX(), p.GetA().GetY())
+		fmt.Fprintf(buf, "\tB: &tpb.Coord{X: %d, Y: %d},\n", p.GetB().GetX(), p.GetB().GetY())
+	}
+	fmt.Fprintf(buf, "}}\n")
+	return buf.String()
 }

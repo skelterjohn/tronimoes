@@ -151,16 +151,16 @@ func newShuffledBag(ctx context.Context) []*tpb.Tile {
 	return b
 }
 
-func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Placement, error) {
+func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 	// Quick lookup to map IDs to players later, mostly for seeing if a player is chickenfooted.
 	players := map[string]*tpb.Player{}
 	for _, p := range b.GetPlayers() {
 		players[p.GetPlayerId()] = p
 	}
 
-	p, ok := players[playerID]
+	p, ok := players[b.GetNextPlayerId()]
 	if !ok {
-		return nil, fmt.Errorf("no player %q", playerID)
+		return nil, fmt.Errorf("no player %q", b.GetNextPlayerId())
 	}
 
 	moves := []*tpb.Placement{}
@@ -193,13 +193,15 @@ func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Plac
 		availableLines = append(availableLines, b.GetFreeLines()...)
 	}
 
+	fmt.Printf("lines available: %d\n", len(availableLines))
+
 	// Build a mask of the board so we can easily tell where a tile can be placed.
 	mask := maskForBoard(ctx, b)
 
 	// For each available line, look at the last placement. We compare it to each tile in the
 	// player's hand, and then check the ways that tile could be placed that don't hit the
 	// mask.
-	for _, l := range availableLines {
+	for i, l := range availableLines {
 		placements := l.GetPlacements()
 		lp := placements[len(placements)-1]
 
@@ -211,6 +213,7 @@ func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Plac
 			starts = append(starts, getAdjacent(ctx, lp.GetA())...)
 			starts = append(starts, getAdjacent(ctx, lp.GetB())...)
 			pips = lp.GetTile().GetA()
+			fmt.Printf("line %d starts with double %d\n", i, pips)
 		} else {
 			// Otherwise, start from the beginning and follow the line until the end
 			// to be sure we have the right pips and start point.
@@ -232,10 +235,13 @@ func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Plac
 			starts = getAdjacent(ctx, curSide)
 		}
 
+		fmt.Printf("Line %d can start at any of %q\n", i, starts)
+
 		// We consider any tile that can place `pips` in one of the `starts`.
 		for _, t := range p.GetHand() {
 			// Unfortunate duplication.
 			if t.GetA() == pips {
+				fmt.Printf("%q matches on the A side\n", t)
 				for _, a := range starts {
 					bs := getAdjacent(ctx, a)
 					for _, b := range bs {
@@ -245,12 +251,15 @@ func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Plac
 							B:    b,
 						}
 						if !mask.getp(nextPlacement) {
+							fmt.Printf("%q doesn't hit the mask\n", nextPlacement)
 							moves = append(moves, nextPlacement)
 						}
+						fmt.Printf("%q hits the mask\n", nextPlacement)
 					}
 				}
 			}
 			if t.GetB() == pips {
+				fmt.Printf("%q matches on the B side\n", t)
 				for _, b := range starts {
 					as := getAdjacent(ctx, b)
 					for _, a := range as {
@@ -260,8 +269,10 @@ func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Plac
 							B:    b,
 						}
 						if !mask.getp(nextPlacement) {
+							fmt.Printf("%q doesn't hit the mask\n", nextPlacement)
 							moves = append(moves, nextPlacement)
 						}
+						fmt.Printf("%q hits the mask\n", nextPlacement)
 					}
 				}
 			}
@@ -271,56 +282,6 @@ func LegalMoves(ctx context.Context, b *tpb.Board, playerID string) ([]*tpb.Plac
 	// TODO: disallow moves that "crowd" the round leader.
 
 	return moves, nil
-}
-
-type mask struct {
-	v []bool
-	w int32
-	h int32
-}
-
-func maskForBoard(ctx context.Context, b *tpb.Board) mask {
-	m := mask{
-		v: make([]bool, b.GetWidth()*b.GetHeight()),
-		w: b.GetWidth(),
-	}
-	allLines := append([]*tpb.Line{}, b.PlayerLines...)
-	allLines = append(allLines, b.FreeLines...)
-	for _, l := range allLines {
-		for _, placement := range l.GetPlacements() {
-			m.setp(placement)
-		}
-	}
-	return m
-}
-
-func (m mask) setp(placement *tpb.Placement) {
-	m.setc(placement.GetA())
-	m.setc(placement.GetB())
-}
-
-func (m mask) setc(coord *tpb.Coord) {
-	if coord.GetX() < 0 || coord.GetY() < 0 {
-		return
-	}
-	if coord.GetX() >= m.w || coord.GetY() >= m.h {
-		return
-	}
-	m.v[coord.GetX()+coord.GetY()*m.w] = true
-}
-
-func (m mask) getp(placement *tpb.Placement) bool {
-	return m.getc(placement.GetA()) || m.getc(placement.GetB())
-}
-
-func (m mask) getc(coord *tpb.Coord) bool {
-	if coord.GetX() < 0 || coord.GetY() < 0 {
-		return true
-	}
-	if coord.GetX() >= m.w || coord.GetY() >= m.h {
-		return true
-	}
-	return m.v[coord.GetX()+coord.GetY()*m.w]
 }
 
 func getAdjacent(ctx context.Context, c *tpb.Coord) []*tpb.Coord {
