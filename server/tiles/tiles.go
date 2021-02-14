@@ -323,23 +323,18 @@ func (m mask) getc(coord *tpb.Coord) bool {
 	return m.v[coord.GetX()+coord.GetY()*m.w]
 }
 
-func getAdjacent(ctx context.Context, coord *tpb.Coord) []*tpb.Coord {
-	return []*tpb.Coord{
-		&tpb.Coord{
-			X: coord.X,
-			Y: coord.Y + 1,
-		},
-		&tpb.Coord{
-			X: coord.X,
-			Y: coord.Y - 1,
-		},
-		&tpb.Coord{
-			X: coord.X + 1,
-			Y: coord.Y,
-		},
-		&tpb.Coord{
-			X: coord.X - 1,
-			Y: coord.Y,
-		},
-	}
+func getAdjacent(ctx context.Context, c *tpb.Coord) []*tpb.Coord {
+	return []*tpb.Coord{{
+		X: c.X,
+		Y: c.Y + 1,
+	}, {
+		X: c.X,
+		Y: c.Y - 1,
+	}, {
+		X: c.X + 1,
+		Y: c.Y,
+	}, {
+		X: c.X - 1,
+		Y: c.Y,
+	}}
 }
