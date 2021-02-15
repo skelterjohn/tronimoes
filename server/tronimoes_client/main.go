@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"log"
 	"time"
@@ -17,27 +18,24 @@ const (
 )
 
 var (
-	tls = flag.Bool("tls", true, "Use TLS")
+	useTLS = flag.Bool("tls", true, "Use TLS")
 )
 
 func main() {
 	flag.Parse()
 	address := flag.Arg(0)
 
-	creds, err := credentials.NewClientTLSFromFile("/etc/ssl/certs/ca-certificates.crt", "")
-	if err != nil {
-		log.Fatalf("failed to load credentials: %v", err)
-	}
+	opts := []grpc.DialOption{}
 
-	_ = creds
-
-	opt := grpc.WithTransportCredentials(creds)
-	if !*tls {
-		opt = grpc.WithInsecure()
+	if *useTLS {
+		config := &tls.Config{}
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(config)))
+	} else {
+		opts = append(opts, grpc.WithInsecure())
 	}
 
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, opt)
+	conn, err := grpc.Dial(address, opts...)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
