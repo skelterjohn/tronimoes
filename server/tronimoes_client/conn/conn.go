@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -12,6 +13,10 @@ import (
 )
 
 func GetClient(ctx context.Context, address string, useTLS bool) (tpb.TronimoesClient, error) {
+	if useTLS && !strings.Contains(address, ":") {
+		address += ":443"
+	}
+
 	opts := []grpc.DialOption{}
 
 	if useTLS {

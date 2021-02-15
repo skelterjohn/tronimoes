@@ -25,6 +25,9 @@ func RPCSummary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo
 func main() {
 	// PORT is being set by the Cloud Run environment
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8082"
+	}
 
 	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
