@@ -10,17 +10,17 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	tpb "github.com/skelterjohn/tronimoes/server/proto"
+	spb "github.com/skelterjohn/tronimoes/server/proto"
 )
 
 type Games interface {
-	WriteGame(ctx context.Context, gm *tpb.Game) error
-	ReadGame(ctx context.Context, id string) (*tpb.Game, error)
-	NewGame(ctx context.Context, gm *tpb.Game) (*tpb.Game, error)
+	WriteGame(ctx context.Context, gm *spb.Game) error
+	ReadGame(ctx context.Context, id string) (*spb.Game, error)
+	NewGame(ctx context.Context, gm *spb.Game) (*spb.Game, error)
 }
 
 type queuedPlayer struct {
-	Req         *tpb.CreateGameRequest
+	Req         *spb.CreateGameRequest
 	OperationID string
 }
 
@@ -32,7 +32,7 @@ type InMemoryQueue struct {
 	Operations Operations
 }
 
-func (q *InMemoryQueue) AddPlayer(ctx context.Context, req *tpb.CreateGameRequest, operationID string) error {
+func (q *InMemoryQueue) AddPlayer(ctx context.Context, req *spb.CreateGameRequest, operationID string) error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	q.joinRequests = append(q.joinRequests, &queuedPlayer{
@@ -50,7 +50,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		return status.Error(codes.NotFound, "no games ready")
 	}
 
-	g := &tpb.Game{}
+	g := &spb.Game{}
 	g.Players = []string{
 		q.joinRequests[0].Req.GetPlayerSelf(),
 		q.joinRequests[1].Req.GetPlayerSelf(),
@@ -67,7 +67,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 
 	log.Printf("Created new game %q for %q", g.GameId, g.Players)
 
-	ops := []*tpb.Operation{}
+	ops := []*spb.Operation{}
 
 	for _, opID := range opIDs {
 		op, err := q.Operations.ReadOperation(ctx, opID)

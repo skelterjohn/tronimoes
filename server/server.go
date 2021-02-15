@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	tpb "github.com/skelterjohn/tronimoes/server/proto"
+	spb "github.com/skelterjohn/tronimoes/server/proto"
 )
 
 func annotatef(err error, format string, items ...interface{}) error {
@@ -17,13 +17,13 @@ func annotatef(err error, format string, items ...interface{}) error {
 }
 
 type Operations interface {
-	WriteOperation(ctx context.Context, op *tpb.Operation) error
-	ReadOperation(ctx context.Context, id string) (*tpb.Operation, error)
-	NewOperation(ctx context.Context) (*tpb.Operation, error)
+	WriteOperation(ctx context.Context, op *spb.Operation) error
+	ReadOperation(ctx context.Context, id string) (*spb.Operation, error)
+	NewOperation(ctx context.Context) (*spb.Operation, error)
 }
 
 type GameQueue interface {
-	AddPlayer(ctx context.Context, req *tpb.CreateGameRequest, operationID string) error
+	AddPlayer(ctx context.Context, req *spb.CreateGameRequest, operationID string) error
 	MakeNextGame(ctx context.Context) error
 }
 
@@ -32,7 +32,7 @@ type Tronimoes struct {
 	GameQueue  GameQueue
 }
 
-func (t *Tronimoes) CreateGame(ctx context.Context, req *tpb.CreateGameRequest) (*tpb.Operation, error) {
+func (t *Tronimoes) CreateGame(ctx context.Context, req *spb.CreateGameRequest) (*spb.Operation, error) {
 	op, err := t.Operations.NewOperation(ctx)
 	if err != nil {
 		return nil, annotatef(err, "could not create operation")
@@ -48,12 +48,12 @@ func (t *Tronimoes) CreateGame(ctx context.Context, req *tpb.CreateGameRequest) 
 	return op, nil
 }
 
-func (t *Tronimoes) GetOperation(ctx context.Context, req *tpb.GetOperationRequest) (*tpb.Operation, error) {
+func (t *Tronimoes) GetOperation(ctx context.Context, req *spb.GetOperationRequest) (*spb.Operation, error) {
 	return t.Operations.ReadOperation(ctx, req.GetOperationId())
 }
 
-func (t *Tronimoes) GetGame(ctx context.Context, req *tpb.GetGameRequest) (*tpb.Game, error) {
-	return &tpb.Game{
+func (t *Tronimoes) GetGame(ctx context.Context, req *spb.GetGameRequest) (*spb.Game, error) {
+	return &spb.Game{
 		GameId: "abc123",
 	}, nil
 }

@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/skelterjohn/tronimoes/server"
-	tpb "github.com/skelterjohn/tronimoes/server/proto"
+	spb "github.com/skelterjohn/tronimoes/server/proto"
 )
 
 func RPCSummary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -45,7 +45,7 @@ func main() {
 		},
 	}
 
-	tpb.RegisterTronimoesServer(s, tronimoes)
+	spb.RegisterTronimoesServer(s, tronimoes)
 	reflection.Register(s)
 
 	if err := s.Serve(lis); err != nil {
