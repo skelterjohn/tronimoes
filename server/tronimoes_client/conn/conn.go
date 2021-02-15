@@ -9,12 +9,16 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	tpb "github.com/skelterjohn/tronimoes/server/proto"
+	spb "github.com/skelterjohn/tronimoes/server/proto"
 )
 
-func GetClient(ctx context.Context, address string, useTLS bool) (tpb.TronimoesClient, error) {
-	if useTLS && !strings.Contains(address, ":") {
-		address += ":443"
+func GetClient(ctx context.Context, address string, useTLS bool) (spb.TronimoesClient, error) {
+	if !strings.Contains(address, ":") {
+		if useTLS {
+			address += ":443"
+		} else {
+			address += ":8082"
+		}
 	}
 
 	opts := []grpc.DialOption{}
@@ -31,5 +35,5 @@ func GetClient(ctx context.Context, address string, useTLS bool) (tpb.TronimoesC
 	if err != nil {
 		return nil, fmt.Errorf("could not connect: %v", err)
 	}
-	return tpb.NewTronimoesClient(conn), nil
+	return spb.NewTronimoesClient(conn), nil
 }

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -44,7 +45,20 @@ var createCmd = &cobra.Command{
 			fmt.Fprintf(os.Stderr, "Error creating game: %v", err)
 			return
 		}
-		fmt.Printf("%v\n", resp)
+
+		fmt.Printf("Creating game with operation %s: ", resp.GetOperationId())
+		for !resp.GetDone() {
+			fmt.Print(".")
+			time.Sleep(1 * time.Second)
+			resp, err = c.GetOperation(ctx, &spb.GetOperationRequest{
+				OperationId: resp.GetOperationId(),
+			})
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error fetching operation game: %v", err)
+				return
+			}
+		}
+		fmt.Printf("done.\n")
 	},
 }
 
