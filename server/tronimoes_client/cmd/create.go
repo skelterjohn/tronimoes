@@ -43,7 +43,6 @@ var createCmd = &cobra.Command{
 
 		resp, err := c.CreateGame(ctx, &spb.CreateGameRequest{
 			Discoverable: false,
-			Players:      []string{},
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
