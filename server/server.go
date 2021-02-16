@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
@@ -56,4 +59,26 @@ func (t *Tronimoes) GetGame(ctx context.Context, req *spb.GetGameRequest) (*spb.
 	return &spb.Game{
 		GameId: "abc123",
 	}, nil
+}
+
+func Serve(ctx context.Context, port string, s *grpc.Server) error {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":"+port))
+	if err != nil {
+		return fmt.Errorf("failed to listen: %v", err)
+	}
+
+	operations := &InMemoryOperations{}
+
+	tronimoes := &Tronimoes{
+		Operations: operations,
+		GameQueue: &InMemoryQueue{
+			Games:      &InMemoryGames{},
+			Operations: operations,
+		},
+	}
+
+	spb.RegisterTronimoesServer(s, tronimoes)
+	reflection.Register(s)
+
+	return s.Serve(lis)
 }
