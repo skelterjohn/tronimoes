@@ -35,5 +35,6 @@ func GetClient(ctx context.Context, address string, useTLS bool) (spb.TronimoesC
 	if err != nil {
 		return nil, fmt.Errorf("could not connect: %v", err)
 	}
+
 	return spb.NewTronimoesClient(conn), nil
 }

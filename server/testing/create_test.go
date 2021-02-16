@@ -3,14 +3,18 @@ package testing
 import (
 	"context"
 	"fmt"
+	"net"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/skelterjohn/tronimoes/server"
 	spb "github.com/skelterjohn/tronimoes/server/proto"
-	"github.com/skelterjohn/tronimoes/server/tronimoes_client/conn"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/test/bufconn"
 )
 
 var (
@@ -67,14 +71,55 @@ func createGameAndWait(t *testing.T, ctx context.Context, c spb.TronimoesClient,
 	return g, nil
 }
 
-func TestCreate(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	t.Logf("Using %q, %v", serverAddress, useTLS)
-	c, err := conn.GetClient(ctx, serverAddress, useTLS)
-	if err != nil {
-		t.Fatalf("Could not connect to server: %v", err)
+func createBufferedServer(t *testing.T, ctx context.Context) (spb.TronimoesClient, func()) {
+	t.Helper()
+
+	l := bufconn.Listen(10 * 1024)
+
+	operations := &server.InMemoryOperations{}
+
+	tronimoes := &server.Tronimoes{
+		Operations: operations,
+		GameQueue: &server.InMemoryQueue{
+			Games:      &server.InMemoryGames{},
+			Operations: operations,
+		},
 	}
+
+	s := grpc.NewServer()
+	spb.RegisterTronimoesServer(s, tronimoes)
+	reflection.Register(s)
+
+	go func() {
+		t.Helper()
+		if err := s.Serve(l); err != nil {
+			t.Errorf("Error serving: %v", err)
+		}
+	}()
+
+	dial := func(context.Context, string) (net.Conn, error) {
+		return l.Dial()
+	}
+
+	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(dial), grpc.WithInsecure())
+	if err != nil {
+		t.Fatalf("Could not dial buffered server: %v", err)
+	}
+	return spb.NewTronimoesClient(conn), func() {
+		if err := conn.Close(); err != nil {
+			t.Errorf("Error closing conn: %v", err)
+		}
+		if err := l.Close(); err != nil {
+			t.Errorf("Error closing listener: %v", err)
+		}
+		s.Stop()
+	}
+}
+
+func TestCreate(t *testing.T) {
+	ctx := context.Background()
+	c, close := createBufferedServer(t, ctx)
+	defer close()
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
