@@ -91,6 +91,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 			TypeUrl: "skelterjohn.tronimoes.Game",
 			Value:   gdata,
 		}
+		op.Status = spb.Operation_SUCCESS
 	}
 
 	q.joinRequests = q.joinRequests[2:]

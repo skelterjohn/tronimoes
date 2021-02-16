@@ -21,6 +21,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cobra"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
@@ -59,6 +60,22 @@ var createCmd = &cobra.Command{
 			}
 		}
 		fmt.Printf("done.\n")
+
+		if resp.GetStatus() != spb.Operation_SUCCESS {
+			fmt.Fprintf(os.Stderr, "Create game operation not successful: %v", err)
+			return
+		}
+
+		g := &spb.Game{}
+		if resp.GetPayload().GetTypeUrl() != "skelterjohn.tronimoes.Game" {
+			fmt.Fprintf(os.Stderr, "Unexpected operation payload type %q", resp.GetPayload().GetTypeUrl())
+			return
+		}
+		if err := proto.Unmarshal(resp.GetPayload().GetValue(), g); err != nil {
+			fmt.Fprintf(os.Stderr, "Could not unmarshal operation payload: %v", err)
+			return
+		}
+		fmt.Println(g)
 	},
 }
 
