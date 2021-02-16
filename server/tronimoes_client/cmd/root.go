@@ -26,9 +26,12 @@ import (
 )
 
 var (
-	cfgFile       string
+	cfgFile string
+
 	serverAddress string
 	useTLS        bool
+
+	playerID string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -67,6 +70,9 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&serverAddress, "server_address", "tronimoes.com", "address of the tronimoes game server")
 	rootCmd.PersistentFlags().BoolVar(&useTLS, "use_tls", true, "Use TLS for the connection (necessary for *.tronimoes.com).")
+
+	rootCmd.PersistentFlags().StringVar(&playerID, "player_id", "", "Player ID to use for all operations.")
+	rootCmd.PersistentFlags().StringVar(&playerID, "access_token", "", "Oauth2 access token.")
 }
 
 // initConfig reads in config file and ENV variables if set.

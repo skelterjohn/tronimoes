@@ -52,8 +52,8 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 
 	g := &spb.Game{}
 	g.Players = []string{
-		q.joinRequests[0].Req.GetPlayerSelf(),
-		q.joinRequests[1].Req.GetPlayerSelf(),
+		q.joinRequests[0].Req.GetPlayerId(),
+		q.joinRequests[1].Req.GetPlayerId(),
 	}
 	opIDs := []string{
 		q.joinRequests[0].OperationID,

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package skelterjohn.tronimoes;
-option go_package = "proto";
+option go_package = ".;proto";
 
 import "google/protobuf/any.proto";
 
@@ -28,7 +28,7 @@ message CreateGameRequest {
 	int32 max_players = 5;
 
 	// The name of the player attempting to create a game.
-	string player_self = 6;
+	string player_id = 6;
 }
 
 message JoinResponse {

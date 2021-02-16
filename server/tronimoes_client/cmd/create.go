@@ -41,7 +41,14 @@ var createCmd = &cobra.Command{
 			return
 		}
 
-		resp, err := c.CreateGame(ctx, &spb.CreateGameRequest{})
+		resp, err := c.CreateGame(ctx, &spb.CreateGameRequest{
+			Discoverable: false,
+			Players:      []string{},
+			Private:      false,
+			MinPlayers:   0,
+			MaxPlayers:   0,
+			PlayerId:     playerID,
+		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating game: %v", err)
 			return
