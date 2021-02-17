@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package skelterjohn.tronimoes.tiles;
-option go_package = ".;proto";
+option go_package = "github.com/skelterjohn/tronimoes/server/tiles/proto;proto";
 
 message Tile {
     int32 a = 1;

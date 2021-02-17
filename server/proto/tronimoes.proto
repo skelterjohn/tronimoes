@@ -1,9 +1,11 @@
 syntax = "proto3";
 
 package skelterjohn.tronimoes;
-option go_package = ".;proto";
+option go_package = "proto;proto";
 
 import "google/protobuf/any.proto";
+
+import "tiles/proto/tiles.proto";
 
 service Tronimoes {
 	rpc CreateGame(CreateGameRequest) returns (Operation);
@@ -62,4 +64,6 @@ message Game {
 	string game_id = 1;
 
 	repeated string players = 2;
+
+	skelterjohn.tronimoes.tiles.Board board = 3;
 }
