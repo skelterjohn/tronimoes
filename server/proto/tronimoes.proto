@@ -4,15 +4,32 @@ package skelterjohn.tronimoes;
 option go_package = "proto;proto";
 
 import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
 
 import "tiles/proto/tiles.proto";
 
 service Tronimoes {
+	rpc CreateAccessToken(CreateAccessTokenRequest) returns (AccessTokenResponse);
+
 	rpc CreateGame(CreateGameRequest) returns (Operation);
 
 	rpc GetOperation(GetOperationRequest) returns (Operation);
 
 	rpc GetGame(GetGameRequest) returns (Game);
+
+	rpc GetBoard(GetBoardRequest) returns (skelterjohn.tronimoes.tiles.Board);
+}
+
+message CreateAccessTokenRequest {
+	string player_id = 1;
+}
+
+message AccessTokenResponse {
+	// Token to send with authenticated RPCs.
+	string access_token = 1;
+
+	// The expiry beyond which the token will not work.
+	google.protobuf.Timestamp expiry = 2;
 }
 
 message CreateGameRequest {
@@ -29,7 +46,6 @@ message CreateGameRequest {
 
 	int32 max_players = 5;
 
-	// The name of the player attempting to create a game.
 	string player_id = 6;
 }
 
@@ -63,7 +79,9 @@ message GetGameRequest {
 message Game {
 	string game_id = 1;
 
-	repeated string players = 2;
+	repeated string player_ids = 2;
+}
 
-	skelterjohn.tronimoes.tiles.Board board = 3;
+message GetBoardRequest {
+	string game_id = 1;
 }

@@ -10,11 +10,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/skelterjohn/tronimoes/server"
+	"github.com/skelterjohn/tronimoes/server/auth"
 )
 
-func RPCSummary(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	start := time.Now()
-	resp, err := handler(ctx, req)
+	resp, err := auth.AccessFilter(ctx, req, info, handler)
 	log.Printf("RPC: %s=%v latency=%v", info.FullMethod, status.Code(err), time.Since(start))
 	return resp, err
 }
@@ -29,7 +30,7 @@ func main() {
 	}
 
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(RPCSummary),
+		grpc.UnaryInterceptor(interceptor),
 	)
 
 	if err := server.Serve(ctx, port, s); err != nil {

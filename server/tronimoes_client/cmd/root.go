@@ -31,7 +31,8 @@ var (
 	serverAddress string
 	useTLS        bool
 
-	playerID string
+	playerID    string
+	accessToken string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -72,7 +73,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&useTLS, "use_tls", true, "Use TLS for the connection (necessary for *.tronimoes.com).")
 
 	rootCmd.PersistentFlags().StringVar(&playerID, "player_id", "", "Player ID to use for all operations.")
-	rootCmd.PersistentFlags().StringVar(&playerID, "access_token", "", "Oauth2 access token.")
+	rootCmd.PersistentFlags().StringVar(&accessToken, "access_token", "", "Access token to authenticate the player ID.")
 }
 
 // initConfig reads in config file and ENV variables if set.

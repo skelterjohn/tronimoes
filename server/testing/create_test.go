@@ -11,8 +11,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/skelterjohn/tronimoes/server"
+	"github.com/skelterjohn/tronimoes/server/auth"
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/test/bufconn"
 )
@@ -38,8 +40,13 @@ func getUseTLS() bool {
 	return tstr == "1"
 }
 
-func createGameAndWait(t *testing.T, ctx context.Context, c spb.TronimoesClient, req *spb.CreateGameRequest) (*spb.Game, error) {
+func createGameAndWait(t *testing.T, ctx context.Context, c spb.TronimoesClient, playerID string, req *spb.CreateGameRequest) (*spb.Game, error) {
 	t.Helper()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+		"access_token": playerID,
+		"player_id":    playerID,
+	}))
 
 	resp, err := c.CreateGame(ctx, req)
 	if err != nil {
@@ -86,7 +93,7 @@ func createBufferedServer(t *testing.T, ctx context.Context) (spb.TronimoesClien
 		},
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(auth.AccessFilter))
 	spb.RegisterTronimoesServer(s, tronimoes)
 	reflection.Register(s)
 
@@ -127,22 +134,20 @@ func TestCreate(t *testing.T) {
 	var err1, err2 error
 	go func() {
 		defer wg.Done()
-		g1, err1 = createGameAndWait(t, ctx, c, &spb.CreateGameRequest{
+		g1, err1 = createGameAndWait(t, ctx, c, "jt", &spb.CreateGameRequest{
 			Discoverable: false,
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
-			PlayerId:     "jt",
 		})
 	}()
 	go func() {
 		defer wg.Done()
-		g2, err2 = createGameAndWait(t, ctx, c, &spb.CreateGameRequest{
+		g2, err2 = createGameAndWait(t, ctx, c, "stef", &spb.CreateGameRequest{
 			Discoverable: false,
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
-			PlayerId:     "stef",
 		})
 	}()
 	wg.Wait()

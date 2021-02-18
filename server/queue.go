@@ -20,6 +20,7 @@ type Games interface {
 }
 
 type queuedPlayer struct {
+	PlayerID    string
 	Req         *spb.CreateGameRequest
 	OperationID string
 }
@@ -32,10 +33,11 @@ type InMemoryQueue struct {
 	Operations Operations
 }
 
-func (q *InMemoryQueue) AddPlayer(ctx context.Context, req *spb.CreateGameRequest, operationID string) error {
+func (q *InMemoryQueue) AddPlayer(ctx context.Context, playerID string, req *spb.CreateGameRequest, operationID string) error {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 	q.joinRequests = append(q.joinRequests, &queuedPlayer{
+		PlayerID:    playerID,
 		Req:         req,
 		OperationID: operationID,
 	})
@@ -51,9 +53,9 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 	}
 
 	g := &spb.Game{}
-	g.Players = []string{
-		q.joinRequests[0].Req.GetPlayerId(),
-		q.joinRequests[1].Req.GetPlayerId(),
+	g.PlayerIds = []string{
+		q.joinRequests[0].PlayerID,
+		q.joinRequests[1].PlayerID,
 	}
 	opIDs := []string{
 		q.joinRequests[0].OperationID,
@@ -65,7 +67,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		return annotatef(err, "could not create new game")
 	}
 
-	log.Printf("Created new game %q for %q", g.GameId, g.Players)
+	log.Printf("Created new game %q for %q", g.GameId, g.PlayerIds)
 
 	ops := []*spb.Operation{}
 

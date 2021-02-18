@@ -23,6 +23,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc/metadata"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 	"github.com/skelterjohn/tronimoes/server/tronimoes_client/conn"
@@ -41,12 +42,16 @@ var createCmd = &cobra.Command{
 			return
 		}
 
+		ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+			"access_token": accessToken,
+			"player_id":    playerID,
+		}))
+
 		resp, err := c.CreateGame(ctx, &spb.CreateGameRequest{
 			Discoverable: false,
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
-			PlayerId:     playerID,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating game: %v", err)
