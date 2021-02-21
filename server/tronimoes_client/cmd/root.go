@@ -69,10 +69,10 @@ func init() {
 	// when this action is called directly.
 	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	rootCmd.PersistentFlags().StringVar(&serverAddress, "server_address", "tronimoes.com", "address of the tronimoes game server")
+	rootCmd.PersistentFlags().StringVarP(&serverAddress, "server_address", "s", "tronimoes.com", "address of the tronimoes game server")
 	rootCmd.PersistentFlags().BoolVar(&useTLS, "use_tls", true, "Use TLS for the connection (necessary for *.tronimoes.com).")
 
-	rootCmd.PersistentFlags().StringVar(&playerID, "player_id", "", "Player ID to use for all operations.")
+	rootCmd.PersistentFlags().StringVarP(&playerID, "player_id", "p", "", "Player ID to use for all operations.")
 	rootCmd.PersistentFlags().StringVar(&accessToken, "access_token", "", "Access token to authenticate the player ID.")
 }
 

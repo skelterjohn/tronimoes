@@ -47,6 +47,12 @@ message CreateGameRequest {
 	int32 max_players = 5;
 
 	string player_id = 6;
+
+	enum BoardShape {
+		UNKNOWN = 0;
+		standard_31_by_30 = 1;
+	}
+	BoardShape board_shape = 7;
 }
 
 message JoinResponse {

@@ -84,13 +84,16 @@ func createBufferedServer(t *testing.T, ctx context.Context) (spb.TronimoesClien
 	l := bufconn.Listen(10 * 1024)
 
 	operations := &server.InMemoryOperations{}
+	games := &server.InMemoryGames{}
+	queue := &server.InMemoryQueue{
+		Games:      games,
+		Operations: operations,
+	}
 
 	tronimoes := &server.Tronimoes{
 		Operations: operations,
-		GameQueue: &server.InMemoryQueue{
-			Games:      &server.InMemoryGames{},
-			Operations: operations,
-		},
+		Games:      games,
+		Queue:      queue,
 	}
 
 	s := grpc.NewServer(grpc.UnaryInterceptor(auth.AccessFilter))
@@ -139,6 +142,7 @@ func TestCreate(t *testing.T) {
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
+			BoardShape:   spb.CreateGameRequest_standard_31_by_30,
 		})
 	}()
 	go func() {
@@ -148,6 +152,7 @@ func TestCreate(t *testing.T) {
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
+			BoardShape:   spb.CreateGameRequest_standard_31_by_30,
 		})
 	}()
 	wg.Wait()
@@ -161,4 +166,46 @@ func TestCreate(t *testing.T) {
 	if g1.GetGameId() != g2.GetGameId() {
 		t.Errorf("Game IDs did not match, %q != %q", g1.GetGameId(), g2.GetGameId())
 	}
+
+	gameID := g1.GetGameId()
+
+	checkBoardForPlayer := func(t *testing.T, ctx context.Context, playerID string) {
+		t.Helper()
+
+		ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+			"access_token": playerID,
+			"player_id":    playerID,
+		}))
+
+		b, err := c.GetBoard(ctx, &spb.GetBoardRequest{
+			GameId: gameID,
+		})
+		if err != nil {
+			t.Errorf("Could not get board for %s: %v", playerID, err)
+			return
+		}
+		for _, tile := range b.GetBag() {
+			if tile.A != -1 {
+				t.Errorf("%s can see the bag contents: %v", playerID, tile)
+				break
+			}
+		}
+		for _, p := range b.GetPlayers() {
+			for _, tile := range p.GetHand() {
+				if p.GetPlayerId() == playerID {
+					if tile.A == -1 {
+						t.Errorf("%s cannot see own hand: %v", playerID, tile)
+						break
+					}
+					continue
+				}
+				if tile.A != -1 {
+					t.Errorf("%s can see the %s's hand: %v", playerID, p.GetPlayerId(), tile)
+					break
+				}
+			}
+		}
+	}
+	checkBoardForPlayer(t, ctx, "stef")
+	checkBoardForPlayer(t, ctx, "jt")
 }

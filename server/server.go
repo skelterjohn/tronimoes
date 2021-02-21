@@ -29,14 +29,15 @@ type Operations interface {
 	NewOperation(ctx context.Context) (*spb.Operation, error)
 }
 
-type GameQueue interface {
+type Queue interface {
 	AddPlayer(ctx context.Context, playerID string, req *spb.CreateGameRequest, operationID string) error
 	MakeNextGame(ctx context.Context) error
 }
 
 type Tronimoes struct {
 	Operations Operations
-	GameQueue  GameQueue
+	Queue      Queue
+	Games      Games
 }
 
 func (t *Tronimoes) CreateAccessToken(ctx context.Context, req *spb.CreateAccessTokenRequest) (*spb.AccessTokenResponse, error) {
@@ -59,11 +60,11 @@ func (t *Tronimoes) CreateGame(ctx context.Context, req *spb.CreateGameRequest) 
 	if err != nil {
 		return nil, annotatef(err, "could not create operation")
 	}
-	if err := t.GameQueue.AddPlayer(ctx, playerID, req, op.GetOperationId()); err != nil {
+	if err := t.Queue.AddPlayer(ctx, playerID, req, op.GetOperationId()); err != nil {
 		return nil, annotatef(err, "could not create queue player")
 	}
 
-	if err := t.GameQueue.MakeNextGame(ctx); err != nil && status.Code(err) != codes.NotFound {
+	if err := t.Queue.MakeNextGame(ctx); err != nil && status.Code(err) != codes.NotFound {
 		log.Printf("Error finding the next game: %v", err)
 	}
 
@@ -74,14 +75,70 @@ func (t *Tronimoes) GetOperation(ctx context.Context, req *spb.GetOperationReque
 	return t.Operations.ReadOperation(ctx, req.GetOperationId())
 }
 
+func (t *Tronimoes) checkPlayerInGame(ctx context.Context, playerID string, g *spb.Game) error {
+
+	foundPlayer := false
+	for _, pid := range g.GetPlayerIds() {
+		if pid == playerID {
+			foundPlayer = true
+		}
+	}
+	if foundPlayer {
+		return nil
+	}
+	return status.Errorf(codes.PermissionDenied, "%s is not a player in game %s", playerID, g.GetGameId())
+}
+
 func (t *Tronimoes) GetGame(ctx context.Context, req *spb.GetGameRequest) (*spb.Game, error) {
-	return &spb.Game{
-		GameId: "abc123",
-	}, nil
+	playerID, ok := auth.PlayerIDFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unknown player ID")
+	}
+	g, err := t.Games.ReadGame(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get game")
+	}
+	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
+		return nil, err
+	}
+	return g, nil
 }
 
 func (t *Tronimoes) GetBoard(ctx context.Context, req *spb.GetBoardRequest) (*tpb.Board, error) {
-	return nil, nil
+	playerID, ok := auth.PlayerIDFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unknown player ID")
+	}
+
+	g, err := t.Games.ReadGame(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get game")
+	}
+	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
+		return nil, err
+	}
+
+	b, err := t.Games.ReadBoard(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get board")
+	}
+
+	// Nil out all tiles in the bag and other players' hands.
+	for i := range b.GetBag() {
+		b.Bag[i].A = -1
+		b.Bag[i].B = -1
+	}
+	for _, p := range b.GetPlayers() {
+		if p.GetPlayerId() == playerID {
+			continue
+		}
+		for i := range p.GetHand() {
+			p.Hand[i].A = -1
+			p.Hand[i].B = -1
+		}
+	}
+
+	return b, nil
 }
 
 func Serve(ctx context.Context, port string, s *grpc.Server) error {
@@ -91,13 +148,16 @@ func Serve(ctx context.Context, port string, s *grpc.Server) error {
 	}
 
 	operations := &InMemoryOperations{}
+	games := &InMemoryGames{}
+	queue := &InMemoryQueue{
+		Games:      games,
+		Operations: operations,
+	}
 
 	tronimoes := &Tronimoes{
 		Operations: operations,
-		GameQueue: &InMemoryQueue{
-			Games:      &InMemoryGames{},
-			Operations: operations,
-		},
+		Games:      games,
+		Queue:      queue,
 	}
 
 	spb.RegisterTronimoesServer(s, tronimoes)

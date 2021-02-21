@@ -11,12 +11,16 @@ import (
 	"google.golang.org/grpc/status"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
+	"github.com/skelterjohn/tronimoes/server/tiles"
+	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
 )
 
 type Games interface {
 	WriteGame(ctx context.Context, gm *spb.Game) error
 	ReadGame(ctx context.Context, id string) (*spb.Game, error)
 	NewGame(ctx context.Context, gm *spb.Game) (*spb.Game, error)
+	WriteBoard(ctx context.Context, id string, b *tpb.Board) error
+	ReadBoard(ctx context.Context, id string) (*tpb.Board, error)
 }
 
 type queuedPlayer struct {
@@ -52,19 +56,45 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		return status.Error(codes.NotFound, "no games ready")
 	}
 
-	g := &spb.Game{}
-	g.PlayerIds = []string{
-		q.joinRequests[0].PlayerID,
-		q.joinRequests[1].PlayerID,
+	jrs := []*queuedPlayer{
+		q.joinRequests[0],
+		q.joinRequests[1],
 	}
-	opIDs := []string{
-		q.joinRequests[0].OperationID,
-		q.joinRequests[1].OperationID,
+
+	g := &spb.Game{}
+	opIDs := []string{}
+	for _, jr := range jrs {
+		g.PlayerIds = append(g.PlayerIds, jr.PlayerID)
+		opIDs = append(opIDs, jr.OperationID)
 	}
 
 	var err error
 	if g, err = q.Games.NewGame(ctx, g); err != nil {
 		return annotatef(err, "could not create new game")
+	}
+
+	switch q.joinRequests[0].Req.GetBoardShape() {
+	case spb.CreateGameRequest_standard_31_by_30:
+		b := &tpb.Board{
+			Width:  31,
+			Height: 30,
+		}
+		for _, pid := range g.PlayerIds {
+			b.Players = append(b.Players, &tpb.Player{
+				PlayerId: pid,
+			})
+		}
+
+		b, err := tiles.SetupBoard(ctx, b, 100)
+		if err != nil {
+			return annotatef(err, "could not set up initial board")
+		}
+
+		if err := q.Games.WriteBoard(ctx, g.GetGameId(), b); err != nil {
+			return annotatef(err, "could not create board")
+		}
+	default:
+		return status.Error(codes.FailedPrecondition, "board shape not defined")
 	}
 
 	log.Printf("Created new game %q for %q", g.GameId, g.PlayerIds)
