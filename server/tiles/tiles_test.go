@@ -203,10 +203,21 @@ func TestSetupBoard(t *testing.T) {
 	}
 }
 
-func TestLegalMoves(t *testing.T) {
-	Debug = true
-	ctx := context.Background()
-	emptyBoard := &tpb.Board{
+func tab(a, b int32) *tpb.Tile {
+	return &tpb.Tile{
+		A: a,
+		B: b,
+	}
+}
+func xy(x, y int32) *tpb.Coord {
+	return &tpb.Coord{
+		X: x,
+		Y: y,
+	}
+}
+
+func sortedBoard() *tpb.Board {
+	return &tpb.Board{
 		Players: []*tpb.Player{{
 			PlayerId: "jt",
 		}, {
@@ -216,7 +227,83 @@ func TestLegalMoves(t *testing.T) {
 		Width:  11,
 		Height: 10,
 	}
-	newBoard, err := SetupBoard(ctx, emptyBoard, 13)
+}
+
+func TestEdgeRace(t *testing.T) {
+	Debug = true
+	ctx := context.Background()
+
+	board := sortedBoard()
+
+	board, err := SetupBoard(ctx, board, 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+	board.GetPlayers()[0].Hand = []*tpb.Tile{
+		tab(12, 12), tab(12, 11), tab(11, 10), tab(10, 9), tab(9, 8),
+	}
+	board.GetPlayers()[1].Hand = []*tpb.Tile{
+		tab(12, 10), tab(10, 8), tab(8, 6), tab(6, 4), tab(4, 2),
+	}
+
+	for i, l := range board.GetPlayerLines() {
+		if len(l.GetPlacements()) != 1 {
+			t.Fatalf("Bad initial line for %s", board.GetPlayers()[i].GetPlayerId())
+		}
+		if !proto.Equal(l.GetPlacements()[0].GetTile(), tab(12, 12)) {
+			t.Fatalf("Wrong round leader %q for %s", l.GetPlacements()[0], board.GetPlayers()[i].GetPlayerId())
+		}
+	}
+
+	placements := []*tpb.Placement{{
+		Tile: tab(12, 10),
+		A:    xy(6, 5),
+		B:    xy(7, 5),
+	}, {
+		Tile: tab(12, 11),
+		A:    xy(3, 5),
+		B:    xy(2, 5),
+	}, {
+		Tile: tab(10, 8),
+		A:    xy(8, 5),
+		B:    xy(9, 5),
+	}, {
+		Tile: tab(11, 10),
+		A:    xy(1, 5),
+		B:    xy(0, 5),
+	}}
+
+	// Play a bunch of legal moves.
+
+	for _, placement := range placements {
+		if err := LayTile(ctx, board, placement); err != nil {
+			t.Fatalf("Error placing %q: %v", placement, err)
+		}
+	}
+
+	// Try to play a move using a tile not in the hand.
+	if err := LayTile(ctx, board, &tpb.Placement{
+		Tile: tab(8, 1),
+		A:    xy(9, 4),
+		B:    xy(9, 3),
+	}); err == nil {
+		t.Fatal("able to lay tile not in hand")
+	}
+
+	// Try to play a tile somewhere disconnected.
+	if err := LayTile(ctx, board, &tpb.Placement{
+		Tile: tab(8, 6),
+		A:    xy(1, 2),
+		B:    xy(1, 3),
+	}); err == nil {
+		t.Fatal("able to lay disconnected tile")
+	}
+}
+
+func TestLegalMoves(t *testing.T) {
+	Debug = true
+	ctx := context.Background()
+	newBoard, err := SetupBoard(ctx, sortedBoard(), 13)
 	if err != nil {
 		t.Fatalf("Problem making new board: %v", err)
 	}

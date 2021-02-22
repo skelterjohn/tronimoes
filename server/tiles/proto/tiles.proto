@@ -37,6 +37,8 @@ message Line {
     repeated Placement placements = 1;
 
     string player_id = 2;
+
+    string murderer = 3;
 }
 
 message Player {

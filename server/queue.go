@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	any "github.com/golang/protobuf/ptypes/any"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -18,7 +19,6 @@ import (
 type Games interface {
 	WriteGame(ctx context.Context, gm *spb.Game) error
 	ReadGame(ctx context.Context, id string) (*spb.Game, error)
-	NewGame(ctx context.Context, gm *spb.Game) (*spb.Game, error)
 	WriteBoard(ctx context.Context, id string, b *tpb.Board) error
 	ReadBoard(ctx context.Context, id string) (*tpb.Board, error)
 }
@@ -68,9 +68,10 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		opIDs = append(opIDs, jr.OperationID)
 	}
 
-	var err error
-	if g, err = q.Games.NewGame(ctx, g); err != nil {
-		return annotatef(err, "could not create new game")
+	g.GameId = uuid.New().String()
+
+	if err := q.Games.WriteGame(ctx, g); err != nil {
+		return annotatef(err, "could not write new game")
 	}
 
 	switch q.joinRequests[0].Req.GetBoardShape() {
@@ -91,7 +92,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		}
 
 		if err := q.Games.WriteBoard(ctx, g.GetGameId(), b); err != nil {
-			return annotatef(err, "could not create board")
+			return annotatef(err, "could not write board")
 		}
 	default:
 		return status.Error(codes.FailedPrecondition, "board shape not defined")

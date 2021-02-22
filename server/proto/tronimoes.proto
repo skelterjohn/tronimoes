@@ -18,6 +18,10 @@ service Tronimoes {
 	rpc GetGame(GetGameRequest) returns (Game);
 
 	rpc GetBoard(GetBoardRequest) returns (skelterjohn.tronimoes.tiles.Board);
+
+	rpc GetMoves(GetMovesRequest) returns (GetMovesResponse);
+
+	rpc LayTile(LayTileRequest) returns (skelterjohn.tronimoes.tiles.Board);
 }
 
 message CreateAccessTokenRequest {
@@ -90,4 +94,18 @@ message Game {
 
 message GetBoardRequest {
 	string game_id = 1;
+}
+
+message GetMovesRequest {
+	string game_id = 1;
+}
+
+message GetMovesResponse {
+	repeated skelterjohn.tronimoes.tiles.Placement placements = 1;
+}
+
+message LayTileRequest {
+	string game_id = 1;
+	
+	skelterjohn.tronimoes.tiles.Placement placement = 2;
 }

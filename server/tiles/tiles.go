@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/golang/protobuf/proto"
 	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
 )
 
@@ -160,6 +161,189 @@ func newShuffledBag(ctx context.Context) []*tpb.Tile {
 	return b
 }
 
+func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
+	validMoves, err := LegalMoves(ctx, b)
+	if err != nil {
+		return fmt.Errorf("could not get legal moves before playing: %v", err)
+	}
+	legal := false
+	for _, vm := range validMoves {
+		if proto.Equal(vm, move) {
+			legal = true
+			break
+		}
+	}
+	if !legal {
+		return fmt.Errorf("%v was an illegal move", move)
+	}
+
+	// Check all lines to see if this tile can be placed on them.
+	players := map[string]*tpb.Player{}
+	for _, p := range b.GetPlayers() {
+		players[p.GetPlayerId()] = p
+	}
+	player, ok := players[b.GetNextPlayerId()]
+	if !ok {
+		return fmt.Errorf("next player %s not in list", b.GetNextPlayerId())
+	}
+	availableLines, err := AvailableLines(ctx, b, player, players)
+	if err != nil {
+		return fmt.Errorf("could not get available lines: %v", err)
+	}
+	playableLines := []*tpb.Line{}
+	for _, l := range availableLines {
+		starts, pips, err := NextStartsAndPips(ctx, l)
+		if err != nil {
+			return fmt.Errorf("could not get starts and pips for line: %v", err)
+		}
+		if pips == move.GetTile().GetA() && isInCoordList(ctx, move.GetA(), starts) {
+			playableLines = append(playableLines, l)
+			continue
+		}
+		if pips == move.GetTile().GetB() && isInCoordList(ctx, move.GetB(), starts) {
+			playableLines = append(playableLines, l)
+		}
+	}
+
+	if len(playableLines) == 0 {
+		return errors.New("illegal move")
+	}
+
+	for _, l := range playableLines {
+		// If a move can be played on more than one line, they all die (il ouroboros).
+		if len(playableLines) > 1 {
+			l.Murderer = player.GetPlayerId()
+		}
+		l.Placements = append(l.Placements, move)
+	}
+
+	// Check all lines to see if there is room for another play sometime
+	// in the future. If not, the line is dead.
+	m := maskForBoard(ctx, b)
+	for _, l := range b.GetPlayerLines() {
+		if l.GetMurderer() != "" {
+			continue
+		}
+		room, err := roomToPlay(ctx, m, l)
+		if err != nil {
+			return fmt.Errorf("could not check for room: %v", err)
+		}
+		if !room {
+			l.Murderer = player.GetPlayerId()
+		}
+	}
+
+	// Remove the laid tile from the player's hand.
+	nh := []*tpb.Tile{}
+	for _, t := range player.GetHand() {
+		if proto.Equal(t, move) {
+			continue
+		}
+		nh = append(nh, t)
+	}
+	player.Hand = nh
+
+	b.NextPlayerId, err = nextPlayer(ctx, b, b.GetNextPlayerId())
+	if err != nil {
+		return fmt.Errorf("could not get next player: %v", err)
+	}
+
+	return nil
+}
+
+func roomToPlay(ctx context.Context, m mask, line *tpb.Line) (bool, error) {
+	starts, _, err := NextStartsAndPips(ctx, line)
+	if err != nil {
+		return false, fmt.Errorf("could not get starts: %v", err)
+	}
+	for _, start := range starts {
+		if !m.getc(start) {
+			continue
+		}
+		ends := getAdjacent(ctx, start)
+		for _, end := range ends {
+			if m.getc(end) {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
+func isInCoordList(ctx context.Context, c *tpb.Coord, cs []*tpb.Coord) bool {
+	for _, o := range cs {
+		if proto.Equal(c, o) {
+			return true
+		}
+	}
+	return false
+}
+
+func AvailableLines(ctx context.Context, b *tpb.Board, player *tpb.Player, players map[string]*tpb.Player) ([]*tpb.Line, error) {
+	// Check the lines that can be played on. The player's own line is always included. If
+	// the player is not chickenfooted, then other chickenfooted lines are also included.
+	availableLines := []*tpb.Line{}
+	for _, l := range b.GetPlayerLines() {
+		if l.GetPlayerId() == player.GetPlayerId() {
+			availableLines = append(availableLines, l)
+			continue
+		}
+
+		// If the player is chickenfooted, the only legal move is on their own line.
+		if player.GetChickenFooted() {
+			continue
+		}
+
+		lp, ok := players[l.GetPlayerId()]
+		if !ok {
+			return nil, fmt.Errorf("bad board state, line has unknown player %q", l.GetPlayerId())
+		}
+		if lp.GetChickenFooted() {
+			availableLines = append(availableLines, l)
+		}
+	}
+
+	// If the player is not chickenfooted, they can also play on any free lines.
+	if !player.GetChickenFooted() {
+		availableLines = append(availableLines, b.GetFreeLines()...)
+	}
+	return availableLines, nil
+}
+
+func NextStartsAndPips(ctx context.Context, line *tpb.Line) ([]*tpb.Coord, int32, error) {
+	placements := line.GetPlacements()
+	if len(placements) == 0 {
+		return nil, 0, errors.New("line had no placements")
+	}
+
+	lastPlacement := placements[len(placements)-1]
+	if lastPlacement.GetTile().GetA() == lastPlacement.GetTile().GetB() {
+		var starts []*tpb.Coord
+		starts = append(starts, getAdjacent(ctx, lastPlacement.GetA())...)
+		starts = append(starts, getAdjacent(ctx, lastPlacement.GetB())...)
+		pips := lastPlacement.GetTile().GetA()
+		return starts, pips, nil
+	}
+
+	pips := placements[0].GetTile().GetA() // It's necessarily a double.
+	var curSide *tpb.Coord
+	for _, placement := range placements[1:] {
+		if placement.GetTile().GetA() == pips {
+			pips = placement.GetTile().GetB()
+			curSide = placement.GetB()
+			continue
+		}
+		if placement.GetTile().GetB() == pips {
+			pips = placement.GetTile().GetA()
+			curSide = placement.GetA()
+			continue
+		}
+		return nil, 0, fmt.Errorf("problem with this line at %v", placement)
+	}
+	starts := getAdjacent(ctx, curSide)
+	return starts, pips, nil
+}
+
 func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 	// Quick lookup to map IDs to players later, mostly for seeing if a player is chickenfooted.
 	players := map[string]*tpb.Player{}
@@ -176,30 +360,9 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 
 	// Check the lines that can be played on. The player's own line is always included. If
 	// the player is not chickenfooted, then other chickenfooted lines are also included.
-	availableLines := []*tpb.Line{}
-	for _, l := range b.GetPlayerLines() {
-		if l.GetPlayerId() == p.GetPlayerId() {
-			availableLines = append(availableLines, l)
-			continue
-		}
-
-		// If the player is chickenfooted, the only legal move is on their own line.
-		if p.GetChickenFooted() {
-			continue
-		}
-
-		lp, ok := players[l.GetPlayerId()]
-		if !ok {
-			return nil, fmt.Errorf("bad board state, line has unknown player %q", l.GetPlayerId())
-		}
-		if lp.GetChickenFooted() {
-			availableLines = append(availableLines, l)
-		}
-	}
-
-	// If the player is not chickenfooted, they can also play on any free lines.
-	if !p.GetChickenFooted() {
-		availableLines = append(availableLines, b.GetFreeLines()...)
+	availableLines, err := AvailableLines(ctx, b, p, players)
+	if err != nil {
+		return nil, fmt.Errorf("could not get available lines: %v", err)
 	}
 
 	debug("lines available: %d\n", len(availableLines))
@@ -211,40 +374,18 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 	// player's hand, and then check the ways that tile could be placed that don't hit the
 	// mask.
 	for i, l := range availableLines {
-		placements := l.GetPlacements()
-		lp := placements[len(placements)-1]
-
-		starts := []*tpb.Coord{}
-		var pips int32 = 0
-
-		if lp.GetTile().GetA() == lp.GetTile().GetB() {
-			// If the tile is a double, we can start from either side with the next tile.
-			starts = append(starts, getAdjacent(ctx, lp.GetA())...)
-			starts = append(starts, getAdjacent(ctx, lp.GetB())...)
-			pips = lp.GetTile().GetA()
-			debug("line %d starts with double %d\n", i, pips)
-		} else {
-			// Otherwise, start from the beginning and follow the line until the end
-			// to be sure we have the right pips and start point.
-			pips = placements[0].GetTile().GetA() // It's necessarily a double.
-			var curSide *tpb.Coord
-			for _, placement := range placements[1:] {
-				if placement.GetTile().GetA() == pips {
-					pips = placement.GetTile().GetB()
-					curSide = placement.GetB()
-					continue
-				}
-				if placement.GetTile().GetB() == pips {
-					pips = placement.GetTile().GetA()
-					curSide = placement.GetA()
-					continue
-				}
-				return nil, fmt.Errorf("problem with this line at %v", placement)
-			}
-			starts = getAdjacent(ctx, curSide)
+		// Can't play on a dead line.
+		if l.GetMurderer() != "" {
+			continue
+		}
+		starts, pips, err := NextStartsAndPips(ctx, l)
+		if err != nil {
+			return nil, fmt.Errorf("could not get next starts and pips: %v", err)
 		}
 
 		debug("Line %d can start with %d pips at any of %q\n", i, pips, starts)
+
+		debug("Player %s has hand %q\n", p.GetPlayerId(), p.GetHand())
 
 		// We consider any tile that can place `pips` in one of the `starts`.
 		for _, t := range p.GetHand() {
@@ -262,10 +403,10 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 							B:    b,
 						}
 						if !mask.getp(nextPlacement) {
-							debug("%q doesn't hit the mask\n", nextPlacement)
+							// debug("%q doesn't hit the mask\n", nextPlacement)
 							moves = append(moves, nextPlacement)
 						}
-						debug("%q hits the mask\n", nextPlacement)
+						// debug("%q hits the mask\n", nextPlacement)
 					}
 				}
 			}
@@ -281,10 +422,10 @@ func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
 							B:    b,
 						}
 						if !mask.getp(nextPlacement) {
-							debug("%q doesn't hit the mask\n", nextPlacement)
+							// debug("%q doesn't hit the mask\n", nextPlacement)
 							moves = append(moves, nextPlacement)
 						}
-						debug("%q hits the mask\n", nextPlacement)
+						// debug("%q hits the mask\n", nextPlacement)
 					}
 				}
 			}

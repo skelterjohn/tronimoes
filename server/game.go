@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -40,14 +39,6 @@ func (g *InMemoryGames) ReadGame(ctx context.Context, id string) (*spb.Game, err
 		return proto.Clone(gm).(*spb.Game), nil
 	}
 	return nil, status.Errorf(codes.NotFound, "no such game %s", id)
-}
-
-func (g *InMemoryGames) NewGame(ctx context.Context, gm *spb.Game) (*spb.Game, error) {
-	gm.GameId = uuid.New().String()
-	if err := g.WriteGame(ctx, gm); err != nil {
-		return nil, err
-	}
-	return gm, nil
 }
 
 func (g *InMemoryGames) WriteBoard(ctx context.Context, id string, b *tpb.Board) error {

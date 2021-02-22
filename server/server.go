@@ -15,6 +15,7 @@ import (
 
 	"github.com/skelterjohn/tronimoes/server/auth"
 	spb "github.com/skelterjohn/tronimoes/server/proto"
+	"github.com/skelterjohn/tronimoes/server/tiles"
 	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
 )
 
@@ -136,6 +137,73 @@ func (t *Tronimoes) GetBoard(ctx context.Context, req *spb.GetBoardRequest) (*tp
 			p.Hand[i].A = -1
 			p.Hand[i].B = -1
 		}
+	}
+
+	return b, nil
+}
+
+func (t *Tronimoes) GetMoves(ctx context.Context, req *spb.GetMovesRequest) (*spb.GetMovesResponse, error) {
+	playerID, ok := auth.PlayerIDFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unknown player ID")
+	}
+
+	g, err := t.Games.ReadGame(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get game")
+	}
+	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
+		return nil, err
+	}
+
+	b, err := t.Games.ReadBoard(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get board")
+	}
+
+	if b.GetNextPlayerId() != playerID {
+		return nil, status.Error(codes.FailedPrecondition, "it is not your turn")
+	}
+
+	moves, err := tiles.LegalMoves(ctx, b)
+	if err != nil {
+		return nil, annotatef(err, "could not get legal moves")
+	}
+
+	return &spb.GetMovesResponse{
+		Placements: moves,
+	}, nil
+}
+
+func (t *Tronimoes) LayTile(ctx context.Context, req *spb.LayTileRequest) (*tpb.Board, error) {
+	playerID, ok := auth.PlayerIDFromContext(ctx)
+	if !ok {
+		return nil, status.Error(codes.Unauthenticated, "unknown player ID")
+	}
+
+	g, err := t.Games.ReadGame(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get game")
+	}
+	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
+		return nil, err
+	}
+
+	b, err := t.Games.ReadBoard(ctx, req.GetGameId())
+	if err != nil {
+		return nil, annotatef(err, "could not get board")
+	}
+
+	if b.GetNextPlayerId() != playerID {
+		return nil, status.Error(codes.FailedPrecondition, "it is not your turn")
+	}
+
+	if err := tiles.LayTile(ctx, b, req.GetPlacement()); err != nil {
+		return nil, annotatef(err, "could not lay tile")
+	}
+
+	if err := t.Games.WriteBoard(ctx, req.GetGameId(), b); err != nil {
+		return nil, annotatef(err, "could not write board")
 	}
 
 	return b, nil

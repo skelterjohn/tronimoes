@@ -3,7 +3,9 @@ package testing
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"net"
+	"sync"
 	"testing"
 	"time"
 
@@ -17,6 +19,97 @@ import (
 	"github.com/skelterjohn/tronimoes/server/auth"
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 )
+
+func playMovesUntilDone(t *testing.T, ctx context.Context, c spb.TronimoesClient, playerID, gameID string) {
+	t.Helper()
+
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.New(map[string]string{
+		"access_token": playerID,
+		"player_id":    playerID,
+	}))
+
+	for {
+		// Wait until this player's turn.
+		b, err := c.GetBoard(ctx, &spb.GetBoardRequest{
+			GameId: gameID,
+		})
+
+		if err != nil {
+			t.Fatalf("Error getting board for %s: %v", playerID, err)
+			return
+		}
+
+		if b.GetNextPlayerId() == "" {
+			t.Fatal("It was no one's turn")
+			return
+		}
+
+		if b.GetNextPlayerId() != playerID {
+			// Since all players will be automated, we can have a short wait time to avoid a long test.
+			time.Sleep(10 * time.Millisecond)
+			continue
+		}
+
+		resp, err := c.GetMoves(ctx, &spb.GetMovesRequest{
+			GameId: gameID,
+		})
+		if err != nil {
+			t.Fatalf("Could not get moves: %v", err)
+		}
+
+		placements := resp.GetPlacements()
+		if len(placements) == 0 {
+			return
+		}
+
+		placement := placements[rand.Intn(len(placements))]
+
+		if _, err := c.LayTile(ctx, &spb.LayTileRequest{
+			GameId:    gameID,
+			Placement: placement,
+		}); err != nil {
+			t.Fatalf("Error laying tile: %v", err)
+		}
+		fmt.Printf("%s played %q\n", playerID, placement)
+	}
+}
+
+func gameForPlayers(t *testing.T, ctx context.Context, c spb.TronimoesClient, playerIDs []string) string {
+	t.Helper()
+
+	games := make([]*spb.Game, len(playerIDs))
+
+	wg := &sync.WaitGroup{}
+	for i, pid := range playerIDs {
+		wg.Add(1)
+		go func(ctx context.Context, i int, pid string) {
+			defer wg.Done()
+			g, err := createGameAndWait(t, ctx, c, pid, &spb.CreateGameRequest{
+				Discoverable: false,
+				Private:      false,
+				MinPlayers:   0,
+				MaxPlayers:   0,
+				BoardShape:   spb.CreateGameRequest_standard_31_by_30,
+			})
+			if err != nil {
+				t.Fatalf("Could not create game for %s: %v", pid, err)
+			}
+			games[i] = g
+		}(ctx, i, pid)
+	}
+	wg.Wait()
+
+	for i := range games {
+		if games[i].GetGameId() != games[0].GetGameId() {
+			t.Fatalf("Got different games for different players, %s != %s", games[i].GetGameId(), games[0].GetGameId())
+		}
+	}
+
+	return games[0].GetGameId()
+}
 
 func createGameAndWait(t *testing.T, ctx context.Context, c spb.TronimoesClient, playerID string, req *spb.CreateGameRequest) (*spb.Game, error) {
 	t.Helper()

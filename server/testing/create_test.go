@@ -2,7 +2,6 @@ package testing
 
 import (
 	"context"
-	"sync"
 	"testing"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
@@ -14,43 +13,7 @@ func TestCreate(t *testing.T) {
 	c, close := createBufferedServer(t, ctx)
 	defer close()
 
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
-	var g1, g2 *spb.Game
-	var err1, err2 error
-	go func() {
-		defer wg.Done()
-		g1, err1 = createGameAndWait(t, ctx, c, "jt", &spb.CreateGameRequest{
-			Discoverable: false,
-			Private:      false,
-			MinPlayers:   0,
-			MaxPlayers:   0,
-			BoardShape:   spb.CreateGameRequest_standard_31_by_30,
-		})
-	}()
-	go func() {
-		defer wg.Done()
-		g2, err2 = createGameAndWait(t, ctx, c, "stef", &spb.CreateGameRequest{
-			Discoverable: false,
-			Private:      false,
-			MinPlayers:   0,
-			MaxPlayers:   0,
-			BoardShape:   spb.CreateGameRequest_standard_31_by_30,
-		})
-	}()
-	wg.Wait()
-	if err1 != nil {
-		t.Fatalf("Could not create game 1: %v", err1)
-	}
-	if err2 != nil {
-		t.Fatalf("Could not create game 2: %v", err2)
-	}
-
-	if g1.GetGameId() != g2.GetGameId() {
-		t.Errorf("Game IDs did not match, %q != %q", g1.GetGameId(), g2.GetGameId())
-	}
-
-	gameID := g1.GetGameId()
+	gameID := gameForPlayers(t, ctx, c, []string{"jt", "stef"})
 
 	checkBoardForPlayer := func(t *testing.T, ctx context.Context, playerID string) {
 		t.Helper()
