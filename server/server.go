@@ -165,7 +165,17 @@ func (t *Tronimoes) GetMoves(ctx context.Context, req *spb.GetMovesRequest) (*sp
 		return nil, status.Error(codes.FailedPrecondition, "it is not your turn")
 	}
 
-	moves, err := tiles.LegalMoves(ctx, b)
+	var player *tpb.Player
+	for _, p := range b.GetPlayers() {
+		if p.GetPlayerId() == playerID {
+			player = p
+		}
+	}
+	if player == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "player %s is not in this game", playerID)
+	}
+
+	moves, err := tiles.LegalMoves(ctx, b, player)
 	if err != nil {
 		return nil, annotatef(err, "could not get legal moves")
 	}

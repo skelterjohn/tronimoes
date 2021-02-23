@@ -162,7 +162,16 @@ func newShuffledBag(ctx context.Context) []*tpb.Tile {
 }
 
 func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
-	validMoves, err := LegalMoves(ctx, b)
+	players := map[string]*tpb.Player{}
+	for _, p := range b.GetPlayers() {
+		players[p.GetPlayerId()] = p
+	}
+	player, ok := players[b.GetNextPlayerId()]
+	if !ok {
+		return fmt.Errorf("next player %s not in list", b.GetNextPlayerId())
+	}
+
+	validMoves, err := LegalMoves(ctx, b, player)
 	if err != nil {
 		return fmt.Errorf("could not get legal moves before playing: %v", err)
 	}
@@ -178,14 +187,6 @@ func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
 	}
 
 	// Check all lines to see if this tile can be placed on them.
-	players := map[string]*tpb.Player{}
-	for _, p := range b.GetPlayers() {
-		players[p.GetPlayerId()] = p
-	}
-	player, ok := players[b.GetNextPlayerId()]
-	if !ok {
-		return fmt.Errorf("next player %s not in list", b.GetNextPlayerId())
-	}
 	availableLines, err := AvailableLines(ctx, b, player, players)
 	if err != nil {
 		return fmt.Errorf("could not get available lines: %v", err)
@@ -243,12 +244,55 @@ func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
 	}
 	player.Hand = nh
 
+	over, err := gameIsOver(ctx, b)
+	if err != nil {
+		return fmt.Errorf("could not check if game is over: %v", err)
+	}
+	if over {
+		b.Done = true
+		return nil
+	}
+
 	b.NextPlayerId, err = nextPlayer(ctx, b, b.GetNextPlayerId())
 	if err != nil {
 		return fmt.Errorf("could not get next player: %v", err)
 	}
 
 	return nil
+}
+
+func gameIsOver(ctx context.Context, b *tpb.Board) (bool, error) {
+	for _, player := range b.GetPlayers() {
+		if len(player.GetHand()) == 0 {
+			return true, nil
+		}
+	}
+
+	linesAlive := 0
+	for _, pl := range b.GetPlayerLines() {
+		if pl.GetMurderer() == "" {
+			linesAlive++
+		}
+	}
+	if linesAlive < 2 {
+		return true, nil
+	}
+
+	playersWithMoves := 0
+	for _, player := range b.GetPlayers() {
+		moves, err := LegalMoves(ctx, b, player)
+		if err != nil {
+			return false, fmt.Errorf("could not find legal moves for %s: %v", player.GetPlayerId(), err)
+		}
+		if len(moves) == 0 {
+			playersWithMoves++
+		}
+	}
+	if playersWithMoves == 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func roomToPlay(ctx context.Context, m mask, line *tpb.Line) (bool, error) {
@@ -344,16 +388,15 @@ func NextStartsAndPips(ctx context.Context, line *tpb.Line) ([]*tpb.Coord, int32
 	return starts, pips, nil
 }
 
-func LegalMoves(ctx context.Context, b *tpb.Board) ([]*tpb.Placement, error) {
+func LegalMoves(ctx context.Context, b *tpb.Board, p *tpb.Player) ([]*tpb.Placement, error) {
+	if b.Done {
+		return nil, nil
+	}
+
 	// Quick lookup to map IDs to players later, mostly for seeing if a player is chickenfooted.
 	players := map[string]*tpb.Player{}
 	for _, p := range b.GetPlayers() {
 		players[p.GetPlayerId()] = p
-	}
-
-	p, ok := players[b.GetNextPlayerId()]
-	if !ok {
-		return nil, fmt.Errorf("no player %q", b.GetNextPlayerId())
 	}
 
 	moves := []*tpb.Placement{}

@@ -90,6 +90,13 @@ message Game {
 	string game_id = 1;
 
 	repeated string player_ids = 2;
+
+	enum Status {
+		UNKNOWN = 0;
+		PLAYING = 1;
+		DONE = 2;
+	}
+	Status status = 3;
 }
 
 message GetBoardRequest {
@@ -106,6 +113,6 @@ message GetMovesResponse {
 
 message LayTileRequest {
 	string game_id = 1;
-	
+
 	skelterjohn.tronimoes.tiles.Placement placement = 2;
 }

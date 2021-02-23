@@ -37,6 +37,10 @@ func playMovesUntilDone(t *testing.T, ctx context.Context, c spb.TronimoesClient
 			GameId: gameID,
 		})
 
+		if b.GetDone() {
+			return
+		}
+
 		if err != nil {
 			t.Fatalf("Error getting board for %s: %v", playerID, err)
 			return
