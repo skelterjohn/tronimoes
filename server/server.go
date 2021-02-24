@@ -208,7 +208,8 @@ func (t *Tronimoes) LayTile(ctx context.Context, req *spb.LayTileRequest) (*tpb.
 		return nil, status.Error(codes.FailedPrecondition, "it is not your turn")
 	}
 
-	if err := tiles.LayTile(ctx, b, req.GetPlacement()); err != nil {
+	b, err = tiles.LayTile(ctx, b, req.GetPlacement())
+	if err != nil {
 		return nil, annotatef(err, "could not lay tile")
 	}
 

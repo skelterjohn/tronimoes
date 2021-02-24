@@ -240,7 +240,7 @@ func TestEdgeRace(t *testing.T) {
 		t.Fatal(err)
 	}
 	board.GetPlayers()[0].Hand = []*tpb.Tile{
-		tab(12, 12), tab(12, 11), tab(11, 10), tab(10, 9), tab(9, 8),
+		tab(12, 11), tab(11, 10), tab(10, 9), tab(9, 8),
 	}
 	board.GetPlayers()[1].Hand = []*tpb.Tile{
 		tab(12, 10), tab(10, 8), tab(8, 6), tab(6, 4), tab(4, 2),
@@ -276,13 +276,26 @@ func TestEdgeRace(t *testing.T) {
 	// Play a bunch of legal moves.
 
 	for _, placement := range placements {
-		if err := LayTile(ctx, board, placement); err != nil {
+		p, err := GetNextPlayer(ctx, board)
+		if err != nil {
+			t.Fatal(err)
+		}
+		moves, err := LegalMoves(ctx, board, p)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Printf("Moves for %s:\n", p.GetPlayerId())
+		for _, m := range moves {
+			fmt.Println(m)
+		}
+		board, err = LayTile(ctx, board, placement)
+		if err != nil {
 			t.Fatalf("Error placing %q: %v", placement, err)
 		}
 	}
 
 	// Try to play a move using a tile not in the hand.
-	if err := LayTile(ctx, board, &tpb.Placement{
+	if _, err := LayTile(ctx, board, &tpb.Placement{
 		Tile: tab(8, 1),
 		A:    xy(9, 4),
 		B:    xy(9, 3),
@@ -291,7 +304,7 @@ func TestEdgeRace(t *testing.T) {
 	}
 
 	// Try to play a tile somewhere disconnected.
-	if err := LayTile(ctx, board, &tpb.Placement{
+	if _, err := LayTile(ctx, board, &tpb.Placement{
 		Tile: tab(8, 6),
 		A:    xy(1, 2),
 		B:    xy(1, 3),
@@ -319,146 +332,186 @@ func TestLegalMoves(t *testing.T) {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 7},
 			B:    &tpb.Coord{X: 4, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 6},
 			B:    &tpb.Coord{X: 4, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 6},
 			B:    &tpb.Coord{X: 4, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 3},
 			B:    &tpb.Coord{X: 4, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 4},
 			B:    &tpb.Coord{X: 4, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 4},
 			B:    &tpb.Coord{X: 4, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 6},
 			B:    &tpb.Coord{X: 3, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 4},
 			B:    &tpb.Coord{X: 3, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 2, Y: 5},
 			B:    &tpb.Coord{X: 3, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 7},
 			B:    &tpb.Coord{X: 5, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 6},
 			B:    &tpb.Coord{X: 5, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 6},
 			B:    &tpb.Coord{X: 5, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 3},
 			B:    &tpb.Coord{X: 5, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 4},
 			B:    &tpb.Coord{X: 5, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 4},
 			B:    &tpb.Coord{X: 5, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 6},
 			B:    &tpb.Coord{X: 6, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 4},
 			B:    &tpb.Coord{X: 6, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 8, B: 12},
 			A:    &tpb.Coord{X: 7, Y: 5},
 			B:    &tpb.Coord{X: 6, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 7},
 			B:    &tpb.Coord{X: 4, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 6},
 			B:    &tpb.Coord{X: 4, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 6},
 			B:    &tpb.Coord{X: 4, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 3},
 			B:    &tpb.Coord{X: 4, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 4},
 			B:    &tpb.Coord{X: 4, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 4},
 			B:    &tpb.Coord{X: 4, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 6},
 			B:    &tpb.Coord{X: 3, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 3, Y: 4},
 			B:    &tpb.Coord{X: 3, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 2, Y: 5},
 			B:    &tpb.Coord{X: 3, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 7},
 			B:    &tpb.Coord{X: 5, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 6},
 			B:    &tpb.Coord{X: 5, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 6},
 			B:    &tpb.Coord{X: 5, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 5, Y: 3},
 			B:    &tpb.Coord{X: 5, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 4},
 			B:    &tpb.Coord{X: 5, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 4, Y: 4},
 			B:    &tpb.Coord{X: 5, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 6},
 			B:    &tpb.Coord{X: 6, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 6, Y: 4},
 			B:    &tpb.Coord{X: 6, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 7, B: 12},
 			A:    &tpb.Coord{X: 7, Y: 5},
 			B:    &tpb.Coord{X: 6, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
+		}, {
+			Type: tpb.Placement_PASS,
+		}, {
+			Type: tpb.Placement_DRAW,
 		}},
 	}, {
 		label: "next move",
@@ -480,10 +533,12 @@ func TestLegalMoves(t *testing.T) {
 					Tile: &tpb.Tile{A: 12, B: 12},
 					A:    &tpb.Coord{X: 4, Y: 5},
 					B:    &tpb.Coord{X: 5, Y: 5},
+					Type: tpb.Placement_PLAYER_LEADER,
 				}, {
 					Tile: &tpb.Tile{A: 11, B: 12},
 					A:    &tpb.Coord{X: 2, Y: 5},
 					B:    &tpb.Coord{X: 3, Y: 5},
+					Type: tpb.Placement_PLAYER_CONTINUATION,
 				}},
 			}},
 		},
@@ -491,38 +546,51 @@ func TestLegalMoves(t *testing.T) {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 2, Y: 7},
 			B:    &tpb.Coord{X: 2, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 3, Y: 6},
 			B:    &tpb.Coord{X: 2, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 1, Y: 6},
 			B:    &tpb.Coord{X: 2, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 2, Y: 3},
 			B:    &tpb.Coord{X: 2, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 3, Y: 4},
 			B:    &tpb.Coord{X: 2, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 1, Y: 4},
 			B:    &tpb.Coord{X: 2, Y: 4},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 1, Y: 6},
 			B:    &tpb.Coord{X: 1, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 1, Y: 4},
 			B:    &tpb.Coord{X: 1, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 10, B: 11},
 			A:    &tpb.Coord{X: 0, Y: 5},
 			B:    &tpb.Coord{X: 1, Y: 5},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
+		}, {
+			Type: tpb.Placement_PASS,
+		}, {
+			Type: tpb.Placement_DRAW,
 		}},
 	}, {
 		label: "next move adjacent",
@@ -550,14 +618,17 @@ func TestLegalMoves(t *testing.T) {
 					Tile: &tpb.Tile{A: 12, B: 12},
 					A:    &tpb.Coord{X: 4, Y: 5},
 					B:    &tpb.Coord{X: 5, Y: 5},
+					Type: tpb.Placement_PLAYER_LEADER,
 				}, {
 					Tile: &tpb.Tile{A: 11, B: 12},
 					A:    &tpb.Coord{X: 4, Y: 6},
 					B:    &tpb.Coord{X: 4, Y: 7},
+					Type: tpb.Placement_PLAYER_CONTINUATION,
 				}, {
 					Tile: &tpb.Tile{A: 11, B: 10},
 					A:    &tpb.Coord{X: 4, Y: 8},
 					B:    &tpb.Coord{X: 4, Y: 9},
+					Type: tpb.Placement_PLAYER_CONTINUATION,
 				}},
 			}, {
 				PlayerId: "stef",
@@ -565,10 +636,12 @@ func TestLegalMoves(t *testing.T) {
 					Tile: &tpb.Tile{A: 12, B: 12},
 					A:    &tpb.Coord{X: 4, Y: 5},
 					B:    &tpb.Coord{X: 5, Y: 5},
+					Type: tpb.Placement_PLAYER_LEADER,
 				}, {
 					Tile: &tpb.Tile{A: 12, B: 11},
 					A:    &tpb.Coord{X: 5, Y: 6},
 					B:    &tpb.Coord{X: 5, Y: 7},
+					Type: tpb.Placement_PLAYER_CONTINUATION,
 				}},
 			}},
 		},
@@ -576,26 +649,40 @@ func TestLegalMoves(t *testing.T) {
 			Tile: &tpb.Tile{A: 11, B: 9},
 			A:    &tpb.Coord{X: 5, Y: 8},
 			B:    &tpb.Coord{X: 5, Y: 9},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 11, B: 9},
 			A:    &tpb.Coord{X: 5, Y: 8},
 			B:    &tpb.Coord{X: 6, Y: 8},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 11, B: 9},
 			A:    &tpb.Coord{X: 6, Y: 7},
 			B:    &tpb.Coord{X: 6, Y: 8},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 11, B: 9},
 			A:    &tpb.Coord{X: 6, Y: 7},
 			B:    &tpb.Coord{X: 6, Y: 6},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
 		}, {
 			Tile: &tpb.Tile{A: 11, B: 9},
 			A:    &tpb.Coord{X: 6, Y: 7},
 			B:    &tpb.Coord{X: 7, Y: 7},
+			Type: tpb.Placement_PLAYER_CONTINUATION,
+		}, {
+			Type: tpb.Placement_PASS,
+		}, {
+			Type: tpb.Placement_DRAW,
 		}},
 	}} {
 		t.Run(tc.label, func(t *testing.T) {
-			got, err := LegalMoves(ctx, tc.board)
+			player, err := GetNextPlayer(ctx, tc.board)
+			if err != nil {
+				t.Fatal(err)
+			}
+			Debug = true
+			got, err := LegalMoves(ctx, tc.board, player)
 			if err != nil {
 				t.Fatalf("Could not get legal moves: %v", err)
 			}
@@ -698,6 +785,7 @@ func goCodeForPlacements(placements []*tpb.Placement) string {
 		fmt.Fprintf(buf, "\tTile: &tpb.Tile{A: %d, B: %d},\n", p.GetTile().GetA(), p.GetTile().GetB())
 		fmt.Fprintf(buf, "\tA: &tpb.Coord{X: %d, Y: %d},\n", p.GetA().GetX(), p.GetA().GetY())
 		fmt.Fprintf(buf, "\tB: &tpb.Coord{X: %d, Y: %d},\n", p.GetB().GetX(), p.GetB().GetY())
+		fmt.Fprintf(buf, "\tType: %s,\n", p.GetType().String())
 	}
 	fmt.Fprintf(buf, "}}\n")
 	return buf.String()

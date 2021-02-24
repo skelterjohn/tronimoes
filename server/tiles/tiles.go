@@ -161,41 +161,92 @@ func newShuffledBag(ctx context.Context) []*tpb.Tile {
 	return b
 }
 
-func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
+func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) (*tpb.Board, error) {
 	players := map[string]*tpb.Player{}
 	for _, p := range b.GetPlayers() {
 		players[p.GetPlayerId()] = p
 	}
 	player, ok := players[b.GetNextPlayerId()]
 	if !ok {
-		return fmt.Errorf("next player %s not in list", b.GetNextPlayerId())
+		return nil, fmt.Errorf("next player %s not in list", b.GetNextPlayerId())
 	}
 
 	validMoves, err := LegalMoves(ctx, b, player)
 	if err != nil {
-		return fmt.Errorf("could not get legal moves before playing: %v", err)
+		return nil, fmt.Errorf("could not get legal moves before playing: %v", err)
 	}
 	legal := false
+	debug("checking %s\n", move)
 	for _, vm := range validMoves {
-		if proto.Equal(vm, move) {
-			legal = true
-			break
+		debug("is it %s?\n", vm)
+		if !proto.Equal(vm.GetTile(), move.GetTile()) {
+			debug("no\n")
+			continue
 		}
+		if !proto.Equal(vm.GetA(), move.GetA()) {
+			debug("no\n")
+			continue
+		}
+		if !proto.Equal(vm.GetB(), move.GetB()) {
+			debug("no\n")
+			continue
+		}
+		debug("yes\n")
+		move.Type = vm.GetType()
+		legal = true
 	}
 	if !legal {
-		return fmt.Errorf("%v was an illegal move", move)
+		return nil, fmt.Errorf("%v was an illegal move", move)
 	}
+
+	// If the player passed, apply chickenfooting and move to the next turn.
+	if move.Type == tpb.Placement_PASS {
+		player.ChickenFooted = true
+		b.NextPlayerId, err = nextPlayer(ctx, b, b.GetNextPlayerId())
+		if err != nil {
+			return nil, fmt.Errorf("could not get next player: %v", err)
+		}
+		debug("passed, turn goes to %s\n", b.GetNextPlayerId())
+		b.Done, err = gameIsOver(ctx, b)
+		if err != nil {
+			return nil, fmt.Errorf("could not check if game was done after pass: %v", err)
+		}
+		return b, nil
+	}
+
+	// If the player draws, add the next tile from the bag to their hand
+	// and move to the next turn.
+	if move.Type == tpb.Placement_DRAW {
+		if len(b.GetBag()) == 0 {
+			return nil, errors.New("tried to draw when there were no tiles in the bag")
+		}
+		drawnTile := b.GetBag()[0]
+		b.Bag = b.GetBag()[1:]
+		player.Hand = append(player.Hand, drawnTile)
+		b.NextPlayerId, err = nextPlayer(ctx, b, b.GetNextPlayerId())
+		if err != nil {
+			return nil, fmt.Errorf("could not get next player: %v", err)
+		}
+		debug("drew, turn goes to %s\n", b.GetNextPlayerId())
+		b.Done, err = gameIsOver(ctx, b)
+		if err != nil {
+			return nil, fmt.Errorf("could not check if game was done after draw: %v", err)
+		}
+		return b, nil
+	}
+
+	debug("must be a continuation\n")
 
 	// Check all lines to see if this tile can be placed on them.
 	availableLines, err := AvailableLines(ctx, b, player, players)
 	if err != nil {
-		return fmt.Errorf("could not get available lines: %v", err)
+		return nil, fmt.Errorf("could not get available lines: %v", err)
 	}
 	playableLines := []*tpb.Line{}
 	for _, l := range availableLines {
 		starts, pips, err := NextStartsAndPips(ctx, l)
 		if err != nil {
-			return fmt.Errorf("could not get starts and pips for line: %v", err)
+			return nil, fmt.Errorf("could not get starts and pips for line: %v", err)
 		}
 		if pips == move.GetTile().GetA() && isInCoordList(ctx, move.GetA(), starts) {
 			playableLines = append(playableLines, l)
@@ -207,8 +258,10 @@ func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
 	}
 
 	if len(playableLines) == 0 {
-		return errors.New("illegal move")
+		return nil, errors.New("illegal move")
 	}
+
+	debug("%d playable lines\n", len(playableLines))
 
 	for _, l := range playableLines {
 		// If a move can be played on more than one line, they all die (il ouroboros).
@@ -227,7 +280,7 @@ func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
 		}
 		room, err := roomToPlay(ctx, m, l)
 		if err != nil {
-			return fmt.Errorf("could not check for room: %v", err)
+			return nil, fmt.Errorf("could not check for room: %v", err)
 		}
 		if !room {
 			l.Murderer = player.GetPlayerId()
@@ -244,26 +297,42 @@ func LayTile(ctx context.Context, b *tpb.Board, move *tpb.Placement) error {
 	}
 	player.Hand = nh
 
+	// Once you play a tile you're no longer chickenfooted.
+	player.ChickenFooted = false
+
 	over, err := gameIsOver(ctx, b)
 	if err != nil {
-		return fmt.Errorf("could not check if game is over: %v", err)
+		return nil, fmt.Errorf("could not check if game is over: %v", err)
 	}
 	if over {
 		b.Done = true
-		return nil
+		debug("game over\n")
+		return b, nil
 	}
 
 	b.NextPlayerId, err = nextPlayer(ctx, b, b.GetNextPlayerId())
 	if err != nil {
-		return fmt.Errorf("could not get next player: %v", err)
+		return nil, fmt.Errorf("could not get next player: %v", err)
 	}
 
-	return nil
+	debug("laid, turn goes to %s\n", b.GetNextPlayerId())
+	return b, nil
+}
+
+func GetNextPlayer(ctx context.Context, b *tpb.Board) (*tpb.Player, error) {
+	for _, p := range b.GetPlayers() {
+		if p.GetPlayerId() == b.GetNextPlayerId() {
+			return p, nil
+		}
+	}
+	return nil, fmt.Errorf("no player with id %q", b.GetNextPlayerId())
 }
 
 func gameIsOver(ctx context.Context, b *tpb.Board) (bool, error) {
+
 	for _, player := range b.GetPlayers() {
 		if len(player.GetHand()) == 0 {
+			debug("game is over because a %s ran out of tiles\n", player.GetPlayerId())
 			return true, nil
 		}
 	}
@@ -275,6 +344,7 @@ func gameIsOver(ctx context.Context, b *tpb.Board) (bool, error) {
 		}
 	}
 	if linesAlive < 2 {
+		debug("game is over because there aren't at least two player lines left\n")
 		return true, nil
 	}
 
@@ -284,11 +354,14 @@ func gameIsOver(ctx context.Context, b *tpb.Board) (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("could not find legal moves for %s: %v", player.GetPlayerId(), err)
 		}
-		if len(moves) == 0 {
-			playersWithMoves++
+		if len(moves) == 1 && moves[0].GetType() == tpb.Placement_PASS {
+			continue
 		}
+		fmt.Printf("internal: %s has %d moves\n", player.GetPlayerId(), len(moves))
+		playersWithMoves++
 	}
 	if playersWithMoves == 0 {
+		debug("game is over because no player has any moves\n")
 		return true, nil
 	}
 
@@ -408,6 +481,7 @@ func LegalMoves(ctx context.Context, b *tpb.Board, p *tpb.Player) ([]*tpb.Placem
 		return nil, fmt.Errorf("could not get available lines: %v", err)
 	}
 
+	debug("%s wants to play\n", p.GetPlayerId())
 	debug("lines available: %d\n", len(availableLines))
 
 	// Build a mask of the board so we can easily tell where a tile can be placed.
@@ -426,6 +500,16 @@ func LegalMoves(ctx context.Context, b *tpb.Board, p *tpb.Player) ([]*tpb.Placem
 			return nil, fmt.Errorf("could not get next starts and pips: %v", err)
 		}
 
+		var placementType tpb.Placement_Type
+		switch l.GetPlacements()[0].GetType() {
+		case tpb.Placement_PLAYER_LEADER:
+			placementType = tpb.Placement_PLAYER_CONTINUATION
+		case tpb.Placement_FREE_LEADER:
+			placementType = tpb.Placement_FREE_CONTINUATION
+		default:
+			return nil, fmt.Errorf("line start wasn't a leader, instead %s", l.GetPlacements()[0].GetType().String())
+		}
+
 		debug("Line %d can start with %d pips at any of %q\n", i, pips, starts)
 
 		debug("Player %s has hand %q\n", p.GetPlayerId(), p.GetHand())
@@ -435,15 +519,16 @@ func LegalMoves(ctx context.Context, b *tpb.Board, p *tpb.Player) ([]*tpb.Placem
 			// Unfortunate duplication.
 			debug("Looking at tile %q\n", t)
 			if t.GetA() == pips {
-				debug("%q matches on the A side\n", t)
+				// debug("%q matches on the A side\n", t)
 				for _, a := range starts {
-					debug("Checking when A=%q\n", a)
+					// debug("Checking when A=%q\n", a)
 					bs := getAdjacent(ctx, a)
 					for _, b := range bs {
 						nextPlacement := &tpb.Placement{
 							Tile: t,
 							A:    a,
 							B:    b,
+							Type: placementType,
 						}
 						if !mask.getp(nextPlacement) {
 							// debug("%q doesn't hit the mask\n", nextPlacement)
@@ -454,15 +539,16 @@ func LegalMoves(ctx context.Context, b *tpb.Board, p *tpb.Player) ([]*tpb.Placem
 				}
 			}
 			if t.GetB() == pips {
-				debug("%q matches on the B side\n", t)
+				// debug("%q matches on the B side\n", t)
 				for _, b := range starts {
-					debug("Checking when B=%q\n", b)
+					// debug("Checking when B=%q\n", b)
 					as := getAdjacent(ctx, b)
 					for _, a := range as {
 						nextPlacement := &tpb.Placement{
 							Tile: t,
 							A:    a,
 							B:    b,
+							Type: placementType,
 						}
 						if !mask.getp(nextPlacement) {
 							// debug("%q doesn't hit the mask\n", nextPlacement)
@@ -474,6 +560,17 @@ func LegalMoves(ctx context.Context, b *tpb.Board, p *tpb.Player) ([]*tpb.Placem
 			}
 		}
 	}
+
+	moves = append(moves, &tpb.Placement{
+		Type: tpb.Placement_PASS,
+	})
+	if len(b.GetBag()) != 0 {
+		moves = append(moves, &tpb.Placement{
+			Type: tpb.Placement_DRAW,
+		})
+	}
+
+	// TODO: opportunities to start new free lines.
 
 	// TODO: disallow moves that "crowd" the round leader.
 

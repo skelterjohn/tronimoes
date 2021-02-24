@@ -69,6 +69,8 @@ func playMovesUntilDone(t *testing.T, ctx context.Context, c spb.TronimoesClient
 			return
 		}
 
+		t.Logf("%s has %d moves", playerID, len(placements))
+
 		placement := placements[rand.Intn(len(placements))]
 
 		if _, err := c.LayTile(ctx, &spb.LayTileRequest{

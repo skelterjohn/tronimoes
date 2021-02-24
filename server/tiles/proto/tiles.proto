@@ -28,6 +28,8 @@ message Placement {
         PLAYER_CONTINUATION = 2;
         FREE_LEADER = 3;
         FREE_CONTINUATION = 4;
+        PASS = 5;
+        DRAW = 6;
     }
     Type type = 4;
 }
