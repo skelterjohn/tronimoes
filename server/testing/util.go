@@ -91,7 +91,8 @@ func gameForPlayers(t *testing.T, ctx context.Context, c spb.TronimoesClient, pl
 	wg := &sync.WaitGroup{}
 	for i, pid := range playerIDs {
 		wg.Add(1)
-		go func(ctx context.Context, i int, pid string) {
+		go func(t *testing.T, ctx context.Context, i int, pid string) {
+			t.Helper()
 			defer wg.Done()
 			g, err := createGameAndWait(t, ctx, c, pid, &spb.CreateGameRequest{
 				Discoverable: false,
@@ -104,7 +105,7 @@ func gameForPlayers(t *testing.T, ctx context.Context, c spb.TronimoesClient, pl
 				t.Fatalf("Could not create game for %s: %v", pid, err)
 			}
 			games[i] = g
-		}(ctx, i, pid)
+		}(t, ctx, i, pid)
 	}
 	wg.Wait()
 
