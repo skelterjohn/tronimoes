@@ -163,15 +163,20 @@ func createBufferedServer(t *testing.T, ctx context.Context) (spb.TronimoesClien
 
 	operations := &server.InMemoryOperations{}
 	games := &server.InMemoryGames{}
+	rounds := &server.Rounds{
+		Games: games,
+	}
 	queue := &server.InMemoryQueue{
 		Games:      games,
 		Operations: operations,
+		Rounds:     rounds,
 	}
 
 	tronimoes := &server.Tronimoes{
 		Operations: operations,
 		Games:      games,
 		Queue:      queue,
+		Rounds:     rounds,
 	}
 
 	s := grpc.NewServer(grpc.UnaryInterceptor(auth.AccessFilter))

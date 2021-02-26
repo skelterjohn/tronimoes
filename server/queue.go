@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
-	"github.com/skelterjohn/tronimoes/server/tiles"
 	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
 )
 
@@ -35,6 +34,7 @@ type InMemoryQueue struct {
 
 	Games      Games
 	Operations Operations
+	Rounds     *Rounds
 }
 
 func (q *InMemoryQueue) AddPlayer(ctx context.Context, playerID string, req *spb.CreateGameRequest, operationID string) error {
@@ -61,7 +61,9 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		q.joinRequests[1],
 	}
 
-	g := &spb.Game{}
+	g := &spb.Game{
+		BoardShape: q.joinRequests[0].Req.GetBoardShape(),
+	}
 	opIDs := []string{}
 	for _, jr := range jrs {
 		g.Players = append(g.Players, &spb.Player{
@@ -73,31 +75,11 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 	g.GameId = uuid.New().String()
 
 	if err := q.Games.WriteGame(ctx, g); err != nil {
-		return annotatef(err, "could not write  new game")
+		return annotatef(err, "could not write new game")
 	}
 
-	switch q.joinRequests[0].Req.GetBoardShape() {
-	case spb.BoardShape_standard_31_by_30:
-		b := &tpb.Board{
-			Width:  31,
-			Height: 30,
-		}
-		for _, p := range g.Players {
-			b.Players = append(b.Players, &tpb.Player{
-				PlayerId: p.GetPlayerId(),
-			})
-		}
-
-		b, err := tiles.SetupBoard(ctx, b, 100)
-		if err != nil {
-			return annotatef(err, "could not set up initial board")
-		}
-
-		if err := q.Games.WriteBoard(ctx, g.GetGameId(), b); err != nil {
-			return annotatef(err, "could not write board")
-		}
-	default:
-		return status.Error(codes.FailedPrecondition, "board shape not defined")
+	if err := q.Rounds.StartRound(ctx, g); err != nil {
+		return annotatef(err, "could not start first round")
 	}
 
 	log.Printf("Created new game %q for %q", g.GameId, g.Players)

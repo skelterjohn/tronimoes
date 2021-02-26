@@ -20,7 +20,11 @@ import (
 )
 
 func annotatef(err error, format string, items ...interface{}) error {
-	msg := fmt.Sprintf(format, items...)
+	upstream := err.Error()
+	if s, ok := status.FromError(err); ok {
+		upstream = s.Message()
+	}
+	msg := fmt.Sprintf(format, items...) + ": " + upstream
 	return status.Error(status.Code(err), msg)
 }
 
@@ -39,6 +43,7 @@ type Tronimoes struct {
 	Operations Operations
 	Queue      Queue
 	Games      Games
+	Rounds     *Rounds
 }
 
 func (t *Tronimoes) CreateAccessToken(ctx context.Context, req *spb.CreateAccessTokenRequest) (*spb.AccessTokenResponse, error) {
@@ -66,7 +71,7 @@ func (t *Tronimoes) CreateGame(ctx context.Context, req *spb.CreateGameRequest) 
 	}
 
 	if err := t.Queue.MakeNextGame(ctx); err != nil && status.Code(err) != codes.NotFound {
-		log.Printf("Error finding the next game: %v", err)
+		log.Printf(annotatef(err, "could not find the next game").Error())
 	}
 
 	return t.Operations.ReadOperation(ctx, op.GetOperationId())
@@ -228,15 +233,20 @@ func Serve(ctx context.Context, port string, s *grpc.Server) error {
 
 	operations := &InMemoryOperations{}
 	games := &InMemoryGames{}
+	rounds := &Rounds{
+		Games: games,
+	}
 	queue := &InMemoryQueue{
 		Games:      games,
 		Operations: operations,
+		Rounds:     rounds,
 	}
 
 	tronimoes := &Tronimoes{
 		Operations: operations,
 		Games:      games,
 		Queue:      queue,
+		Rounds:     rounds,
 	}
 
 	spb.RegisterTronimoesServer(s, tronimoes)

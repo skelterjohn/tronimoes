@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -16,7 +17,10 @@ import (
 func interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	start := time.Now()
 	resp, err := auth.AccessFilter(ctx, req, info, handler)
-	log.Printf("RPC: %s=%v latency=%v", info.FullMethod, status.Code(err), time.Since(start))
+	log.Printf("RPC: %s=%v latency=%v\n", info.FullMethod, status.Code(err), time.Since(start))
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+	}
 	return resp, err
 }
 

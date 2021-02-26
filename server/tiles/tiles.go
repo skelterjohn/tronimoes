@@ -24,6 +24,10 @@ func debug(format string, items ...interface{}) {
 }
 
 func SetupBoard(ctx context.Context, b *tpb.Board, lastLeaderPips int32) (*tpb.Board, error) {
+	if lastLeaderPips == 0 {
+		// First round, highest available double leads.
+		lastLeaderPips = 10000
+	}
 	if lastLeaderPips < 2 {
 		return nil, errors.New("last leader must be at least 2")
 	}
