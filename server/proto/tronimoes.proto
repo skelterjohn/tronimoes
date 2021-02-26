@@ -89,7 +89,7 @@ message GetGameRequest {
 message Game {
 	string game_id = 1;
 
-	repeated string player_ids = 2;
+	repeated Player players = 2;
 
 	enum Status {
 		UNKNOWN = 0;
@@ -97,6 +97,14 @@ message Game {
 		DONE = 2;
 	}
 	Status status = 3;
+}
+
+message Player {
+	string player_id = 1;
+
+	string name = 2;
+
+	int32 score = 3;
 }
 
 message GetBoardRequest {

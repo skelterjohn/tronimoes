@@ -44,13 +44,11 @@ message Line {
 }
 
 message Player {
-    string name = 1;
+    string player_id = 1;
 
-    string player_id = 2;
+    bool chicken_footed = 2;
 
-    bool chicken_footed = 3;
-
-    repeated Tile hand = 4;
+    repeated Tile hand = 3;
 }
 
 message Board {

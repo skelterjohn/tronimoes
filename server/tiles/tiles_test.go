@@ -716,9 +716,6 @@ func assertBoardsEqual(t *testing.T, got, want *tpb.Board) {
 		if proto.Equal(gp, wp) {
 			continue
 		}
-		if gp.GetName() != wp.GetName() {
-			t.Errorf("Player %d wrong name; got %q, want %q", i, gp.GetName(), wp.GetName())
-		}
 		if gp.GetPlayerId() != wp.GetPlayerId() {
 			t.Errorf("Player %d wrong player_id; got %q, want %q", i, gp.GetPlayerId(), wp.GetPlayerId())
 		}

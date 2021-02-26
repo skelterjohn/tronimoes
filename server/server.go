@@ -79,8 +79,8 @@ func (t *Tronimoes) GetOperation(ctx context.Context, req *spb.GetOperationReque
 func (t *Tronimoes) checkPlayerInGame(ctx context.Context, playerID string, g *spb.Game) error {
 
 	foundPlayer := false
-	for _, pid := range g.GetPlayerIds() {
-		if pid == playerID {
+	for _, p := range g.GetPlayers() {
+		if p.GetPlayerId() == playerID {
 			foundPlayer = true
 		}
 	}

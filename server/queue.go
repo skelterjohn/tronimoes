@@ -64,14 +64,16 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 	g := &spb.Game{}
 	opIDs := []string{}
 	for _, jr := range jrs {
-		g.PlayerIds = append(g.PlayerIds, jr.PlayerID)
+		g.Players = append(g.Players, &spb.Player{
+			PlayerId: jr.PlayerID,
+		})
 		opIDs = append(opIDs, jr.OperationID)
 	}
 
 	g.GameId = uuid.New().String()
 
 	if err := q.Games.WriteGame(ctx, g); err != nil {
-		return annotatef(err, "could not write new game")
+		return annotatef(err, "could not write  new game")
 	}
 
 	switch q.joinRequests[0].Req.GetBoardShape() {
@@ -80,9 +82,9 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 			Width:  31,
 			Height: 30,
 		}
-		for _, pid := range g.PlayerIds {
+		for _, p := range g.Players {
 			b.Players = append(b.Players, &tpb.Player{
-				PlayerId: pid,
+				PlayerId: p.GetPlayerId(),
 			})
 		}
 
@@ -98,7 +100,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 		return status.Error(codes.FailedPrecondition, "board shape not defined")
 	}
 
-	log.Printf("Created new game %q for %q", g.GameId, g.PlayerIds)
+	log.Printf("Created new game %q for %q", g.GameId, g.Players)
 
 	ops := []*spb.Operation{}
 
