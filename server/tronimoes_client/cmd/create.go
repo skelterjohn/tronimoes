@@ -52,7 +52,7 @@ var createCmd = &cobra.Command{
 			Private:      false,
 			MinPlayers:   0,
 			MaxPlayers:   0,
-			BoardShape:   spb.CreateGameRequest_standard_31_by_30,
+			BoardShape:   spb.BoardShape_standard_31_by_30,
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error creating game: %v", err)

@@ -98,7 +98,7 @@ func gameForPlayers(t *testing.T, ctx context.Context, c spb.TronimoesClient, pl
 				Private:      false,
 				MinPlayers:   0,
 				MaxPlayers:   0,
-				BoardShape:   spb.CreateGameRequest_standard_31_by_30,
+				BoardShape:   spb.BoardShape_standard_31_by_30,
 			})
 			if err != nil {
 				t.Fatalf("Could not create game for %s: %v", pid, err)

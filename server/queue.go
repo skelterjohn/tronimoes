@@ -77,7 +77,7 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 	}
 
 	switch q.joinRequests[0].Req.GetBoardShape() {
-	case spb.CreateGameRequest_standard_31_by_30:
+	case spb.BoardShape_standard_31_by_30:
 		b := &tpb.Board{
 			Width:  31,
 			Height: 30,

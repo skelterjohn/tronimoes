@@ -36,6 +36,11 @@ message AccessTokenResponse {
 	google.protobuf.Timestamp expiry = 2;
 }
 
+enum BoardShape {
+	UNKNOWN = 0;
+	standard_31_by_30 = 1;
+}
+
 message CreateGameRequest {
 	// If discoverable is true, players can join you without knowing you.
 	bool discoverable = 1;
@@ -52,10 +57,6 @@ message CreateGameRequest {
 
 	string player_id = 6;
 
-	enum BoardShape {
-		UNKNOWN = 0;
-		standard_31_by_30 = 1;
-	}
 	BoardShape board_shape = 7;
 }
 
@@ -97,6 +98,10 @@ message Game {
 		DONE = 2;
 	}
 	Status status = 3;
+
+	repeated int32 rounder_leaders = 4;
+	
+	BoardShape board_shape = 5;
 }
 
 message Player {
