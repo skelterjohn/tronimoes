@@ -14,19 +14,12 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/skelterjohn/tronimoes/server/auth"
+	"github.com/skelterjohn/tronimoes/server/pq"
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 	"github.com/skelterjohn/tronimoes/server/tiles"
 	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
+	"github.com/skelterjohn/tronimoes/server/util"
 )
-
-func annotatef(err error, format string, items ...interface{}) error {
-	upstream := err.Error()
-	if s, ok := status.FromError(err); ok {
-		upstream = s.Message()
-	}
-	msg := fmt.Sprintf(format, items...) + ": " + upstream
-	return status.Error(status.Code(err), msg)
-}
 
 type Operations interface {
 	WriteOperation(ctx context.Context, op *spb.Operation) error
@@ -64,14 +57,14 @@ func (t *Tronimoes) CreateGame(ctx context.Context, req *spb.CreateGameRequest) 
 	}
 	op, err := t.Operations.NewOperation(ctx)
 	if err != nil {
-		return nil, annotatef(err, "could not create operation")
+		return nil, util.Annotate(err, "could not create operation")
 	}
 	if err := t.Queue.AddPlayer(ctx, playerID, req, op.GetOperationId()); err != nil {
-		return nil, annotatef(err, "could not create queue player")
+		return nil, util.Annotate(err, "could not create queue player")
 	}
 
 	if err := t.Queue.MakeNextGame(ctx); err != nil && status.Code(err) != codes.NotFound {
-		log.Printf(annotatef(err, "could not find the next game").Error())
+		log.Printf(util.Annotate(err, "could not find the next game").Error())
 	}
 
 	return t.Operations.ReadOperation(ctx, op.GetOperationId())
@@ -102,7 +95,7 @@ func (t *Tronimoes) GetGame(ctx context.Context, req *spb.GetGameRequest) (*spb.
 	}
 	g, err := t.Games.ReadGame(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get game")
+		return nil, util.Annotate(err, "could not get game")
 	}
 	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
 		return nil, err
@@ -118,7 +111,7 @@ func (t *Tronimoes) GetBoard(ctx context.Context, req *spb.GetBoardRequest) (*tp
 
 	g, err := t.Games.ReadGame(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get game")
+		return nil, util.Annotate(err, "could not get game")
 	}
 	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
 		return nil, err
@@ -126,7 +119,7 @@ func (t *Tronimoes) GetBoard(ctx context.Context, req *spb.GetBoardRequest) (*tp
 
 	b, err := t.Games.ReadBoard(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get board")
+		return nil, util.Annotate(err, "could not get board")
 	}
 
 	// Nil out all tiles in the bag and other players' hands.
@@ -155,7 +148,7 @@ func (t *Tronimoes) GetMoves(ctx context.Context, req *spb.GetMovesRequest) (*sp
 
 	g, err := t.Games.ReadGame(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get game")
+		return nil, util.Annotate(err, "could not get game")
 	}
 	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
 		return nil, err
@@ -163,7 +156,7 @@ func (t *Tronimoes) GetMoves(ctx context.Context, req *spb.GetMovesRequest) (*sp
 
 	b, err := t.Games.ReadBoard(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get board")
+		return nil, util.Annotate(err, "could not get board")
 	}
 
 	if b.GetNextPlayerId() != playerID {
@@ -182,7 +175,7 @@ func (t *Tronimoes) GetMoves(ctx context.Context, req *spb.GetMovesRequest) (*sp
 
 	moves, err := tiles.LegalMoves(ctx, b, player)
 	if err != nil {
-		return nil, annotatef(err, "could not get legal moves")
+		return nil, util.Annotate(err, "could not get legal moves")
 	}
 
 	return &spb.GetMovesResponse{
@@ -198,7 +191,7 @@ func (t *Tronimoes) LayTile(ctx context.Context, req *spb.LayTileRequest) (*tpb.
 
 	g, err := t.Games.ReadGame(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get game")
+		return nil, util.Annotate(err, "could not get game")
 	}
 	if err := t.checkPlayerInGame(ctx, playerID, g); err != nil {
 		return nil, err
@@ -206,7 +199,7 @@ func (t *Tronimoes) LayTile(ctx context.Context, req *spb.LayTileRequest) (*tpb.
 
 	b, err := t.Games.ReadBoard(ctx, req.GetGameId())
 	if err != nil {
-		return nil, annotatef(err, "could not get board")
+		return nil, util.Annotate(err, "could not get board")
 	}
 
 	if b.GetNextPlayerId() != playerID {
@@ -215,22 +208,17 @@ func (t *Tronimoes) LayTile(ctx context.Context, req *spb.LayTileRequest) (*tpb.
 
 	b, err = tiles.LayTile(ctx, b, req.GetPlacement())
 	if err != nil {
-		return nil, annotatef(err, "could not lay tile")
+		return nil, util.Annotate(err, "could not lay tile")
 	}
 
 	if err := t.Games.WriteBoard(ctx, req.GetGameId(), b); err != nil {
-		return nil, annotatef(err, "could not write board")
+		return nil, util.Annotate(err, "could not write board")
 	}
 
 	return b, nil
 }
 
-func Serve(ctx context.Context, port string, s *grpc.Server) error {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":"+port))
-	if err != nil {
-		return fmt.Errorf("failed to listen: %v", err)
-	}
-
+func makeInMemoryTronimoes(ctx context.Context) (*Tronimoes, error) {
 	operations := &InMemoryOperations{}
 	games := &InMemoryGames{}
 	rounds := &Rounds{
@@ -241,14 +229,55 @@ func Serve(ctx context.Context, port string, s *grpc.Server) error {
 		Operations: operations,
 		Rounds:     rounds,
 	}
-
-	tronimoes := &Tronimoes{
+	return &Tronimoes{
 		Operations: operations,
 		Games:      games,
 		Queue:      queue,
 		Rounds:     rounds,
+	}, nil
+}
+
+func makePostgresTronimoes(ctx context.Context) (*Tronimoes, error) {
+	db, err := pq.Connect(ctx)
+	if err != nil {
+		return nil, util.Annotate(err, "could not get pq db")
 	}
 
+	operations := &pq.PQOperations{DB: db}
+	games := &InMemoryGames{}
+	rounds := &Rounds{
+		Games: games,
+	}
+	queue := &InMemoryQueue{
+		Games:      games,
+		Operations: operations,
+		Rounds:     rounds,
+	}
+	return &Tronimoes{
+		Operations: operations,
+		Games:      games,
+		Queue:      queue,
+		Rounds:     rounds,
+	}, nil
+}
+
+func makeTronimoes(ctx context.Context) (*Tronimoes, error) {
+	if pq.UsePostgres(ctx) {
+		return makePostgresTronimoes(ctx)
+	}
+	return makeInMemoryTronimoes(ctx)
+}
+
+func Serve(ctx context.Context, port string, s *grpc.Server) error {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":"+port))
+	if err != nil {
+		return fmt.Errorf("failed to listen: %v", err)
+	}
+
+	tronimoes, err := makeInMemoryTronimoes(ctx)
+	if err != nil {
+		return err
+	}
 	spb.RegisterTronimoesServer(s, tronimoes)
 	reflection.Register(s)
 

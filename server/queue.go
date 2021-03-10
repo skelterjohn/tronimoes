@@ -13,6 +13,7 @@ import (
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
+	"github.com/skelterjohn/tronimoes/server/util"
 )
 
 type Games interface {
@@ -75,11 +76,11 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 	g.GameId = uuid.New().String()
 
 	if err := q.Games.WriteGame(ctx, g); err != nil {
-		return annotatef(err, "could not write new game")
+		return util.Annotate(err, "could not write new game")
 	}
 
 	if err := q.Rounds.StartRound(ctx, g); err != nil {
-		return annotatef(err, "could not start first round")
+		return util.Annotate(err, "could not start first round")
 	}
 
 	log.Printf("Created new game %q for %q", g.GameId, g.Players)
@@ -89,14 +90,14 @@ func (q *InMemoryQueue) MakeNextGame(ctx context.Context) error {
 	for _, opID := range opIDs {
 		op, err := q.Operations.ReadOperation(ctx, opID)
 		if err != nil {
-			return annotatef(err, "could not read new player operation")
+			return util.Annotate(err, "could not read new player operation")
 		}
 		ops = append(ops, op)
 	}
 
 	gdata, err := proto.Marshal(g)
 	if err != nil {
-		return annotatef(err, "could not marshal game for operation payload")
+		return util.Annotate(err, "could not marshal game for operation payload")
 	}
 
 	for _, op := range ops {

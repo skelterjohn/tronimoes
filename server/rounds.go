@@ -3,11 +3,13 @@ package server
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 	"github.com/skelterjohn/tronimoes/server/tiles"
 	tpb "github.com/skelterjohn/tronimoes/server/tiles/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	"github.com/skelterjohn/tronimoes/server/util"
 )
 
 type Rounds struct {
@@ -29,11 +31,11 @@ func (r *Rounds) StartRound(ctx context.Context, g *spb.Game) error {
 
 		b, err := tiles.SetupBoard(ctx, b, 100)
 		if err != nil {
-			return annotatef(err, "could not set up initial board")
+			return util.Annotate(err, "could not set up initial board")
 		}
 
 		if err := r.Games.WriteBoard(ctx, g.GetGameId(), b); err != nil {
-			return annotatef(err, "could not write board")
+			return util.Annotate(err, "could not write board")
 		}
 
 		return nil
