@@ -276,7 +276,7 @@ func Serve(ctx context.Context, port string, s *grpc.Server) error {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
 
-	tronimoes, err := makeInMemoryTronimoes(ctx)
+	tronimoes, err := makeTronimoes(ctx)
 	if err != nil {
 		return err
 	}
