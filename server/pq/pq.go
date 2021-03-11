@@ -7,22 +7,39 @@ import (
 	"fmt"
 	"os"
 
+	"cloud.google.com/go/compute/metadata"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/skelterjohn/tronimoes/server/util"
 )
 
+func getServiceAccountAccessToken(ctx context.Context) (string, error) {
+	return metadata.Get("/instance/service-accounts/default/token")
+}
+func getServiceAccountEmail(ctx context.Context) (string, error) {
+	return metadata.Get("/instance/service-accounts/default/email")
+}
+
 func UsePostgres(ctx context.Context) bool {
-	_, ok := os.LookupEnv("DB_USER")
+	_, ok := os.LookupEnv("DB_INSTANCE")
 	return ok
 }
 
 func Connect(ctx context.Context) (*sql.DB, error) {
 	user, ok := os.LookupEnv("DB_USER")
 	if !ok {
-		return nil, errors.New("DB_USER not defined")
+		serviceAccountEmail, err := getServiceAccountEmail(ctx)
+		if err != nil {
+			return nil, util.Annotate(err, "DB_USER not defined and could not use metadata")
+		}
+		user = serviceAccountEmail
 	}
 	password, ok := os.LookupEnv("DB_PASS")
 	if !ok {
-		return nil, errors.New("DB_PASS not defined")
+		token, err := getServiceAccountAccessToken(ctx)
+		if err != nil {
+			return nil, util.Annotate(err, "DB_PASS not defined and could not use metadata")
+		}
+		password = token
 	}
 	instance, ok := os.LookupEnv("DB_INSTANCE")
 	if !ok {

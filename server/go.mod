@@ -3,6 +3,7 @@ module github.com/skelterjohn/tronimoes/server
 go 1.13
 
 require (
+	cloud.google.com/go v0.46.3
 	github.com/golang/protobuf v1.4.1
 	github.com/google/uuid v1.1.1
 	github.com/jackc/pgx/v4 v4.10.1
