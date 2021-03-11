@@ -3,7 +3,7 @@ package pq
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"log"
 
 	spb "github.com/skelterjohn/tronimoes/server/proto"
 	"github.com/skelterjohn/tronimoes/server/util"
@@ -27,11 +27,11 @@ func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) er
 		if err := rows.Scan(&opID, &done); err != nil {
 			return util.Annotate(err, "could not scan")
 		}
-		fmt.Printf("op: %s, done: %v\n", opID, done)
+		log.Printf("op: %s, done: %v\n", opID, done)
 		count++
 	}
 
-	fmt.Printf("Count: %d\n", count)
+	log.Printf("Count: %d\n", count)
 
 	return nil
 }

@@ -263,10 +263,10 @@ func makePostgresTronimoes(ctx context.Context) (*Tronimoes, error) {
 
 func makeTronimoes(ctx context.Context) (*Tronimoes, error) {
 	if pq.UsePostgres(ctx) {
-		fmt.Println("Using postgres")
+		log.Println("Using postgres")
 		return makePostgresTronimoes(ctx)
 	}
-	fmt.Println("Using in-memory")
+	log.Println("Using in-memory")
 	return makeInMemoryTronimoes(ctx)
 }
 
