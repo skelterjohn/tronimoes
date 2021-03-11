@@ -65,5 +65,7 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 	dbPool.SetMaxOpenConns(7)
 	dbPool.SetConnMaxLifetime(1800)
 
+	fmt.Printf("Connected to %q on %q\n", name, instance)
+
 	return dbPool, nil
 }
