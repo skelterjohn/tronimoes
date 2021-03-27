@@ -59,10 +59,12 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 	var dbURI string
 	if host_ok {
 		dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s port=5432", user, password, name, host)
+		fmt.Printf("Connecting to database %s as %s @ %s\n", name, user, host)
 
 	}
 	if instance_ok {
 		dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", user, password, name, socketDir, instance)
+		fmt.Printf("Connecting to database %s as %s @ %s/%s\n", name, user, socketDir, instance)
 	}
 
 	dbPool, err := sql.Open("pgx", dbURI)
@@ -73,8 +75,6 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 	dbPool.SetMaxIdleConns(5)
 	dbPool.SetMaxOpenConns(7)
 	dbPool.SetConnMaxLifetime(1800)
-
-	fmt.Printf("Connected to %q on %q\n", name, instance)
 
 	return dbPool, nil
 }
