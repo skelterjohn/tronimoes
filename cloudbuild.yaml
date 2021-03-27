@@ -17,7 +17,7 @@ steps:
   - '--platform=managed'
   - '--region=us-east4'
   - '--set-env-vars=SHORT_SHA=$SHORT_SHA'
-  - '--set-env-vars=DB_INSTANCE=tronimoes:us-east4:tronimoes-autopush1'
+  - '--set-env-vars=DB_HOST=172.30.32.3'
   - '--set-env-vars=DB_NAME=conductor'
   - '--allow-unauthenticated'
   - '--revision-suffix=v$SHORT_SHA'
