@@ -20,8 +20,13 @@ func getServiceAccountEmail(ctx context.Context) (string, error) {
 }
 
 func UsePostgres(ctx context.Context) bool {
-	_, ok := os.LookupEnv("DB_INSTANCE")
-	return ok
+	if _, ok := os.LookupEnv("DB_INSTANCE"); ok {
+		return true
+	}
+	if _, ok := os.LookupEnv("DB_HOST"); ok {
+		return true
+	}
+	return false
 }
 
 func Connect(ctx context.Context) (*sql.DB, error) {
