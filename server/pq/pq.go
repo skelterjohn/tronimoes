@@ -41,10 +41,12 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 		}
 		password = token
 	}
-	instance, ok := os.LookupEnv("DB_INSTANCE")
-	if !ok {
-		return nil, errors.New("DB_INSTANCE not defined")
+	instance, instance_ok := os.LookupEnv("DB_INSTANCE")
+	host, host_ok := os.LookupEnv("DB_HOST")
+	if !instance_ok && !host_ok {
+		return nil, errors.New("neither DB_INSTANCE nor DB_HOST defined")
 	}
+
 	name, ok := os.LookupEnv("DB_NAME")
 	if !ok {
 		return nil, errors.New("DB_NAME not defined")
@@ -54,7 +56,14 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 		socketDir = "/cloudsql"
 	}
 
-	dbURI := fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", user, password, name, socketDir, instance)
+	var dbURI string
+	if host_ok {
+		dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s port=5432", user, password, name, host)
+
+	}
+	if instance_ok {
+		dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s/%s", user, password, name, socketDir, instance)
+	}
 
 	dbPool, err := sql.Open("pgx", dbURI)
 	if err != nil {
