@@ -8,8 +8,10 @@ import (
 	"os"
 
 	"cloud.google.com/go/compute/metadata"
+	secretsv1 "cloud.google.com/go/secretmanager/apiv1"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/skelterjohn/tronimoes/server/util"
+	secretpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 func getServiceAccountAccessToken(ctx context.Context) (string, error) {
@@ -30,16 +32,38 @@ func UsePostgres(ctx context.Context) bool {
 }
 
 func Connect(ctx context.Context) (*sql.DB, error) {
-	user, ok := os.LookupEnv("DB_USER")
-	if !ok {
+	user, user_ok := os.LookupEnv("DB_USER")
+	if !user_ok {
 		serviceAccountEmail, err := getServiceAccountEmail(ctx)
 		if err != nil {
 			return nil, util.Annotate(err, "DB_USER not defined and could not use metadata")
 		}
 		user = serviceAccountEmail
 	}
-	password, ok := os.LookupEnv("DB_PASS")
-	if !ok {
+
+	passwordSecret, secret_ok := os.LookupEnv("DB_PASS_SECRET")
+	password, password_ok := os.LookupEnv("DB_PASS")
+	if secret_ok && password_ok {
+		return nil, errors.New("must have at most one of DB_PASS and DB_PASS_SECRET defined")
+	}
+	if !user_ok && (secret_ok || password_ok) {
+		return nil, errors.New("may not define DB_PASS or DB_PASS_SECRET without DB_USER")
+	}
+	if secret_ok {
+		c, err := secretsv1.NewClient(ctx)
+		if err != nil {
+			return nil, util.Annotate(err, "could not get secrets client")
+		}
+		s, err := c.AccessSecretVersion(ctx, &secretpb.AccessSecretVersionRequest{
+			Name: passwordSecret,
+		})
+		if err != nil {
+			return nil, util.Annotate(err, "could not fetch secret")
+		}
+		password = string(s.GetPayload().GetData())
+	}
+
+	if !user_ok {
 		token, err := getServiceAccountAccessToken(ctx)
 		if err != nil {
 			return nil, util.Annotate(err, "DB_PASS not defined and could not use metadata")
