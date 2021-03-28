@@ -78,8 +78,7 @@ func (o *PQOperations) NewOperation(ctx context.Context) (*spb.Operation, error)
 	}
 	_, err := o.DB.Exec(`
 		INSERT INTO conductor.operations
-		(operation_id, done, payload, status) VALUES ($1, $2, $3, $4)
-		WHERE operation_id=$4`,
+		(operation_id, done, payload, status) VALUES ($1, $2, $3, $4)`,
 		op.GetOperationId(), op.GetDone(), op.GetPayload(), op.GetStatus())
 
 	if err != nil {
