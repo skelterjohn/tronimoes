@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/compute/metadata"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -35,6 +36,9 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 		serviceAccountEmail, err := getServiceAccountEmail(ctx)
 		if err != nil {
 			return nil, util.Annotate(err, "DB_USER not defined and could not use metadata")
+		}
+		if strings.HasSuffix(serviceAccountEmail, ".gserviceaccount.com") {
+			serviceAccountEmail = serviceAccountEmail[:len(".gserviceaccount.com")]
 		}
 		user = serviceAccountEmail
 	}
