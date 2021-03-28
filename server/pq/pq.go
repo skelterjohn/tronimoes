@@ -37,10 +37,7 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 		if err != nil {
 			return nil, util.Annotate(err, "DB_USER not defined and could not use metadata")
 		}
-		if strings.HasSuffix(serviceAccountEmail, ".gserviceaccount.com") {
-			serviceAccountEmail = serviceAccountEmail[:len(".gserviceaccount.com")]
-		}
-		user = serviceAccountEmail
+		user = strings.TrimSuffix(serviceAccountEmail, ".gserviceaccount.com")
 	}
 	password, ok := os.LookupEnv("DB_PASS")
 	if !ok {
