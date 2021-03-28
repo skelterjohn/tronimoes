@@ -48,8 +48,8 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 	}
 	instance, instance_ok := os.LookupEnv("DB_INSTANCE")
 	host, host_ok := os.LookupEnv("DB_HOST")
-	if !instance_ok && !host_ok {
-		return nil, errors.New("neither DB_INSTANCE nor DB_HOST defined")
+	if instance_ok == host_ok {
+		return nil, errors.New("must have exactly one of DB_INSTANCE or DB_HOST defined")
 	}
 
 	name, ok := os.LookupEnv("DB_NAME")
