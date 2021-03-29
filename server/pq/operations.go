@@ -79,7 +79,7 @@ func (o *PQOperations) NewOperation(ctx context.Context) (*spb.Operation, error)
 	_, err := o.DB.Exec(`
 		INSERT INTO conductor.operations
 		(operation_id, done, payload, status) VALUES ($1, $2, $3, $4)`,
-		op.GetOperationId(), op.GetDone(), op.GetPayload(), op.GetStatus())
+		op.GetOperationId(), op.GetDone(), op.GetPayload(), op.GetStatus().String())
 
 	if err != nil {
 		return nil, util.Annotate(err, "could not insert operation")

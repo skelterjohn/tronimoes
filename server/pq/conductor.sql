@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS conductor.Operations (
     operation_id uuid,
     done bool,
     payload bytea,
-    oepration_status OperationStatus
+    status OperationStatus
 );
 
 CREATE TABLE IF NOT EXISTS conductor.Queue (
