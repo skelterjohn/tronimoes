@@ -15,24 +15,6 @@ type PQOperations struct {
 	DB *sql.DB
 }
 
-/*
-
-message Operation {
-	string operation_id = 1;
-
-	bool done = 2;
-
-	google.protobuf.Any payload = 3;
-
-	enum Status {
-		UNKNOWN = 0;
-		SUCCESS = 1;
-		FAILURE = 2;
-	}
-	Status status = 4;
-}
-*/
-
 func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) error {
 	_, err := o.DB.Exec(`
 		UPDATE conductor.operations
@@ -49,7 +31,10 @@ func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) er
 
 func (o *PQOperations) ReadOperation(ctx context.Context, id string) (*spb.Operation, error) {
 	rows, err := o.DB.Query(`
-		SELECT (done, payload, status)
+		SELECT
+			done,
+			payload,
+			status
 		FROM conductor.operations
 		WHERE operation_id = $1`,
 		id)
