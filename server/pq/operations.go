@@ -50,9 +50,13 @@ func (o *PQOperations) ReadOperation(ctx context.Context, id string) (*spb.Opera
 		OperationId: id,
 	}
 
-	if err := rows.Scan(&op.Done, &op.Payload, &op.Status); err != nil {
+	var statusString string
+
+	if err := rows.Scan(&op.Done, &op.Payload, &statusString); err != nil {
 		return nil, util.Annotate(err, "could not scan row into operation")
 	}
+
+	op.Status = spb.Operation_Status(spb.Operation_Status_value[statusString])
 
 	return op, nil
 }
