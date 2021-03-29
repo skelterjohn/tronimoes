@@ -20,7 +20,7 @@ func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) er
 		UPDATE conductor.operations
 		SET (done, payload, status) = ($1, $2, $3)
 		WHERE operation_id=$4`,
-		op.GetDone(), op.GetPayload(), op.GetStatus(), op.GetOperationId())
+		op.GetDone(), op.GetPayload(), op.GetStatus().String(), op.GetOperationId())
 
 	if err != nil {
 		return util.Annotate(err, "could not write operation")
