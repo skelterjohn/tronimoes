@@ -20,7 +20,7 @@ steps:
   - '--set-env-vars=DB_INSTANCE=tronimoes:us-east4:tronimoes-autopush1'
   - '--set-env-vars=DB_NAME=conductor'
   - '--set-env-vars=DB_USER=autopush'
-  - '--set-env-vars=DB_PASS_SECRET=projects/tronimoes/secrets/autopush-password'
+  - '--set-env-vars=DB_PASS_SECRET=projects/tronimoes/secrets/autopush-password/versions/latest'
   - '--allow-unauthenticated'
   - '--revision-suffix=v$SHORT_SHA'
   - 'autopush'
