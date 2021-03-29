@@ -35,7 +35,7 @@ message Operation {
 
 func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) error {
 	_, err := o.DB.Exec(`
-		UPDATE operations
+		UPDATE conductor.operations
 		SET (done, payload, status) = ($1, $2, $3)
 		WHERE operation_id=$4`,
 		op.GetDone(), op.GetPayload(), op.GetStatus(), op.GetOperationId())
@@ -50,7 +50,7 @@ func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) er
 func (o *PQOperations) ReadOperation(ctx context.Context, id string) (*spb.Operation, error) {
 	rows, err := o.DB.Query(`
 		SELECT (done, payload, status)
-		FROM operations
+		FROM conductor.operations
 		WHERE operation_id = $1`,
 		id)
 	if err != nil {
@@ -77,7 +77,7 @@ func (o *PQOperations) NewOperation(ctx context.Context) (*spb.Operation, error)
 		OperationId: uuid.New().String(),
 	}
 	_, err := o.DB.Exec(`
-		INSERT INTO operations
+		INSERT INTO conductor.operations
 		(operation_id, done, payload, status) VALUES ($1, $2, $3, $4)`,
 		op.GetOperationId(), op.GetDone(), op.GetPayload(), op.GetStatus())
 
