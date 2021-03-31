@@ -17,7 +17,7 @@ type PQOperations struct {
 
 func (o *PQOperations) WriteOperation(ctx context.Context, op *spb.Operation) error {
 	_, err := o.DB.Exec(`
-		UPDATE conductor.operations
+		UPDATE Operations
 		SET (done, payload, status) = ($1, $2, $3)
 		WHERE operation_id=$4`,
 		op.GetDone(), op.GetPayload(), op.GetStatus().String(), op.GetOperationId())
@@ -35,7 +35,7 @@ func (o *PQOperations) ReadOperation(ctx context.Context, id string) (*spb.Opera
 			done,
 			payload,
 			status
-		FROM conductor.operations
+		FROM Operations
 		WHERE operation_id = $1`,
 		id)
 	if err != nil {
@@ -66,7 +66,7 @@ func (o *PQOperations) NewOperation(ctx context.Context) (*spb.Operation, error)
 		OperationId: uuid.New().String(),
 	}
 	_, err := o.DB.Exec(`
-		INSERT INTO conductor.operations
+		INSERT INTO Operations
 		(operation_id, done, payload, status) VALUES ($1, $2, $3, $4)`,
 		op.GetOperationId(), op.GetDone(), op.GetPayload(), op.GetStatus().String())
 

@@ -85,10 +85,15 @@ func Connect(ctx context.Context) (*sql.DB, error) {
 		socketDir = "/cloudsql"
 	}
 
+	port, ok := os.LookupEnv("DB_PORT")
+	if !ok {
+		port = "5432"
+	}
+
 	var dbURI string
 	if host_ok {
-		dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s port=5432", user, password, name, host)
-		fmt.Printf("Connecting to database %s as %s @ %s\n", name, user, host)
+		dbURI = fmt.Sprintf("user=%s password=%s database=%s host=%s port=%s", user, password, name, host, port)
+		fmt.Printf("Connecting to database %s as %s @ %s:%s\n", name, user, host, port)
 
 	}
 	if instance_ok {
