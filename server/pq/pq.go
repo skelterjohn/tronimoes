@@ -22,6 +22,8 @@ func getServiceAccountEmail(ctx context.Context) (string, error) {
 }
 
 func UsePostgres(ctx context.Context) bool {
+	fmt.Printf("DB_INSTANCE=%s\n", os.Getenv("DB_INSTANCE"))
+	fmt.Printf("DB_HOST=%s\n", os.Getenv("DB_HOST"))
 	if _, ok := os.LookupEnv("DB_INSTANCE"); ok {
 		return true
 	}

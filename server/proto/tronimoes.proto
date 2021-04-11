@@ -45,19 +45,16 @@ message CreateGameRequest {
 	// If discoverable is true, players can join you without knowing you.
 	bool discoverable = 1;
 
-	// Only look for games that involve one of these players.
-	repeated string players = 2;
+	// Requests with the same game_code are matched.
+	string game_code = 2;
 
-	// If private is true, don't join a game with a player not requested.
-	bool private = 3;
+	int32 min_players = 3;
 
-	int32 min_players = 4;
+	int32 max_players = 4;
 
-	int32 max_players = 5;
+	string player_id = 5;
 
-	string player_id = 6;
-
-	BoardShape board_shape = 7;
+	BoardShape board_shape = 6;
 }
 
 message JoinResponse {
