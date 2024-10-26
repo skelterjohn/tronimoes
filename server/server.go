@@ -244,7 +244,7 @@ func makePostgresTronimoes(ctx context.Context) (*Tronimoes, error) {
 	}
 
 	operations := &pq.PQOperations{DB: db}
-	games := &InMemoryGames{}
+	games := &pq.PQGames{}
 	rounds := &Rounds{
 		Games: games,
 	}

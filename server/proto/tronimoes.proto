@@ -96,7 +96,7 @@ message Game {
 	}
 	Status status = 3;
 
-	repeated int32 rounder_leaders = 4;
+	repeated int32 round_leaders = 4;
 	
 	BoardShape board_shape = 5;
 }
