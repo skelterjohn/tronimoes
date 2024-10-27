@@ -6,7 +6,7 @@ function Square({ x, y }) {
 	} else {
 		cnm = `${cnm} bg-slate-200`;
 	}
-	return <div className={cnm}> {x} {y}</div>;
+	return <div className={cnm}> </div>;
 }
 
 export default Square;

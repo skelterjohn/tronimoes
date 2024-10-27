@@ -6,7 +6,7 @@ export default function Home() {
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         Tronimes
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row w-screen aspect-square">
+        <div className="w-screen aspect-square">
           <Board width={10} height={10} />
         </div>
       </main>
