@@ -12,22 +12,32 @@ function Board({ width = 10, height = 10 }) {
 									<div className="w-full z-10 pb-[100%] relative">
 										{ x == 3 && y == 3 && (
 											<div className="w-full h-full z-20 pb-[100%] absolute">
-												<Tile pips={6} orientation={0} />
+												<Tile pips={0} orientation={0} />
 											</div>
 										)}
 										{ x == 3 && y == 4 && (
 											<div className="w-full h-full z-20 pb-[100%] absolute">
-												<Tile pips={5} orientation={1} />
+												<Tile pips={1} orientation={1} />
 											</div>
 										)}
 										{ x == 5 && y == 6 && (
 											<div className="w-full h-full z-20 pb-[100%] absolute">
-												<Tile pips={6} orientation={2} />
+												<Tile pips={2} orientation={2} />
 											</div>
 										)}
 										{ x == 6 && y == 6 && (
 											<div className="w-full h-full z-20 pb-[100%] absolute">
-												<Tile pips={5} orientation={3} />
+												<Tile pips={3} orientation={3} />
+											</div>
+										)}
+										{ x == 0 && y == 0 && (
+											<div className="w-full h-full z-20 pb-[100%] absolute">
+												<Tile pips={4} orientation={0} />
+											</div>
+										)}
+										{ x == 0 && y == 1 && (
+											<div className="w-full h-full z-20 pb-[100%] absolute">
+												<Tile pips={5} orientation={1} />
 											</div>
 										)}
 										<div className="absolute inset-0">
