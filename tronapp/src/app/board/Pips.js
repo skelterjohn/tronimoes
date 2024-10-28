@@ -1,6 +1,16 @@
 function Pip({color="red"}) {
+	const colorMap = {
+        red: "bg-red-500",
+        blue: "bg-blue-500",
+        green: "bg-green-500",
+        indigo: "bg-indigo-500",
+        orange: "bg-orange-500",
+        yellow: "bg-yellow-500",
+        purple: "bg-purple-500",
+        white: "bg-white"
+    };
 	return <td className="w-[15%] aspect-square">
-		<div className={`p-1 aspect-square rounded-full bg-${color}-500`}></div>
+		<div className={`p-1 aspect-square rounded-full ${colorMap[color]}`}></div>
 	</td>;
 }
 
@@ -259,3 +269,4 @@ function Pips({pips}) {
 }
 
 export default Pips;
+export {safelist}

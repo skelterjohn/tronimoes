@@ -1,15 +1,11 @@
 function Square({ x, y, center=false }) {
-
-	var intensity = 200;
-	if (center) {
-		intensity = 400;
-	}
-
 	var cnm = "w-full aspect-square";
-	if ((x+y) % 2 == 0) {
-		cnm = `${cnm} bg-blue-${intensity}`;
+	if (center) {
+		cnm = `${cnm} bg-gray-400`;
+	} else if ((x+y) % 2 == 0) {
+		cnm = `${cnm} bg-blue-200`;
 	} else {
-		cnm = `${cnm} bg-slate-${intensity}`;
+		cnm = `${cnm} bg-slate-200`;
 	}
 	return <div className={cnm}> </div>;
 }
