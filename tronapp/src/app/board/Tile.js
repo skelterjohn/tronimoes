@@ -2,7 +2,6 @@ import Pips from "./Pips";
 
 function TileHalf({ pips, orientation }) {
 	var outercnm = "w-full aspect-square";
-	var innercnm = "w-full h-full bg-white flex items-center justify-center ";
 		switch (orientation) {
 			case "down": // down
 				outercnm = `${outercnm} rotate-0`;
@@ -13,7 +12,7 @@ function TileHalf({ pips, orientation }) {
 	}
 	return (
 		<div className={outercnm}>
-			<div className={innercnm}>
+			<div className="w-full h-full bg-white flex items-center justify-center p-1">
 				<Pips pips={pips} />
 			</div>
 		</div>
