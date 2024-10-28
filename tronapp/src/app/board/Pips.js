@@ -70,6 +70,151 @@ function Pips({pips}) {
 		c32 = c;
 		c33 = c;
 	}
+	if (pips == 7) {
+		const c = "purple";
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c22 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+	}
+	if (pips == 8) {
+		const c = "blue";
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c21 = c;
+		c23 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+	}
+	if (pips == 9) {
+		const c = "red";
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c21 = c;
+		c22 = c;
+		c23 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+	}
+	if (pips == 10) {
+		const c = "green";
+		c10 = c;
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c14 = c;
+		c30 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+		c34 = c;
+	}
+	if (pips == 11) {
+		const c = "indigo";
+		c10 = c;
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c14 = c;
+		c22 = c;
+		c30 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+		c34 = c;
+	}
+	if (pips == 12) {
+		const c = "orange";
+		c10 = c;
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c14 = c;
+		c21 = c;
+		c23 = c;
+		c30 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+		c34 = c;
+	}
+	if (pips == 13) {
+		const c = "yellow";
+		c10 = c;
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c14 = c;
+		c20 = c;
+		c22 = c;
+		c24 = c;
+		c30 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+		c34 = c;
+	}
+	if (pips == 14) {
+		const c = "purple";
+		c10 = c;
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c14 = c;
+		c02 = c;
+		c21 = c;
+		c23 = c;
+		c42 = c;
+		c30 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+		c34 = c;
+	}
+	if (pips == 15) {
+		const c = "blue";
+		c10 = c;
+		c11 = c;
+		c12 = c;
+		c13 = c;
+		c14 = c;
+		c02 = c;
+		c21 = c;
+		c22 = c;
+		c23 = c;
+		c42 = c;
+		c30 = c;
+		c31 = c;
+		c32 = c;
+		c33 = c;
+		c34 = c;
+	}
+	if (pips == 16) {
+		const c = "red";
+		c20 = c;
+		c01 = c;
+		c10 = c;
+		c11 = c;
+		c03 = c;
+		c24 = c;
+		c13 = c;
+		c14 = c;
+		c30 = c;
+		c31 = c;
+		c02 = c;
+		c41 = c;
+		c33 = c;
+		c34 = c;
+		c43 = c;
+		c42 = c;
+	}
 	return (
 		<table className="w-full aspect-square table-fixed">
 			<tbody className="h-full w-full">
