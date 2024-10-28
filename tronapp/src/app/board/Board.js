@@ -3,7 +3,7 @@ import Tile from "./Tile";
 
 function Board({ width = 10, height = 11 }) {
 	return (
-			<table className="h-[80%] aspect-square table-fixed">
+			<table className="w-full aspect-square table-fixed">
 				<tbody>
 					{Array.from({length: height}, (_, y) => (
 						<tr key={y}>
