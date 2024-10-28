@@ -7,7 +7,7 @@ export default function Home() {
         Tronimes
 
         <div className="w-screen aspect-square">
-          <Board width={10} height={10} />
+          <Board width={10} height={11} />
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
