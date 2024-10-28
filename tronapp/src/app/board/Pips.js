@@ -1,5 +1,7 @@
 function Pip({color="red"}) {
-	return <td className={`w-[15%] aspect-square rounded-full bg-${color}-500`}></td>
+	return <td className="w-[15%] aspect-square">
+		<div className={`p-1 aspect-square rounded-full bg-${color}-500`}></div>
+	</td>;
 }
 
 function Pips({pips}) {
