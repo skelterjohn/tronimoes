@@ -1,8 +1,8 @@
 import Pips from "./Pips";
 
-function Tile({ pips, orientation }) {
-	var outercnm = "pt-1 pr-1 pl-1 w-full aspect-square";
-	var innercnm = "w-full h-full bg-white border-black flex items-center justify-center rounded-t-lg  border-t-2 border-l-2 border-r-2 ";
+function TileHalf({ pips, orientation }) {
+	var outercnm = "w-full aspect-square";
+	var innercnm = "w-full h-full bg-white flex items-center justify-center ";
 		switch (orientation) {
 			case 0: // down
 				outercnm = `${outercnm} rotate-0`;
@@ -20,12 +20,75 @@ function Tile({ pips, orientation }) {
 	return (
 		<div className={outercnm}>
 			<div className={innercnm}>
-				<div className="p-1">	
-					<Pips pips={pips} />
-				</div>
+				<Pips pips={pips} />
 			</div>
 		</div>
 	);
+}
+
+function Tile({pipsa, pipsb, orientation}) {
+	if (orientation == 0) {
+		return (
+			<div className="h-[200%] w-full p-1 bg-white border-black rounded-lg border-2 ">
+				<table className="w-full h-full table-fixed ">
+					<tbody className="h-full w-full">
+						<tr className="w-full"><td>
+							<TileHalf pips={pipsa} orientation={0}/>
+						</td></tr>
+						<tr className="w-full"><td>
+							<TileHalf pips={pipsb} orientation={1}/>
+						</td></tr>
+					</tbody>
+				</table>
+			</div>
+		);
+	}
+	if (orientation == 1) {
+		return (
+			<div className="h-[200%] w-full p-1 bg-white border-black rounded-lg border-2 ">
+				<table className="w-full h-full table-fixed ">
+					<tbody className="h-full w-full">
+						<tr className="w-full"><td>
+							<TileHalf pips={pipsb} orientation={0}/>
+						</td></tr>
+						<tr className="w-full"><td>
+							<TileHalf pips={pipsa} orientation={1}/>
+						</td></tr>
+					</tbody>
+				</table>
+			</div>
+		);
+	}
+	if (orientation == 2) {
+		return (
+			<div className="w-[200%] h-full p-1 bg-white border-black rounded-lg border-2 ">
+				<table className="w-full h-full table-fixed ">
+					<tbody className="h-full w-full">
+						<tr className="w-full"><td>
+							<TileHalf pips={pipsa} orientation={2}/>
+						</td><td>
+							<TileHalf pips={pipsb} orientation={3}/>
+						</td></tr>
+					</tbody>
+				</table>
+			</div>
+		);
+	}
+	if (orientation == 3) {
+		return (
+			<div className="w-[200%] h-full p-1 bg-white border-black rounded-lg border-2 ">
+				<table className="w-full h-full table-fixed ">
+					<tbody className="h-full w-full">
+						<tr className="w-full"><td>
+							<TileHalf pips={pipsb} orientation={2}/>
+						</td><td>
+							<TileHalf pips={pipsa} orientation={3}/>
+						</td></tr>
+					</tbody>
+				</table>
+			</div>
+		);
+	}
 }
 
 export default Tile;
