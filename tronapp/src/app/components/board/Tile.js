@@ -1,3 +1,5 @@
+"use client";
+
 import Pips from "./Pips";
 
 function TileHalf({ pips, orientation }) {
