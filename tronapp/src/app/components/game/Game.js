@@ -7,21 +7,31 @@ import Board from '../board/Board';
 import Hand from './Hand';
 
 function Game({}) {
-
-	const [opponents, setOpponents] = useState([
+	// These states come from the server
+	const [playerName, setPlayerName] = useState("Rad Bicycle");
+	const [players, setPlayers] = useState([
 		{
+			name: "Cool Symbiote",
 			color: "red",
-			count: 4,
+			tiles: [{},{},{},{}],
 			dead: true,
 		},
 		{
+			name: "Hot Xenophage",
 			color: "blue",
-			count: 3,
+			tiles: [{},{},{}],
+			dead: false,
+		},
+		{
+			name: "Rad Bicycle",
+			color: "green",
+			tiles: [{a:1, b:2}, {a:3, b:12}],
 			dead: false,
 		},
 	]);
 
-	const [playerHand, setPlayerHand] = useState([{a:1, b:2}, {a:3, b:12}]);
+	const [turnIndex, setTurnIndex] = useState(2);
+
 	const [laidTiles, setLaidTiles] = useState({
 		"4,5": {a:12, b:12, orientation:"right", color:"white", dead:false},
 
@@ -37,16 +47,34 @@ function Game({}) {
 		"6,4": {a:3, b:15, orientation:"right", color:"blue", dead:false},
 	});
 
-	const [playerTurn, setPlayerTurn] = useState(true);
-	const [selectedTile, setSelectedTile] = useState({a:1, b:2});
+	// The remaining states are derived.
+
+	const [playerColor, setPlayerColor] = useState("green");
+
+	const [opponents, setOpponents] = useState([]);
+	useEffect(() => {
+		var playerIndex = players.findIndex(p => p.name === playerName);
+		var oppList = [];
+		for (let offset=1; offset<players.length; offset++) {
+			const opp = players[(playerIndex+offset)%players.length];
+			oppList.push(opp);
+		}
+		setOpponents(oppList);
+
+		setPlayerHand(players[playerIndex].tiles);
+		setPlayerColor(players[playerIndex].color);
+	}, [players]);
+
+	const [playerHand, setPlayerHand] = useState([]);
+	const [selectedTile, setSelectedTile] = useState(undefined);
 
 	function startTurn() {
-		setPlayerTurn(true);
+		setTurnIndex(2);
 		setSelectedTile(undefined);
 	}
 
 	function playTile(tile) {
-		tile.color = "green";
+		tile.color = playerColor;
 		setLaidTiles({...laidTiles, [`${tile.x},${tile.y}`]: tile});
 		startTurn();
 	}
@@ -60,10 +88,11 @@ function Game({}) {
 			{opponents.map((o, i) => (
 				<Col key={i}>
 					<Hand
+						name={o.name}
 						color={o.color}
 						hidden={true}
 						dead={o.dead}
-						tiles={Array(o.count).fill({a:0, b:0})}
+						tiles={o.tiles}
 					/>
 				</Col>
 			))}
@@ -78,11 +107,12 @@ function Game({}) {
 		</Row>
 		<Row>
 			<Hand
-				color="green"
+				name={playerName}
+				color={playerColor}
 				tiles={playerHand}
 				selectedTile={selectedTile}
 				setSelectedTile={setSelectedTile}
-				playerTurn={playerTurn}
+				playerTurn={players[turnIndex].name === playerName}
 			/>
 		</Row>
 	</div>;
