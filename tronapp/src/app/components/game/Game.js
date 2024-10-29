@@ -6,6 +6,16 @@ import { useState, useEffect } from 'react';
 import Board from '../board/Board';
 import Hand from './Hand';
 
+const borderColorMap = {
+	red: "border-red-300",
+	blue: "border-blue-300",
+	green: "border-green-300",
+	indigo: "border-indigo-300",
+	orange: "border-orange-300",
+	fuchsia: "border-fuchsia-300",
+	white: "border-white"
+};
+
 function Game({}) {
 	// These states come from the server
 	const [playerName, setPlayerName] = useState("Rad Bicycle");
@@ -98,12 +108,14 @@ function Game({}) {
 			))}
 		</Row>
 		<Row>
-			<Board
-				width={10} height={11}
-				tiles={laidTiles}
-				selectedTile={selectedTile}
-				playTile={playTile}
-			/>
+			<div className={`${borderColorMap[players[turnIndex].color]} border-8`}>
+				<Board
+					width={10} height={11}
+					tiles={laidTiles}
+					selectedTile={selectedTile}
+					playTile={playTile}
+				/>
+			</div>
 		</Row>
 		<Row>
 			<Hand
