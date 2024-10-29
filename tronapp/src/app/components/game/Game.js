@@ -1,23 +1,25 @@
+import {Row, Col} from 'react-bootstrap';
+
 import Board from '../board/Board';
 import Hand from './Hand';
 
 function Game({}) {
 	return <div className="">
-		<table>
-			<tbody>
-				<tr></tr>
-				<tr>
-					<td>
-						<Board width={10} height={11} />
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<Hand/>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<Row className="flex justify-center items-center">
+			<Col>
+				<Hand color="red" hidden={true} dead={true} />
+			</Col>
+			<Col>
+				<Hand color="blue" hidden={true} dead={false} />
+			</Col>
+		</Row>
+		<Row>
+			<Board width={10} height={11} />
+		</Row>
+		<Row>
+			<Hand color="green"/>
+
+		</Row>
 	</div>;
 }
 
