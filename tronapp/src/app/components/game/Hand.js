@@ -1,6 +1,6 @@
 import Tile from '../board/Tile';
 
-function Hand({ color="white", hidden=false, tiles=[], dead=false, selectedTile, setSelectedTile }) {
+function Hand({ color="white", hidden=false, tiles=[], dead=false, selectedTile, setSelectedTile, playerTurn}) {
 	function tileClicked(tile) {
 		if (hidden) return;
 		setSelectedTile(tile);
@@ -14,7 +14,7 @@ function Hand({ color="white", hidden=false, tiles=[], dead=false, selectedTile,
 				pipsb={t.b}
 				back={hidden}
 				dead={dead}
-				selected={selectedTile!==undefined && t.a===selectedTile.a && t.b===selectedTile.b}
+				selected={playerTurn && selectedTile!==undefined && t.a===selectedTile.a && t.b===selectedTile.b}
 			/>
 		</div>
 	))}</div>;

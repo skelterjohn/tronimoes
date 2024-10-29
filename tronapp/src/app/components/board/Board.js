@@ -1,9 +1,40 @@
 "use client";
 
+import { useState } from 'react';
+
 import Square from "./Square";
 import Tile from "./Tile";
 
-function Board({ width = 10, height = 11, tiles }) {
+function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
+	const [playA, setPlayA] = useState(undefined);
+
+	function clickSquare(x, y) {
+		if (selectedTile===undefined) {
+			return;
+		}
+		if (playA===undefined) {
+			setPlayA({x:x, y:y});
+		} else {
+			var orientation = undefined;
+			if (x === playA.x+1 && y === playA.y) {
+				orientation = "right";
+			} else if (x === playA.x-1 && y === playA.y) {
+				orientation = "left";
+			} else if (x === playA.x && y === playA.y+1) {
+				orientation = "down";
+			} else if (x === playA.x && y === playA.y-1) {
+				orientation = "up";
+			}
+			playTile({
+				a:selectedTile.a, b:selectedTile.b,
+				x:playA.x, y:playA.y,
+				orientation:orientation,
+				dead:false,
+			});
+			setPlayA(undefined);
+		}
+	}
+
 	return (
 			<table className="w-full aspect-square table-fixed">
 				<tbody>
@@ -22,10 +53,15 @@ function Board({ width = 10, height = 11, tiles }) {
 													dead={tiles[`${x},${y}`].dead} />
 											</div>
 										)}
-										<div className="z-10 absolute inset-0">
+										<div
+											className="z-10 absolute inset-0"
+											onClick={()=>clickSquare(x, y)}
+										>
 											<Square
 												x={x} y={y}
-												center={y == (height-1)/2 && (x == (width/2)-1 || x == (width/2))}/>
+												center={y == (height-1)/2 && (x == (width/2)-1 || x == (width/2))}
+												clicked={playA!==undefined && playA.x==x && playA.y==y}
+											/>
 										</div>
 									</div>
 								</td>

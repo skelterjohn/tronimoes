@@ -1,7 +1,7 @@
 "use client";
 
 import {Row, Col} from 'react-bootstrap';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Board from '../board/Board';
 import Hand from './Hand';
@@ -37,7 +37,23 @@ function Game({}) {
 		"6,4": {a:3, b:15, orientation:"right", color:"blue", dead:false},
 	});
 
+	const [playerTurn, setPlayerTurn] = useState(true);
 	const [selectedTile, setSelectedTile] = useState({a:1, b:2});
+
+	function startTurn() {
+		setPlayerTurn(true);
+		setSelectedTile(undefined);
+	}
+
+	function playTile(tile) {
+		tile.color = "green";
+		setLaidTiles({...laidTiles, [`${tile.x},${tile.y}`]: tile});
+		startTurn();
+	}
+
+	useEffect(() => {
+		startTurn();
+	}, []);
 
 	return <div className="">
 		<Row className="flex justify-center items-center">
@@ -53,7 +69,12 @@ function Game({}) {
 			))}
 		</Row>
 		<Row>
-			<Board width={10} height={11} tiles={laidTiles}/>
+			<Board
+				width={10} height={11}
+				tiles={laidTiles}
+				selectedTile={selectedTile}
+				playTile={playTile}
+			/>
 		</Row>
 		<Row>
 			<Hand
@@ -61,6 +82,7 @@ function Game({}) {
 				tiles={playerHand}
 				selectedTile={selectedTile}
 				setSelectedTile={setSelectedTile}
+				playerTurn={playerTurn}
 			/>
 		</Row>
 	</div>;
