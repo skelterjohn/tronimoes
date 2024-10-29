@@ -37,11 +37,18 @@ function Game({}) {
 		"6,4": {a:3, b:15, orientation:"right", color:"blue", dead:false},
 	});
 
+	const [selectedTile, setSelectedTile] = useState({a:1, b:2});
+
 	return <div className="">
 		<Row className="flex justify-center items-center">
 			{opponents.map((o, i) => (
 				<Col key={i}>
-					<Hand color={o.color} hidden={true} dead={o.dead} tiles={Array(o.count).fill({a:0, b:0})}/>
+					<Hand
+						color={o.color}
+						hidden={true}
+						dead={o.dead}
+						tiles={Array(o.count).fill({a:0, b:0})}
+					/>
 				</Col>
 			))}
 		</Row>
@@ -49,7 +56,12 @@ function Game({}) {
 			<Board width={10} height={11} tiles={laidTiles}/>
 		</Row>
 		<Row>
-			<Hand color="green" tiles={playerHand}/>
+			<Hand
+				color="green"
+				tiles={playerHand}
+				selectedTile={selectedTile}
+				setSelectedTile={setSelectedTile}
+			/>
 		</Row>
 	</div>;
 }
