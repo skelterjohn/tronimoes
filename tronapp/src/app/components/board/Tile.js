@@ -31,6 +31,15 @@ function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false,
         fuchsia: "bg-fuchsia-100",
         white: "bg-white"
     };
+	const borderColorMap = {
+        red: "border-red-300",
+        blue: "border-blue-300",
+        green: "border-green-300",
+        indigo: "border-indigo-300",
+        orange: "border-orange-300",
+        fuchsia: "border-fuchsia-300",
+        white: "border-white"
+    };
 	const selectedColorMap = {
         red: "bg-red-300",
         blue: "bg-blue-300",
@@ -67,10 +76,14 @@ function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false,
 		rotate = '-rotate-90'
 		bar = squareBar;
 	}
+
+	const bgcolor = dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]);
+	const bordercolor = dead ? borderColorMap[color] : "border-black";
+
 	return (
 		<div className={`h-full w-full ${rotate}`}>
 			<div className={height+" w-[100%] p-1"}>
-				<div className={`w-full h-full ${selected ? selectedColorMap[color] : colorMap[color]} ${dead ? "border-gray-300" : "border-black"} rounded-lg border-4`}>
+				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-4`}>
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							<tr><td>
