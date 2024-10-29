@@ -1,8 +1,11 @@
-export default function Home() {
+import Board from "../components/board/Board";
+import Game from "../components/game/Game";
+
+export default function Gameboard() {
   return (
     <div className="items-center justify-items-center min-h-screen h-screen">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full  max-w-screen-md">
-        let's play a game
+        <Game/>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         JT

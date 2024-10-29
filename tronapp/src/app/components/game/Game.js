@@ -2,7 +2,7 @@
 
 import {Row, Col} from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-
+import { useGameCode } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
 
@@ -17,6 +17,8 @@ const borderColorMap = {
 };
 
 function Game({}) {
+	const { gameCode } = useGameCode();
+
 	// These states come from the server
 	const [playerName, setPlayerName] = useState("Rad Bicycle");
 	const [players, setPlayers] = useState([
@@ -57,6 +59,10 @@ function Game({}) {
 		"6,4": {a:3, b:15, orientation:"right", color:"blue", dead:false},
 	});
 
+	useEffect(() => {
+		console.log(gameCode);
+	}, [gameCode]);
+
 	// The remaining states are derived.
 
 	const [playerColor, setPlayerColor] = useState("green");
@@ -94,6 +100,9 @@ function Game({}) {
 	}, []);
 
 	return <div className="">
+		<Row className="flex justify-center items-center">
+			<div className="text-center text-5xl font-bold">{gameCode}</div>
+		</Row>
 		<Row className="flex justify-center items-center">
 			{opponents.map((o, i) => (
 				<Col key={i}>
