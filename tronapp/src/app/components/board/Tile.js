@@ -12,14 +12,24 @@ function TileHalf({ pips, orientation }) {
 	}
 	return (
 		<div className={outercnm}>
-			<div className="w-full h-full bg-white flex items-center justify-center p-1">
+			<div className="w-full h-full bg-transparent flex items-center justify-center p-1">
 				<Pips pips={pips} />
 			</div>
 		</div>
 	);
 }
 
-function Tile({pipsa, pipsb, orientation}) {
+function Tile({pipsa, pipsb, orientation, color = "white"}) {
+	const colorMap = {
+        red: "bg-red-100",
+        blue: "bg-blue-100",
+        green: "bg-green-100",
+        indigo: "bg-indigo-100",
+        orange: "bg-orange-100",
+        fuchsia: "bg-fuchsia-100",
+        white: "bg-white"
+    };
+
 	var rotate = 'rotate-0'
 	if (orientation == "up") {
 		rotate = 'rotate-180'
@@ -30,25 +40,25 @@ function Tile({pipsa, pipsb, orientation}) {
 	if (orientation == "right") {
 		rotate = '-rotate-90'
 	}
-		return (
-			<div className={`h-full w-full ${rotate}`}>
-				<div className="h-[200%] w-[100%] p-1">
-					<div className="w-full h-full bg-white border-black rounded-lg border-4">
-						<table className="w-full h-full table-fixed">
-							<tbody>
-								<tr><td>
-									<TileHalf pips={pipsa} orientation={"down"}/>
-									<div className="absolute bottom-[-2px] left-[15%] w-[70%] h-[4px] bg-gray-300"></div>
-								</td></tr>
-								<tr><td>
-									<TileHalf pips={pipsb} orientation={"up"}/>
-								</td></tr>
-							</tbody>
-						</table>
-					</div>
+	return (
+		<div className={`h-full w-full ${rotate}`}>
+			<div className="h-[200%] w-[100%] p-1">
+				<div className={`w-full h-full ${colorMap[color]} border-black rounded-lg border-4`}>
+					<table className="w-full h-full table-fixed">
+						<tbody>
+							<tr><td>
+								<TileHalf pips={pipsa} orientation={"down"}/>
+								<div className="absolute bottom-[-2px] left-[15%] w-[70%] h-[4px] bg-gray-300"></div>
+							</td></tr>
+							<tr><td>
+								<TileHalf pips={pipsb} orientation={"up"}/>
+							</td></tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
-		);
+		</div>
+	);
 
 }
 

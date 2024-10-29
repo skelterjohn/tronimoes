@@ -7,7 +7,7 @@ function Pip({color="red"}) {
         orange: "bg-orange-500",
         yellow: "bg-yellow-500",
         purple: "bg-purple-500",
-        white: "bg-white"
+        transparent: "bg-transparent"
     };
 	return <td className="w-[15%] aspect-square">
 		<div className={`p-1 aspect-square rounded-full ${colorMap[color]}`}></div>
@@ -15,7 +15,7 @@ function Pip({color="red"}) {
 }
 
 function Pips({pips}) {
-	const defaultcolor = "white";
+	const defaultcolor = "transparent";
 	var c00 = defaultcolor;
 	var c10 = defaultcolor;
 	var c20 = defaultcolor;
