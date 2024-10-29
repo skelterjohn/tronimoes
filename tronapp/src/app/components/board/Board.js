@@ -1,12 +1,21 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import Square from "./Square";
 import Tile from "./Tile";
 
 function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
 	const [playA, setPlayA] = useState(undefined);
+
+	function rightClick(evt) {
+		evt.preventDefault();
+		setPlayA(undefined);
+	}
+
+	useEffect(() => {
+		setPlayA(undefined);
+	}, [selectedTile]);
 
 	function clickSquare(x, y) {
 		if (selectedTile===undefined) {
@@ -24,6 +33,9 @@ function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
 				orientation = "down";
 			} else if (x === playA.x && y === playA.y-1) {
 				orientation = "up";
+			} else {
+				setPlayA({x:x, y:y});
+				return;
 			}
 			playTile({
 				a:selectedTile.a, b:selectedTile.b,
@@ -36,6 +48,7 @@ function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
 	}
 
 	return (
+		<div onContextMenu={rightClick}>
 			<table className="w-full aspect-square table-fixed">
 				<tbody>
 					{Array.from({length: height}, (_, y) => (
@@ -70,6 +83,7 @@ function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
 					))}
 				</tbody>
 			</table>
+		</div>
 	)
 }
 
