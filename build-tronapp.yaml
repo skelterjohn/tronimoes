@@ -21,6 +21,6 @@ steps:
   - '--allow-unauthenticated'
   - '--revision-suffix=v$SHORT_SHA'
   - '--port=80'
-  - 'tronapp
+  - 'tronapp'
 images:
-- "us-east4-docker.pkg.dev/primus-game/primus/frontend:v$SHORT_SHA"
+- "us-east4-docker.pkg.dev/tronimoes/tronimoes/tronapp:v$SHORT_SHA"
