@@ -2,7 +2,7 @@
 
 import Pips from "./Pips";
 
-function TileHalf({ pips, orientation }) {
+const TileHalf = ({ pips, orientation }) => {
 	var outercnm = "w-full aspect-square";
 		switch (orientation) {
 			case "down": // down
@@ -21,7 +21,7 @@ function TileHalf({ pips, orientation }) {
 	);
 }
 
-function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false, selected=false}) {
+export default function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false, selected=false}) {
 	const colorMap = {
         red: "bg-red-100",
         blue: "bg-blue-100",
@@ -101,5 +101,3 @@ function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false,
 	);
 
 }
-
-export default Tile;

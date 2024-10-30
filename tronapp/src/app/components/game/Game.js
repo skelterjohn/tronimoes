@@ -1,6 +1,5 @@
 "use client";
 
-import {Row, Col} from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { useGameCode } from '../GameState';
 import Board from '../board/Board';
@@ -16,11 +15,14 @@ const borderColorMap = {
 	white: "border-white"
 };
 
-function Game({}) {
-	const { gameCode } = useGameCode();
+function Game() {
+	const { gameCode, playerName } = useGameCode();
+	useEffect(() => {
+		console.log("Game code:", gameCode);
+		console.log("Player name:", playerName);
+	}, [gameCode, playerName]);	
 
 	// These states come from the server
-	const [playerName, setPlayerName] = useState("Rad Bicycle");
 	const [players, setPlayers] = useState([
 		{
 			name: "Cool Symbiote",
@@ -59,10 +61,6 @@ function Game({}) {
 		"6,4": {a:3, b:15, orientation:"right", color:"blue", dead:false},
 	});
 
-	useEffect(() => {
-		console.log(gameCode);
-	}, [gameCode]);
-
 	// The remaining states are derived.
 
 	const [playerColor, setPlayerColor] = useState("green");
@@ -70,16 +68,18 @@ function Game({}) {
 	const [opponents, setOpponents] = useState([]);
 	useEffect(() => {
 		var playerIndex = players.findIndex(p => p.name === playerName);
+		if (playerIndex === -1) {
+			return;
+		}
 		var oppList = [];
 		for (let offset=1; offset<players.length; offset++) {
 			const opp = players[(playerIndex+offset)%players.length];
 			oppList.push(opp);
 		}
 		setOpponents(oppList);
-
 		setPlayerHand(players[playerIndex].tiles);
 		setPlayerColor(players[playerIndex].color);
-	}, [players]);
+	}, [players, playerName]);
 
 	const [playerHand, setPlayerHand] = useState([]);
 	const [selectedTile, setSelectedTile] = useState(undefined);
@@ -100,33 +100,33 @@ function Game({}) {
 	}, []);
 
 	return <div className="">
-		<Row className="flex justify-center items-center">
+		<div className="flex justify-center items-center">
 			<div className="text-center text-5xl font-bold">{gameCode}</div>
-		</Row>
-		<Row className="flex justify-center items-center">
+		</div>
+		<div className="flex justify-center items-center gap-4">
 			{opponents.map((o, i) => (
-				<Col key={i}>
+				<div key={i} className="flex-1">
 					<Hand
 						name={o.name}
 						color={o.color}
 						hidden={true}
 						dead={o.dead}
 						tiles={o.tiles}
-					/>
-				</Col>
+						/>
+				</div>
 			))}
-		</Row>
-		<Row>
+		</div>
+		<div>
 			<div className={`${borderColorMap[players[turnIndex].color]} border-8`}>
 				<Board
 					width={10} height={11}
-					tiles={laidTiles}
-					selectedTile={selectedTile}
-					playTile={playTile}
+						tiles={laidTiles}
+						selectedTile={selectedTile}
+						playTile={playTile}
 				/>
 			</div>
-		</Row>
-		<Row>
+		</div>
+		<div>
 			<Hand
 				name={playerName}
 				color={playerColor}
@@ -135,7 +135,7 @@ function Game({}) {
 				setSelectedTile={setSelectedTile}
 				playerTurn={players[turnIndex].name === playerName}
 			/>
-		</Row>
+		</div>
 	</div>;
 }
 

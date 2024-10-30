@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Square from "./Square";
 import Tile from "./Tile";
 
-function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
+export default function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
 	const [playA, setPlayA] = useState(undefined);
 
 	function rightClick(evt) {
@@ -87,4 +87,3 @@ function Board({ width = 10, height = 11, tiles, selectedTile, playTile }) {
 	)
 }
 
-export default Board;

@@ -1,25 +1,42 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation'; 
 import Image from 'next/image';
-import { Input, Button } from 'antd';
+import { Input, Button, Row, Col } from 'antd';
+
+import { useGameCode } from './components/GameState';
 
 export default function Home() {
+	const router = useRouter();
 
 	const [name, setName] = useState("");
 	const [code, setCode] = useState("");
 
-	return (
-		<div className="relative min-h-screen flex items-center justify-center">
-			<Image 
-			src="/trondude.png"
-			alt="Background"
-			fill
-			className="object-cover z-0"
-			priority
-			/>
+	const { setGameCode, setPlayerName } = useGameCode();
 
-			<div className="relative z-10 flex flex-col gap-4 text-white">
+	function joinCode() {
+		setGameCode(code);
+		setPlayerName(name);
+		router.push('/gameboard');
+	}
+
+	function joinRandom() {
+		setGameCode("abc123");
+		setPlayerName(name);
+		router.push('/gameboard');
+	}
+
+	return (
+		<main className="relative min-h-screen w-screen bg-slate-800">
+			<Image 
+				src="/trondude.png"
+				alt="Background"
+				fill
+				className="object-cover z-0"
+				priority
+			/>
+			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 space-y-4">
 				<Input
 					placeholder="name"
 					size="large"
@@ -38,20 +55,20 @@ export default function Home() {
 					<Button
 						type="primary"
 						size="large"
+						onClick={joinCode}
 					>
 						join
 					</Button>
 				</div>
-				<div className="flex w-full gap-2">
-					<Button
-						className="w-full"
-						type="primary"
-						size="large"
-					>
-						random
-					</Button>
-				</div>
+				<Button
+					className="w-full"
+					type="primary"
+					size="large"
+					onClick={joinRandom}
+				>
+					random
+				</Button>
 			</div>
-		</div>
+		</main>
 	);
 }

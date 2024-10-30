@@ -14,7 +14,7 @@ function Pip({color="red"}) {
 	</td>;
 }
 
-function Pips({pips}) {
+export default function Pips({pips}) {
 	const defaultcolor = "transparent";
 	var c00 = defaultcolor;
 	var c10 = defaultcolor;
@@ -267,6 +267,3 @@ function Pips({pips}) {
 		</table>
 	);
 }
-
-export default Pips;
-export {safelist}

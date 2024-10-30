@@ -1,4 +1,4 @@
-function Square({ x, y, center=false, clicked=false }) {
+export default function Square({ x, y, center=false, clicked=false }) {
 	var cnm = "w-full aspect-square";
 	if (center) {
 		cnm = `${cnm} bg-gray-400`;
@@ -14,5 +14,3 @@ function Square({ x, y, center=false, clicked=false }) {
 
 	return <div className={cnm}> </div>;
 }
-
-export default Square;
