@@ -23,26 +23,7 @@ function Game() {
 	}, [gameCode, playerName]);	
 
 	// These states come from the server
-	const [players, setPlayers] = useState([
-		{
-			name: "Cool Symbiote",
-			color: "red",
-			tiles: [{},{},{},{}],
-			dead: true,
-		},
-		{
-			name: "Hot Xenophage",
-			color: "blue",
-			tiles: [{},{},{}],
-			dead: false,
-		},
-		{
-			name: "Rad Bicycle",
-			color: "green",
-			tiles: [{a:1, b:2}, {a:3, b:12}],
-			dead: false,
-		},
-	]);
+	const [players, setPlayers] = useState([]);
 
 	useEffect(() => {
 		setPlayers([
@@ -122,6 +103,12 @@ function Game() {
 		startTurn();
 	}, []);
 
+	let borderColor = "bg-white";
+	if (players.length > 0) {
+		borderColor = borderColorMap[players[turnIndex].color];
+	}
+	let myTurn = players.length > 0 && players[turnIndex].name === playerName;
+
 	return <div className="">
 		<div className="flex justify-center items-center">
 			<div className="text-center text-5xl font-bold">{gameCode}</div>
@@ -140,7 +127,7 @@ function Game() {
 			))}
 		</div>
 		<div>
-			<div className={`${borderColorMap[players[turnIndex].color]} border-8`}>
+			<div className={`${borderColor} border-8`}>
 				<Board
 					width={10} height={11}
 						tiles={laidTiles}
@@ -156,7 +143,7 @@ function Game() {
 				tiles={playerHand}
 				selectedTile={selectedTile}
 				setSelectedTile={setSelectedTile}
-				playerTurn={players[turnIndex].name === playerName}
+				playerTurn={myTurn}
 			/>
 		</div>
 	</div>;
