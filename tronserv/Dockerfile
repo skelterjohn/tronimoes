@@ -10,6 +10,8 @@ WORKDIR /app
 COPY --from=builder /app/tronserv .
 
 EXPOSE 8080
+ENV PORT 8080
+ENV HOSTNAME "0.0.0.0"
 USER nonroot
 
 ENTRYPOINT ["/app/tronserv"]
