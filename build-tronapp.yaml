@@ -1,10 +1,4 @@
 steps:
-- name: 'gcr.io/cloud-builders/npm'
-  dir: 'tronapp'
-  args: ['install']
-- name: 'gcr.io/cloud-builders/npm'
-  dir: 'tronapp'
-  args: ['run', 'build']
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'tronapp'
   args: ['build', '--tag=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronapp:v$SHORT_SHA', '.']
