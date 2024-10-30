@@ -44,6 +44,29 @@ function Game() {
 		},
 	]);
 
+	useEffect(() => {
+		setPlayers([
+			{
+				name: "Cool Symbiote",
+				color: "red",
+				tiles: [{},{},{},{}],
+				dead: true,
+			},
+			{
+				name: "Hot Xenophage",
+				color: "blue",
+				tiles: [{},{},{}],
+				dead: false,
+			},
+			{
+				name: playerName,
+				color: "green",
+				tiles: [{a:1, b:2}, {a:3, b:12}],
+				dead: false,
+			},
+		])
+	}, [playerName]);
+
 	const [turnIndex, setTurnIndex] = useState(2);
 
 	const [laidTiles, setLaidTiles] = useState({
