@@ -1,0 +1,26 @@
+steps:
+- name: 'gcr.io/cloud-builders/npm'
+  dir: 'tronapp'
+  args: ['install']
+- name: 'gcr.io/cloud-builders/npm'
+  dir: 'tronapp'
+  args: ['run', 'build']
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'tronapp'
+  args: ['build', '--tag=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronapp:v$SHORT_SHA', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-east4-docker.pkg.dev/tronimoes/tronimoes/tronapp:v$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: 
+  - '-q'
+  - 'run'
+  - 'deploy'
+  - '--image=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronapp:v$SHORT_SHA'
+  - '--platform=managed'
+  - '--region=us-east4'
+  - '--allow-unauthenticated'
+  - '--revision-suffix=v$SHORT_SHA'
+  - '--port=80'
+  - 'tronapp
+images:
+- "us-east4-docker.pkg.dev/primus-game/primus/frontend:v$SHORT_SHA"
