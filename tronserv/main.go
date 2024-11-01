@@ -9,14 +9,14 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/skelterjohn/tronimoes/tronserv/queue"
+	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	queue.RegisterHandlers(r)
+	game.RegisterHandlers(r)
 
 	addr := fmt.Sprintf("%s:%s", os.Getenv("HOSTNAME"), os.Getenv("PORT"))
 	log.Printf("Server starting on %s", addr)
