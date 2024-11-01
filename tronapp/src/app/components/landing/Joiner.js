@@ -23,8 +23,8 @@ export default function Joiner() {
 		}).catch((error) => {
 			console.error('join error', error);
 			setGameCode('');
+			window.location.reload();
 		});
-		// router.push('/gameboard');
 	}
 
 	function joinPickup() {
@@ -32,12 +32,6 @@ export default function Joiner() {
 		setPlayerName(name);
 		router.push('/gameboard');
 	}
-
-	useEffect(() => {
-		if (name === "") {
-			setGameCode('');
-		}
-	}, [name]);
 
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
 		<Input
@@ -55,7 +49,6 @@ export default function Joiner() {
 				className="text-lg"
 				formatter={(str) => str.toUpperCase()}
 				disabled={name === ""}
-				value={gameCode}
 				onChange={joinCode}
 			/>
 		</div>
