@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 
 import { useGameCode } from '../../components/GameState';
 
+import client from '../../../client/Client';
+
 export default function Joiner() {
 	const router = useRouter();
 
@@ -14,7 +16,8 @@ export default function Joiner() {
 	function joinCode(code) {
 		setGameCode(code);
 		setPlayerName(name);
-		router.push('/gameboard');
+		client.join(name, code);
+		// router.push('/gameboard');
 	}
 
 	function joinPickup() {
