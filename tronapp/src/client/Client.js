@@ -24,25 +24,26 @@ class Client {
 
 
     async doRequest(method, path, body = null) {
-        try {
-            const response = await fetch(`${this.baseURL}${path}`, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: body ? JSON.stringify(body) : null,
-            });
+        const response = await fetch(`${this.baseURL}${path}`, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: body ? JSON.stringify(body) : null,
+        });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        const data = await response.json();
 
-            return await response.json();
-        } catch (error) {
-            console.error('Request failed:', error);
-            throw error;
+        if (!response.ok) {
+            throw {
+                status: response.status,
+                data: data,
+                message: `HTTP error! status: ${response.status}`
+            };
         }
+
+        return data;
     }
 }
 

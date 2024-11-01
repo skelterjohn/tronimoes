@@ -30,10 +30,11 @@ func HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	g := Game{Code: code}
 
+	w.WriteHeader(http.StatusConflict)
+
 	if err := json.NewEncoder(w).Encode(g); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Input } from "antd";
 import { useRouter } from "next/navigation";
 
@@ -11,12 +11,19 @@ export default function Joiner() {
 
 	const [name, setName] = useState("");
 
-	const { setGameCode, setPlayerName } = useGameCode();
+	const { gameCode, setGameCode, setPlayerName } = useGameCode();
 
 	function joinCode(code) {
-		setGameCode(code);
-		setPlayerName(name);
-		client.join(name, code);
+		console.log('joining', name, code);
+		client.join(name, code).then((resp) => {
+			console.log('join response', resp);
+			setGameCode(code);
+			setPlayerName(name);
+			router.push('/gameboard');
+		}).catch((error) => {
+			console.error('join error', error);
+			setGameCode('');
+		});
 		// router.push('/gameboard');
 	}
 
@@ -25,6 +32,12 @@ export default function Joiner() {
 		setPlayerName(name);
 		router.push('/gameboard');
 	}
+
+	useEffect(() => {
+		if (name === "") {
+			setGameCode('');
+		}
+	}, [name]);
 
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
 		<Input
@@ -42,6 +55,7 @@ export default function Joiner() {
 				className="text-lg"
 				formatter={(str) => str.toUpperCase()}
 				disabled={name === ""}
+				value={gameCode}
 				onChange={joinCode}
 			/>
 		</div>

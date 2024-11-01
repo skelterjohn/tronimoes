@@ -5,7 +5,7 @@ import { createContext, useContext, useState } from 'react';
 const GameContext = createContext();
 
 export function GameProvider({ children }) {
-    const [gameCode, setGameCode] = useState("xyz123");
+    const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("Rad Bicycle");
 
     return (
