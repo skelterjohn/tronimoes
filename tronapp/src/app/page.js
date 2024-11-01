@@ -1,16 +1,10 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; 
 import Image from 'next/image';
-import { Input, Button, Row, Col } from 'antd';
 
 import Joiner from './components/landing/Joiner';
 
 export default function Home() {
-	const router = useRouter();
-
-
 	return (
 		<main className="relative min-h-screen w-screen bg-slate-800">
 			<Image 
