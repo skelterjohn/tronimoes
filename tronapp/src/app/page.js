@@ -20,7 +20,7 @@ export default function Home() {
 				className="object-cover z-0"
 				priority
 			/>
-			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 space-y-4">
+			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit space-y-4">
 				<Joiner/>
 			</div>
 		</main>
