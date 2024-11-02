@@ -20,6 +20,7 @@ type Game struct {
 	BoardWidth  int       `json:"board_width"`
 	BoardHeight int       `json:"board_height"`
 	MaxPips     int       `json:"max_pips"`
+	History     []string  `json:"history"`
 }
 
 func NewGame(code string) *Game {
@@ -126,6 +127,8 @@ func (g *Game) Start() error {
 			g.DrawTile(p.Name)
 		}
 	}
+
+	g.History = append(g.History, fmt.Sprintf("round %d %s - %d:%d", len(g.Rounds), g.Players[g.Turn].Name, potentialLeader, potentialLeader))
 
 	if err := g.LayTile(&LaidTile{
 		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},

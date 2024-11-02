@@ -38,7 +38,8 @@ function Game() {
 	const [turnIndex, setTurnIndex] = useState(0);
 	const [laidTiles, setLaidTiles] = useState({});
 
-	const [history, setHistory] = useState([]);
+	const [roundHistory, setRoundHistory] = useState([]);
+	const [gameHistory, setGameHistory] = useState([]);
 
 	// here we query the server
 	const [game, setGame] = useState(undefined);
@@ -115,8 +116,9 @@ function Game() {
 					dead: false,
 				}
 			});
-			setHistory(lastRound.history);
+			setRoundHistory(lastRound.history || []);
 		}
+		setGameHistory(game.history || []);
 		setTurnIndex(game.turn);
 		setLaidTiles(allLaidTiles);
 	}, [game]);
@@ -241,6 +243,9 @@ function Game() {
 				</div>
 				<div>
 					<div className="flex gap-4">
+						<span>
+							<History history={gameHistory}/>
+						</span>
 						<div className={`${borderColor} border-8`}>
 							<Board
 								width={10} height={11}
@@ -250,7 +255,7 @@ function Game() {
 							/>
 						</div>
 						<span>
-							<History history={history}/>
+							<History history={roundHistory}/>
 						</span>
 					</div>
 				</div>
