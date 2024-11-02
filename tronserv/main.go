@@ -32,7 +32,7 @@ func main() {
 		MaxAge:           300,
 	}))
 
-	game.RegisterHandlers(r)
+	game.RegisterHandlers(r, game.NewMemoryStore())
 
 	listenAddr := fmt.Sprintf("%s:%d", *addr, *port)
 	log.Printf("Server starting on %s", listenAddr)
