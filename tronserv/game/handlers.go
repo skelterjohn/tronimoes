@@ -41,12 +41,14 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(r)
 	if err != nil {
+		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -57,22 +59,26 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
+		log.Printf("Player %q is not in turn for game %q", name, code)
 		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
 		return
 	}
 
 	if len(g.Rounds) == 0 {
+		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 	round := g.Rounds[len(g.Rounds)-1]
 	if round.Done {
+		log.Printf("Player %q tried to play game %q but the round is done", name, code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 
 	lt := &LaidTile{}
 	if err := json.NewDecoder(r.Body).Decode(lt); err != nil {
+		log.Printf("Error decoding tile for %q / %q: %v", name, code, err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
@@ -80,17 +86,23 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	lt.PlayerName = player.Name
 
 	if err := g.LayTile(*lt); err != nil {
+		log.Printf("Error laying tile for %q / %q: %v", name, code, err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(g)
+	if err := json.NewEncoder(w).Encode(g); err != nil {
+		log.Printf("Error encoding game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
@@ -103,6 +115,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		var err error
 		version, err = strconv.Atoi(versionStr)
 		if err != nil {
+			log.Printf("Error parsing version %q: %v", versionStr, err)
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
@@ -110,6 +123,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -122,6 +136,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	if g.Version > version {
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(g); err != nil {
+			log.Printf("Error encoding game %q: %v", code, err)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
@@ -135,7 +150,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	case game := <-s.store.WatchGame(ctx, code):
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(game); err != nil {
-			log.Printf("Error encoding game: %v", err)
+			log.Printf("Error encoding game %q: %v", code, err)
 			return
 		}
 	}
@@ -147,12 +162,14 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(r)
 	if err != nil {
+		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil && err != ErrNoSuchGame {
+		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -163,16 +180,19 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	player := &Player{}
 	if err := json.NewDecoder(r.Body).Decode(player); err != nil {
+		log.Printf("Error decoding player for %q / %q", name, code)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if player.Name != name {
+		log.Printf("Header name %q does not match payload name %q", name, player.Name)
 		writeErr(w, ErrNotYou, http.StatusForbidden)
 		return
 	}
 
 	if err := g.AddPlayer(player); err != nil {
+		log.Printf("Error adding player %q to game %q: %v", name, code, err)
 		if err == ErrGameTooManyPlayers {
 			writeErr(w, err, http.StatusConflict)
 			return
@@ -190,12 +210,14 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.store.WriteGame(ctx, g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(g); err != nil {
+		log.Printf("Error encoding game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -207,28 +229,33 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(r)
 	if err != nil {
+		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	// Only the first player can start the round.
 	if g.Players[0].Name != name {
+		log.Printf("In game %q, player %q tried to start game for %q", code, name, g.Players[0].Name)
 		writeErr(w, ErrNotYourGame, http.StatusForbidden)
 		return
 	}
 
 	if err := g.Start(); err != nil {
+		log.Printf("Error starting round for game %q: %v", code, err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
