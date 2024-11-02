@@ -94,10 +94,11 @@ function Game() {
 			return {
 				name: p.name,
 				color: availableColors[i],
-				tiles: p.hand?.map((t) => ({
+				hand: p.hand?.map((t) => ({
 					a: t.pips_a, 
 					b: t.pips_b,
 				})),
+				score: p.score,
 				dead: false,
 			}
 		}));
@@ -123,9 +124,8 @@ function Game() {
 
 	// The remaining states are derived.
 
-	const [playerColor, setPlayerColor] = useState("green");
-
 	const [opponents, setOpponents] = useState([]);
+	const [player, setPlayer] = useState(undefined);
 	useEffect(() => {
 		var playerIndex = players.findIndex(p => p.name === playerName);
 		if (playerIndex === -1) {
@@ -137,11 +137,14 @@ function Game() {
 			oppList.push(opp);
 		}
 		setOpponents(oppList);
-		setPlayerHand(players[playerIndex].tiles);
-		setPlayerColor(players[playerIndex].color);
+		
+		if (playerIndex === -1) {
+			return;
+		}
+		console.log(players[playerIndex]);
+		setPlayer(players[playerIndex]);
 	}, [players, playerName]);
 
-	const [playerHand, setPlayerHand] = useState([]);
 	const [selectedTile, setSelectedTile] = useState(undefined);
 
 	const [roundInProgress, setRoundInProgress] = useState(false);
@@ -164,7 +167,7 @@ function Game() {
 
 	function playTile(tile) {
 		setSelectedTile(undefined);
-		tile.color = playerColor;
+		tile.color = player.color;
 		client.LayTile(gameCode, {
 			tile:{
 				pips_a: tile.a,
@@ -173,7 +176,7 @@ function Game() {
 			x: tile.x,
 			y: tile.y,
 			orientation: tile.orientation,
-			player_name: playerName,
+			player_name: player.name,
 		}).then((resp) => {
 			console.log("laid tile", resp);
 		}).catch((error) => {
@@ -227,10 +230,11 @@ function Game() {
 						<div key={i} className="flex-1">
 							<Hand
 								name={o.name}
+								score={o.score}
 								color={o.color}
 								hidden={true}
 								dead={o.dead}
-								tiles={o.tiles}
+								tiles={o.hand}
 							/>
 						</div>
 					))}
@@ -253,9 +257,10 @@ function Game() {
 				<div className="flex justify-center items-center gap-4 min-h-32">
 					<Hand
 						name={playerName}
+						score={player?.score}
 						hidden={false}
-						color={playerColor}
-						tiles={playerHand}
+						color={player?.color}
+						tiles={player?.hand}
 						selectedTile={selectedTile}
 						setSelectedTile={setSelectedTile}
 						playerTurn={myTurn}
