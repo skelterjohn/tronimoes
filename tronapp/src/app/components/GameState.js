@@ -1,20 +1,34 @@
 "use client";
 
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import clientFor from '../../client/Client';
 
 const GameContext = createContext();
 
 export function GameProvider({ children }) {
     const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("Rad Bicycle");
+	const [playerKey, setPlayerKey] = useState(uuidv4());
+	const [client, setClient] = useState(undefined);
+
+
+	useEffect(() => {
+		setClient(clientFor(playerName, playerKey));
+	}, [playerName, playerKey]);
 
     return (
-        <GameContext.Provider value={{ gameCode, setGameCode, playerName, setPlayerName }}>
+        <GameContext.Provider value={{
+			gameCode, setGameCode,
+			playerName, setPlayerName,
+			playerKey, setPlayerKey,
+			client, setClient,
+		}}>
             {children}
         </GameContext.Provider>
     );
 }
 
-export function useGameCode() {
+export function useGameState() {
     return useContext(GameContext);
 }

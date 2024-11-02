@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { Button, Input } from "antd";
 import { useRouter } from "next/navigation";
 
-import { useGameCode } from '../../components/GameState';
+import { useGameState } from '../../components/GameState';
 
-import client from '../../../client/Client';
+import clientFor from '../../../client/Client';
 
 export default function Joiner() {
 	const router = useRouter();
 
 	const [name, setName] = useState("");
 
-	const { setGameCode, setPlayerName } = useGameCode();
+	const { setGameCode, setPlayerName, client } = useGameState();
 
 	function joinCode(code) {
 		console.log('joining', name, code);

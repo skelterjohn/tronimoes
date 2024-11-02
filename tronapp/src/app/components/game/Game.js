@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useGameCode } from '../GameState';
+import { useGameState } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
 import client from '../../../client/Client';
@@ -29,7 +29,7 @@ const borderColorMap = {
 
 function Game() {
 	const router = useRouter();
-	const { gameCode, playerName } = useGameCode();
+	const { gameCode, playerName, client } = useGameState();
 
 	// These states come from the server
 	const [version, setVersion] = useState(0);

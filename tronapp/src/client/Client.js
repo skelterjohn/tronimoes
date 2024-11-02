@@ -1,6 +1,8 @@
 class Client {
-    constructor(baseURL) {
+    constructor(baseURL, name, key) {
         this.baseURL = baseURL;
+		this.name = name;
+		this.key = key;
     }
 
 
@@ -41,6 +43,8 @@ class Client {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
+				'X-Player-Name': this.name,
+				'Authorization': `Bearer ${this.key}`,
             },
             body: body ? JSON.stringify(body) : null,
         });
@@ -60,6 +64,6 @@ class Client {
 }
 
 
-// Export a singleton instance
-const client = new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080');
-export default client;
+export default function clientFor(name, key) {
+	return new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080', name, key);
+}
