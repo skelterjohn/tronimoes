@@ -52,6 +52,9 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 }
 
 func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+
 	game.Version++
 
 	// Deep copy using JSON marshal/unmarshal so that changes (like filtering)
@@ -66,16 +69,19 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 		return fmt.Errorf("unmarshaling game: %w", err)
 	}
 
-	s.gamesMu.Lock()
 	s.games[game.Code] = &gameCopy
-	s.gamesMu.Unlock()
 
 	s.watchMu.Lock()
-	for _, ch := range s.watchChans[game.Code] {
-		ch <- game
+	for _, ch := range s.watchChans[gameCopy.Code] {
+		// We make yet another copy because we may get concurrent watch-reads.
+		var gameCopyCopy Game
+		if err := json.Unmarshal(data, &gameCopyCopy); err != nil {
+			return fmt.Errorf("unmarshaling game: %w", err)
+		}
+		ch <- &gameCopyCopy
 		close(ch)
 	}
-	s.watchChans[game.Code] = nil
+	s.watchChans[gameCopy.Code] = nil
 	s.watchMu.Unlock()
 
 	return nil
