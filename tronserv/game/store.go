@@ -2,12 +2,7 @@ package game
 
 import (
 	"context"
-	"errors"
 	"sync"
-)
-
-var (
-	ErrNoSuchGame = errors.New("no such game")
 )
 
 type Store interface {

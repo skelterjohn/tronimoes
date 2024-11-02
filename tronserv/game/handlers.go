@@ -2,20 +2,11 @@ package game
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-)
-
-var (
-	ErrRoundNotStarted = errors.New("round not started")
-	ErrNotYourTurn     = errors.New("not your turn")
-	ErrNotYourGame     = errors.New("not your game")
-	ErrNotYou          = errors.New("not you")
-	ErrMissingToken    = errors.New("missing token")
 )
 
 func writeErr(w http.ResponseWriter, err error, code int) {

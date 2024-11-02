@@ -1,19 +1,9 @@
 package game
 
 import (
-	"errors"
 	"fmt"
 
 	"math/rand"
-)
-
-var (
-	ErrGameAlreadyStarted       = errors.New("game already started")
-	ErrGameTooManyPlayers       = errors.New("game already has 6 players")
-	ErrGameNotEnoughPlayers     = errors.New("not enough players")
-	ErrGamePreviousRoundNotDone = errors.New("previous round not done")
-	ErrPlayerAlreadyInGame      = errors.New("player already in game")
-	ErrRoundAlreadyDone         = errors.New("round already done")
 )
 
 var Colors = []string{"red", "blue", "green"}
