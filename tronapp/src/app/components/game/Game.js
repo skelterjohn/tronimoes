@@ -157,7 +157,7 @@ function Game() {
 
 	return <div className="">
 		<div className="flex justify-center items-center">
-			<div className="text-center text-5xl font-bold">{gameCode}</div>
+			<div className="text-center text-5xl font-bold">#{gameCode}</div>
 		</div>
 		<div className="flex justify-center items-center gap-4">
 			{opponents.map((o, i) => (
