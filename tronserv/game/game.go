@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"log"
 
 	"math/rand"
 )
@@ -15,8 +16,10 @@ type Game struct {
 	Players     []*Player `json:"players"`
 	Turn        int       `json:"turn"`
 	Rounds      []*Round  `json:"rounds"`
+	Bag         []*Tile   `json:"bag"`
 	BoardWidth  int       `json:"board_width"`
 	BoardHeight int       `json:"board_height"`
+	MaxPips     int       `json:"max_pips"`
 }
 
 func NewGame(code string) *Game {
@@ -25,6 +28,7 @@ func NewGame(code string) *Game {
 		Version:     0,
 		BoardWidth:  10,
 		BoardHeight: 11,
+		MaxPips:     16,
 	}
 }
 
@@ -65,14 +69,48 @@ func (g *Game) Start() error {
 		LaidTiles: []*LaidTile{},
 	})
 
+	// Fill the bag with tiles.
+	for a := 0; a < g.MaxPips; a++ {
+		for b := a; b < g.MaxPips; b++ {
+			g.Bag = append(g.Bag, &Tile{
+				PipsA: a,
+				PipsB: b,
+			})
+		}
+	}
+	// And shuffle it.
+	rand.Shuffle(len(g.Bag), func(i, j int) {
+		g.Bag[i], g.Bag[j] = g.Bag[j], g.Bag[i]
+	})
+
 	for _, p := range g.Players {
-		p.Hand = []*Tile{{
-			PipsA: rand.Intn(16),
-			PipsB: rand.Intn(16),
-		}}
+		for i := 0; i < 7; i++ {
+			g.DrawTile(p.Name)
+		}
 	}
 
 	return nil
+}
+
+func (g *Game) DrawTile(name string) bool {
+	if len(g.Bag) == 0 {
+		return false
+	}
+
+	var player *Player
+	for _, p := range g.Players {
+		if p.Name == name {
+			player = p
+		}
+	}
+	if player == nil {
+		return false
+	}
+
+	player.Hand = append(player.Hand, g.Bag[0])
+	log.Printf("%s drew %v", name, g.Bag[0])
+	g.Bag = g.Bag[1:]
+	return true
 }
 
 func (g *Game) LayTile(tile *LaidTile) error {
