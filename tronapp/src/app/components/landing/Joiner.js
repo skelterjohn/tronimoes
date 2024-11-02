@@ -11,7 +11,7 @@ export default function Joiner() {
 
 	const [name, setName] = useState("");
 
-	const { gameCode, setGameCode, setPlayerName } = useGameCode();
+	const { setGameCode, setPlayerName } = useGameCode();
 
 	function joinCode(code) {
 		console.log('joining', name, code);
