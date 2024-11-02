@@ -94,10 +94,10 @@ func (g *Game) Start() error {
 		g.Bag[i], g.Bag[j] = g.Bag[j], g.Bag[i]
 	})
 
+	// Give each player 7 tiles.
 	for _, p := range g.Players {
-		for i := 0; i < 7; i++ {
-			g.DrawTile(p.Name)
-		}
+		p.Hand = g.Bag[:7]
+		g.Bag = g.Bag[7:]
 	}
 	g.Turn = 0
 
@@ -160,6 +160,9 @@ func (g *Game) DrawTile(name string) bool {
 
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
+	round := g.Rounds[len(g.Rounds)-1]
+	round.History = append(round.History, fmt.Sprintf("%s drew a tile", name))
+
 	return true
 }
 
@@ -197,6 +200,9 @@ func (g *Game) LayTile(tile *LaidTile) error {
 		return fmt.Errorf("laying tile: %w", err)
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
+
+	round.History = append(round.History, fmt.Sprintf("%s laid %d-%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
+
 	return nil
 }
 
@@ -235,6 +241,7 @@ type Round struct {
 	Turn      int         `json:"turn"`
 	LaidTiles []*LaidTile `json:"laid_tiles"`
 	Done      bool        `json:"done"`
+	History   []string    `json:"history"`
 }
 
 func (r *Round) LayTile(tile *LaidTile) error {
