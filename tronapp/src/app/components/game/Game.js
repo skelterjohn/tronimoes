@@ -57,14 +57,32 @@ function Game() {
 			setGame(undefined);
 			router.push('/');
 		}
-		console.log("getting game", gameCode, version);
-		client.GetGame(gameCode, version).then((resp) => {
-			console.log("game", resp);
-			setVersion(resp.version);
-			setGame(resp);
-		}).catch((error) => {
-			console.error("error", error);
-		});
+
+		const getGame = () => {
+			client.GetGame(gameCode, version).then((resp) => {
+				console.log("game", resp);
+				if (resp.version === version) {
+					// We got back the same one, so let's try again after a bit.
+					setTimeout(getGame, 5000);
+				}
+				setVersion(resp.version);
+				// setting the version to something new triggers the next fetch.
+				setGame(resp);
+			}).catch((error) => {
+				if (error.name !== "AbortError") {
+					console.error("error", error);
+					setTimeout(getGame, 30000);
+					return;
+				} 
+				const timeoutDuration = new Date() - requestTime;
+				if (timeoutDuration < 10000) {
+					console.log(`request timed out quickly in ${timeoutDuration}ms`)
+					setTimeout(getGame, 5000);
+				} 
+			})
+		}
+		getGame();
+
 	}, [gameCode, version]);
 
 	useEffect(() => {
