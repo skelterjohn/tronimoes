@@ -14,6 +14,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	gs := &GameServer{store: s}
 	r.Get("/game/{code}", gs.HandleGetGame)
 	r.Put("/game/{code}", gs.HandlePutGame)
+	r.Post("/game/{code}/start", gs.HandleStartRound)
 }
 
 type GameServer struct {
@@ -76,7 +77,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if g == nil {
-		g = &Game{Code: code}
+		g = NewGame(code)
 	}
 
 	if len(g.Players) >= 4 {
@@ -85,13 +86,13 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var player Player
-	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
+	player := &Player{}
+	if err := json.NewDecoder(r.Body).Decode(player); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	g.Players = append(g.Players, player)
+	g.AddPlayer(player)
 	if err := s.store.WriteGame(ctx, g); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -102,4 +103,27 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
+	code := chi.URLParam(r, "code")
+
+	g, err := s.store.ReadGame(r.Context(), code)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := g.Start(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(g)
 }
