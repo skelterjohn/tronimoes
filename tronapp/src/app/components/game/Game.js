@@ -163,6 +163,7 @@ function Game() {
 	}
 
 	function playTile(tile) {
+		setSelectedTile(undefined);
 		tile.color = playerColor;
 		client.LayTile(gameCode, {
 			tile:{
@@ -181,6 +182,7 @@ function Game() {
 	}
 
 	function drawTile() {
+		setSelectedTile(undefined);
 		client.DrawTile(gameCode).then((resp) => {
 			console.log("drew tile", resp);
 		}).catch((error) => {
