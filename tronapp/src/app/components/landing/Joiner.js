@@ -30,9 +30,7 @@ export default function Joiner() {
 	}
 
 	function joinPickup() {
-		setGameCode(null);
-		setPlayerName(name);
-		router.push('/gameboard');
+		joinCode("<>");
 	}
 
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
@@ -42,6 +40,7 @@ export default function Joiner() {
 			className="text-lg"
 			value={name}
 			onChange={(e) => setName(e.target.value)}
+			onPressEnter={joinPickup}
 		/>
 		<div className="flex gap-2 text-white">
 			<span className="text-3xl text-white font-bold">#</span>
