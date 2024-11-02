@@ -16,6 +16,10 @@ class Client {
 		return this.post(`/game/${code}/start`);
 	}
 
+	async LayTile(code, tile) {
+		return this.post(`/game/${code}/tile`, tile);
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }

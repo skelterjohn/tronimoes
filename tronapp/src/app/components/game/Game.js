@@ -101,8 +101,8 @@ function Game() {
 					dead: false,
 				}
 			});
-			setTurnIndex(lastRound?.turn);
 		}
+		setTurnIndex(game.turn);
 		setLaidTiles(allLaidTiles);
 
 	}, [game]);
@@ -152,8 +152,20 @@ function Game() {
 
 	function playTile(tile) {
 		tile.color = playerColor;
-		setLaidTiles({...laidTiles, [`${tile.x},${tile.y}`]: tile});
-		startTurn();
+		client.LayTile(gameCode, {
+			tile:{
+				pips_a: tile.a,
+				pips_b: tile.b,
+			},
+			x: tile.x,
+			y: tile.y,
+			orientation: tile.orientation,
+			player_name: playerName,
+		}).then((resp) => {
+			console.log("laid tile", resp);
+		}).catch((error) => {
+			console.error("error", error);
+		});
 	}
 
 	useEffect(() => {

@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 
 	"math/rand"
 )
@@ -12,6 +13,7 @@ var (
 	ErrGameNotEnoughPlayers     = errors.New("not enough players")
 	ErrGamePreviousRoundNotDone = errors.New("previous round not done")
 	ErrPlayerAlreadyInGame      = errors.New("player already in game")
+	ErrRoundAlreadyDone         = errors.New("round already done")
 )
 
 var Colors = []string{"red", "blue", "green"}
@@ -21,7 +23,8 @@ type Game struct {
 
 	Code        string    `json:"code"`
 	Players     []*Player `json:"players"`
-	Rounds      []Round   `json:"rounds"`
+	Turn        int       `json:"turn"`
+	Rounds      []*Round  `json:"rounds"`
 	BoardWidth  int       `json:"board_width"`
 	BoardHeight int       `json:"board_height"`
 }
@@ -67,7 +70,7 @@ func (g *Game) Start() error {
 		}
 	}
 
-	g.Rounds = append(g.Rounds, Round{
+	g.Rounds = append(g.Rounds, &Round{
 		Turn:      0,
 		LaidTiles: []LaidTile{},
 	})
@@ -82,6 +85,15 @@ func (g *Game) Start() error {
 	return nil
 }
 
+func (g *Game) LayTile(tile LaidTile) error {
+	round := g.Rounds[len(g.Rounds)-1]
+	if err := round.LayTile(tile); err != nil {
+		return fmt.Errorf("laying tile: %w", err)
+	}
+	g.Turn = (g.Turn + 1) % len(g.Players)
+	return nil
+}
+
 type Player struct {
 	Name  string `json:"name"`
 	Score int    `json:"score"`
@@ -93,16 +105,24 @@ type Tile struct {
 	PipsB int `json:"pips_b"`
 }
 
-type Round struct {
-	Turn      int        `json:"turn"`
-	LaidTiles []LaidTile `json:"laid_tiles"`
-	Done      bool       `json:"done"`
-}
-
 type LaidTile struct {
 	Tile        Tile   `json:"tile"`
 	X           int    `json:"x"`
 	Y           int    `json:"y"`
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`
+}
+
+type Round struct {
+	Turn      int        `json:"turn"`
+	LaidTiles []LaidTile `json:"laid_tiles"`
+	Done      bool       `json:"done"`
+}
+
+func (r *Round) LayTile(tile LaidTile) error {
+	if r.Done {
+		return ErrRoundAlreadyDone
+	}
+	r.LaidTiles = append(r.LaidTiles, tile)
+	return nil
 }

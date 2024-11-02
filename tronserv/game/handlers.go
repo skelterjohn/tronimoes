@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -9,11 +10,16 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+var (
+	ErrRoundNotStarted = errors.New("round not started")
+)
+
 func RegisterHandlers(r chi.Router, s Store) {
 	gs := &GameServer{store: s}
 	r.Get("/game/{code}", gs.HandleGetGame)
 	r.Put("/game/{code}", gs.HandlePutGame)
 	r.Post("/game/{code}/start", gs.HandleStartRound)
+	r.Post("/game/{code}/tile", gs.HandleLayTile)
 }
 
 type GameServer struct {
@@ -23,6 +29,51 @@ type GameServer struct {
 func writeErr(w http.ResponseWriter, err error, code int) {
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+}
+
+func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	code := chi.URLParam(r, "code")
+
+	g, err := s.store.ReadGame(ctx, code)
+	if err != nil {
+		if err == ErrNoSuchGame {
+			writeErr(w, err, http.StatusNotFound)
+			return
+		}
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	if len(g.Rounds) == 0 {
+		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
+		return
+	}
+	round := g.Rounds[len(g.Rounds)-1]
+	if round.Done {
+		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
+		return
+	}
+
+	lt := &LaidTile{}
+	if err := json.NewDecoder(r.Body).Decode(lt); err != nil {
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := g.LayTile(*lt); err != nil {
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(g)
 }
 
 func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
