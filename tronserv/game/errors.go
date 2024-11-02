@@ -15,4 +15,6 @@ var (
 	ErrNotYou                   = errors.New("not you")
 	ErrMissingToken             = errors.New("missing token")
 	ErrNoSuchGame               = errors.New("no such game")
+	ErrPlayerNotFound           = errors.New("player not found")
+	ErrTileNotFound             = errors.New("tile not found")
 )

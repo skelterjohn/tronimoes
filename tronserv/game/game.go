@@ -113,7 +113,35 @@ func (g *Game) DrawTile(name string) bool {
 	return true
 }
 
+func (g *Game) GetPlayer(name string) *Player {
+	for _, p := range g.Players {
+		if p.Name == name {
+			return p
+		}
+	}
+	return nil
+}
+
 func (g *Game) LayTile(tile *LaidTile) error {
+	player := g.GetPlayer(tile.PlayerName)
+	if player == nil {
+		return ErrPlayerNotFound
+	}
+
+	newHand := []*Tile{}
+	foundTile := false
+	for _, t := range player.Hand {
+		if t.PipsA != tile.Tile.PipsA || t.PipsB != tile.Tile.PipsB {
+			newHand = append(newHand, t)
+			continue
+		}
+		foundTile = true
+	}
+	if !foundTile {
+		return ErrTileNotFound
+	}
+	player.Hand = newHand
+
 	round := g.Rounds[len(g.Rounds)-1]
 	if err := round.LayTile(tile); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
