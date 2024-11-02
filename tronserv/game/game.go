@@ -103,8 +103,9 @@ func (g *Game) Start() error {
 
 	// Find the round leader, drawing tiles if we need to.
 	foundLeader := false
+	var potentialLeader int
 	for !foundLeader {
-		for potentialLeader := lastRoundLeader - 1; potentialLeader > 0; potentialLeader-- {
+		for potentialLeader = lastRoundLeader - 1; potentialLeader > 0; potentialLeader-- {
 			for i, p := range g.Players {
 				if !p.HasRoundLeader(potentialLeader) {
 					continue
@@ -126,6 +127,16 @@ func (g *Game) Start() error {
 		}
 	}
 
+	if err := g.LayTile(&LaidTile{
+		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
+		PlayerName:  g.Players[g.Turn].Name,
+		Orientation: "right",
+		X:           g.BoardWidth/2 - 1,
+		Y:           g.BoardHeight / 2,
+	}); err != nil {
+		return fmt.Errorf("laying round leader tile: %w", err)
+	}
+
 	return nil
 }
 
@@ -145,7 +156,6 @@ func (g *Game) DrawTile(name string) bool {
 	}
 
 	player.Hand = append(player.Hand, g.Bag[0])
-	log.Printf("%s drew %v", name, g.Bag[0])
 	g.Bag = g.Bag[1:]
 
 	g.Turn = (g.Turn + 1) % len(g.Players)
