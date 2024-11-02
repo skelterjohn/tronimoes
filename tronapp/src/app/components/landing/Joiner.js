@@ -20,7 +20,8 @@ export default function Joiner() {
 	function joinCode(code) {
 		console.log('joining', name, code);
 		client.JoinGame(code, name).then((resp) => {
-			setGameCode(code);
+			console.log('joined game', resp);
+			setGameCode(resp.code);
 			router.push('/gameboard');
 		}).catch((error) => {
 			if (error.status === 409) {

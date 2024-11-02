@@ -167,6 +167,15 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if code == "<>" {
+		code, err = GetPickupCode(name)
+		if err != nil {
+			log.Printf("Error getting pickup code for %q: %v", name, err)
+			writeErr(w, err, http.StatusInternalServerError)
+			return
+		}
+	}
+
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil && err != ErrNoSuchGame {
 		log.Printf("Error reading game %q: %v", code, err)
@@ -178,11 +187,11 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		g = NewGame(code)
 	}
 
+	inGame := false
 	for _, p := range g.Players {
 		if p.Name == name {
+			inGame = true
 			log.Printf("Player %q already in game %q", name, code)
-			writeErr(w, ErrPlayerAlreadyInGame, http.StatusConflict)
-			return
 		}
 	}
 
@@ -199,28 +208,30 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := g.AddPlayer(player); err != nil {
-		log.Printf("Error adding player %q to game %q: %v", name, code, err)
-		if err == ErrGameTooManyPlayers {
-			writeErr(w, err, http.StatusUnprocessableEntity)
+	if !inGame {
+		if err := g.AddPlayer(player); err != nil {
+			log.Printf("Error adding player %q to game %q: %v", name, code, err)
+			if err == ErrGameTooManyPlayers {
+				writeErr(w, err, http.StatusUnprocessableEntity)
+				return
+			}
+			if err == ErrGameAlreadyStarted {
+				writeErr(w, err, http.StatusUnprocessableEntity)
+				return
+			}
+			if err == ErrPlayerAlreadyInGame {
+				writeErr(w, err, http.StatusConflict)
+				return
+			}
+			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
-		if err == ErrGameAlreadyStarted {
-			writeErr(w, err, http.StatusUnprocessableEntity)
-			return
-		}
-		if err == ErrPlayerAlreadyInGame {
-			writeErr(w, err, http.StatusConflict)
-			return
-		}
-		writeErr(w, err, http.StatusInternalServerError)
-		return
-	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
-		log.Printf("Error writing game %q: %v", code, err)
-		writeErr(w, err, http.StatusInternalServerError)
-		return
+		if err := s.store.WriteGame(ctx, g); err != nil {
+			log.Printf("Error writing game %q: %v", code, err)
+			writeErr(w, err, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
