@@ -6,6 +6,7 @@ import { useGameCode } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
 import client from '../../../client/Client';
+import { Button } from 'antd';
 
 const availableColors = [
 	"red",
@@ -130,6 +131,11 @@ function Game() {
 	const [playerHand, setPlayerHand] = useState([]);
 	const [selectedTile, setSelectedTile] = useState(undefined);
 
+	const [roundInProgress, setRoundInProgress] = useState(false);
+	useEffect(() => {
+		const round = game?.rounds?.[game?.rounds?.length-1];
+		setRoundInProgress(round?.done !== true);
+	}, [game]);
 
 	function startTurn() {
 		setTurnIndex(2);
@@ -156,10 +162,20 @@ function Game() {
 	}
 
 	return <div className="">
-		<div className="flex justify-center items-center">
-			<div className="text-center text-5xl font-bold">#{gameCode}</div>
+		<div className="flex justify-between items-center">
+			<span className="text-left text-5xl font-bold">
+				#{gameCode}
+			</span>
+			<Button 
+				type="primary"
+				size="large"
+				disabled={!roundInProgress}
+				onClick={() => startTurn()}
+			>
+				Start Round
+			</Button>
 		</div>
-		<div className="flex justify-center items-center gap-4">
+		<div className="flex justify-center items-center gap-4 h-32">
 			{opponents.map((o, i) => (
 				<div key={i} className="flex-1">
 					<Hand
@@ -168,7 +184,7 @@ function Game() {
 						hidden={true}
 						dead={o.dead}
 						tiles={o.tiles}
-						/>
+					/>
 				</div>
 			))}
 		</div>
@@ -182,7 +198,7 @@ function Game() {
 				/>
 			</div>
 		</div>
-		<div>
+		<div className="flex justify-center items-center gap-4 h-32">
 			<Hand
 				name={playerName}
 				color={playerColor}
