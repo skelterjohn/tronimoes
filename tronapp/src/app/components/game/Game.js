@@ -134,7 +134,11 @@ function Game() {
 	const [roundInProgress, setRoundInProgress] = useState(false);
 	useEffect(() => {
 		const round = game?.rounds?.[game?.rounds?.length-1];
-		setRoundInProgress(round?.done !== true);
+		if (round === undefined) {
+			setRoundInProgress(false);
+		} else {
+			setRoundInProgress(!round.done);
+		}
 	}, [game]);
 
 	function startRound() {
@@ -181,19 +185,25 @@ function Game() {
 		myTurn = players.length > 0 && playerTurn.name === playerName;
 	}
 
+	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
+
 	return <div className="">
 		<div className="flex justify-between items-center">
 			<span className="text-left text-5xl font-bold">
 				#{gameCode}
 			</span>
-			<Button 
-				type="primary"
-				size="large"
-				disabled={!roundInProgress}
-				onClick={() => startRound()}
-			>
-				Start Round
-			</Button>
+			{amFirstPlayer && !roundInProgress &&
+				<Button 
+					type="primary"
+					size="large"
+					onClick={() => startRound()}
+				>
+					Start Round
+				</Button>
+			}
+			{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
+				(<span>waiting for {players[0].name} to start the round...</span>)
+			}
 		</div>
 		<div className="flex justify-center items-center gap-4 min-h-32">
 			{opponents.map((o, i) => (

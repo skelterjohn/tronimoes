@@ -12,7 +12,14 @@ import (
 
 var (
 	ErrRoundNotStarted = errors.New("round not started")
+	ErrNotYourTurn     = errors.New("not your turn")
+	ErrNotYourGame     = errors.New("not your game")
 )
+
+func writeErr(w http.ResponseWriter, err error, code int) {
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+}
 
 func RegisterHandlers(r chi.Router, s Store) {
 	gs := &GameServer{store: s}
@@ -26,15 +33,19 @@ type GameServer struct {
 	store Store
 }
 
-func writeErr(w http.ResponseWriter, err error, code int) {
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+func (s *GameServer) getName(r *http.Request) (string, error) {
+	return r.Header.Get("X-Player-Name"), nil
 }
 
 func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
@@ -43,6 +54,12 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	player := g.Players[g.Turn]
+	if player.Name != name {
+		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
 		return
 	}
 
@@ -61,6 +78,8 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
+
+	lt.PlayerName = player.Name
 
 	if err := g.LayTile(*lt); err != nil {
 		writeErr(w, err, http.StatusBadRequest)
@@ -176,10 +195,21 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
 
 	g, err := s.store.ReadGame(r.Context(), code)
 	if err != nil {
 		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	// Only the first player can start the round.
+	if g.Players[0].Name != name {
+		writeErr(w, ErrNotYourGame, http.StatusForbidden)
 		return
 	}
 
