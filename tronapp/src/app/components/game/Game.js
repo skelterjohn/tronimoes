@@ -47,6 +47,7 @@ function Game() {
 		}
 
 		const getGame = () => {
+			const myCode = gameCode;
 			client.GetGame(gameCode, version).then((resp) => {
 				if (resp.version === version) {
 					// We got back the same one, so let's try again after a bit.
@@ -56,6 +57,10 @@ function Game() {
 				// setting the version to something new triggers the next fetch.
 				setGame(resp);
 			}).catch((error) => {
+				if (myCode !== gameCode) {
+					// This thread is out of sync.
+					return;
+				}
 				if (error.name !== "AbortError") {
 					console.error("error", error);
 					setTimeout(getGame, 30000);
