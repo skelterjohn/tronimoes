@@ -36,7 +36,7 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 	if game, ok := s.games[code]; ok {
 		return game, nil
 	}
-	return nil, nil
+	return nil, ErrNoSuchGame
 }
 
 func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {

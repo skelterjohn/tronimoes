@@ -42,11 +42,11 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
+		if err == ErrNoSuchGame {
+			writeErr(w, err, http.StatusNotFound)
+			return
+		}
 		writeErr(w, err, http.StatusInternalServerError)
-		return
-	}
-	if g == nil {
-		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
