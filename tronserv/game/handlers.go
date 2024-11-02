@@ -14,6 +14,8 @@ var (
 	ErrRoundNotStarted = errors.New("round not started")
 	ErrNotYourTurn     = errors.New("not your turn")
 	ErrNotYourGame     = errors.New("not your game")
+	ErrNotYou          = errors.New("not you")
+	ErrMissingToken    = errors.New("missing token")
 )
 
 func writeErr(w http.ResponseWriter, err error, code int) {
@@ -34,6 +36,11 @@ type GameServer struct {
 }
 
 func (s *GameServer) getName(r *http.Request) (string, error) {
+	// TODO: validate bearer token
+	token := r.Header.Get("Authorization")
+	if token == "" {
+		return "", ErrMissingToken
+	}
 	return r.Header.Get("X-Player-Name"), nil
 }
 
@@ -147,6 +154,11 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
 
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil && err != ErrNoSuchGame {
@@ -161,6 +173,11 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	player := &Player{}
 	if err := json.NewDecoder(r.Body).Decode(player); err != nil {
 		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if player.Name != name {
+		writeErr(w, ErrNotYou, http.StatusForbidden)
 		return
 	}
 
@@ -194,6 +211,8 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(r)
 	if err != nil {
@@ -201,7 +220,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(r.Context(), code)
+	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
