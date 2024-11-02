@@ -8,12 +8,13 @@ const GameContext = createContext();
 
 export function GameProvider({ children }) {
     const [gameCode, setGameCode] = useState("");
-	const [playerName, setPlayerName] = useState("Rad Bicycle");
+	const [playerName, setPlayerName] = useState(undefined);
 	const [playerKey, setPlayerKey] = useState(uuidv4());
 	const [client, setClient] = useState(undefined);
 
 
 	useEffect(() => {
+		console.log("playerName", playerName);
 		setClient(clientFor(playerName, playerKey));
 	}, [playerName, playerKey]);
 

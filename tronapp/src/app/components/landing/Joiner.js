@@ -13,12 +13,15 @@ export default function Joiner() {
 
 	const { setGameCode, setPlayerName, client } = useGameState();
 
+	useEffect(() => {
+		setPlayerName(name);
+	}, [name]);
+
 	function joinCode(code) {
 		console.log('joining', name, code);
-		client.JoinGame(code, name).then((resp) => {
+		client.JoinGame(code).then((resp) => {
 			console.log('join response', resp);
 			setGameCode(code);
-			setPlayerName(name);
 			router.push('/gameboard');
 		}).catch((error) => {
 			console.error('join error', error);
