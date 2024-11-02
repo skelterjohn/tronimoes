@@ -46,6 +46,11 @@ func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *G
 			t.PipsB = 0
 		}
 	}
+	// Hide the bag from everyone.
+	for _, t := range g.Bag {
+		t.PipsA = 0
+		t.PipsB = 0
+	}
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(g); err != nil {
 		log.Printf("Error encoding game %q: %v", g.Code, err)
