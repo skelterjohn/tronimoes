@@ -9,11 +9,11 @@ function Hand({ name, color="white", hidden=false, tiles=[], dead=false, selecte
 		}
 		setSelectedTile(tile);
 	}
-	return <div className="flex flex-col items-center gap-2">
+	return <div className="h-full flex flex-col items-center">
 		<div className="text-center font-bold">{name} - ({score})</div>
-		<div className="flex items-center justify-center">
+		<div className="flex items-center justify-center overflow-hidden">
 			{tiles.map((t, i) => (
-				<div key={i} className="max-w-[10%] " onClick={()=>tileClicked(t)}>
+				<div key={i} className="w-[4rem]" onClick={()=>tileClicked(t)}>
 					<Tile
 						color={color}
 						pipsa={t.a}

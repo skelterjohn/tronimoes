@@ -49,7 +49,7 @@ export default function Board({ width = 10, height = 11, tiles, selectedTile, pl
 
 	return (
 		<div onContextMenu={rightClick}>
-			<table className="w-full aspect-square table-fixed">
+			<table className="w-full table-fixed">
 				<tbody>
 					{Array.from({length: height}, (_, y) => (
 						<tr key={y}>
@@ -84,6 +84,6 @@ export default function Board({ width = 10, height = 11, tiles, selectedTile, pl
 				</tbody>
 			</table>
 		</div>
-	)
+	);
 }
 
