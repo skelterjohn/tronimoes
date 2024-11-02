@@ -2,13 +2,13 @@ package game
 
 import (
 	"context"
-	"fmt"
 	"sync"
 )
 
 type Store interface {
 	ReadGame(ctx context.Context, code string) (*Game, error)
 	WriteGame(ctx context.Context, game *Game) error
+	WatchGame(ctx context.Context, code string) <-chan *Game
 }
 
 type MemoryStore struct {
@@ -35,6 +35,8 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 }
 
 func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
+	game.Version++
+
 	s.gamesMu.Lock()
 	s.games[game.Code] = game
 	s.gamesMu.Unlock()
@@ -42,22 +44,18 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	s.watchMu.Lock()
 	for _, ch := range s.watchChans[game.Code] {
 		ch <- game
+		close(ch)
 	}
+	s.watchChans[game.Code] = nil
 	s.watchMu.Unlock()
 
 	return nil
 }
 
-func (s *MemoryStore) WatchGame(ctx context.Context, code string) (<-chan *Game, error) {
-	s.gamesMu.Lock()
-	if _, ok := s.games[code]; !ok {
-		return nil, fmt.Errorf("game not found")
-	}
-	s.gamesMu.Unlock()
-
+func (s *MemoryStore) WatchGame(ctx context.Context, code string) <-chan *Game {
 	s.watchMu.Lock()
 	defer s.watchMu.Unlock()
 	ch := make(chan *Game, 1)
 	s.watchChans[code] = append(s.watchChans[code], ch)
-	return ch, nil
+	return ch
 }

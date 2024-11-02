@@ -15,7 +15,7 @@ export default function Joiner() {
 
 	function joinCode(code) {
 		console.log('joining', name, code);
-		client.join(name, code).then((resp) => {
+		client.JoinGame(code, name).then((resp) => {
 			console.log('join response', resp);
 			setGameCode(code);
 			setPlayerName(name);
@@ -23,7 +23,7 @@ export default function Joiner() {
 		}).catch((error) => {
 			console.error('join error', error);
 			setGameCode('');
-			window.location.reload();
+			//window.location.reload();
 		});
 	}
 

@@ -3,7 +3,9 @@ package game
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -19,17 +21,46 @@ type GameServer struct {
 }
 
 func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
-	code := chi.URLParam(r, "code")
+	ctx := r.Context()
 
-	g, err := s.store.ReadGame(r.Context(), code)
+	code := chi.URLParam(r, "code")
+	versionStr := r.URL.Query().Get("version")
+	version := 0
+	if versionStr != "" {
+		var err error
+		version, err = strconv.Atoi(versionStr)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	g, err := s.store.ReadGame(ctx, code)
 	if err != nil || g == nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(g); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	// We aleady have something newer.
+	if g.Version > version {
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(g); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		return
+	}
+
+	// Otherwise, wait for am update.
+	select {
+	case <-ctx.Done():
+		return
+	case game := <-s.store.WatchGame(ctx, code):
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(game); err != nil {
+			log.Printf("Error encoding game: %v", err)
+			return
+		}
 	}
 }
 
@@ -66,9 +97,9 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(g); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 }

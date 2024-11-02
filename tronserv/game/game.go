@@ -1,6 +1,8 @@
 package game
 
 type Game struct {
+	Version int `json:"version"`
+
 	Code        string   `json:"code"`
 	Players     []Player `json:"players"`
 	Rounds      []Round  `json:"rounds"`

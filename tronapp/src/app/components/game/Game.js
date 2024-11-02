@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useGameCode } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
+import client from '../../../client/Client';
 
 const borderColorMap = {
 	red: "border-red-300",
@@ -17,12 +18,9 @@ const borderColorMap = {
 
 function Game() {
 	const { gameCode, playerName } = useGameCode();
-	useEffect(() => {
-		console.log("Game code:", gameCode);
-		console.log("Player name:", playerName);
-	}, [gameCode, playerName]);	
 
 	// These states come from the server
+	const [version, setVersion] = useState(0);
 	const [players, setPlayers] = useState([]);
 
 	useEffect(() => {
@@ -87,6 +85,18 @@ function Game() {
 
 	const [playerHand, setPlayerHand] = useState([]);
 	const [selectedTile, setSelectedTile] = useState(undefined);
+
+	// here we query the server
+	useEffect(() => {
+		console.log("getting game", gameCode, version);
+		client.GetGame(gameCode, version).then((resp) => {
+			console.log("game", resp);
+			setVersion(resp.version);
+		}).catch((error) => {
+			console.error("error", error);
+		});
+	}, [gameCode, version]);
+
 
 	function startTurn() {
 		setTurnIndex(2);

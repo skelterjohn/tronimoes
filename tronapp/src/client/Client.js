@@ -4,8 +4,12 @@ class Client {
     }
 
 
-	async join(name, code) {
+	async JoinGame(code, name) {
 		return this.put(`/game/${code}`, { name });
+	}
+
+	async GetGame(code, version) {
+		return this.get(`/game/${code}?version=${version}`);
 	}
 
     async get(path) {
