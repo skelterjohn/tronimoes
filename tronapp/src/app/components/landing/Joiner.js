@@ -23,6 +23,12 @@ export default function Joiner() {
 			setGameCode(code);
 			router.push('/gameboard');
 		}).catch((error) => {
+			if (error.status === 409) {
+				console.log('rejoining...')
+				setGameCode(code);
+				router.push('/gameboard');
+				return;
+			}
 			console.error('join error', error);
 			setGameCode('');
 			//window.location.reload();

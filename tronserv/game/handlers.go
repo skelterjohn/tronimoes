@@ -178,6 +178,14 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		g = NewGame(code)
 	}
 
+	for _, p := range g.Players {
+		if p.Name == name {
+			log.Printf("Player %q already in game %q", name, code)
+			writeErr(w, ErrPlayerAlreadyInGame, http.StatusConflict)
+			return
+		}
+	}
+
 	player := &Player{}
 	if err := json.NewDecoder(r.Body).Decode(player); err != nil {
 		log.Printf("Error decoding player for %q / %q", name, code)
@@ -194,11 +202,11 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	if err := g.AddPlayer(player); err != nil {
 		log.Printf("Error adding player %q to game %q: %v", name, code, err)
 		if err == ErrGameTooManyPlayers {
-			writeErr(w, err, http.StatusConflict)
+			writeErr(w, err, http.StatusUnprocessableEntity)
 			return
 		}
 		if err == ErrGameAlreadyStarted {
-			writeErr(w, err, http.StatusConflict)
+			writeErr(w, err, http.StatusUnprocessableEntity)
 			return
 		}
 		if err == ErrPlayerAlreadyInGame {
