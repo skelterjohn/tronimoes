@@ -12,6 +12,10 @@ class Client {
 		return this.get(`/game/${code}?version=${version}`);
 	}
 
+	async StartRound(code) {
+		return this.post(`/game/${code}/start`);
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }

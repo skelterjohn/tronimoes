@@ -137,6 +137,14 @@ function Game() {
 		setRoundInProgress(round?.done !== true);
 	}, [game]);
 
+	function startRound() {
+		client.StartRound(gameCode).then((resp) => {
+			console.log("started round", resp);
+		}).catch((error) => {
+			console.error("error", error);
+		});
+	}
+
 	function startTurn() {
 		setTurnIndex(2);
 		setSelectedTile(undefined);
@@ -170,12 +178,12 @@ function Game() {
 				type="primary"
 				size="large"
 				disabled={!roundInProgress}
-				onClick={() => startTurn()}
+				onClick={() => startRound()}
 			>
 				Start Round
 			</Button>
 		</div>
-		<div className="flex justify-center items-center gap-4 h-32">
+		<div className="flex justify-center items-center gap-4 min-h-32">
 			{opponents.map((o, i) => (
 				<div key={i} className="flex-1">
 					<Hand
@@ -198,7 +206,7 @@ function Game() {
 				/>
 			</div>
 		</div>
-		<div className="flex justify-center items-center gap-4 h-32">
+		<div className="flex justify-center items-center gap-4 min-h-32">
 			<Hand
 				name={playerName}
 				color={playerColor}
