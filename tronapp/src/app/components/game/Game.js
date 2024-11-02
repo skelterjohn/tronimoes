@@ -33,22 +33,10 @@ function Game() {
 
 	// These states come from the server
 	const [version, setVersion] = useState(0);
-	useEffect(() => {
-		console.log("version", version);
-	}, [version]);
 	const [players, setPlayers] = useState([]);
-	useEffect(() => {
-		console.log("players", players);
-	}, [players]);	
 
 	const [turnIndex, setTurnIndex] = useState(0);
-	useEffect(() => {
-		console.log("turnIndex", turnIndex);
-	}, [turnIndex]);
 	const [laidTiles, setLaidTiles] = useState({});
-	useEffect(() => {
-		console.log("laidTiles", laidTiles);
-	}, [laidTiles]);
 
 	// here we query the server
 	const [game, setGame] = useState(undefined);
@@ -60,7 +48,6 @@ function Game() {
 
 		const getGame = () => {
 			client.GetGame(gameCode, version).then((resp) => {
-				console.log("game", resp);
 				if (resp.version === version) {
 					// We got back the same one, so let's try again after a bit.
 					setTimeout(getGame, 5000);
@@ -94,7 +81,6 @@ function Game() {
 		let playerColors = {}
 
 		setPlayers(game.players.map((p, i) => {
-			console.log(i, p)
 			playerColors[p.name] = availableColors[i];
 			return {
 				name: p.name,
@@ -167,11 +153,6 @@ function Game() {
 		});
 	}
 
-	function startTurn() {
-		setTurnIndex(2);
-		setSelectedTile(undefined);
-	}
-
 	function playTile(tile) {
 		tile.color = playerColor;
 		client.LayTile(gameCode, {
@@ -189,10 +170,6 @@ function Game() {
 			console.error("error", error);
 		});
 	}
-
-	useEffect(() => {
-		startTurn();
-	}, []);
 
 	const playerTurn = players[turnIndex];
 

@@ -14,7 +14,6 @@ export function GameProvider({ children }) {
 
 
 	useEffect(() => {
-		console.log("playerName", playerName);
 		setClient(clientFor(playerName, playerKey));
 	}, [playerName, playerKey]);
 
