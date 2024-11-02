@@ -53,6 +53,15 @@ func (g *Game) AddPlayer(player *Player) error {
 	return nil
 }
 
+func (g *Game) LastRoundLeader() int {
+	if len(g.Rounds) == 0 {
+		return g.MaxPips + 1
+	}
+	lastRound := g.Rounds[len(g.Rounds)-1]
+	firstTile := lastRound.LaidTiles[0]
+	return firstTile.Tile.PipsA
+}
+
 func (g *Game) Start() error {
 	if len(g.Players) < 2 {
 		return ErrGameNotEnoughPlayers
@@ -63,6 +72,8 @@ func (g *Game) Start() error {
 			return ErrGamePreviousRoundNotDone
 		}
 	}
+
+	lastRoundLeader := g.LastRoundLeader()
 
 	g.Rounds = append(g.Rounds, &Round{
 		Turn:      0,
@@ -89,6 +100,31 @@ func (g *Game) Start() error {
 		}
 	}
 	g.Turn = 0
+
+	// Find the round leader, drawing tiles if we need to.
+	foundLeader := false
+	for !foundLeader {
+		for potentialLeader := lastRoundLeader - 1; potentialLeader > 0; potentialLeader-- {
+			for i, p := range g.Players {
+				if !p.HasRoundLeader(potentialLeader) {
+					continue
+				}
+				log.Printf("%s is the round leader", p.Name)
+				foundLeader = true
+				g.Turn = i
+				break
+			}
+			if foundLeader {
+				break
+			}
+		}
+		if foundLeader {
+			break
+		}
+		for _, p := range g.Players {
+			g.DrawTile(p.Name)
+		}
+	}
 
 	return nil
 }
@@ -158,6 +194,18 @@ type Player struct {
 	Name  string  `json:"name"`
 	Score int     `json:"score"`
 	Hand  []*Tile `json:"hand"`
+}
+
+func (p *Player) HasRoundLeader(leader int) bool {
+	for _, t := range p.Hand {
+		if t.PipsA != t.PipsB {
+			continue
+		}
+		if t.PipsA == leader {
+			return true
+		}
+	}
+	return false
 }
 
 type Tile struct {
