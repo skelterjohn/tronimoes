@@ -88,6 +88,7 @@ func (g *Game) Start() error {
 			g.DrawTile(p.Name)
 		}
 	}
+	g.Turn = 0
 
 	return nil
 }
@@ -110,6 +111,9 @@ func (g *Game) DrawTile(name string) bool {
 	player.Hand = append(player.Hand, g.Bag[0])
 	log.Printf("%s drew %v", name, g.Bag[0])
 	g.Bag = g.Bag[1:]
+
+	g.Turn = (g.Turn + 1) % len(g.Players)
+
 	return true
 }
 

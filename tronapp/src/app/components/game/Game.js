@@ -178,6 +178,14 @@ function Game() {
 		});
 	}
 
+	function drawTile() {
+		client.DrawTile(gameCode).then((resp) => {
+			console.log("drew tile", resp);
+		}).catch((error) => {
+			console.error("error", error);
+		});
+	}
+
 	const playerTurn = players[turnIndex];
 
 	let borderColor = "bg-white";
@@ -239,6 +247,7 @@ function Game() {
 				selectedTile={selectedTile}
 				setSelectedTile={setSelectedTile}
 				playerTurn={myTurn}
+				drawTile={drawTile}
 			/>
 		</div>
 	</div>;

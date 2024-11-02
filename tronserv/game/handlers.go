@@ -20,6 +20,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Put("/game/{code}", gs.HandlePutGame)
 	r.Post("/game/{code}/start", gs.HandleStartRound)
 	r.Post("/game/{code}/tile", gs.HandleLayTile)
+	r.Post("/game/{code}/draw", gs.HandleDrawTile)
 }
 
 type GameServer struct {
@@ -56,6 +57,62 @@ func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *G
 		log.Printf("Error encoding game %q: %v", g.Code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 	}
+}
+
+func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		log.Printf("Error getting name: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	g, err := s.store.ReadGame(ctx, code)
+	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
+		if err == ErrNoSuchGame {
+			writeErr(w, err, http.StatusNotFound)
+			return
+		}
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	player := g.Players[g.Turn]
+	if player.Name != name {
+		log.Printf("Player %q is not in turn for game %q", name, code)
+		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
+		return
+	}
+
+	if len(g.Rounds) == 0 {
+		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
+		return
+	}
+	round := g.Rounds[len(g.Rounds)-1]
+	if round.Done {
+		log.Printf("Player %q tried to play game %q but the round is done", name, code)
+		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
+		return
+	}
+
+	if !g.DrawTile(player.Name) {
+		log.Print("Could not draw a tile")
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	s.encodeFilteredGame(w, name, g)
 }
 
 func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
@@ -103,6 +160,11 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(lt); err != nil {
 		log.Printf("Error decoding tile for %q / %q: %v", name, code, err)
 		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+	if lt.Tile == nil {
+		log.Printf("No tile provided for %q / %q", name, code)
+		writeErr(w, ErrNoTile, http.StatusBadRequest)
 		return
 	}
 

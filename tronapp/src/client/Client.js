@@ -22,6 +22,10 @@ class Client {
 		return this.post(`/game/${code}/tile`, tile);
 	}
 
+	async DrawTile(code) {
+		return this.post(`/game/${code}/draw`, {});
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }

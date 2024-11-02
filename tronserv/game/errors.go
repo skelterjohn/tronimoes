@@ -17,4 +17,5 @@ var (
 	ErrNoSuchGame               = errors.New("no such game")
 	ErrPlayerNotFound           = errors.New("player not found")
 	ErrTileNotFound             = errors.New("tile not found")
+	ErrNoTile                   = errors.New("no tile provided")
 )
