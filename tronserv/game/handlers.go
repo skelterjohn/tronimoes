@@ -35,6 +35,24 @@ func (s *GameServer) getName(r *http.Request) (string, error) {
 	return r.Header.Get("X-Player-Name"), nil
 }
 
+func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *Game) {
+	for _, p := range g.Players {
+		if p.Name == name {
+			continue
+		}
+		// Hide the hands of other players, though we still send the tile counts.
+		for _, t := range p.Hand {
+			t.PipsA = 0
+			t.PipsB = 0
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(g); err != nil {
+		log.Printf("Error encoding game %q: %v", g.Code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+	}
+}
+
 func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -85,7 +103,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	lt.PlayerName = player.Name
 
-	if err := g.LayTile(*lt); err != nil {
+	if err := g.LayTile(lt); err != nil {
 		log.Printf("Error laying tile for %q / %q: %v", name, code, err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
@@ -97,12 +115,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(g); err != nil {
-		log.Printf("Error encoding game %q: %v", code, err)
-		writeErr(w, err, http.StatusInternalServerError)
-		return
-	}
+	s.encodeFilteredGame(w, name, g)
 }
 
 func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +132,12 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
+	}
+	name, err := s.getName(r)
+	if err != nil {
+		log.Printf("Error getting name: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
 	}
 
 	g, err := s.store.ReadGame(ctx, code)
@@ -147,12 +166,8 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	select {
 	case <-ctx.Done():
 		return
-	case game := <-s.store.WatchGame(ctx, code):
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(game); err != nil {
-			log.Printf("Error encoding game %q: %v", code, err)
-			return
-		}
+	case g := <-s.store.WatchGame(ctx, code):
+		s.encodeFilteredGame(w, name, g)
 	}
 }
 
@@ -234,12 +249,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(g); err != nil {
-		log.Printf("Error encoding game %q: %v", code, err)
-		writeErr(w, err, http.StatusInternalServerError)
-		return
-	}
+	s.encodeFilteredGame(w, name, g)
 }
 
 func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
@@ -279,6 +289,5 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(g)
+	s.encodeFilteredGame(w, name, g)
 }

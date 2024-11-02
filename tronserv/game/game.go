@@ -62,11 +62,11 @@ func (g *Game) Start() error {
 
 	g.Rounds = append(g.Rounds, &Round{
 		Turn:      0,
-		LaidTiles: []LaidTile{},
+		LaidTiles: []*LaidTile{},
 	})
 
 	for _, p := range g.Players {
-		p.Hand = []Tile{{
+		p.Hand = []*Tile{{
 			PipsA: rand.Intn(16),
 			PipsB: rand.Intn(16),
 		}}
@@ -75,7 +75,7 @@ func (g *Game) Start() error {
 	return nil
 }
 
-func (g *Game) LayTile(tile LaidTile) error {
+func (g *Game) LayTile(tile *LaidTile) error {
 	round := g.Rounds[len(g.Rounds)-1]
 	if err := round.LayTile(tile); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
@@ -85,9 +85,9 @@ func (g *Game) LayTile(tile LaidTile) error {
 }
 
 type Player struct {
-	Name  string `json:"name"`
-	Score int    `json:"score"`
-	Hand  []Tile `json:"hand"`
+	Name  string  `json:"name"`
+	Score int     `json:"score"`
+	Hand  []*Tile `json:"hand"`
 }
 
 type Tile struct {
@@ -96,7 +96,7 @@ type Tile struct {
 }
 
 type LaidTile struct {
-	Tile        Tile   `json:"tile"`
+	Tile        *Tile  `json:"tile"`
 	X           int    `json:"x"`
 	Y           int    `json:"y"`
 	Orientation string `json:"orientation"`
@@ -104,12 +104,12 @@ type LaidTile struct {
 }
 
 type Round struct {
-	Turn      int        `json:"turn"`
-	LaidTiles []LaidTile `json:"laid_tiles"`
-	Done      bool       `json:"done"`
+	Turn      int         `json:"turn"`
+	LaidTiles []*LaidTile `json:"laid_tiles"`
+	Done      bool        `json:"done"`
 }
 
-func (r *Round) LayTile(tile LaidTile) error {
+func (r *Round) LayTile(tile *LaidTile) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}

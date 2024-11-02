@@ -2,6 +2,8 @@ package game
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"sync"
 )
 
@@ -28,17 +30,44 @@ func NewMemoryStore() *MemoryStore {
 func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
-	if game, ok := s.games[code]; ok {
-		return game, nil
+
+	game, ok := s.games[code]
+	if !ok {
+		return nil, ErrNoSuchGame
 	}
-	return nil, ErrNoSuchGame
+
+	// Deep copy using JSON marshal/unmarshal so that changes (like filtering)
+	// aren't reflected in the saved state.
+	data, err := json.Marshal(game)
+	if err != nil {
+		return nil, fmt.Errorf("marshaling game: %w", err)
+	}
+
+	var gameCopy Game
+	if err := json.Unmarshal(data, &gameCopy); err != nil {
+		return nil, fmt.Errorf("unmarshaling game: %w", err)
+	}
+
+	return &gameCopy, nil
 }
 
 func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	game.Version++
 
+	// Deep copy using JSON marshal/unmarshal so that changes (like filtering)
+	// aren't reflected in the saved state.
+	data, err := json.Marshal(game)
+	if err != nil {
+		return fmt.Errorf("marshaling game: %w", err)
+	}
+
+	var gameCopy Game
+	if err := json.Unmarshal(data, &gameCopy); err != nil {
+		return fmt.Errorf("unmarshaling game: %w", err)
+	}
+
 	s.gamesMu.Lock()
-	s.games[game.Code] = game
+	s.games[game.Code] = &gameCopy
 	s.gamesMu.Unlock()
 
 	s.watchMu.Lock()
