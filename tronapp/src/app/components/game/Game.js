@@ -78,6 +78,8 @@ function Game() {
 	}, [gameCode, version]);
 
 	useEffect(() => {
+		console.log('game', game);
+
 		if (game === undefined) {
 			return;
 		}
@@ -231,6 +233,7 @@ function Game() {
 		<div className="flex justify-center items-center gap-4 min-h-32">
 			<Hand
 				name={playerName}
+				hidden={false}
 				color={playerColor}
 				tiles={playerHand}
 				selectedTile={selectedTile}
