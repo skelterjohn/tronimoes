@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useGameCode } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
 import client from '../../../client/Client';
+
+const availableColors = [
+	"red",
+	"blue",
+	"green",
+	"indigo",
+	"orange",
+	"fuchsia",
+]
 
 const borderColorMap = {
 	red: "border-red-300",
@@ -17,51 +27,85 @@ const borderColorMap = {
 };
 
 function Game() {
+	const router = useRouter();
 	const { gameCode, playerName } = useGameCode();
 
 	// These states come from the server
 	const [version, setVersion] = useState(0);
+	useEffect(() => {
+		console.log("version", version);
+	}, [version]);
 	const [players, setPlayers] = useState([]);
+	useEffect(() => {
+		console.log("players", players);
+	}, [players]);	
+
+	const [turnIndex, setTurnIndex] = useState(0);
+	useEffect(() => {
+		console.log("turnIndex", turnIndex);
+	}, [turnIndex]);
+	const [laidTiles, setLaidTiles] = useState({});
+	useEffect(() => {
+		console.log("laidTiles", laidTiles);
+	}, [laidTiles]);
+
+	// here we query the server
+	const [game, setGame] = useState(undefined);
+	useEffect(() => {
+		if (gameCode === "") {
+			setGame(undefined);
+			router.push('/');
+		}
+		console.log("getting game", gameCode, version);
+		client.GetGame(gameCode, version).then((resp) => {
+			console.log("game", resp);
+			setVersion(resp.version);
+			setGame(resp);
+		}).catch((error) => {
+			console.error("error", error);
+		});
+	}, [gameCode, version]);
 
 	useEffect(() => {
-		setPlayers([
-			{
-				name: "Cool Symbiote",
-				color: "red",
-				tiles: [{},{},{},{}],
-				dead: true,
-			},
-			{
-				name: "Hot Xenophage",
-				color: "blue",
-				tiles: [{},{},{}],
+		if (game === undefined) {
+			return;
+		}
+		setVersion(game.version);
+
+		let playerColors = {}
+
+		setPlayers(game.players.map((p, i) => {
+			console.log(i, p)
+			playerColors[p.name] = availableColors[i];
+			return {
+				name: p.name,
+				color: availableColors[i],
+				tiles: p.hand?.map((t) => ({
+					a: t.pips_a, 
+					b: t.pips_b,
+				})),
 				dead: false,
-			},
-			{
-				name: playerName,
-				color: "green",
-				tiles: [{a:1, b:2}, {a:3, b:12}],
-				dead: false,
-			},
-		])
-	}, [playerName]);
+			}
+		}));
 
-	const [turnIndex, setTurnIndex] = useState(2);
+		let allLaidTiles = {}
+		if (game.rounds?.length > 0) {
+			const lastRound = game.rounds[game.rounds.length-1]
+			lastRound?.laid_tiles?.forEach((lt) => {
+				allLaidTiles[`${lt.x},${lt.y}`] = {
+					a: lt.tile.pips_a,
+					b: lt.tile.pips_b,
+					orientation: lt.orientation,
+					color: playerColors[lt.player_name],
+					dead: false,
+				}
+			});
+			setTurnIndex(lastRound?.turn);
+		}
+		setLaidTiles(allLaidTiles);
 
-	const [laidTiles, setLaidTiles] = useState({
-		"4,5": {a:12, b:12, orientation:"right", color:"white", dead:false},
+	}, [game]);
 
-		"6,5": {a:12, b:3, orientation:"down", color:"red", dead:true},
-
-		"5,6": {a:12, b:8, orientation:"down", color:"green", dead:false},
-		"6,7": {a:8, b:10, orientation:"right", color:"green", dead:false},
-		"7,6": {a:10, b:2, orientation:"up", color:"green", dead:false},
-		
-		"3,5": {a:12, b:13, orientation:"left", color:"blue", dead:false},
-		"2,4": {a:13, b:7, orientation:"right", color:"blue", dead:false},
-		"4,4": {a:7, b:3, orientation:"right", color:"blue", dead:false},
-		"6,4": {a:3, b:15, orientation:"right", color:"blue", dead:false},
-	});
 
 	// The remaining states are derived.
 
@@ -86,17 +130,6 @@ function Game() {
 	const [playerHand, setPlayerHand] = useState([]);
 	const [selectedTile, setSelectedTile] = useState(undefined);
 
-	// here we query the server
-	useEffect(() => {
-		console.log("getting game", gameCode, version);
-		client.GetGame(gameCode, version).then((resp) => {
-			console.log("game", resp);
-			setVersion(resp.version);
-		}).catch((error) => {
-			console.error("error", error);
-		});
-	}, [gameCode, version]);
-
 
 	function startTurn() {
 		setTurnIndex(2);
@@ -113,11 +146,14 @@ function Game() {
 		startTurn();
 	}, []);
 
+	const playerTurn = players[turnIndex];
+
 	let borderColor = "bg-white";
-	if (players.length > 0) {
-		borderColor = borderColorMap[players[turnIndex].color];
+	let myTurn = false;
+	if (playerTurn !== undefined) {
+		borderColor = borderColorMap[playerTurn.color];
+		myTurn = players.length > 0 && playerTurn.name === playerName;
 	}
-	let myTurn = players.length > 0 && players[turnIndex].name === playerName;
 
 	return <div className="">
 		<div className="flex justify-center items-center">

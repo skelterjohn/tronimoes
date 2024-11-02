@@ -1,9 +1,17 @@
 package game
 
 import (
-	"fmt"
+	"errors"
 
 	"math/rand"
+)
+
+var (
+	ErrGameAlreadyStarted       = errors.New("game already started")
+	ErrGameTooManyPlayers       = errors.New("game already has 6 players")
+	ErrGameNotEnoughPlayers     = errors.New("not enough players")
+	ErrGamePreviousRoundNotDone = errors.New("previous round not done")
+	ErrPlayerAlreadyInGame      = errors.New("player already in game")
 )
 
 var Colors = []string{"red", "blue", "green"}
@@ -29,11 +37,17 @@ func NewGame(code string) *Game {
 
 func (g *Game) AddPlayer(player *Player) error {
 	if len(g.Players) >= 6 {
-		return fmt.Errorf("game already has 6 players")
+		return ErrGameTooManyPlayers
 	}
 
 	if len(g.Rounds) > 0 {
-		return fmt.Errorf("game already started")
+		return ErrGameAlreadyStarted
+	}
+
+	for _, p := range g.Players {
+		if p.Name == player.Name {
+			return ErrPlayerAlreadyInGame
+		}
 	}
 
 	player.Score = 0
@@ -44,12 +58,12 @@ func (g *Game) AddPlayer(player *Player) error {
 
 func (g *Game) Start() error {
 	if len(g.Players) < 2 {
-		return fmt.Errorf("not enough players")
+		return ErrGameNotEnoughPlayers
 	}
 
 	if len(g.Rounds) > 0 {
 		if !g.Rounds[len(g.Rounds)-1].Done() {
-			return fmt.Errorf("previous round not done")
+			return ErrGamePreviousRoundNotDone
 		}
 	}
 
