@@ -62,7 +62,7 @@ func (g *Game) Start() error {
 	}
 
 	if len(g.Rounds) > 0 {
-		if !g.Rounds[len(g.Rounds)-1].Done() {
+		if !g.Rounds[len(g.Rounds)-1].Done {
 			return ErrGamePreviousRoundNotDone
 		}
 	}
@@ -96,10 +96,7 @@ type Tile struct {
 type Round struct {
 	Turn      int        `json:"turn"`
 	LaidTiles []LaidTile `json:"laid_tiles"`
-}
-
-func (r *Round) Done() bool {
-	return false
+	Done      bool       `json:"done"`
 }
 
 type LaidTile struct {

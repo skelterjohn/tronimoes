@@ -79,7 +79,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 
 	g, err := s.store.ReadGame(ctx, code)
-	if err != nil {
+	if err != nil && err != ErrNoSuchGame {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
