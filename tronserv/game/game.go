@@ -161,7 +161,7 @@ func (g *Game) DrawTile(name string) bool {
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
 	round := g.Rounds[len(g.Rounds)-1]
-	round.History = append(round.History, fmt.Sprintf("%s drew a tile", name))
+	round.History = append(round.History, fmt.Sprintf("%s drew", name))
 
 	return true
 }
@@ -201,7 +201,7 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
-	round.History = append(round.History, fmt.Sprintf("%s laid %d-%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
+	round.History = append(round.History, fmt.Sprintf("%s laid %d:%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
 
 	return nil
 }

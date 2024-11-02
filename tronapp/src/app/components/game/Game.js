@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useGameState } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
-import client from '../../../client/Client';
+import History from './History';
 import { Button } from 'antd';
 
 const availableColors = [
@@ -37,6 +37,8 @@ function Game() {
 
 	const [turnIndex, setTurnIndex] = useState(0);
 	const [laidTiles, setLaidTiles] = useState({});
+
+	const [history, setHistory] = useState([]);
 
 	// here we query the server
 	const [game, setGame] = useState(undefined);
@@ -112,10 +114,10 @@ function Game() {
 					dead: false,
 				}
 			});
+			setHistory(lastRound.history);
 		}
 		setTurnIndex(game.turn);
 		setLaidTiles(allLaidTiles);
-
 	}, [game]);
 
 
@@ -197,60 +199,70 @@ function Game() {
 
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
-	return <div className="">
-		<div className="flex justify-between items-center">
-			<span className="text-left text-5xl font-bold">
-				#{gameCode}
-			</span>
-			{amFirstPlayer && !roundInProgress &&
-				<Button 
-					type="primary"
-					size="large"
-					onClick={() => startRound()}
-				>
-					Start Round
-				</Button>
-			}
-			{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
-				(<span>waiting for {players[0].name} to start the round...</span>)
-			}
-		</div>
-		<div className="flex justify-center items-center gap-4 min-h-32">
-			{opponents.map((o, i) => (
-				<div key={i} className="flex-1">
+	return (
+		<div className="">
+			<div className="">
+				<div className="flex justify-between items-center">
+					<span className="text-left text-5xl font-bold">
+						#{gameCode}
+					</span>
+					{amFirstPlayer && !roundInProgress &&
+						<Button 
+							type="primary"
+							size="large"
+							onClick={() => startRound()}
+						>
+							Start Round
+						</Button>
+					}
+					{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
+						(<span>waiting for {players[0].name} to start the round...</span>)
+					}
+				</div>
+				
+				<div className="flex justify-center items-center gap-4 min-h-32">
+					{opponents.map((o, i) => (
+						<div key={i} className="flex-1">
+							<Hand
+								name={o.name}
+								color={o.color}
+								hidden={true}
+								dead={o.dead}
+								tiles={o.tiles}
+							/>
+						</div>
+					))}
+				</div>
+				<div>
+					<div className="flex gap-4">
+						<div className={`${borderColor} border-8`}>
+							<Board
+								width={10} height={11}
+									tiles={laidTiles}
+									selectedTile={selectedTile}
+									playTile={playTile}
+							/>
+						</div>
+						<span>
+							<History history={history}/>
+						</span>
+					</div>
+				</div>
+				<div className="flex justify-center items-center gap-4 min-h-32">
 					<Hand
-						name={o.name}
-						color={o.color}
-						hidden={true}
-						dead={o.dead}
-						tiles={o.tiles}
+						name={playerName}
+						hidden={false}
+						color={playerColor}
+						tiles={playerHand}
+						selectedTile={selectedTile}
+						setSelectedTile={setSelectedTile}
+						playerTurn={myTurn}
+						drawTile={drawTile}
 					/>
 				</div>
-			))}
-		</div>
-		<div>
-			<div className={`${borderColor} border-8`}>
-				<Board
-					width={10} height={11}
-						tiles={laidTiles}
-						selectedTile={selectedTile}
-						playTile={playTile}
-				/>
 			</div>
 		</div>
-		<div className="flex justify-center items-center gap-4 min-h-32">
-			<Hand
-				name={playerName}
-				hidden={false}
-				color={playerColor}
-				tiles={playerHand}
-				selectedTile={selectedTile}
-				setSelectedTile={setSelectedTile}
-				playerTurn={myTurn}
-				drawTile={drawTile}
-			/>
-		</div>
-	</div>;
+	);
 }
 
 export default Game;
