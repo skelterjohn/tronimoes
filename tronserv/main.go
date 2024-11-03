@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -16,9 +17,11 @@ import (
 var (
 	addr = flag.String("addr", "0.0.0.0", "address to listen on")
 	port = flag.Int("port", 8080, "port to listen on")
+	env  = flag.String("env", "", "firestore env (unset to use MemoryStore)")
 )
 
 func main() {
+	ctx := context.Background()
 	flag.Parse()
 
 	r := chi.NewRouter()
@@ -35,7 +38,18 @@ func main() {
 		MaxAge:           300,
 	}))
 
-	game.RegisterHandlers(r, game.NewMemoryStore())
+	var store game.Store
+	if *env == "" {
+		store = game.NewMemoryStore()
+	} else {
+		var err error
+		store, err = game.NewFirestore(ctx, "tronimoes", *env)
+		if err != nil {
+			log.Fatalf("Could not connect to firestore: %v", err)
+		}
+	}
+
+	game.RegisterHandlers(r, store)
 
 	listenAddr := fmt.Sprintf("%s:%d", *addr, *port)
 	log.Printf("Server starting on %s", listenAddr)

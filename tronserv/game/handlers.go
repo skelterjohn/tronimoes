@@ -285,10 +285,10 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 	code := chi.URLParam(r, "code")
 	versionStr := r.URL.Query().Get("version")
-	version := 0
+	var version int64
 	if versionStr != "" {
 		var err error
-		version, err = strconv.Atoi(versionStr)
+		version, err = strconv.ParseInt(versionStr, 10, 64)
 		if err != nil {
 			log.Printf("Error parsing version %q: %v", versionStr, err)
 			writeErr(w, err, http.StatusBadRequest)
@@ -329,7 +329,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	case <-ctx.Done():
 		log.Printf("%s broke connection for %q", name, code)
 		return
-	case g := <-s.store.WatchGame(ctx, code):
+	case g := <-s.store.WatchGame(ctx, code, version):
 		s.encodeFilteredGame(w, name, g)
 	}
 }

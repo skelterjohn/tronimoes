@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"sync"
 )
 
 type Store interface {
 	ReadGame(ctx context.Context, code string) (*Game, error)
 	WriteGame(ctx context.Context, game *Game) error
-	WatchGame(ctx context.Context, code string) <-chan *Game
+	WatchGame(ctx context.Context, code string, version int64) <-chan *Game
 }
 
 type MemoryStore struct {
@@ -53,6 +54,8 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 		return nil, fmt.Errorf("unmarshaling game: %w", err)
 	}
 
+	js, _ := json.MarshalIndent(gameCopy, " ", " ")
+	log.Printf("read %s", js)
 	return &gameCopy, nil
 }
 
@@ -92,7 +95,8 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	return nil
 }
 
-func (s *MemoryStore) WatchGame(ctx context.Context, code string) <-chan *Game {
+func (s *MemoryStore) WatchGame(ctx context.Context, code string, version int64) <-chan *Game {
+	// todo race with game updated
 	s.watchMu.Lock()
 	defer s.watchMu.Unlock()
 	ch := make(chan *Game, 1)

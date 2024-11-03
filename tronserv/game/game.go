@@ -10,8 +10,8 @@ import (
 var Colors = []string{"red", "blue", "green"}
 
 type Game struct {
-	Version int  `json:"version"`
-	Done    bool `json:"done"`
+	Version int64 `json:"version"`
+	Done    bool  `json:"done"`
 
 	Code        string    `json:"code"`
 	Players     []*Player `json:"players"`
