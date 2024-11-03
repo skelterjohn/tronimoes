@@ -218,6 +218,26 @@ func (g *Game) LayTile(tile *LaidTile) error {
 		player.ChickenFoot = false
 	}
 
+	livingPlayers := []*Player{}
+	for _, p := range g.Players {
+		if !p.Dead {
+			livingPlayers = append(livingPlayers, p)
+		}
+	}
+	if len(livingPlayers) == 1 {
+		round.Done = true
+		round.History = append(round.History, fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
+		livingPlayers[0].Score += 2
+	} else {
+		for _, p := range livingPlayers {
+			if len(p.Hand) == 0 {
+				round.Done = true
+				round.History = append(round.History, fmt.Sprintf("%s wins the round", p.Name))
+				p.Score += 2
+			}
+		}
+	}
+
 	return nil
 }
 
