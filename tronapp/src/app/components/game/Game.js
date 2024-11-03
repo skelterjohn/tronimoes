@@ -37,6 +37,7 @@ function Game() {
 
 	const [turnIndex, setTurnIndex] = useState(0);
 	const [laidTiles, setLaidTiles] = useState({});
+	const [lineHeads, setLineHeads] = useState({})
 
 	const [roundHistory, setRoundHistory] = useState([]);
 	const [gameHistory, setGameHistory] = useState([]);
@@ -118,6 +119,9 @@ function Game() {
 					dead: false,
 				}
 			});
+			setLineHeads(Object.values(lastRound?.player_lines).map((line) => {
+				return line[line.length-1];
+			}))
 			setRoundHistory(lastRound.history || []);
 		}
 		setGameHistory(game.history || []);
@@ -260,6 +264,7 @@ function Game() {
 					<Board
 						width={10} height={11}
 						tiles={laidTiles}
+						lineHeads={lineHeads}
 						selectedTile={selectedTile}
 						playTile={playTile}
 					/>

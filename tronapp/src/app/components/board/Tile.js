@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Pips from "./Pips";
 
 const TileHalf = ({ pips, orientation }) => {
@@ -21,7 +22,7 @@ const TileHalf = ({ pips, orientation }) => {
 	);
 }
 
-export default function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false, selected=false}) {
+export default function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false, selected=false, lineHeads}) {
 	const colorMap = {
         red: "bg-red-100",
         blue: "bg-blue-100",
@@ -38,6 +39,15 @@ export default function Tile({pipsa, pipsb, orientation, back=false, color="whit
         indigo: "border-indigo-300",
         orange: "border-orange-300",
         fuchsia: "border-fuchsia-300",
+        white: "border-white"
+    };
+	const lineHeadBorderColorMap = {
+        red: "border-red-500",
+        blue: "border-blue-500",
+        green: "border-green-500",
+        indigo: "border-indigo-500",
+        orange: "border-orange-500",
+        fuchsia: "border-fuchsia-500",
         white: "border-white"
     };
 	const selectedColorMap = {
@@ -77,8 +87,30 @@ export default function Tile({pipsa, pipsb, orientation, back=false, color="whit
 		bar = squareBar;
 	}
 
-	const bgcolor = dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]);
-	const bordercolor = dead ? borderColorMap[color] : "border-black";
+	const [ isLineHead, setIsLineHead ] = useState(false);
+	useEffect(()=>{
+		setIsLineHead(false);
+		lineHeads?.forEach((lt)=>{
+			if (lt.tile.pips_a !== pipsa || lt.tile.pips_b !== pipsb) {
+				return;
+			}
+			setIsLineHead(true);
+		});
+	}, [lineHeads])
+
+	const [bgcolor, setBgcolor] = useState("bg-gray-500");
+	const [bordercolor, setBordercolor] = useState("border-black");
+
+	useEffect(()=>{
+		setBgcolor(dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]));
+		if (dead) {
+			setBordercolor(borderColorMap[color]);
+		} else if (isLineHead) {
+			setBordercolor(lineHeadBorderColorMap[color])
+		} else {
+			setBordercolor("border-black")
+		}
+	}, [selected, dead, isLineHead]);
 
 	return (
 		<div className={`h-full w-full ${rotate}`}>
