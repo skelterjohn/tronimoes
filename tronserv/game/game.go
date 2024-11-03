@@ -281,7 +281,11 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	firstTile := len(round.LaidTiles) == 0
 
 	if err := round.LayTile(g, tile); err != nil {
-		return fmt.Errorf("laying tile: %w", err)
+		// Attempt to reverse it.
+		tile.Reverse()
+		if err := round.LayTile(g, tile); err != nil {
+			return fmt.Errorf("laying tile: %w", err)
+		}
 	}
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
 		g.Turn = (g.Turn + 1) % len(g.Players)
@@ -350,6 +354,20 @@ type LaidTile struct {
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`
 	NextPips    int    `json:"next_pips"`
+}
+
+func (lt *LaidTile) Reverse() {
+	lt.X, lt.Y = lt.CoordBX(), lt.CoordBY()
+	switch lt.Orientation {
+	case "up":
+		lt.Orientation = "down"
+	case "down":
+		lt.Orientation = "up"
+	case "left":
+		lt.Orientation = "right"
+	case "right":
+		lt.Orientation = "left"
+	}
 }
 
 func (lt *LaidTile) CoordA() string {
