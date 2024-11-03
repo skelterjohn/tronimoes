@@ -172,6 +172,7 @@ func (g *Game) DrawTile(name string) bool {
 	round := g.Rounds[len(g.Rounds)-1]
 	round.History = append(round.History, fmt.Sprintf("%s drew", name))
 	player.ChickenFoot = true
+	round.History = append(round.History, fmt.Sprintf("%s is chicken-footed", name))
 
 	return true
 }
@@ -206,13 +207,16 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	player.Hand = newHand
 
 	round := g.Rounds[len(g.Rounds)-1]
-	if err := round.LayTile(player, tile); err != nil {
+	if err := round.LayTile(g, tile); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
 	round.History = append(round.History, fmt.Sprintf("%s laid %d:%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
-	player.ChickenFoot = false
+	if player.ChickenFoot {
+		round.History = append(round.History, fmt.Sprintf("%s is no longer chicken-footed", tile.PlayerName))
+		player.ChickenFoot = false
+	}
 
 	return nil
 }
@@ -299,7 +303,7 @@ type Round struct {
 	FreeLines   [][]*LaidTile          `json:"free_lines"`
 }
 
-func (r *Round) LayTile(p *Player, lt *LaidTile) error {
+func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
@@ -373,7 +377,8 @@ func (r *Round) LayTile(p *Player, lt *LaidTile) error {
 
 	numLinesPlayed := 0
 
-	if !p.Dead {
+	player := g.GetPlayer(lt.PlayerName)
+	if !player.Dead {
 		mainLine := r.PlayerLines[lt.PlayerName]
 		if canPlayOnLine(mainLine) {
 			numLinesPlayed++
@@ -381,15 +386,15 @@ func (r *Round) LayTile(p *Player, lt *LaidTile) error {
 		}
 	}
 
-	if p.Dead || !p.ChickenFoot {
+	if player.Dead || !player.ChickenFoot {
 		for name, line := range r.PlayerLines {
-			if name == p.Name {
+			if name == player.Name {
 				continue
 			}
-			if !p.ChickenFoot {
+			if !player.ChickenFoot {
 				continue
 			}
-			if p.Dead {
+			if player.Dead {
 				continue
 			}
 			if canPlayOnLine(line) {
