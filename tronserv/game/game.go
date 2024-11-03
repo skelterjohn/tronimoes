@@ -165,6 +165,7 @@ func (g *Game) DrawTile(name string) bool {
 
 	round := g.Rounds[len(g.Rounds)-1]
 	round.History = append(round.History, fmt.Sprintf("%s drew", name))
+	player.ChickenFoot = true
 
 	return true
 }
@@ -205,14 +206,16 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
 	round.History = append(round.History, fmt.Sprintf("%s laid %d:%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
+	player.ChickenFoot = false
 
 	return nil
 }
 
 type Player struct {
-	Name  string  `json:"name"`
-	Score int     `json:"score"`
-	Hand  []*Tile `json:"hand"`
+	Name        string  `json:"name"`
+	Score       int     `json:"score"`
+	Hand        []*Tile `json:"hand"`
+	ChickenFoot bool    `json:"chicken_foot"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {

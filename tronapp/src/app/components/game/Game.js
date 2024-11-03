@@ -101,6 +101,7 @@ function Game() {
 				})),
 				score: p.score,
 				dead: false,
+				chickenFoot: p.chicken_foot,
 			}
 		}));
 
@@ -143,7 +144,6 @@ function Game() {
 		if (playerIndex === -1) {
 			return;
 		}
-		console.log(players[playerIndex]);
 		setPlayer(players[playerIndex]);
 	}, [players, playerName]);
 
@@ -230,6 +230,7 @@ function Game() {
 				{opponents.map((o, i) => (
 					<div key={i} className="flex-1">
 						<Hand
+							player={o}
 							name={o.name}
 							score={o.score}
 							color={o.color}
@@ -258,11 +259,9 @@ function Game() {
 			</div>
 			<div className="flex justify-center items-center gap-4 h-32 max-h-32">
 				<Hand
+					player={player}
 					name={playerName}
-					score={player?.score}
 					hidden={false}
-					color={player?.color}
-					tiles={player?.hand}
 					selectedTile={selectedTile}
 					setSelectedTile={setSelectedTile}
 					playerTurn={myTurn}

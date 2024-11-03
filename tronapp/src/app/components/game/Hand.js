@@ -2,20 +2,21 @@ import Tile from '../board/Tile';
 import { Button } from "antd";
 import { useEffect } from "react";
 
-function Hand({ name, color="white", hidden=false, tiles=[], dead=false, selectedTile, setSelectedTile, playerTurn, drawTile, score }) {
+function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile, playerTurn, drawTile }) {
 	function tileClicked(tile) {
 		if (hidden) {
 			return;
 		}
 		setSelectedTile(tile);
 	}
+	console.log(player);
 	return <div className="h-full flex flex-col items-center">
-		<div className="text-center font-bold">{name} - ({score})</div>
+		<div className="text-center font-bold">{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}</div>
 		<div className="flex items-center justify-center overflow-hidden">
-			{tiles.map((t, i) => (
+			{player?.hand?.map((t, i) => (
 				<div key={i} className="w-[4rem]" onClick={()=>tileClicked(t)}>
 					<Tile
-						color={color}
+						color={player?.color}
 						pipsa={t.a}
 						pipsb={t.b}
 						back={hidden}
