@@ -289,6 +289,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	// Otherwise, wait for am update.
 	select {
 	case <-ctx.Done():
+		log.Printf("%s broke connection for %q", name, code)
 		return
 	case g := <-s.store.WatchGame(ctx, code):
 		s.encodeFilteredGame(w, name, g)
