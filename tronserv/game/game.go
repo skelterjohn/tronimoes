@@ -137,7 +137,7 @@ func (g *Game) Start() error {
 		}
 	}
 
-	g.History = append(g.History, fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
+	g.Note(fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
 
 	if err := g.LayTile(&LaidTile{
 		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
@@ -168,7 +168,23 @@ func (g *Game) Pass(name string) bool {
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 	player.JustDrew = false
+	g.CurrentRound().Note(fmt.Sprintf("%s passed", name))
 	return true
+}
+
+func (g *Game) Note(n string) {
+	g.History = append(g.History, n)
+}
+
+func (g *Game) CurrentRound() *Round {
+	if len(g.Rounds) == 0 {
+		return nil
+	}
+	r := g.Rounds[len(g.Rounds)-1]
+	if r.Done {
+		return nil
+	}
+	return r
 }
 
 func (g *Game) DrawTile(name string) bool {
@@ -191,11 +207,9 @@ func (g *Game) DrawTile(name string) bool {
 
 	player.JustDrew = true
 
-	round := g.Rounds[len(g.Rounds)-1]
-	round.History = append(round.History, fmt.Sprintf("%s drew", name))
 	if !player.ChickenFoot {
 		player.ChickenFoot = true
-		round.History = append(round.History, fmt.Sprintf("%s is chicken-footed", name))
+		g.Note(fmt.Sprintf("%s is chicken-footed", name))
 	}
 
 	return true
@@ -230,15 +244,18 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	}
 	player.Hand = newHand
 
-	round := g.Rounds[len(g.Rounds)-1]
+	round := g.CurrentRound()
+	if round == nil {
+		return ErrRoundNotStarted
+	}
 	if err := round.LayTile(g, tile); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
-	round.History = append(round.History, fmt.Sprintf("%s laid %d:%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
+	round.Note(fmt.Sprintf("%s laid %d:%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
 	if player.ChickenFoot {
-		round.History = append(round.History, fmt.Sprintf("%s is no longer chicken-footed", tile.PlayerName))
+		g.Note(fmt.Sprintf("%s is no longer chicken-footed", tile.PlayerName))
 		player.ChickenFoot = false
 	}
 
@@ -250,13 +267,13 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	}
 	if len(livingPlayers) == 1 {
 		round.Done = true
-		g.History = append(g.History, fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
+		g.Note(fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
 		livingPlayers[0].Score += 2
 	} else {
 		for _, p := range livingPlayers {
 			if len(p.Hand) == 0 {
 				round.Done = true
-				g.History = append(g.History, fmt.Sprintf("%s wins the round", p.Name))
+				g.Note(fmt.Sprintf("%s wins the round", p.Name))
 				p.Score += 2
 			}
 		}
@@ -348,6 +365,13 @@ type Round struct {
 	History     []string               `json:"history"`
 	PlayerLines map[string][]*LaidTile `json:"player_lines"`
 	FreeLines   [][]*LaidTile          `json:"free_lines"`
+}
+
+func (r *Round) Note(n string) {
+	if r == nil {
+		return
+	}
+	r.History = append(r.History, n)
 }
 
 func (r *Round) LayTile(g *Game, lt *LaidTile) error {
@@ -537,7 +561,7 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 	newFreeLines := [][]*LaidTile{}
 	for _, line := range r.FreeLines {
 		if isCutOff(line) {
-			g.History = append(g.History, fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
+			g.Note(fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
 			continue
 		}
 		newFreeLines = append(newFreeLines, line)
@@ -549,9 +573,9 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 			continue
 		}
 		if p.Name == player.Name {
-			g.History = append(g.History, fmt.Sprintf("%s cut-off their own line", player.Name))
+			g.Note(fmt.Sprintf("%s cut-off their own line", player.Name))
 		} else {
-			g.History = append(g.History, fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
+			g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
 		}
 		player.Score += 1
 		p.Score -= 1
