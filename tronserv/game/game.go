@@ -122,7 +122,8 @@ func (g *Game) Start() error {
 		PlayerLines: playerLines,
 	})
 
-	// Fill the bag with tiles.
+	// Fill the bag with tiles.z
+	g.Bag = nil
 	for a := 0; a < g.MaxPips; a++ {
 		for b := a; b < g.MaxPips; b++ {
 			g.Bag = append(g.Bag, &Tile{
@@ -578,8 +579,6 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		return false, 0
 	}
 
-	numLinesPlayed := 0
-
 	isInRoundLeaderChickenfoot := false
 	for _, p := range g.Players {
 		if !p.ChickenFoot {
@@ -601,17 +600,22 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 	}
 
+	playedALine := false
+
 	player := g.GetPlayer(lt.PlayerName)
 	if !player.Dead && !isInRoundLeaderChickenfoot {
 		mainLine := r.PlayerLines[player.Name]
 		if ok, nextPips := canPlayOnLine(mainLine); ok {
-			numLinesPlayed++
+			playedALine = true
 			r.PlayerLines[player.Name] = append(mainLine, lt)
 			lt.NextPips = nextPips
 		}
 	}
 	if player.Dead || !player.ChickenFoot {
 		for oname, line := range r.PlayerLines {
+			if playedALine {
+				continue
+			}
 			op := g.GetPlayer(oname)
 			if oname == player.Name {
 				continue
@@ -636,15 +640,18 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 				}
 			}
 			if ok, nextPips := canPlayOnLine(line); ok {
-				numLinesPlayed++
+				playedALine = true
 				lt.PlayerName = oname
 				r.PlayerLines[oname] = append(line, lt)
 				lt.NextPips = nextPips
 			}
 		}
 		for i, line := range r.FreeLines {
+			if playedALine {
+				continue
+			}
 			if ok, nextPips := canPlayOnLine(line); ok {
-				numLinesPlayed++
+				playedALine = true
 				lt.PlayerName = ""
 				r.FreeLines[i] = append(line, lt)
 				lt.NextPips = nextPips
@@ -652,7 +659,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 	}
 
-	if numLinesPlayed == 0 {
+	if !playedALine {
 		return ErrNoLine
 	}
 
