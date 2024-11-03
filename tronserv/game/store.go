@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"sync"
 )
 
@@ -54,8 +53,6 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 		return nil, fmt.Errorf("unmarshaling game: %w", err)
 	}
 
-	js, _ := json.MarshalIndent(gameCopy, " ", " ")
-	log.Printf("read %s", js)
 	return &gameCopy, nil
 }
 

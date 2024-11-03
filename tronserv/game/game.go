@@ -197,11 +197,71 @@ func (g *Game) Pass(name string) bool {
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 	player.JustDrew = false
-	g.CurrentRound().Note(fmt.Sprintf("%s passed", name))
+	r := g.CurrentRound()
+	if r == nil {
+		return false
+	}
+	r.Note(fmt.Sprintf("%s passed", name))
 
 	if !player.ChickenFoot {
 		player.ChickenFoot = true
 		g.Note(fmt.Sprintf("%s is chicken-footed", name))
+
+		mainLine, ok := r.PlayerLines[player.Name]
+		if !ok {
+			return false
+		}
+		if len(mainLine) > 1 {
+			mostRecent := mainLine[len(mainLine)-1]
+			if mostRecent.NextPips == mostRecent.Tile.PipsA {
+				player.ChickenFootX = mostRecent.CoordBX()
+				player.ChickenFootY = mostRecent.CoordBY()
+			} else {
+				player.ChickenFootX = mostRecent.CoordAX()
+				player.ChickenFootY = mostRecent.CoordAY()
+			}
+		} else {
+			// we have to pick a viable spot left around the round leader
+			roundLeader := mainLine[0]
+			squarePips := r.MapTiles()
+			checkFoot := func(x, y int) bool {
+				log.Printf("checkFoot(%d, %d)", x, y)
+				if _, occupied := squarePips[fmt.Sprintf("%d,%d", x, y)]; occupied {
+					log.Print("occupied")
+					return false
+				}
+				consider := func(nx, ny int) bool {
+					log.Printf("consider(%d, %d)", nx, ny)
+					if _, occupied := squarePips[fmt.Sprintf("%d,%d", nx, ny)]; occupied {
+						log.Print("occupied")
+						return false
+					}
+					log.Print("good")
+					return true
+				}
+				if consider(x+1, y) || consider(x-1, y) || consider(x, y+1) || consider(x, y-1) {
+					log.Print("something worked")
+					player.ChickenFootX = x
+					player.ChickenFootY = y
+					return true
+				}
+
+				log.Print("nothing good")
+				return false
+			}
+			if !checkFoot(roundLeader.CoordAX()-1, roundLeader.CoordAY()) &&
+				!checkFoot(roundLeader.CoordAX()+1, roundLeader.CoordAY()) &&
+				!checkFoot(roundLeader.CoordAX(), roundLeader.CoordAY()+1) &&
+				!checkFoot(roundLeader.CoordAX(), roundLeader.CoordAY()-1) &&
+				!checkFoot(roundLeader.CoordBX()-1, roundLeader.CoordBY()) &&
+				!checkFoot(roundLeader.CoordBX()+1, roundLeader.CoordBY()) &&
+				!checkFoot(roundLeader.CoordBX(), roundLeader.CoordBY()+1) &&
+				!checkFoot(roundLeader.CoordBX(), roundLeader.CoordBY()-1) {
+				log.Printf("In game %q, unable to find a round-leader chicken foot for %s", g.Code, player.Name)
+				return false
+			}
+
+		}
 	}
 	return true
 }
@@ -322,12 +382,14 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 }
 
 type Player struct {
-	Name        string  `json:"name"`
-	Score       int     `json:"score"`
-	Hand        []*Tile `json:"hand"`
-	ChickenFoot bool    `json:"chicken_foot"`
-	Dead        bool    `json:"dead"`
-	JustDrew    bool    `json:"just_drew"`
+	Name         string  `json:"name"`
+	Score        int     `json:"score"`
+	Hand         []*Tile `json:"hand"`
+	ChickenFoot  bool    `json:"chicken_foot"`
+	Dead         bool    `json:"dead"`
+	JustDrew     bool    `json:"just_drew"`
+	ChickenFootX int     `json:"chicken_foot_x"`
+	ChickenFootY int     `json:"chicken_foot_y"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {

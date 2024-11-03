@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -197,7 +198,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 
 	if !g.Pass(player.Name) {
 		log.Print("Could not pass")
-		writeErr(w, err, http.StatusBadRequest)
+		writeErr(w, errors.New("had trouble passing"), http.StatusBadRequest)
 		return
 	}
 
