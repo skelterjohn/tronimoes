@@ -14,7 +14,7 @@ steps:
   - '--region=us-east4'
   - '--allow-unauthenticated'
   - '--revision-suffix=v$SHORT_SHA'
-  - '--port=80'
+  - '--port=8080'
   - 'tronserv'
 images:
 - "us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA"
