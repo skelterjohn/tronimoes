@@ -333,10 +333,10 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 
 	firstTile := len(round.LaidTiles) == 0
 
-	if err := round.LayTile(g, tile); err != nil {
+	if err := round.LayTile(g, name, tile); err != nil {
 		// Attempt to reverse it.
 		tile.Reverse()
-		if err := round.LayTile(g, tile); err != nil {
+		if err := round.LayTile(g, name, tile); err != nil {
 			return fmt.Errorf("laying tile: %w", err)
 		}
 	}
@@ -481,7 +481,7 @@ func (r *Round) Note(n string) {
 	r.History = append(r.History, n)
 }
 
-func (r *Round) LayTile(g *Game, lt *LaidTile) error {
+func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
@@ -573,8 +573,29 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 
 	numLinesPlayed := 0
 
+	isInRoundLeaderChickenfoot := false
+	for _, p := range g.Players {
+		if !p.ChickenFoot {
+			continue
+		}
+		if p.Name == name {
+			// It's ok to play on our own foot.
+			continue
+		}
+		// we don't check if this is a round-leader chickenfoot, because
+		// otherwise it would be blocked by a tile and already illegal.
+		if lt.CoordAX() == p.ChickenFootX && lt.CoordAY() == p.ChickenFootY {
+			isInRoundLeaderChickenfoot = true
+			break
+		}
+		if lt.CoordBX() == p.ChickenFootX && lt.CoordBY() == p.ChickenFootY {
+			isInRoundLeaderChickenfoot = true
+			break
+		}
+	}
+
 	player := g.GetPlayer(lt.PlayerName)
-	if !player.Dead {
+	if !player.Dead && !isInRoundLeaderChickenfoot {
 		mainLine := r.PlayerLines[player.Name]
 		if ok, nextPips := canPlayOnLine(mainLine); ok {
 			numLinesPlayed++
@@ -583,9 +604,9 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 		}
 	}
 	if player.Dead || !player.ChickenFoot {
-		for name, line := range r.PlayerLines {
-			op := g.GetPlayer(name)
-			if name == player.Name {
+		for oname, line := range r.PlayerLines {
+			op := g.GetPlayer(oname)
+			if oname == player.Name {
 				continue
 			}
 			if !op.ChickenFoot {
@@ -594,16 +615,30 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 			if op.Dead {
 				continue
 			}
+			if len(line) == 1 {
+				// round leader, need to play on top of chickenfoot.
+				isOnMyFoot := false
+				if lt.CoordAX() == op.ChickenFootX && lt.CoordAY() == op.ChickenFootY {
+					isOnMyFoot = true
+				}
+				if lt.CoordBX() == op.ChickenFootX && lt.CoordBY() == op.ChickenFootY {
+					isOnMyFoot = true
+				}
+				if !isOnMyFoot {
+					continue
+				}
+			}
 			if ok, nextPips := canPlayOnLine(line); ok {
 				numLinesPlayed++
-				lt.PlayerName = name
-				r.PlayerLines[name] = append(line, lt)
+				lt.PlayerName = oname
+				r.PlayerLines[oname] = append(line, lt)
 				lt.NextPips = nextPips
 			}
 		}
 		for i, line := range r.FreeLines {
 			if ok, nextPips := canPlayOnLine(line); ok {
 				numLinesPlayed++
+				lt.PlayerName = ""
 				r.FreeLines[i] = append(line, lt)
 				lt.NextPips = nextPips
 			}

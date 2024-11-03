@@ -69,7 +69,7 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 											</div>
 										)}
 										{ chickenFeet[`${x},${y}`] && (
-											<div className="w-full h-full z-30 absolute">
+											<div className="w-full h-full z-30 absolute pointer-events-none">
 												<ChickenFoot 
 													color={chickenFeet[`${x},${y}`]} />
 											</div>
