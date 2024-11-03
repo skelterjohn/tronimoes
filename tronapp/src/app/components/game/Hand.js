@@ -8,7 +8,6 @@ function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile,
 		}
 		setSelectedTile(tile);
 	}
-	console.log(player);
 	return <div className="h-full flex flex-col items-center">
 		<div className="text-center font-bold">{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}</div>
 		<div className="flex items-center justify-center overflow-hidden">
