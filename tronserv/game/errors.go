@@ -22,4 +22,5 @@ var (
 	ErrTileOccluded             = errors.New("tile occluded")
 	ErrNoLine                   = errors.New("no line to play on")
 	ErrTileOutOfBounds          = errors.New("tile out of bounds")
+	ErrGameOver                 = errors.New("game is over")
 )

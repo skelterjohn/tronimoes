@@ -103,6 +103,9 @@ func (g *Game) Start() error {
 	}
 
 	lastRoundLeader := g.LastRoundLeader()
+	if lastRoundLeader == 0 {
+		return ErrGameOver
+	}
 
 	playerLines := map[string][]*LaidTile{}
 	for _, p := range g.Players {
@@ -368,6 +371,10 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 				p.Score += 2
 			}
 		}
+	}
+
+	if round.Done && g.LastRoundLeader() == 0 {
+		g.Done = true
 	}
 
 	player.JustDrew = false
