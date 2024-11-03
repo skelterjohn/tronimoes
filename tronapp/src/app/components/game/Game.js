@@ -240,11 +240,11 @@ function Game() {
 					</div>
 				))}
 			</div>
-			<div className="flex gap-4 justify-center">
-				<span className="w-96">
+			<div className="flex gap-4 justify-center h-[75vh]">
+				<span className="w-96 h-full">
 					<History history={gameHistory}/>
 				</span>
-				<div className={`${borderColor} border-8 `}>
+				<div className={`${borderColor} border-8 h-fit`}>
 					<Board
 						width={10} height={11}
 						tiles={laidTiles}
@@ -252,7 +252,7 @@ function Game() {
 						playTile={playTile}
 					/>
 				</div>
-				<span className="w-96">
+				<span className="w-96 h-full">
 					<History history={roundHistory}/>
 				</span>
 			</div>

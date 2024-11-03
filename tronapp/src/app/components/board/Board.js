@@ -48,13 +48,13 @@ export default function Board({ width = 10, height = 11, tiles, selectedTile, pl
 	}
 
 	return (
-		<div onContextMenu={rightClick}>
+		<div onContextMenu={rightClick} className="max-w-[75vw] max-h-[75vh] w-fit">
 			<table className="w-full table-fixed">
 				<tbody>
 					{Array.from({length: height}, (_, y) => (
 						<tr key={y}>
 							{Array.from({length: width}, (_, x) => (
-								<td key={y*width+x} className="p-0 border-0 ">
+								<td key={y*width+x} className="p-0 border-0">
 									<div className="w-full pb-[100%] relative">
 										{ tiles[`${x},${y}`] && (
 											<div className="w-full h-full z-20 absolute">
