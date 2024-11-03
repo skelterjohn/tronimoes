@@ -136,7 +136,7 @@ func (g *Game) Start() error {
 		}
 	}
 
-	g.History = append(g.History, fmt.Sprintf("round %d %s - %d:%d", len(g.Rounds), g.Players[g.Turn].Name, potentialLeader, potentialLeader))
+	g.History = append(g.History, fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
 
 	if err := g.LayTile(&LaidTile{
 		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
@@ -230,13 +230,13 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	}
 	if len(livingPlayers) == 1 {
 		round.Done = true
-		round.History = append(round.History, fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
+		g.History = append(g.History, fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
 		livingPlayers[0].Score += 2
 	} else {
 		for _, p := range livingPlayers {
 			if len(p.Hand) == 0 {
 				round.Done = true
-				round.History = append(round.History, fmt.Sprintf("%s wins the round", p.Name))
+				g.History = append(g.History, fmt.Sprintf("%s wins the round", p.Name))
 				p.Score += 2
 			}
 		}
@@ -515,7 +515,7 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 	newFreeLines := [][]*LaidTile{}
 	for _, line := range r.FreeLines {
 		if isCutOff(line) {
-			r.History = append(r.History, fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
+			g.History = append(g.History, fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
 			continue
 		}
 		newFreeLines = append(newFreeLines, line)
@@ -527,9 +527,9 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 			continue
 		}
 		if p.Name == player.Name {
-			r.History = append(r.History, fmt.Sprintf("%s cut-off their own line", player.Name))
+			g.History = append(g.History, fmt.Sprintf("%s cut-off their own line", player.Name))
 		} else {
-			r.History = append(r.History, fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
+			g.History = append(g.History, fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
 		}
 		player.Score += 1
 		p.Score -= 1
