@@ -81,6 +81,7 @@ func (g *Game) Start() error {
 		playerLines[p.Name] = []*LaidTile{}
 		p.Dead = false
 		p.ChickenFoot = false
+		p.JustDrew = false
 	}
 
 	g.Rounds = append(g.Rounds, &Round{
@@ -151,6 +152,25 @@ func (g *Game) Start() error {
 	return nil
 }
 
+func (g *Game) Pass(name string) bool {
+	var player *Player
+	for _, p := range g.Players {
+		if p.Name == name {
+			player = p
+		}
+	}
+	if player == nil {
+		return false
+	}
+
+	if !player.JustDrew {
+		return false
+	}
+	g.Turn = (g.Turn + 1) % len(g.Players)
+	player.JustDrew = false
+	return true
+}
+
 func (g *Game) DrawTile(name string) bool {
 	if len(g.Bag) == 0 {
 		return false
@@ -169,7 +189,7 @@ func (g *Game) DrawTile(name string) bool {
 	player.Hand = append(player.Hand, g.Bag[0])
 	g.Bag = g.Bag[1:]
 
-	g.Turn = (g.Turn + 1) % len(g.Players)
+	player.JustDrew = true
 
 	round := g.Rounds[len(g.Rounds)-1]
 	round.History = append(round.History, fmt.Sprintf("%s drew", name))
@@ -242,6 +262,7 @@ func (g *Game) LayTile(tile *LaidTile) error {
 		}
 	}
 
+	player.JustDrew = false
 	return nil
 }
 
@@ -251,6 +272,7 @@ type Player struct {
 	Hand        []*Tile `json:"hand"`
 	ChickenFoot bool    `json:"chicken_foot"`
 	Dead        bool    `json:"dead"`
+	JustDrew    bool    `json:"just_drew"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {

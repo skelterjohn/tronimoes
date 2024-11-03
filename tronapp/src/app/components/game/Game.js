@@ -102,6 +102,7 @@ function Game() {
 				score: p.score,
 				dead: p.dead,
 				chickenFoot: p.chicken_foot,
+				just_drew: p.just_drew,
 			}
 		}));
 
@@ -195,6 +196,16 @@ function Game() {
 		});
 	}
 
+
+	function passTurn() {
+		setSelectedTile(undefined);
+		client.Pass(gameCode).then((resp) => {
+			console.log("passed");
+		}).catch((error) => {
+			console.error("error", error);
+		});
+	}
+
 	const playerTurn = players[turnIndex];
 
 	let borderColor = "bg-white";
@@ -266,6 +277,7 @@ function Game() {
 					setSelectedTile={setSelectedTile}
 					playerTurn={myTurn}
 					drawTile={drawTile}
+					passTurn={passTurn}
 				/>
 			</div>
 		</div>

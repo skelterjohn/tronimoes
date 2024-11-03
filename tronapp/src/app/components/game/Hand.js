@@ -1,8 +1,7 @@
 import Tile from '../board/Tile';
 import { Button } from "antd";
-import { useEffect } from "react";
 
-function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile, playerTurn, drawTile }) {
+function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn }) {
 	function tileClicked(tile) {
 		if (hidden) {
 			return;
@@ -25,14 +24,24 @@ function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile,
 					/>
 				</div>
 			))}
-			{!hidden && <span>
+			{!hidden && <div className="flex flex-col gap-2">
 				<Button
-					disabled={!playerTurn}
+					type="primary"
+					size="large"
+					disabled={!playerTurn || player?.just_drew}
 					onClick={drawTile}
 				>
 					Draw
 				</Button>
-			</span>}
+				<Button
+					type="primary"
+					size="large"
+					disabled={!playerTurn || !player?.just_drew}
+					onClick={passTurn}
+				>
+					Pass
+				</Button>
+			</div>}
 		</div>
 	</div>;
 }
