@@ -79,6 +79,8 @@ func (g *Game) Start() error {
 	playerLines := map[string][]*LaidTile{}
 	for _, p := range g.Players {
 		playerLines[p.Name] = []*LaidTile{}
+		p.Dead = false
+		p.ChickenFoot = false
 	}
 
 	g.Rounds = append(g.Rounds, &Round{
@@ -171,8 +173,10 @@ func (g *Game) DrawTile(name string) bool {
 
 	round := g.Rounds[len(g.Rounds)-1]
 	round.History = append(round.History, fmt.Sprintf("%s drew", name))
-	player.ChickenFoot = true
-	round.History = append(round.History, fmt.Sprintf("%s is chicken-footed", name))
+	if !player.ChickenFoot {
+		player.ChickenFoot = true
+		round.History = append(round.History, fmt.Sprintf("%s is chicken-footed", name))
+	}
 
 	return true
 }
@@ -272,6 +276,7 @@ type LaidTile struct {
 	Y           int    `json:"y"`
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`
+	NextPips    int    `json:"next_pips"`
 }
 
 func (lt *LaidTile) CoordA() string {
@@ -332,11 +337,26 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 		if lt.Tile.PipsA != lt.Tile.PipsB {
 			return ErrNotRoundLeader
 		}
+		lt.NextPips = lt.Tile.PipsA
+		lt.PlayerName = ""
 		r.LaidTiles = append(r.LaidTiles, lt)
 		for n, p := range r.PlayerLines {
 			r.PlayerLines[n] = append(p, lt)
 		}
 		return nil
+	}
+
+	if lt.CoordAX() < 0 || lt.CoordAX() >= g.BoardWidth {
+		return ErrTileOutOfBounds
+	}
+	if lt.CoordAY() < 0 || lt.CoordAY() >= g.BoardHeight {
+		return ErrTileOutOfBounds
+	}
+	if lt.CoordBX() < 0 || lt.CoordBX() >= g.BoardWidth {
+		return ErrTileOutOfBounds
+	}
+	if lt.CoordBY() < 0 || lt.CoordBY() >= g.BoardHeight {
+		return ErrTileOutOfBounds
 	}
 
 	squarePips := r.MapTiles()
@@ -349,50 +369,53 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 		return ErrTileOccluded
 	}
 
-	canPlayOnLine := func(line []*LaidTile) bool {
+	canPlayOnLine := func(line []*LaidTile) (bool, int) {
 		last := line[len(line)-1]
-
-		if last.Tile.PipsA == lt.Tile.PipsA {
-			if last.CoordAX() == lt.CoordAX() &&
-				(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
-				return true
+		if lt.Tile.PipsA == last.NextPips {
+			if last.Tile.PipsA == lt.Tile.PipsA {
+				if last.CoordAX() == lt.CoordAX() &&
+					(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
+					return true, lt.Tile.PipsB
+				}
+				if last.CoordAY() == lt.CoordAY() &&
+					(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
+					return true, lt.Tile.PipsB
+				}
 			}
-			if last.CoordAY() == lt.CoordAY() &&
-				(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
-				return true
-			}
-		}
-		if last.Tile.PipsB == lt.Tile.PipsB {
-			if last.CoordBX() == lt.CoordBX() &&
-				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
-				return true
-			}
-			if last.CoordBY() == lt.CoordBY() &&
-				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
-				return true
-			}
-		}
-		if last.Tile.PipsA == lt.Tile.PipsB {
-			if last.CoordAX() == lt.CoordBX() &&
-				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
-				return true
-			}
-			if last.CoordAY() == lt.CoordBY() &&
-				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
-				return true
+			if last.Tile.PipsB == lt.Tile.PipsA {
+				if last.CoordBX() == lt.CoordAX() &&
+					(last.CoordBY() == lt.CoordAY()+1 || last.CoordBY() == lt.CoordAY()-1) {
+					return true, lt.Tile.PipsB
+				}
+				if last.CoordBY() == lt.CoordAY() &&
+					(last.CoordBX() == lt.CoordAX()+1 || last.CoordBX() == lt.CoordAX()-1) {
+					return true, lt.Tile.PipsB
+				}
 			}
 		}
-		if last.Tile.PipsA == lt.Tile.PipsB {
-			if last.CoordAX() == lt.CoordBX() &&
-				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
-				return true
+		if lt.Tile.PipsB == last.NextPips {
+			if last.Tile.PipsA == lt.Tile.PipsB {
+				if last.CoordAX() == lt.CoordBX() &&
+					(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
+					return true, lt.Tile.PipsA
+				}
+				if last.CoordAY() == lt.CoordBY() &&
+					(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
+					return true, lt.Tile.PipsA
+				}
 			}
-			if last.CoordAY() == lt.CoordBY() &&
-				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
-				return true
+			if last.Tile.PipsB == lt.Tile.PipsB {
+				if last.CoordBX() == lt.CoordBX() &&
+					(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
+					return true, lt.Tile.PipsA
+				}
+				if last.CoordBY() == lt.CoordBY() &&
+					(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
+					return true, lt.Tile.PipsA
+				}
 			}
 		}
-		return false
+		return false, 0
 	}
 
 	numLinesPlayed := 0
@@ -400,9 +423,10 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 	player := g.GetPlayer(lt.PlayerName)
 	if !player.Dead {
 		mainLine := r.PlayerLines[lt.PlayerName]
-		if canPlayOnLine(mainLine) {
+		if ok, nextPips := canPlayOnLine(mainLine); ok {
 			numLinesPlayed++
 			r.PlayerLines[lt.PlayerName] = append(mainLine, lt)
+			lt.NextPips = nextPips
 		}
 	}
 
@@ -417,21 +441,100 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 			if player.Dead {
 				continue
 			}
-			if canPlayOnLine(line) {
+			if ok, nextPips := canPlayOnLine(line); ok {
 				numLinesPlayed++
 				r.PlayerLines[name] = append(line, lt)
+				lt.NextPips = nextPips
 			}
 		}
 		for i, line := range r.FreeLines {
-			if canPlayOnLine(line) {
+			if ok, nextPips := canPlayOnLine(line); ok {
 				numLinesPlayed++
 				r.FreeLines[i] = append(line, lt)
+				lt.NextPips = nextPips
 			}
 		}
 	}
 
 	if numLinesPlayed == 0 {
 		return ErrNoLine
+	}
+
+	// Add the new tile to the occlusion grid.
+	squarePips[lt.CoordA()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsA}
+	squarePips[lt.CoordB()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
+	isOpenFrom := func(x, y int) bool {
+		c := func(x, y int) string {
+			return fmt.Sprintf("%d,%d", x, y)
+		}
+		adj := func(x, y int) []string {
+			return []string{c(x-1, y), c(x+1, y), c(x, y-1), c(x, y+1)}
+		}
+		if _, ok := squarePips[c(x, y+1)]; !ok {
+			for _, n := range adj(x, y+1) {
+				if _, ok := squarePips[n]; !ok {
+					return true
+				}
+			}
+		}
+		if _, ok := squarePips[c(x, y-1)]; !ok {
+			for _, n := range adj(x, y-1) {
+				if _, ok := squarePips[n]; !ok {
+					return true
+				}
+			}
+		}
+		if _, ok := squarePips[c(x+1, y)]; !ok {
+			for _, n := range adj(x+1, y) {
+				if _, ok := squarePips[n]; !ok {
+					return true
+				}
+			}
+		}
+		if _, ok := squarePips[c(x-1, y)]; !ok {
+			for _, n := range adj(x-1, y) {
+				if _, ok := squarePips[n]; !ok {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	isCutOff := func(line []*LaidTile) bool {
+		last := line[len(line)-1]
+		if last.NextPips == last.Tile.PipsA && isOpenFrom(last.CoordAX(), last.CoordAY()) {
+			return false
+		}
+		if last.NextPips == last.Tile.PipsB && isOpenFrom(last.CoordBX(), last.CoordBY()) {
+			return false
+		}
+		return true
+	}
+
+	// Kill lines as needed
+	newFreeLines := [][]*LaidTile{}
+	for _, line := range r.FreeLines {
+		if isCutOff(line) {
+			r.History = append(r.History, fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
+			continue
+		}
+		newFreeLines = append(newFreeLines, line)
+	}
+	r.FreeLines = newFreeLines
+
+	for _, p := range g.Players {
+		if !isCutOff(r.PlayerLines[p.Name]) {
+			continue
+		}
+		if p.Name == player.Name {
+			r.History = append(r.History, fmt.Sprintf("%s cut-off their own line", player.Name))
+		} else {
+			r.History = append(r.History, fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
+		}
+		player.Score += 1
+		p.Score -= 1
+		p.Dead = true
+		p.ChickenFoot = false
 	}
 
 	r.LaidTiles = append(r.LaidTiles, lt)
