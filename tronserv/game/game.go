@@ -225,28 +225,21 @@ func (g *Game) Pass(name string) bool {
 			roundLeader := mainLine[0]
 			squarePips := r.MapTiles()
 			checkFoot := func(x, y int) bool {
-				log.Printf("checkFoot(%d, %d)", x, y)
 				if _, occupied := squarePips[fmt.Sprintf("%d,%d", x, y)]; occupied {
-					log.Print("occupied")
 					return false
 				}
 				consider := func(nx, ny int) bool {
-					log.Printf("consider(%d, %d)", nx, ny)
 					if _, occupied := squarePips[fmt.Sprintf("%d,%d", nx, ny)]; occupied {
-						log.Print("occupied")
 						return false
 					}
-					log.Print("good")
 					return true
 				}
 				if consider(x+1, y) || consider(x-1, y) || consider(x, y+1) || consider(x, y-1) {
-					log.Print("something worked")
 					player.ChickenFootX = x
 					player.ChickenFootY = y
 					return true
 				}
 
-				log.Print("nothing good")
 				return false
 			}
 			if !checkFoot(roundLeader.CoordAX()-1, roundLeader.CoordAY()) &&
