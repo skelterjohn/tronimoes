@@ -1,0 +1,20 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'tronserv'
+  args: ['build', '--tag=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: 
+  - '-q'
+  - 'run'
+  - 'deploy'
+  - '--image=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA'
+  - '--platform=managed'
+  - '--region=us-east4'
+  - '--allow-unauthenticated'
+  - '--revision-suffix=v$SHORT_SHA'
+  - '--port=80'
+  - 'tronserv'
+images:
+- "us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA"
