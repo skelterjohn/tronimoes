@@ -309,6 +309,7 @@ function Game() {
 					playerTurn={myTurn}
 					drawTile={drawTile}
 					passTurn={passTurn}
+					roundInProgress={roundInProgress}
 				/>
 			</div>
 		</div>

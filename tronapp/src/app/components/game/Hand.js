@@ -1,7 +1,7 @@
 import Tile from '../board/Tile';
 import { Button } from "antd";
 
-function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn }) {
+function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress }) {
 	function tileClicked(tile) {
 		if (hidden) {
 			return;
@@ -27,7 +27,7 @@ function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile,
 				<Button
 					type="primary"
 					size="large"
-					disabled={!playerTurn || player?.just_drew}
+					disabled={!roundInProgress || !playerTurn || player?.just_drew}
 					onClick={drawTile}
 				>
 					Draw
@@ -35,7 +35,7 @@ function Hand({ player, hidden=false, dead=false, selectedTile, setSelectedTile,
 				<Button
 					type="primary"
 					size="large"
-					disabled={!playerTurn || !player?.just_drew}
+					disabled={!roundInProgress || !playerTurn || !player?.just_drew}
 					onClick={passTurn}
 				>
 					Pass
