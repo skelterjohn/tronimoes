@@ -55,6 +55,9 @@ func (g *Game) LeaveOrQuit(name string) bool {
 		newPlayers = append(newPlayers, p)
 	}
 	g.Players = newPlayers
+	if len(g.Players) == 0 {
+		g.Done = true
+	}
 	return quitting
 }
 
