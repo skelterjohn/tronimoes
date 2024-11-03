@@ -22,6 +22,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/game/{code}/tile", gs.HandleLayTile)
 	r.Post("/game/{code}/draw", gs.HandleDrawTile)
 	r.Post("/game/{code}/pass", gs.HandlePass)
+	r.Post("/game/{code}/leave", gs.HandleLeaveOrQuit)
 }
 
 type GameServer struct {
@@ -58,6 +59,43 @@ func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *G
 		log.Printf("Error encoding game %q: %v", g.Code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 	}
+}
+
+func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		log.Printf("Error getting name: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	g, err := s.store.ReadGame(ctx, code)
+	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
+		if err == ErrNoSuchGame {
+			writeErr(w, err, http.StatusNotFound)
+			return
+		}
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	if !g.LeaveOrQuit(name) {
+		log.Printf("Player %q cannot leave game %q", name, code)
+		writeErr(w, ErrNotYourGame, http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	s.encodeFilteredGame(w, name, g)
 }
 
 func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {

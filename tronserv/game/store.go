@@ -36,6 +36,11 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 		return nil, ErrNoSuchGame
 	}
 
+	if game.Done {
+		delete(s.games, code)
+		return nil, ErrNoSuchGame
+	}
+
 	// Deep copy using JSON marshal/unmarshal so that changes (like filtering)
 	// aren't reflected in the saved state.
 	data, err := json.Marshal(game)

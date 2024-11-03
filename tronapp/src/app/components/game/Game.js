@@ -164,6 +164,11 @@ function Game() {
 		}
 	}, [game]);
 
+	const [gameInProgress, setGameInProgress] = useState(false);
+	useEffect(() => {
+		setGameInProgress(game?.rounds !== undefined && game?.rounds?.length > 0);
+	}, [game]);
+
 	function startRound() {
 		client.StartRound(gameCode).then((resp) => {
 			console.log("started round", resp);
@@ -210,6 +215,15 @@ function Game() {
 		});
 	}
 
+	function leaveOrQuit() {
+		client.LeaveOrQuit(gameCode).catch((error) => {
+			console.error("error", error);
+			router.push("/");
+		}).finally(() => {
+			router.push("/");
+		});
+	}
+
 	const playerTurn = players[turnIndex];
 
 	let borderColor = "bg-white";
@@ -227,18 +241,30 @@ function Game() {
 				<span className="text-left text-5xl font-bold">
 					#{gameCode}
 				</span>
-				{amFirstPlayer && !roundInProgress &&
-					<Button 
-						type="primary"
-						size="large"
-						onClick={() => startRound()}
-					>
-						Start Round
-					</Button>
-				}
-				{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
-					(<span>waiting for {players[0].name} to start the round...</span>)
-				}
+				<div className="flex flex-col items-end gap-2">
+					<div className="flex gap-2">
+						<Button 
+							type="primary"
+							size="large"
+							className="w-28"
+							disabled={!amFirstPlayer || roundInProgress}
+							onClick={() => startRound()}
+						>
+							Start Round
+						</Button>
+						<Button 
+							type="primary"
+							size="large"
+							className="w-28"
+							onClick={() => leaveOrQuit()}
+						>
+							{gameInProgress && (<div>Quit</div>) || (<div>Leave</div>)}
+						</Button>
+					</div>
+					{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
+						(<span>waiting for {players[0].name} to start the round...</span>)
+					}
+				</div>
 			</div>
 			
 			<div className="flex justify-center items-center gap-4 h-32 max-h-32">

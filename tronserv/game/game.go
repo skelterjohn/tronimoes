@@ -10,7 +10,8 @@ import (
 var Colors = []string{"red", "blue", "green"}
 
 type Game struct {
-	Version int `json:"version"`
+	Version int  `json:"version"`
+	Done    bool `json:"done"`
 
 	Code        string    `json:"code"`
 	Players     []*Player `json:"players"`
@@ -31,6 +32,30 @@ func NewGame(code string) *Game {
 		BoardHeight: 11,
 		MaxPips:     16,
 	}
+}
+
+func (g *Game) LeaveOrQuit(name string) bool {
+	if len(g.Rounds) > 0 {
+		for _, p := range g.Players {
+			if p.Name == name {
+				g.Done = true
+				return true
+			}
+		}
+		return false
+	}
+
+	newPlayers := []*Player{}
+	quitting := false
+	for _, p := range g.Players {
+		if p.Name == name {
+			quitting = true
+			break
+		}
+		newPlayers = append(newPlayers, p)
+	}
+	g.Players = newPlayers
+	return quitting
 }
 
 func (g *Game) AddPlayer(player *Player) error {

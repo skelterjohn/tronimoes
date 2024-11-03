@@ -30,6 +30,10 @@ class Client {
 		return this.post(`/game/${code}/pass`, {});
 	}
 
+	async LeaveOrQuit(code) {
+		return this.post(`/game/${code}/leave`, {});
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }
