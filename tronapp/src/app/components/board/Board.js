@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 
 import Square from "./Square";
 import Tile from "./Tile";
+import ChickenFoot from './ChickenFoot';
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile }) {
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet }) {
 	const [playA, setPlayA] = useState(undefined);
 
 	function rightClick(evt) {
@@ -65,6 +66,12 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 													color={tiles[`${x},${y}`].color}
 													dead={tiles[`${x},${y}`].dead}
 													lineHeads={lineHeads} />
+											</div>
+										)}
+										{ chickenFeet[`${x},${y}`] && (
+											<div className="w-full h-full z-30 absolute">
+												<ChickenFoot 
+													color={chickenFeet[`${x},${y}`]} />
 											</div>
 										)}
 										<div

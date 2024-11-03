@@ -103,6 +103,8 @@ function Game() {
 				score: p.score,
 				dead: p.dead,
 				chickenFoot: p.chicken_foot,
+				chickenFootX: p.chicken_foot_x,
+				chickenFootY: p.chicken_foot_y,
 				just_drew: p.just_drew,
 			}
 		}));
@@ -168,6 +170,18 @@ function Game() {
 	useEffect(() => {
 		setGameInProgress(game?.rounds !== undefined && game?.rounds?.length > 0);
 	}, [game]);
+
+	const [chickenFeet, setChickenFeet] = useState({});
+	useEffect(() => {
+		let allFeet = {};
+		players.forEach((p) => {
+			if (!p.chickenFoot) {
+				return;
+			}
+			allFeet[`${p.chickenFootX},${p.chickenFootY}`] = p.color;
+		});
+		setChickenFeet(allFeet);
+	}, [players]);
 
 	function startRound() {
 		client.StartRound(gameCode).then((resp) => {
@@ -293,6 +307,7 @@ function Game() {
 						lineHeads={lineHeads}
 						selectedTile={selectedTile}
 						playTile={playTile}
+						chickenFeet={chickenFeet}
 					/>
 				</div>
 				<span className="w-96 h-full">
