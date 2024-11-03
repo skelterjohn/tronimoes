@@ -167,7 +167,7 @@ func (g *Game) Start() error {
 
 	g.Note(fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
 
-	if err := g.LayTile(&LaidTile{
+	if err := g.LayTile(g.Players[g.Turn].Name, &LaidTile{
 		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
 		PlayerName:  g.Players[g.Turn].Name,
 		Orientation: "right",
@@ -252,7 +252,7 @@ func (g *Game) GetPlayer(name string) *Player {
 	return nil
 }
 
-func (g *Game) LayTile(tile *LaidTile) error {
+func (g *Game) LayTile(name string, tile *LaidTile) error {
 	player := g.GetPlayer(tile.PlayerName)
 	if player == nil {
 		return ErrPlayerNotFound
@@ -281,7 +281,7 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 
-	round.Note(fmt.Sprintf("%s laid %d:%d", tile.PlayerName, tile.Tile.PipsA, tile.Tile.PipsB))
+	round.Note(fmt.Sprintf("%s laid %d:%d", name, tile.Tile.PipsA, tile.Tile.PipsB))
 	if player.ChickenFoot {
 		g.Note(fmt.Sprintf("%s is no longer chicken-footed", tile.PlayerName))
 		player.ChickenFoot = false
@@ -503,20 +503,21 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 			lt.NextPips = nextPips
 		}
 	}
-
 	if player.Dead || !player.ChickenFoot {
 		for name, line := range r.PlayerLines {
+			op := g.GetPlayer(name)
 			if name == player.Name {
 				continue
 			}
-			if !player.ChickenFoot {
+			if !op.ChickenFoot {
 				continue
 			}
-			if player.Dead {
+			if op.Dead {
 				continue
 			}
 			if ok, nextPips := canPlayOnLine(line); ok {
 				numLinesPlayed++
+				lt.PlayerName = name
 				r.PlayerLines[name] = append(line, lt)
 				lt.NextPips = nextPips
 			}
