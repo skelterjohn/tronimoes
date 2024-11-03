@@ -197,6 +197,11 @@ func (g *Game) Pass(name string) bool {
 	g.Turn = (g.Turn + 1) % len(g.Players)
 	player.JustDrew = false
 	g.CurrentRound().Note(fmt.Sprintf("%s passed", name))
+
+	if !player.ChickenFoot {
+		player.ChickenFoot = true
+		g.Note(fmt.Sprintf("%s is chicken-footed", name))
+	}
 	return true
 }
 
@@ -234,11 +239,6 @@ func (g *Game) DrawTile(name string) bool {
 	g.Bag = g.Bag[1:]
 
 	player.JustDrew = true
-
-	if !player.ChickenFoot {
-		player.ChickenFoot = true
-		g.Note(fmt.Sprintf("%s is chicken-footed", name))
-	}
 
 	return true
 }
