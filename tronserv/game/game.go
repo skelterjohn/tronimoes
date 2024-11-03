@@ -110,6 +110,7 @@ func (g *Game) Start() error {
 		p.Dead = false
 		p.ChickenFoot = false
 		p.JustDrew = false
+		p.Hand = nil
 	}
 
 	g.Rounds = append(g.Rounds, &Round{
@@ -276,10 +277,15 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	if round == nil {
 		return ErrRoundNotStarted
 	}
+
+	firstTile := len(round.LaidTiles) == 0
+
 	if err := round.LayTile(g, tile); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
 	}
-	g.Turn = (g.Turn + 1) % len(g.Players)
+	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
+		g.Turn = (g.Turn + 1) % len(g.Players)
+	}
 
 	round.Note(fmt.Sprintf("%s laid %d:%d", name, tile.Tile.PipsA, tile.Tile.PipsB))
 	if player.ChickenFoot {
@@ -496,10 +502,10 @@ func (r *Round) LayTile(g *Game, lt *LaidTile) error {
 
 	player := g.GetPlayer(lt.PlayerName)
 	if !player.Dead {
-		mainLine := r.PlayerLines[lt.PlayerName]
+		mainLine := r.PlayerLines[player.Name]
 		if ok, nextPips := canPlayOnLine(mainLine); ok {
 			numLinesPlayed++
-			r.PlayerLines[lt.PlayerName] = append(mainLine, lt)
+			r.PlayerLines[player.Name] = append(mainLine, lt)
 			lt.NextPips = nextPips
 		}
 	}
