@@ -18,4 +18,7 @@ var (
 	ErrPlayerNotFound           = errors.New("player not found")
 	ErrTileNotFound             = errors.New("tile not found")
 	ErrNoTile                   = errors.New("no tile provided")
+	ErrNotRoundLeader           = errors.New("not round leader")
+	ErrTileOccluded             = errors.New("tile occluded")
+	ErrNoLine                   = errors.New("no line to play on")
 )

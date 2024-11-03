@@ -100,7 +100,7 @@ function Game() {
 					b: t.pips_b,
 				})),
 				score: p.score,
-				dead: false,
+				dead: p.dead,
 				chickenFoot: p.chicken_foot,
 			}
 		}));

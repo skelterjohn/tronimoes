@@ -76,9 +76,15 @@ func (g *Game) Start() error {
 
 	lastRoundLeader := g.LastRoundLeader()
 
+	playerLines := map[string][]*LaidTile{}
+	for _, p := range g.Players {
+		playerLines[p.Name] = []*LaidTile{}
+	}
+
 	g.Rounds = append(g.Rounds, &Round{
-		Turn:      0,
-		LaidTiles: []*LaidTile{},
+		Turn:        0,
+		LaidTiles:   []*LaidTile{},
+		PlayerLines: playerLines,
 	})
 
 	// Fill the bag with tiles.
@@ -200,7 +206,7 @@ func (g *Game) LayTile(tile *LaidTile) error {
 	player.Hand = newHand
 
 	round := g.Rounds[len(g.Rounds)-1]
-	if err := round.LayTile(tile); err != nil {
+	if err := round.LayTile(player, tile); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
@@ -216,6 +222,7 @@ type Player struct {
 	Score       int     `json:"score"`
 	Hand        []*Tile `json:"hand"`
 	ChickenFoot bool    `json:"chicken_foot"`
+	Dead        bool    `json:"dead"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {
@@ -243,17 +250,185 @@ type LaidTile struct {
 	PlayerName  string `json:"player_name"`
 }
 
-type Round struct {
-	Turn      int         `json:"turn"`
-	LaidTiles []*LaidTile `json:"laid_tiles"`
-	Done      bool        `json:"done"`
-	History   []string    `json:"history"`
+func (lt *LaidTile) CoordA() string {
+	return fmt.Sprintf("%d,%d", lt.X, lt.Y)
 }
 
-func (r *Round) LayTile(tile *LaidTile) error {
+func (lt *LaidTile) CoordAX() int {
+	return lt.X
+}
+
+func (lt *LaidTile) CoordAY() int {
+	return lt.Y
+}
+
+func (lt *LaidTile) CoordBX() int {
+	switch lt.Orientation {
+	case "right":
+		return lt.X + 1
+	case "left":
+		return lt.X - 1
+	}
+	return lt.X
+}
+
+func (lt *LaidTile) CoordBY() int {
+	switch lt.Orientation {
+	case "up":
+		return lt.Y - 1
+	case "down":
+		return lt.Y + 1
+	}
+	return lt.Y
+}
+
+func (lt *LaidTile) CoordB() string {
+	return fmt.Sprintf("%d,%d", lt.CoordBX(), lt.CoordBY())
+}
+
+func (lt *LaidTile) String() string {
+	return fmt.Sprintf("%d:%d %s:%s", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB())
+}
+
+type Round struct {
+	Turn        int                    `json:"turn"`
+	LaidTiles   []*LaidTile            `json:"laid_tiles"`
+	Done        bool                   `json:"done"`
+	History     []string               `json:"history"`
+	PlayerLines map[string][]*LaidTile `json:"player_lines"`
+	FreeLines   [][]*LaidTile          `json:"free_lines"`
+}
+
+func (r *Round) LayTile(p *Player, lt *LaidTile) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
-	r.LaidTiles = append(r.LaidTiles, tile)
+
+	if len(r.LaidTiles) == 0 {
+		if lt.Tile.PipsA != lt.Tile.PipsB {
+			return ErrNotRoundLeader
+		}
+		r.LaidTiles = append(r.LaidTiles, lt)
+		for n, p := range r.PlayerLines {
+			r.PlayerLines[n] = append(p, lt)
+		}
+		return nil
+	}
+
+	squarePips := r.MapTiles()
+	if ot, ok := squarePips[lt.CoordA()]; ok {
+		log.Printf("%s A-blocked by %s", lt, ot.LaidTile)
+		return ErrTileOccluded
+	}
+	if ot, ok := squarePips[lt.CoordB()]; ok {
+		log.Printf("%s B-blocked by %s", lt, ot.LaidTile)
+		return ErrTileOccluded
+	}
+
+	canPlayOnLine := func(line []*LaidTile) bool {
+		last := line[len(line)-1]
+
+		if last.Tile.PipsA == lt.Tile.PipsA {
+			if last.CoordAX() == lt.CoordAX() &&
+				(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
+				return true
+			}
+			if last.CoordAY() == lt.CoordAY() &&
+				(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
+				return true
+			}
+		}
+		if last.Tile.PipsB == lt.Tile.PipsB {
+			if last.CoordBX() == lt.CoordBX() &&
+				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
+				return true
+			}
+			if last.CoordBY() == lt.CoordBY() &&
+				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
+				return true
+			}
+		}
+		if last.Tile.PipsA == lt.Tile.PipsB {
+			if last.CoordAX() == lt.CoordBX() &&
+				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
+				return true
+			}
+			if last.CoordAY() == lt.CoordBY() &&
+				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
+				return true
+			}
+		}
+		if last.Tile.PipsA == lt.Tile.PipsB {
+			if last.CoordAX() == lt.CoordBX() &&
+				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
+				return true
+			}
+			if last.CoordAY() == lt.CoordBY() &&
+				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
+				return true
+			}
+		}
+		return false
+	}
+
+	numLinesPlayed := 0
+
+	if !p.Dead {
+		mainLine := r.PlayerLines[lt.PlayerName]
+		if canPlayOnLine(mainLine) {
+			numLinesPlayed++
+			r.PlayerLines[lt.PlayerName] = append(mainLine, lt)
+		}
+	}
+
+	if p.Dead || !p.ChickenFoot {
+		for name, line := range r.PlayerLines {
+			if name == p.Name {
+				continue
+			}
+			if !p.ChickenFoot {
+				continue
+			}
+			if p.Dead {
+				continue
+			}
+			if canPlayOnLine(line) {
+				numLinesPlayed++
+				r.PlayerLines[name] = append(line, lt)
+			}
+		}
+		for i, line := range r.FreeLines {
+			if canPlayOnLine(line) {
+				numLinesPlayed++
+				r.FreeLines[i] = append(line, lt)
+			}
+		}
+	}
+
+	if numLinesPlayed == 0 {
+		return ErrNoLine
+	}
+
+	r.LaidTiles = append(r.LaidTiles, lt)
 	return nil
+}
+
+type SquarePips struct {
+	LaidTile *LaidTile
+	Pips     int
+}
+
+func (r *Round) MapTiles() map[string]SquarePips {
+	squarePips := map[string]SquarePips{}
+	for _, lt := range r.LaidTiles {
+		squarePips[lt.CoordA()] = SquarePips{
+			LaidTile: lt,
+			Pips:     lt.Tile.PipsA,
+		}
+		squarePips[lt.CoordB()] = SquarePips{
+			LaidTile: lt,
+			Pips:     lt.Tile.PipsB,
+		}
+	}
+	return squarePips
 }
