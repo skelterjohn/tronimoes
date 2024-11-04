@@ -140,11 +140,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !g.DrawTile(player.Name) {
-		log.Print("Could not draw a tile")
-		writeErr(w, err, http.StatusBadRequest)
-		return
-	}
+	g.DrawTile(player.Name)
 
 	if err := s.store.WriteGame(r.Context(), g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
