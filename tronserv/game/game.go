@@ -137,6 +137,45 @@ func (g *Game) Start() error {
 		g.Bag[i], g.Bag[j] = g.Bag[j], g.Bag[i]
 	})
 
+	switch g.Code {
+	case "AAAAAA":
+		log.Print("secret code")
+		g.Bag = []*Tile{{
+			PipsA: 1, PipsB: 1,
+		}, {
+			PipsA: 1, PipsB: 2,
+		}, {
+			PipsA: 2, PipsB: 4,
+		}, {
+			PipsA: 4, PipsB: 6,
+		}, {
+			PipsA: 6, PipsB: 8,
+		}, {
+			PipsA: 8, PipsB: 10,
+		}, {
+			PipsA: 10, PipsB: 12,
+		}, {
+			PipsA: 1, PipsB: 3,
+		}, {
+			PipsA: 3, PipsB: 5,
+		}, {
+			PipsA: 5, PipsB: 7,
+		}, {
+			PipsA: 7, PipsB: 9,
+		}, {
+			PipsA: 9, PipsB: 11,
+		}, {
+			PipsA: 11, PipsB: 13,
+		}, {
+			PipsA: 13, PipsB: 15,
+		}, {
+			PipsA: 0, PipsB: 0,
+		}}
+		for i := 2; i <= 16; i++ {
+			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
+		}
+	}
+
 	// Give each player 7 tiles.
 	for _, p := range g.Players {
 		p.Hand = g.Bag[:7]
@@ -279,10 +318,6 @@ func (g *Game) CurrentRound() *Round {
 }
 
 func (g *Game) DrawTile(name string) bool {
-	if len(g.Bag) == 0 {
-		return false
-	}
-
 	var player *Player
 	for _, p := range g.Players {
 		if p.Name == name {
@@ -293,8 +328,10 @@ func (g *Game) DrawTile(name string) bool {
 		return false
 	}
 
-	player.Hand = append(player.Hand, g.Bag[0])
-	g.Bag = g.Bag[1:]
+	if len(g.Bag) > 0 {
+		player.Hand = append(player.Hand, g.Bag[0])
+		g.Bag = g.Bag[1:]
+	}
 
 	player.JustDrew = true
 
