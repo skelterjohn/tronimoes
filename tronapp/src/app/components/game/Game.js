@@ -283,7 +283,7 @@ function Game() {
 			
 			<div className="flex justify-center items-center gap-4 h-32 max-h-32">
 				{opponents.map((o, i) => (
-					<div key={i} className="flex-1">
+					<div key={i} className="flex-1 overflow-x-auto">
 						<Hand
 							player={o}
 							name={o.name}
@@ -315,17 +315,19 @@ function Game() {
 				</span>
 			</div>
 			<div className="flex justify-center items-center gap-4 h-32 max-h-32">
-				<Hand
-					player={player}
-					name={playerName}
-					hidden={false}
-					selectedTile={selectedTile}
-					setSelectedTile={setSelectedTile}
-					playerTurn={myTurn}
-					drawTile={drawTile}
-					passTurn={passTurn}
-					roundInProgress={roundInProgress}
-				/>
+				<div className="overflow-x-auto w-full">
+					<Hand
+						player={player}
+						name={playerName}
+						hidden={false}
+						selectedTile={selectedTile}
+						setSelectedTile={setSelectedTile}
+						playerTurn={myTurn}
+						drawTile={drawTile}
+						passTurn={passTurn}
+						roundInProgress={roundInProgress}
+					/>
+				</div>
 			</div>
 		</div>
 	);
