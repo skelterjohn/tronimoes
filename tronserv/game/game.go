@@ -148,7 +148,7 @@ func (g *Game) Start() error {
 	foundLeader := false
 	var potentialLeader int
 	for !foundLeader {
-		for potentialLeader = lastRoundLeader - 1; potentialLeader > 0; potentialLeader-- {
+		for potentialLeader = lastRoundLeader - 1; potentialLeader >= 0; potentialLeader-- {
 			for i, p := range g.Players {
 				if !p.HasRoundLeader(potentialLeader) {
 					continue
