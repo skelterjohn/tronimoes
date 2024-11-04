@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 )
 
 type Store interface {
+	FindOpenGame(ctx context.Context, code string) (*Game, error)
 	ReadGame(ctx context.Context, code string) (*Game, error)
 	WriteGame(ctx context.Context, game *Game) error
 	WatchGame(ctx context.Context, code string, version int64) <-chan *Game
@@ -27,17 +29,40 @@ func NewMemoryStore() *MemoryStore {
 	}
 }
 
+func (s *MemoryStore) FindOpenGame(ctx context.Context, code string) (*Game, error) {
+	s.gamesMu.Lock()
+	fullCode := ""
+	for fc, g := range s.games {
+		if g.Done {
+			continue
+		}
+		if len(g.Rounds) > 0 {
+			continue
+		}
+		if len(g.Players) == 6 {
+			continue
+		}
+		if !strings.HasPrefix(fc, code) {
+			continue
+		}
+		fullCode = fc
+		break
+	}
+	s.gamesMu.Unlock()
+
+	if fullCode == "" {
+		return nil, ErrNoSuchGame
+	}
+
+	return s.ReadGame(ctx, fullCode)
+}
+
 func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
 
 	game, ok := s.games[code]
 	if !ok {
-		return nil, ErrNoSuchGame
-	}
-
-	if game.Done {
-		delete(s.games, code)
 		return nil, ErrNoSuchGame
 	}
 

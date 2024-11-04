@@ -37,6 +37,34 @@ func (s *FireStore) games(ctx context.Context) *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("games")
 }
 
+func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error) {
+	c := s.games(ctx)
+	iter := c.Where("code_prefix", "==", code).Where("open", "==", true).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("could not query: %v", err)
+	}
+
+	if len(docs) == 0 {
+		return nil, ErrNoSuchGame
+	}
+
+	// Return the first matching game
+	doc := docs[0]
+	data := doc.Data()
+	gameData, ok := data["game_json"].(string)
+	if !ok {
+		return nil, fmt.Errorf("bad data type for game_json: %T", data["game_json"])
+	}
+
+	g := &Game{}
+	if err := json.Unmarshal([]byte(gameData), g); err != nil {
+		return nil, fmt.Errorf("could not unmarshal: %v", err)
+	}
+
+	return g, nil
+}
+
 func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	c := s.games(ctx)
 	doc, err := c.Doc(code).Get(ctx)
@@ -61,6 +89,8 @@ func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	return g, nil
 }
 func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
+	open := len(game.Rounds) == 0 && len(game.Players) < 6
+
 	game.Version++
 	gameData, err := json.Marshal(game)
 	if err != nil {
@@ -68,8 +98,10 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 	}
 	c := s.games(ctx)
 	if _, err := c.Doc(game.Code).Set(ctx, map[string]any{
-		"game_json": string(gameData),
-		"version":   game.Version,
+		"code_prefix": game.Code[:6],
+		"open":        open,
+		"game_json":   string(gameData),
+		"version":     game.Version,
 	}); err != nil {
 		return fmt.Errorf("could not write: %v", err)
 	}

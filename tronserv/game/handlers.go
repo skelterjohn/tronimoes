@@ -3,7 +3,9 @@ package game
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -24,6 +26,14 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/game/{code}/draw", gs.HandleDrawTile)
 	r.Post("/game/{code}/pass", gs.HandlePass)
 	r.Post("/game/{code}/leave", gs.HandleLeaveOrQuit)
+}
+func RandomString(n int) string {
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 type GameServer struct {
@@ -343,15 +353,10 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if code == "<>" {
-		code, err = GetPickupCode(name)
-		if err != nil {
-			log.Printf("Error getting pickup code for %q: %v", name, err)
-			writeErr(w, err, http.StatusInternalServerError)
-			return
-		}
+		code = "PICKUP"
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.store.FindOpenGame(ctx, code)
 	if err != nil && err != ErrNoSuchGame {
 		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
@@ -359,6 +364,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if g == nil {
+		code = fmt.Sprintf("%s-%s", code, RandomString(6))
 		g = NewGame(code)
 	}
 
