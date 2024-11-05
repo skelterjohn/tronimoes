@@ -735,6 +735,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 	squarePips[lt.CoordB()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
 	isOpenFrom := func(x, y int) bool {
 		c := func(x, y int) string {
+			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
+				return ""
+			}
 			return fmt.Sprintf("%d,%d", x, y)
 		}
 		adj := func(x, y int) []string {
@@ -742,6 +745,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 		if _, ok := squarePips[c(x, y+1)]; !ok {
 			for _, n := range adj(x, y+1) {
+				if n == "" {
+					continue
+				}
 				if _, ok := squarePips[n]; !ok {
 					return true
 				}
@@ -749,6 +755,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 		if _, ok := squarePips[c(x, y-1)]; !ok {
 			for _, n := range adj(x, y-1) {
+				if n == "" {
+					continue
+				}
 				if _, ok := squarePips[n]; !ok {
 					return true
 				}
@@ -756,6 +765,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 		if _, ok := squarePips[c(x+1, y)]; !ok {
 			for _, n := range adj(x+1, y) {
+				if n == "" {
+					continue
+				}
 				if _, ok := squarePips[n]; !ok {
 					return true
 				}
@@ -763,6 +775,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 		if _, ok := squarePips[c(x-1, y)]; !ok {
 			for _, n := range adj(x-1, y) {
+				if n == "" {
+					continue
+				}
 				if _, ok := squarePips[n]; !ok {
 					return true
 				}
