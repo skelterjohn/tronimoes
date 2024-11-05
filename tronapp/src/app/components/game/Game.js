@@ -34,6 +34,8 @@ function Game() {
 	// These states come from the server
 	const [version, setVersion] = useState(0);
 	const [players, setPlayers] = useState([]);
+	const [boardWidth, setBoardWidth] = useState(1);
+	const [boardHeight, setBoardHeight] = useState(1);
 
 	const [turnIndex, setTurnIndex] = useState(0);
 	const [laidTiles, setLaidTiles] = useState({});
@@ -129,6 +131,8 @@ function Game() {
 		setGameHistory(game.history || []);
 		setTurnIndex(game.turn);
 		setLaidTiles(allLaidTiles);
+		setBoardWidth(game.board_width);
+		setBoardHeight(game.board_height);
 	}, [game]);
 
 
@@ -302,7 +306,7 @@ function Game() {
 				</span>
 				<div className={`${borderColor} border-8 h-fit`}>
 					<Board
-						width={10} height={11}
+						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
 						lineHeads={lineHeads}
 						selectedTile={selectedTile}
