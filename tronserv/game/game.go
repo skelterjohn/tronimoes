@@ -428,6 +428,9 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		round.Done = true
 		g.Note(fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
 		livingPlayers[0].Score += 2
+	} else if len(livingPlayers) == 0 {
+		round.Done = true
+		g.Note("you win I guess")
 	} else {
 		for _, p := range livingPlayers {
 			if len(p.Hand) == 0 {
