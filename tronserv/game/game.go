@@ -171,7 +171,7 @@ func (g *Game) Start() error {
 		}, {
 			PipsA: 0, PipsB: 0,
 		}}
-		for i := 2; i <= 16; i++ {
+		for i := 2; i <= g.MaxPips; i++ {
 			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
 		}
 	}
