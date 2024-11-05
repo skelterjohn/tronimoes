@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Pips from "./Pips";
 
-const TileHalf = ({ pips, orientation }) => {
+const TileHalf = ({ pips, back, orientation }) => {
 	var outercnm = "w-full aspect-square";
 		switch (orientation) {
 			case "down": // down
@@ -16,7 +16,7 @@ const TileHalf = ({ pips, orientation }) => {
 	return (
 		<div className={outercnm}>
 			<div className="w-full h-full bg-transparent flex items-center justify-center p-1">
-				<Pips pips={pips} />
+				{!back && <Pips pips={pips} />}
 			</div>
 		</div>
 	);
@@ -119,11 +119,11 @@ export default function Tile({pipsa, pipsb, orientation, back=false, color="whit
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							<tr><td>
-								<TileHalf pips={back ? 0 : pipsa} orientation={"down"}/>
+								<TileHalf pips={back ? 0 : pipsa} back={back} orientation={"down"}/>
 								{!back && bar}
 							</td></tr>
 							<tr><td>
-								<TileHalf pips={back ? 0 : pipsb} orientation={"up"}/>
+								<TileHalf pips={back ? 0 : pipsb} back={back} orientation={"up"}/>
 							</td></tr>
 						</tbody>
 					</table>
