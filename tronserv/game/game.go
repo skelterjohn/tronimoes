@@ -119,7 +119,7 @@ func (g *Game) LastRoundLeader() int {
 }
 
 func (g *Game) Start() error {
-	if len(g.Players) < 2 {
+	if len(g.Players) < 1 {
 		return ErrGameNotEnoughPlayers
 	}
 
@@ -424,7 +424,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 			livingPlayers = append(livingPlayers, p)
 		}
 	}
-	if len(livingPlayers) == 1 {
+	if len(livingPlayers) == 1 && len(g.Players) > 1 {
 		round.Done = true
 		g.Note(fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
 		livingPlayers[0].Score += 2
