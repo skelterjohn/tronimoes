@@ -675,10 +675,22 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 	player := g.GetPlayer(lt.PlayerName)
 	if !player.Dead && !isInRoundLeaderChickenfoot {
 		mainLine := r.PlayerLines[player.Name]
-		if ok, nextPips := canPlayOnLine(mainLine); ok {
-			playedALine = true
-			r.PlayerLines[player.Name] = append(mainLine, lt)
-			lt.NextPips = nextPips
+
+		onFoot := false
+		if player.ChickenFoot {
+			if player.ChickenFootX == lt.CoordAX() && player.ChickenFootY == lt.CoordAY() {
+				onFoot = true
+			}
+			if player.ChickenFootX == lt.CoordBX() && player.ChickenFootY == lt.CoordBY() {
+				onFoot = true
+			}
+		}
+		if onFoot || !player.ChickenFoot {
+			if ok, nextPips := canPlayOnLine(mainLine); ok {
+				playedALine = true
+				r.PlayerLines[player.Name] = append(mainLine, lt)
+				lt.NextPips = nextPips
+			}
 		}
 	}
 	if !player.Dead || !player.ChickenFoot {
