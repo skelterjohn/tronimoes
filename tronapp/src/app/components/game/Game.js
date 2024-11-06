@@ -23,7 +23,7 @@ function Game({code}) {
 	const { playerName, client } = useGameState();
 
 	// These states come from the server
-	const [version, setVersion] = useState(0);
+	const [version, setVersion] = useState(-1);
 	const [players, setPlayers] = useState([]);
 	const [boardWidth, setBoardWidth] = useState(1);
 	const [boardHeight, setBoardHeight] = useState(1);

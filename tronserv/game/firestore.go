@@ -36,6 +36,44 @@ func NewFirestore(ctx context.Context, project, env string) (*FireStore, error) 
 func (s *FireStore) games(ctx context.Context) *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("games")
 }
+func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
+	c := s.games(ctx)
+	iter := c.Where("code_prefix", "==", code).Where("done", "==", false).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("could not query: %v", err)
+	}
+
+	if len(docs) == 0 {
+		return nil, ErrNoSuchGame
+	}
+
+	for _, doc := range docs {
+		data := doc.Data()
+		gameData, ok := data["game_json"].(string)
+		if !ok {
+			return nil, fmt.Errorf("bad data type for game_json: %T", data["game_json"])
+		}
+
+		g := &Game{}
+		if err := json.Unmarshal([]byte(gameData), g); err != nil {
+			return nil, fmt.Errorf("could not unmarshal: %v", err)
+		}
+
+		amInIt := false
+		for _, p := range g.Players {
+			if p.Name == name {
+				amInIt = true
+			}
+		}
+		if !amInIt {
+			continue
+		}
+
+		return g, nil
+	}
+	return nil, nil
+}
 
 func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error) {
 	c := s.games(ctx)
@@ -100,6 +138,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 	if _, err := c.Doc(game.Code).Set(ctx, map[string]any{
 		"code_prefix": game.Code[:6],
 		"open":        open,
+		"done":        game.Done,
 		"game_json":   string(gameData),
 		"version":     game.Version,
 	}); err != nil {

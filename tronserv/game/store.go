@@ -9,6 +9,7 @@ import (
 )
 
 type Store interface {
+	FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error)
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
 	ReadGame(ctx context.Context, code string) (*Game, error)
 	WriteGame(ctx context.Context, game *Game) error
@@ -45,6 +46,37 @@ func (s *MemoryStore) FindOpenGame(ctx context.Context, code string) (*Game, err
 		if !strings.HasPrefix(fc, code) {
 			continue
 		}
+		fullCode = fc
+		break
+	}
+	s.gamesMu.Unlock()
+
+	if fullCode == "" {
+		return nil, ErrNoSuchGame
+	}
+
+	return s.ReadGame(ctx, fullCode)
+}
+func (s *MemoryStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
+	s.gamesMu.Lock()
+	fullCode := ""
+	for fc, g := range s.games {
+		if g.Done {
+			continue
+		}
+		if !strings.HasPrefix(fc, code) {
+			continue
+		}
+		amInIt := false
+		for _, p := range g.Players {
+			if p.Name == name {
+				amInIt = true
+			}
+		}
+		if !amInIt {
+			continue
+		}
+
 		fullCode = fc
 		break
 	}

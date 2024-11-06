@@ -356,11 +356,20 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		code = "PICKUP"
 	}
 
-	g, err := s.store.FindOpenGame(ctx, code)
+	g, err := s.store.FindGameAlreadyPlaying(ctx, code, name)
 	if err != nil && err != ErrNoSuchGame {
 		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
+	}
+
+	if g == nil {
+		g, err = s.store.FindOpenGame(ctx, code)
+		if err != nil && err != ErrNoSuchGame {
+			log.Printf("Error reading game %q: %v", code, err)
+			writeErr(w, err, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if g == nil {
