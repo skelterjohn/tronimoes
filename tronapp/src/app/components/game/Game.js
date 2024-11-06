@@ -91,9 +91,11 @@ function Game({code}) {
 
 	useEffect(()=> {
 		if (!playerName) {
+			// this is definitely lower than the version on the server,
+			// so we get this loop started.
 			setVersion(-10);
 		}
-	},[]);
+	}, [playerName]);
 
 	useEffect(() => {
 		console.log('game', game);
