@@ -18,9 +18,9 @@ const availableColors = [
 	"fuchsia",
 ]
 
-function Game() {
+function Game({code}) {
 	const router = useRouter();
-	const { gameCode, playerName, client } = useGameState();
+	const { playerName, client } = useGameState();
 
 	// These states come from the server
 	const [version, setVersion] = useState(0);
@@ -38,7 +38,7 @@ function Game() {
 	// here we query the server
 	const [game, setGame] = useState(undefined);
 	useEffect(() => {
-		if (gameCode === "") {
+		if (code === "") {
 			setGame(undefined);
 			router.push('/');
 		}
@@ -47,12 +47,12 @@ function Game() {
 		let isActive = true;
 
 		const getGame = () => {
-			const myCode = gameCode;
+			const myCode = code;
 			if (client === undefined) {
 				isActive = false;
 				return;
 			}
-			client.GetGame(gameCode, version).then((resp) => {
+			client.GetGame(code, version).then((resp) => {
 				// Only update state if component is still mounted
 				if (!isActive) return;
 
@@ -64,7 +64,7 @@ function Game() {
 				setGame(resp);
 			}).catch((error) => {
 				if (!isActive) return;
-				if (myCode !== gameCode) {
+				if (myCode !== code) {
 					isActive = false;
 					return;
 				}
@@ -87,7 +87,7 @@ function Game() {
 		return () => {
 			isActive = false;
 		};
-	}, [gameCode, version]);
+	}, [code, version]);
 
 	useEffect(() => {
 		console.log('game', game);
@@ -196,7 +196,7 @@ function Game() {
 	const [indicated, setIndicated] = useState(undefined);
 
 	function startRound() {
-		client.StartRound(gameCode).then((resp) => {
+		client.StartRound(code).then((resp) => {
 			console.log("started round", resp);
 		}).catch((error) => {
 			console.error("error", error);
@@ -207,7 +207,7 @@ function Game() {
 
 	function playTile(tile) {
 		tile.color = player.color;
-		client.LayTile(gameCode, {
+		client.LayTile(code, {
 			tile:{
 				pips_a: tile.a,
 				pips_b: tile.b,
@@ -232,7 +232,7 @@ function Game() {
 
 	function drawTile() {
 		setSelectedTile(undefined);
-		client.DrawTile(gameCode).then((resp) => {
+		client.DrawTile(code).then((resp) => {
 			console.log("drew tile", resp);
 		}).catch((error) => {
 			console.error("error", error);
@@ -242,7 +242,7 @@ function Game() {
 
 	function passTurn() {
 		setSelectedTile(undefined);
-		client.Pass(gameCode).then((resp) => {
+		client.Pass(code).then((resp) => {
 			console.log("passed");
 		}).catch((error) => {
 			console.error("error", error);
@@ -250,7 +250,7 @@ function Game() {
 	}
 
 	function leaveOrQuit() {
-		client.LeaveOrQuit(gameCode).catch((error) => {
+		client.LeaveOrQuit(code).catch((error) => {
 			console.error("error", error);
 			router.push("/");
 		}).finally(() => {
@@ -271,7 +271,7 @@ function Game() {
 		<div className="h-full " onClick={()=>setPlayErrorMessage("")}>
 			<div className="flex justify-between items-center mb-4">
 				<span className="text-left text-5xl font-bold">
-					#{gameCode} {game.done && "(done)"}
+					#{code} {game?.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
@@ -290,7 +290,7 @@ function Game() {
 							className="w-28"
 							onClick={() => leaveOrQuit()}
 						>
-							{(gameInProgress && !game.done) && (<div>Quit</div>) || (<div>Leave</div>)}
+							{(gameInProgress && !game?.done) && (<div>Quit</div>) || (<div>Leave</div>)}
 						</Button>
 					</div>
 					{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
