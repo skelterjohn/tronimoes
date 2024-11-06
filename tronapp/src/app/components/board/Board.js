@@ -38,6 +38,13 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 		}
 	}, [activePlayer])
 
+	const [cellSpan, setCellSpan] = useState("");
+	const [gutterSpan, setGutterSpan] = useState("");
+	useEffect(() => {
+		setCellSpan(`${100/width+1}%`);
+		setGutterSpan(`${50/width+1}%`);
+	}, [width]);
+
 	function clickSquare(x, y) {
 		if (selectedTile===undefined) {
 			return;
@@ -68,6 +75,8 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 		}
 	}
 
+
+
 	return (
 		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
@@ -76,10 +85,10 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 						<tbody>
 							{Array.from({length: height}, (_, y) => (
 								<tr key={y}>
-									<td className={`p-0 border-0 w-[4.76%]`}>
+									<td className={`p-0 border-0`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 									{Array.from({length: width}, (_, x) => (
-										<td key={y*width+x} className="p-0 border-0">
+										<td key={y*width+x} className="p-0 border-0" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
 												{ tiles[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute">
@@ -114,7 +123,7 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 											</div>
 										</td>
 									))}
-									<td className={`p-0 border-0 w-[4.76%]`}>
+									<td className={`p-0 border-0`}  style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 								</tr>
 							))}
