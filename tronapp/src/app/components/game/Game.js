@@ -52,19 +52,25 @@ function Game() {
 			router.push('/');
 		}
 
+		// Add cleanup flag
+		let isActive = true;
+
 		const getGame = () => {
 			const myCode = gameCode;
 			client.GetGame(gameCode, version).then((resp) => {
+				// Only update state if component is still mounted
+				if (!isActive) return;
+
 				if (resp.version === version) {
 					// We got back the same one, so let's try again after a bit.
 					setTimeout(getGame, 5000);
 				}
 				setVersion(resp.version);
-				// setting the version to something new triggers the next fetch.
 				setGame(resp);
 			}).catch((error) => {
+				if (!isActive) return;
 				if (myCode !== gameCode) {
-					// This thread is out of sync.
+					isActive = false;
 					return;
 				}
 				if (error.name !== "AbortError") {
@@ -77,10 +83,15 @@ function Game() {
 					console.log(`request timed out quickly in ${timeoutDuration}ms`)
 					setTimeout(getGame, 5000);
 				} 
-			})
-		}
+			});
+		};
+
 		getGame();
 
+		// Cleanup function
+		return () => {
+			isActive = false;
+		};
 	}, [gameCode, version]);
 
 	useEffect(() => {
