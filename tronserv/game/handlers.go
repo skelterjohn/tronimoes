@@ -65,6 +65,14 @@ func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *G
 		t.PipsA = 0
 		t.PipsB = 0
 	}
+
+	// Add legal moves for this player to see.
+	r := g.CurrentRound()
+	p := g.Players[g.Turn]
+	if !g.Done && r != nil && p.Name == name {
+		r.FindLegalMoves(g, name, p)
+	}
+
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(g); err != nil {
 		log.Printf("Error encoding game %q: %v", g.Code, err)

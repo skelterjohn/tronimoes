@@ -65,8 +65,8 @@ function Game({code}) {
 			}).catch((error) => {
 				if (error?.status === 404) {
 					isActive = false;
-					setGame(undefined);
-					router.push('/');
+					// setGame(undefined);
+					// router.push('/');
 					return;
 				}
 				if (!isActive) return;
@@ -361,10 +361,10 @@ function Game({code}) {
 							hidden={false}
 							selectedTile={selectedTile}
 							setSelectedTile={setSelectedTile}
-								playerTurn={myTurn}
-								drawTile={drawTile}
-								passTurn={passTurn}
-								roundInProgress={roundInProgress}
+							playerTurn={myTurn}
+							drawTile={drawTile}
+							passTurn={passTurn}
+							roundInProgress={roundInProgress}
 						/>
 					</div>
 				</div>
