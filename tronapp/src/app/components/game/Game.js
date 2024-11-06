@@ -48,6 +48,10 @@ function Game() {
 
 		const getGame = () => {
 			const myCode = gameCode;
+			if (client === undefined) {
+				isActive = false;
+				return;
+			}
 			client.GetGame(gameCode, version).then((resp) => {
 				// Only update state if component is still mounted
 				if (!isActive) return;
