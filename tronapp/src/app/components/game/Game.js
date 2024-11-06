@@ -267,7 +267,7 @@ function Game() {
 		<div className="h-full " onClick={()=>setPlayErrorMessage("")}>
 			<div className="flex justify-between items-center mb-4">
 				<span className="text-left text-5xl font-bold">
-					#{gameCode}
+					#{gameCode} {game.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
