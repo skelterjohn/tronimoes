@@ -6,7 +6,7 @@ import { useGameState } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
 import History from './History';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 
 const availableColors = [
 	"red",
@@ -219,6 +219,10 @@ function Game() {
 			console.log("laid tile", resp);
 		}).catch((error) => {
 			console.error("error", error);
+			Modal.error({
+				title: 'could not make play',
+				content: error.data.error || "Failed to play tile. Please try again.",
+			});
 		});
 	}
 
