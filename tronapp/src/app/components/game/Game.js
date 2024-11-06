@@ -63,6 +63,12 @@ function Game({code}) {
 				setVersion(resp.version);
 				setGame(resp);
 			}).catch((error) => {
+				if (error?.status === 404) {
+					isActive = false;
+					setGame(undefined);
+					router.push('/');
+					return;
+				}
 				if (!isActive) return;
 				if (myCode !== code) {
 					isActive = false;
@@ -72,7 +78,7 @@ function Game({code}) {
 					console.error("error", error);
 					setTimeout(getGame, 30000);
 					return;
-				} 
+				}
 				const timeoutDuration = new Date() - requestTime;
 				if (timeoutDuration < 10000) {
 					console.log(`request timed out quickly in ${timeoutDuration}ms`)
