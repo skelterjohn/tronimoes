@@ -306,11 +306,11 @@ function Game() {
 					</div>
 				))}
 			</div>
-			<div className="flex gap-4 justify-center h-[75vh]">
-				<span className="w-96 h-full">
+			<div className="flex gap-4 justify-center h-[75vh] overflow-hidden">
+				<span className="w-96">
 					<History history={gameHistory}/>
 				</span>
-				<div className="border-black border-8 h-fit">
+				<div className="border-black border-8 min-h-0 min-w-0 flex-1">
 					<Board
 						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
@@ -324,7 +324,7 @@ function Game() {
 						activePlayer={roundInProgress && players[turnIndex]}
 					/>
 				</div>
-				<span className="w-96 h-full">
+				<span className="w-96">
 					<History history={roundHistory}/>
 				</span>
 			</div>
