@@ -70,55 +70,57 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 
 	return (
 		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
-			<div className="aspect-square min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
-				<table className="w-full h-full table-fixed">
-					<tbody>
-						{Array.from({length: height}, (_, y) => (
-							<tr key={y}>
-								<td className={`p-0 border-0 w-[4.76%]`}>
-								</td>
-								{Array.from({length: width}, (_, x) => (
-									<td key={y*width+x} className="p-0 border-0">
-										<div className="w-full pb-[100%] relative">
-											{ tiles[`${x},${y}`] && (
-												<div className="w-full h-full z-20 absolute">
-													<Tile 
-														pipsa={tiles[`${x},${y}`].a}
-														pipsb={tiles[`${x},${y}`].b}
-														orientation={tiles[`${x},${y}`].orientation}
-														color={tiles[`${x},${y}`].color}
-														dead={tiles[`${x},${y}`].dead}
-														lineHeads={lineHeads}
-														indicated={indicated}
-														setIndicated={setIndicated} />
-												</div>
-											)}
-											{ chickenFeet[`${x},${y}`] && (
-												<div className="w-full h-full z-30 absolute pointer-events-none">
-													<ChickenFoot 
-														color={chickenFeet[`${x},${y}`]} />
-												</div>
-											)}
-											<div
-												className="z-10 absolute inset-0"
-												onClick={()=>clickSquare(x, y)}
-											>
-												<Square
-													x={x} y={y}
-													center={y == (height-1)/2 && (x == (width/2)-1 || x == (width/2))}
-													clicked={playA!==undefined && playA.x==x && playA.y==y}
-													pips={selectedTile?.a}
-												/>
-											</div>
-										</div>
+			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
+				<div className="aspect-square">
+					<table className="w-full h-full table-fixed">
+						<tbody>
+							{Array.from({length: height}, (_, y) => (
+								<tr key={y}>
+									<td className={`p-0 border-0 w-[4.76%]`}>
 									</td>
-								))}
-								<td className={`p-0 border-0 w-[4.76%]`}>
-								</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
+									{Array.from({length: width}, (_, x) => (
+										<td key={y*width+x} className="p-0 border-0">
+											<div className="w-full pb-[100%] relative">
+												{ tiles[`${x},${y}`] && (
+													<div className="w-full h-full z-20 absolute">
+														<Tile 
+															pipsa={tiles[`${x},${y}`].a}
+															pipsb={tiles[`${x},${y}`].b}
+															orientation={tiles[`${x},${y}`].orientation}
+															color={tiles[`${x},${y}`].color}
+															dead={tiles[`${x},${y}`].dead}
+															lineHeads={lineHeads}
+															indicated={indicated}
+															setIndicated={setIndicated} />
+													</div>
+												)}
+												{ chickenFeet[`${x},${y}`] && (
+													<div className="w-full h-full z-30 absolute pointer-events-none">
+														<ChickenFoot 
+															color={chickenFeet[`${x},${y}`]} />
+													</div>
+												)}
+												<div
+													className="z-10 absolute inset-0"
+													onClick={()=>clickSquare(x, y)}
+												>
+													<Square
+														x={x} y={y}
+														center={y == (height-1)/2 && (x == (width/2)-1 || x == (width/2))}
+														clicked={playA!==undefined && playA.x==x && playA.y==y}
+														pips={selectedTile?.a}
+													/>
+												</div>
+											</div>
+										</td>
+									))}
+									<td className={`p-0 border-0 w-[4.76%]`}>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	);
