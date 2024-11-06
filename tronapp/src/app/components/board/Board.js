@@ -88,7 +88,7 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 									<td className={`p-0 border-0`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 									{Array.from({length: width}, (_, x) => (
-										<td key={y*width+x} className="p-0 border-0" style={{ height: cellSpan, width: cellSpan }}>
+										<td key={y*width+x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
 												{ tiles[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute">
