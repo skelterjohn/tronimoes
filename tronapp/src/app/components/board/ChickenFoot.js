@@ -9,5 +9,5 @@ export default function ChickenFoot({ color }) {
         purple: "bg-purple-500",
         transparent: "bg-transparent"
     };
-	return <div className={`w-full h-full rounded-full ${colorMap[color]}`}></div>
+	return <div className={`w-full h-full rounded-full ${colorMap[color]} opacity-50`}></div>
 }
