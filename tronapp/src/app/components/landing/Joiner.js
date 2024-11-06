@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button, Input } from "antd";
 import { useRouter } from "next/navigation";
 
@@ -13,9 +13,16 @@ export default function Joiner() {
 
 	const { setGameCode, setPlayerName, client } = useGameState();
 
+	const inputRef = useRef(null);
+
 	useEffect(() => {
 		setPlayerName(name);
 	}, [name]);
+
+	useEffect(() => {
+		// Focus the input when component mounts
+		inputRef.current?.focus();
+	}, []);
 
 	function joinCode(code) {
 		console.log('joining', name, code);
@@ -36,6 +43,7 @@ export default function Joiner() {
 
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
 		<Input
+			ref={inputRef}
 			placeholder="enter your designation"
 			size="large"
 			className="text-lg"
