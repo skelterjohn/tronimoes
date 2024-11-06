@@ -400,13 +400,8 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	}
 
 	firstTile := len(round.LaidTiles) == 0
-
 	if err := round.LayTile(g, name, tile); err != nil {
-		// Attempt to reverse it.
-		tile.Reverse()
-		if err := round.LayTile(g, name, tile); err != nil {
-			return fmt.Errorf("laying tile: %w", err)
-		}
+		return fmt.Errorf("laying tile: %w", err)
 	}
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
 		g.Turn = (g.Turn + 1) % len(g.Players)
@@ -635,10 +630,12 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			if last.Tile.PipsB == lt.Tile.PipsB {
 				if last.CoordBX() == lt.CoordBX() &&
 					(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
+					log.Print("b-b/x")
 					return true, lt.Tile.PipsA
 				}
 				if last.CoordBY() == lt.CoordBY() &&
 					(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
+					log.Print("b-b/y")
 					return true, lt.Tile.PipsA
 				}
 			}

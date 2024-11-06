@@ -82,6 +82,7 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 												x={x} y={y}
 												center={y == (height-1)/2 && (x == (width/2)-1 || x == (width/2))}
 												clicked={playA!==undefined && playA.x==x && playA.y==y}
+												pips={selectedTile?.a}
 											/>
 										</div>
 									</div>

@@ -1,4 +1,6 @@
-export default function Square({ x, y, center=false, clicked=false }) {
+import Pips from "./Pips";
+
+export default function Square({ x, y, center=false, clicked=false, pips=0 }) {
 	var cnm = "w-full aspect-square";
 	if (center) {
 		cnm = `${cnm} bg-gray-400`;
@@ -12,5 +14,7 @@ export default function Square({ x, y, center=false, clicked=false }) {
 		cnm = `${cnm} border border-2 border-black`;
 	}
 
-	return <div className={cnm}> </div>;
+	return <div className={cnm}>
+		{clicked && <Pips pips={pips} />}
+	</div>;
 }
