@@ -7,6 +7,7 @@ import Board from '../board/Board';
 import Hand from './Hand';
 import History from './History';
 import { Button, Modal } from 'antd';
+import WhyNot from './WhyNot';
 
 const availableColors = [
 	"red",
@@ -198,6 +199,8 @@ function Game() {
 		});
 	}
 
+	const [playErrorMessage, setPlayErrorMessage] = useState("");
+
 	function playTile(tile) {
 		tile.color = player.color;
 		client.LayTile(gameCode, {
@@ -219,10 +222,7 @@ function Game() {
 			console.log("laid tile", resp);
 		}).catch((error) => {
 			console.error("error", error);
-			Modal.error({
-				title: 'could not make play',
-				content: error.data.error || "Failed to play tile. Please try again.",
-			});
+			setPlayErrorMessage(error.data.error);
 		});
 	}
 
@@ -264,7 +264,7 @@ function Game() {
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
 	return (
-		<div className="h-full ">
+		<div className="h-full " onClick={()=>setPlayErrorMessage("")}>
 			<div className="flex justify-between items-center mb-4">
 				<span className="text-left text-5xl font-bold">
 					#{gameCode}
@@ -314,7 +314,7 @@ function Game() {
 				<span className="w-96">
 					<History history={gameHistory}/>
 				</span>
-				<div className="border-black border-8 min-h-0 min-w-0 flex-1">
+				<div className="border-black border-8 min-h-0 min-w-0 flex-1 relative">
 					<Board
 						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
@@ -327,6 +327,7 @@ function Game() {
 						playerTurn={myTurn}
 						activePlayer={roundInProgress && players[turnIndex]}
 					/>
+					<WhyNot message={playErrorMessage} />
 				</div>
 				<span className="w-96">
 					<History history={roundHistory}/>
