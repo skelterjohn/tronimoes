@@ -6,7 +6,17 @@ import Square from "./Square";
 import Tile from "./Tile";
 import ChickenFoot from './ChickenFoot';
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated }) {
+const bgColorMap = {
+	red: "bg-red-300",
+	blue: "bg-blue-300",
+	green: "bg-green-300",
+	indigo: "bg-indigo-300",
+	orange: "bg-orange-300",
+	fuchsia: "bg-fuchsia-300",
+	white: "bg-white"
+};
+
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer }) {
 	const [playA, setPlayA] = useState(undefined);
 
 	function rightClick(evt) {
@@ -18,6 +28,15 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 	useEffect(() => {
 		setPlayA(undefined);
 	}, [selectedTile]);
+
+	const [gutterColor, setGutterColor] = useState("bg-gray")
+	useEffect(() => {
+		if (activePlayer !== undefined) {
+			setGutterColor(bgColorMap[activePlayer.color]);
+		} else {
+			setGutterColor("bg-gray-300");
+		}
+	}, [activePlayer])
 
 	function clickSquare(x, y) {
 		if (selectedTile===undefined) {
@@ -50,11 +69,13 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 	}
 
 	return (
-		<div onContextMenu={rightClick} className="max-w-[75vw] max-h-[75vh] w-fit">
-			<table className="w-full table-fixed">
+		<div onContextMenu={rightClick} className="max-w-[75vw] max-h-[75vh] w-fit aspect-square">
+			<table className="w-full h-full table-fixed">
 				<tbody>
 					{Array.from({length: height}, (_, y) => (
 						<tr key={y}>
+							<td className={`p-0 ${gutterColor} border-0 w-[4.76%]`}>
+							</td>
 							{Array.from({length: width}, (_, x) => (
 								<td key={y*width+x} className="p-0 border-0">
 									<div className="w-full pb-[100%] relative">
@@ -91,6 +112,8 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 									</div>
 								</td>
 							))}
+							<td className={`p-0 ${gutterColor} border-0 w-[4.76%]`}>
+							</td>
 						</tr>
 					))}
 				</tbody>

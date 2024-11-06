@@ -17,16 +17,6 @@ const availableColors = [
 	"fuchsia",
 ]
 
-const borderColorMap = {
-	red: "border-red-300",
-	blue: "border-blue-300",
-	green: "border-green-300",
-	indigo: "border-indigo-300",
-	orange: "border-orange-300",
-	fuchsia: "border-fuchsia-300",
-	white: "border-white"
-};
-
 function Game() {
 	const router = useRouter();
 	const { gameCode, playerName, client } = useGameState();
@@ -262,10 +252,8 @@ function Game() {
 
 	const playerTurn = players[turnIndex];
 
-	let borderColor = "bg-white";
 	let myTurn = false;
 	if (playerTurn !== undefined) {
-		borderColor = borderColorMap[playerTurn.color];
 		myTurn = players.length > 0 && playerTurn.name === playerName;
 	}
 
@@ -322,7 +310,7 @@ function Game() {
 				<span className="w-96 h-full">
 					<History history={gameHistory}/>
 				</span>
-				<div className={`${borderColor} border-8 h-fit`}>
+				<div className="border-black border-8 h-fit">
 					<Board
 						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
@@ -332,6 +320,8 @@ function Game() {
 						chickenFeet={chickenFeet}
 						indicated={indicated}
 						setIndicated={setIndicated}
+						playerTurn={myTurn}
+						activePlayer={roundInProgress && players[turnIndex]}
 					/>
 				</div>
 				<span className="w-96 h-full">
