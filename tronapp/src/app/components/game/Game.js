@@ -275,7 +275,7 @@ function Game() {
 							type="primary"
 							size="large"
 							className="w-28"
-							disabled={!amFirstPlayer || roundInProgress}
+							disabled={!amFirstPlayer || roundInProgress || game?.done}
 							onClick={() => startRound()}
 						>
 							Start Round
@@ -286,7 +286,7 @@ function Game() {
 							className="w-28"
 							onClick={() => leaveOrQuit()}
 						>
-							{gameInProgress && (<div>Quit</div>) || (<div>Leave</div>)}
+							{(gameInProgress && !game.done) && (<div>Quit</div>) || (<div>Leave</div>)}
 						</Button>
 					</div>
 					{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
