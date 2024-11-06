@@ -260,7 +260,7 @@ function Game() {
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
 	return (
-		<div className="h-full">
+		<div className="h-full ">
 			<div className="flex justify-between items-center mb-4">
 				<span className="text-left text-5xl font-bold">
 					#{gameCode}
