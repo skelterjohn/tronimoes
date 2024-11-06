@@ -479,6 +479,7 @@ type LaidTile struct {
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`
 	NextPips    int    `json:"next_pips"`
+	Indicated   *Tile  `json:"indicated"`
 }
 
 func (lt *LaidTile) Reverse() {
@@ -594,6 +595,11 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 
 	canPlayOnLine := func(line []*LaidTile) (bool, int) {
 		last := line[len(line)-1]
+		if lt.Indicated != nil && lt.Indicated.PipsA != -1 {
+			if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
+				return false, 0
+			}
+		}
 		if lt.Tile.PipsA == last.NextPips {
 			if last.Tile.PipsA == lt.Tile.PipsA {
 				if last.CoordAX() == lt.CoordAX() &&
@@ -675,7 +681,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			lt.NextPips = nextPips
 		}
 	}
-	if player.Dead || !player.ChickenFoot {
+	if !player.Dead || !player.ChickenFoot {
 		for oname, line := range r.PlayerLines {
 			if playedALine {
 				continue

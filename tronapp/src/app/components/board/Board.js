@@ -12,6 +12,7 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
+		setIndicated(undefined);
 	}
 
 	useEffect(() => {
