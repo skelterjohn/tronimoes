@@ -69,13 +69,13 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 	}
 
 	return (
-		<div onContextMenu={rightClick} className="h-full w-full flex items-center justify-center overflow-hidden">
+		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
 			<div className="aspect-square min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
 				<table className="w-full h-full table-fixed">
 					<tbody>
 						{Array.from({length: height}, (_, y) => (
 							<tr key={y}>
-								<td className={`p-0 ${gutterColor} border-0 w-[4.76%]`}>
+								<td className={`p-0 border-0 w-[4.76%]`}>
 								</td>
 								{Array.from({length: width}, (_, x) => (
 									<td key={y*width+x} className="p-0 border-0">
@@ -113,7 +113,7 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 										</div>
 									</td>
 								))}
-								<td className={`p-0 ${gutterColor} border-0 w-[4.76%]`}>
+								<td className={`p-0 border-0 w-[4.76%]`}>
 								</td>
 							</tr>
 						))}
