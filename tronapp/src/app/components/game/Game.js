@@ -89,6 +89,12 @@ function Game({code}) {
 		};
 	}, [code, version]);
 
+	useEffect(()=> {
+		if (!playerName) {
+			setVersion(-10);
+		}
+	},[]);
+
 	useEffect(() => {
 		console.log('game', game);
 
@@ -149,6 +155,7 @@ function Game({code}) {
 	useEffect(() => {
 		var playerIndex = players.findIndex(p => p.name === playerName);
 		if (playerIndex === -1) {
+			setOpponents(players);
 			return;
 		}
 		var oppList = [];
@@ -337,21 +344,23 @@ function Game({code}) {
 					<History history={roundHistory}/>
 				</span>
 			</div>
-			<div className="flex justify-center items-center gap-4 h-32 max-h-32">
-				<div className="overflow-x-auto w-full">
-					<Hand
-						player={player}
-						name={playerName}
-						hidden={false}
-						selectedTile={selectedTile}
-						setSelectedTile={setSelectedTile}
-						playerTurn={myTurn}
-						drawTile={drawTile}
-						passTurn={passTurn}
-						roundInProgress={roundInProgress}
-					/>
+			{player && 
+				<div className="flex justify-center items-center gap-4 h-32 max-h-32">
+					<div className="overflow-x-auto w-full">
+						<Hand
+							player={player}
+							name={playerName}
+							hidden={false}
+							selectedTile={selectedTile}
+							setSelectedTile={setSelectedTile}
+							playerTurn={myTurn}
+							drawTile={drawTile}
+							passTurn={passTurn}
+							roundInProgress={roundInProgress}
+						/>
+					</div>
 				</div>
-			</div>
+			}
 		</div>
 	);
 }
