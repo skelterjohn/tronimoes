@@ -6,7 +6,7 @@ import Square from "./Square";
 import Tile from "./Tile";
 import ChickenFoot from './ChickenFoot';
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet }) {
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated }) {
 	const [playA, setPlayA] = useState(undefined);
 
 	function rightClick(evt) {
@@ -65,7 +65,9 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 													orientation={tiles[`${x},${y}`].orientation}
 													color={tiles[`${x},${y}`].color}
 													dead={tiles[`${x},${y}`].dead}
-													lineHeads={lineHeads} />
+													lineHeads={lineHeads}
+													indicated={indicated}
+													setIndicated={setIndicated} />
 											</div>
 										)}
 										{ chickenFeet[`${x},${y}`] && (

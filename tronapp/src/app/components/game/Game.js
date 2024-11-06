@@ -187,6 +187,8 @@ function Game() {
 		setChickenFeet(allFeet);
 	}, [players]);
 
+	const [indicated, setIndicated] = useState(undefined);
+
 	function startRound() {
 		client.StartRound(gameCode).then((resp) => {
 			console.log("started round", resp);
@@ -196,7 +198,6 @@ function Game() {
 	}
 
 	function playTile(tile) {
-		setSelectedTile(undefined);
 		tile.color = player.color;
 		client.LayTile(gameCode, {
 			tile:{
@@ -207,7 +208,13 @@ function Game() {
 			y: tile.y,
 			orientation: tile.orientation,
 			player_name: player.name,
+			indicated:{
+				pips_a: indicated?.a,
+				pips_b: indicated?.b,
+			}
 		}).then((resp) => {
+			setSelectedTile(undefined);
+			setIndicated(undefined);
 			console.log("laid tile", resp);
 		}).catch((error) => {
 			console.error("error", error);
@@ -312,6 +319,8 @@ function Game() {
 						selectedTile={selectedTile}
 						playTile={playTile}
 						chickenFeet={chickenFeet}
+						indicated={indicated}
+						setIndicated={setIndicated}
 					/>
 				</div>
 				<span className="w-96 h-full">
