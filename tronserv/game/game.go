@@ -446,15 +446,15 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 }
 
 type Player struct {
-	Name         string        `json:"name"`
-	Score        int           `json:"score"`
-	Hand         []*Tile       `json:"hand"`
-	LegalMoves   [][]*LaidTile `json:"legal_moves"`
-	ChickenFoot  bool          `json:"chicken_foot"`
-	Dead         bool          `json:"dead"`
-	JustDrew     bool          `json:"just_drew"`
-	ChickenFootX int           `json:"chicken_foot_x"`
-	ChickenFootY int           `json:"chicken_foot_y"`
+	Name         string     `json:"name"`
+	Score        int        `json:"score"`
+	Hand         []*Tile    `json:"hand"`
+	Hints        [][]string `json:"hints"`
+	ChickenFoot  bool       `json:"chicken_foot"`
+	Dead         bool       `json:"dead"`
+	JustDrew     bool       `json:"just_drew"`
+	ChickenFootX int        `json:"chicken_foot_x"`
+	ChickenFootY int        `json:"chicken_foot_y"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {
@@ -557,8 +557,12 @@ func (r *Round) Note(n string) {
 	r.History = append(r.History, n)
 }
 
-func (r *Round) FindLegalMoves(g *Game, name string, p *Player) {
-	p.LegalMoves = make([][]*LaidTile, len(p.Hand))
+func (r *Round) FindHints(g *Game, name string, p *Player) {
+	hints := make([]map[string]bool, len(p.Hand))
+	for i := range hints {
+		hints[i] = map[string]bool{}
+	}
+
 	squarePips := r.MapTiles()
 
 	for i, t := range p.Hand {
@@ -590,11 +594,13 @@ func (r *Round) FindLegalMoves(g *Game, name string, p *Player) {
 					continue
 				}
 				if ok, _ := r.canPlayOnTile(lt, head); ok {
-					p.LegalMoves[i] = append(p.LegalMoves[i], lt)
+					hints[i][lt.CoordA()] = true
+					hints[i][lt.CoordB()] = true
 				}
 				rt := lt.Reverse()
 				if ok, _ := r.canPlayOnTile(rt, head); ok {
-					p.LegalMoves[i] = append(p.LegalMoves[i], rt)
+					hints[i][rt.CoordA()] = true
+					hints[i][rt.CoordB()] = true
 				}
 			}
 
@@ -631,6 +637,12 @@ func (r *Round) FindLegalMoves(g *Game, name string, p *Player) {
 		}
 
 		// then consider new free lines
+	}
+	p.Hints = make([][]string, len(p.Hand))
+	for i, hintList := range hints {
+		for h := range hintList {
+			p.Hints[i] = append(p.Hints[i], h)
+		}
 	}
 }
 
@@ -680,12 +692,10 @@ func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int) {
 		if last.Tile.PipsB == lt.Tile.PipsB {
 			if last.CoordBX() == lt.CoordBX() &&
 				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
-				log.Print("b-b/x")
 				return true, lt.Tile.PipsA
 			}
 			if last.CoordBY() == lt.CoordBY() &&
 				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
-				log.Print("b-b/y")
 				return true, lt.Tile.PipsA
 			}
 		}

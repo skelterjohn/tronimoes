@@ -122,6 +122,7 @@ function Game({code}) {
 					a: t.pips_a, 
 					b: t.pips_b,
 				})),
+				hints: p.hints,
 				score: p.score,
 				dead: p.dead,
 				chickenFoot: p.chicken_foot,
@@ -209,6 +210,33 @@ function Game({code}) {
 	}, [players]);
 
 	const [indicated, setIndicated] = useState(undefined);
+
+	const [hints, setHints] = useState({});
+	useEffect(()=>{
+		if (!selectedTile) {
+			
+			setHints({});
+			return;
+		}
+		if (player?.hints === null || player?.hints === undefined) {
+			setHints({});
+			return;
+		}
+		player.hand.forEach((t, i) => {
+			if (t !== selectedTile) {
+				return;
+			}
+			if (player.hints[i] === null) {
+				setHints({});
+				return;
+			}
+			let hintSet = {};
+			player.hints[i].forEach((coord) => {
+				hintSet[coord] = true;
+			})
+			setHints(hintSet);
+		})
+	}, [selectedTile, player]);
 
 	function startRound() {
 		client.StartRound(code).then((resp) => {
@@ -345,6 +373,7 @@ function Game({code}) {
 						setIndicated={setIndicated}
 						playerTurn={myTurn}
 						activePlayer={roundInProgress && players[turnIndex]}
+						hints={hints}
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>

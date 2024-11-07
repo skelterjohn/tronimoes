@@ -70,7 +70,7 @@ func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *G
 	r := g.CurrentRound()
 	p := g.Players[g.Turn]
 	if !g.Done && r != nil && p.Name == name {
-		r.FindLegalMoves(g, name, p)
+		r.FindHints(g, name, p)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -330,12 +330,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 	// We aleady have something newer.
 	if g.Version > version {
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(g); err != nil {
-			log.Printf("Error encoding game %q: %v", code, err)
-			writeErr(w, err, http.StatusInternalServerError)
-			return
-		}
+		s.encodeFilteredGame(w, name, g)
 		return
 	}
 

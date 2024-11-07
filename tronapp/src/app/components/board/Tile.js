@@ -22,7 +22,7 @@ const TileHalf = ({ pips, back, orientation }) => {
 	);
 }
 
-export default function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false, selected=false, lineHeads, indicated, setIndicated}) {
+export default function Tile({pipsa, pipsb, orientation, back=false, color="white", dead=false, selected=false, lineHeads, indicated, setIndicated, hint}) {
 	const colorMap = {
         red: "bg-red-100",
         blue: "bg-blue-100",
@@ -100,6 +100,7 @@ export default function Tile({pipsa, pipsb, orientation, back=false, color="whit
 
 	const [bgcolor, setBgcolor] = useState("bg-gray-500");
 	const [bordercolor, setBordercolor] = useState("border-black");
+	const [opacity, setOpacity] = useState("");
 
 	useEffect(()=>{
 		setBgcolor(dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]));
@@ -112,7 +113,8 @@ export default function Tile({pipsa, pipsb, orientation, back=false, color="whit
 		} else {
 			setBordercolor("border-black")
 		}
-	}, [selected, dead, isLineHead, indicated]);
+		setOpacity(hint ? "opacity-50" : "");
+	}, [selected, dead, isLineHead, indicated, hint]);
 
 	function tileClicked() {
 		if (!isLineHead || dead) {
@@ -124,7 +126,7 @@ export default function Tile({pipsa, pipsb, orientation, back=false, color="whit
 	return (
 		<div className={`h-full w-full ${rotate}`}>
 			<div className={height+" w-[100%] p-1"}>
-				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-4`} onClick={()=>tileClicked()}>
+				<div className={`w-full h-full ${bgcolor} ${bordercolor} ${opacity} rounded-lg border-4`} onClick={()=>tileClicked()}>
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							<tr><td>

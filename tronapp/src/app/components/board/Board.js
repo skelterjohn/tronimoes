@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Square from "./Square";
 import Tile from "./Tile";
 import ChickenFoot from './ChickenFoot';
+import Hint from './Hint';
 
 const bgColorMap = {
 	red: "bg-red-300",
@@ -16,7 +17,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer }) {
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer, hints }) {
 	const [playA, setPlayA] = useState(undefined);
 
 	function rightClick(evt) {
@@ -75,8 +76,6 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 		}
 	}
 
-
-
 	return (
 		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
@@ -90,6 +89,12 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 									{Array.from({length: width}, (_, x) => (
 										<td key={y*width+x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
+												{ hints[`${x},${y}`] && (
+													<div className="w-full h-full z-20 absolute pointer-events-none">
+														<Hint 
+															color={activePlayer.color} />
+													</div>
+												)}
 												{ tiles[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute">
 														<Tile 
