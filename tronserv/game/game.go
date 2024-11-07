@@ -914,7 +914,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		mainLine := r.PlayerLines[player.Name]
 
 		onFoot := false
-		if player.ChickenFoot {
+		if player.ChickenFoot && len(mainLine) == 1 {
 			if player.ChickenFootX == lt.CoordAX() && player.ChickenFootY == lt.CoordAY() {
 				onFoot = true
 			}
@@ -922,7 +922,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 				onFoot = true
 			}
 		}
-		if onFoot || !player.ChickenFoot {
+		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
 			if ok, nextPips := r.canPlayOnLine(lt, mainLine); ok {
 				playedALine = true
 				r.PlayerLines[player.Name] = append(mainLine, lt)
