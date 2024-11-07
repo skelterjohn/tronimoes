@@ -494,6 +494,10 @@ type Tile struct {
 	PipsB int `json:"pips_b"`
 }
 
+func (t *Tile) String() string {
+	return fmt.Sprintf("%d:%d", t.PipsA, t.PipsB)
+}
+
 type LaidTile struct {
 	Tile        *Tile  `json:"tile"`
 	X           int    `json:"x"`
@@ -675,10 +679,26 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 		}
 
 		// potential free liner
-
 		tryFromCoord := func(x1, y1 int) {
-
+			if x1 < 0 || x1 >= g.BoardWidth {
+				return
+			}
+			if y1 < 0 || y1 >= g.BoardHeight {
+				return
+			}
+			if _, ok := squarePips[fmt.Sprintf("%d,%d", x1, y1)]; ok {
+				return
+			}
 			tryToCoord := func(x2, y2 int) {
+				if x2 < 0 || x2 >= g.BoardWidth {
+					return
+				}
+				if y2 < 0 || y2 >= g.BoardHeight {
+					return
+				}
+				if _, ok := squarePips[fmt.Sprintf("%d,%d", x2, y2)]; ok {
+					return
+				}
 				if x2 < 0 || x2 >= g.BoardWidth {
 					return
 				}
@@ -694,7 +714,6 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				if !sixPathFrom(squarePips, x1, y1, x2, y2) {
 					return
 				}
-				log.Printf("path from %d,%d to %d,%d", x1, y1, x2, y2)
 				isOpen := func(x, y int) bool {
 					if x < 0 || y < 0 || x >= g.BoardWidth || y >= g.BoardHeight {
 						return false
@@ -708,12 +727,10 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					return true
 				}
 				tryA := func(x, y int) {
-					log.Printf("trying A=%d,%d", x, y)
 					if !isOpen(x, y) {
 						return
 					}
 					mark := func(x2, y2 int) {
-						log.Printf("trying B=%d,%d", x2, y2)
 						if isOpen(x2, y2) {
 							hints[i][fmt.Sprintf("%d,%d", x, y)] = true
 							hints[i][fmt.Sprintf("%d,%d", x2, y2)] = true
@@ -735,16 +752,24 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			tryToCoord(x1, y1-5)
 		}
 		tryFreeFrom := func(head *LaidTile) {
-			tryFromCoord(head.CoordAX()-1, head.CoordAY())
-			tryFromCoord(head.CoordAX()+1, head.CoordAY())
-			tryFromCoord(head.CoordAX(), head.CoordAY()-1)
-			tryFromCoord(head.CoordAX(), head.CoordAY()+1)
+			if head.NextPips == t.PipsA {
+				tryFromCoord(head.CoordAX()-1, head.CoordAY())
+				tryFromCoord(head.CoordAX()+1, head.CoordAY())
+				tryFromCoord(head.CoordAX(), head.CoordAY()-1)
+				tryFromCoord(head.CoordAX(), head.CoordAY()+1)
+			}
+			if head.NextPips == t.PipsB {
+				tryFromCoord(head.CoordBX()-1, head.CoordBY())
+				tryFromCoord(head.CoordBX()+1, head.CoordBY())
+				tryFromCoord(head.CoordBX(), head.CoordBY()-1)
+				tryFromCoord(head.CoordBX(), head.CoordBY()+1)
+			}
 		}
 		for _, l := range r.PlayerLines {
-			tryFreeFrom(l[0])
+			tryFreeFrom(l[len(l)-1])
 		}
 		for _, l := range r.FreeLines {
-			tryFreeFrom(l[0])
+			tryFreeFrom(l[len(l)-1])
 		}
 	}
 	p.Hints = make([][]string, len(p.Hand))
