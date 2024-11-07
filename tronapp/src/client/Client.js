@@ -1,38 +1,38 @@
 class Client {
     constructor(baseURL, name, key) {
         this.baseURL = baseURL;
-		this.name = name;
-		this.key = key;
+        this.name = name;
+        this.key = key;
     }
 
 
-	async JoinGame(code, name) {
-		return this.put(`/game/${code}`, { name });
-	}
+    async JoinGame(code, name) {
+        return this.put(`/game/${code}`, { name });
+    }
 
-	async GetGame(code, version) {
-		return this.get(`/game/${code}?version=${version}`);
-	}
+    async GetGame(code, version) {
+        return this.get(`/game/${code}?version=${version}`);
+    }
 
-	async StartRound(code) {
-		return this.post(`/game/${code}/start`);
-	}
+    async StartRound(code) {
+        return this.post(`/game/${code}/start`);
+    }
 
-	async LayTile(code, tile) {
-		return this.post(`/game/${code}/tile`, tile);
-	}
+    async LayTile(code, tile) {
+        return this.post(`/game/${code}/tile`, tile);
+    }
 
-	async DrawTile(code) {
-		return this.post(`/game/${code}/draw`, {});
-	}
+    async DrawTile(code) {
+        return this.post(`/game/${code}/draw`, {});
+    }
 
-	async Pass(code) {
-		return this.post(`/game/${code}/pass`, {});
-	}
+    async Pass(code, selected) {
+        return this.post(`/game/${code}/pass`, selected);
+    }
 
-	async LeaveOrQuit(code) {
-		return this.post(`/game/${code}/leave`, {});
-	}
+    async LeaveOrQuit(code) {
+        return this.post(`/game/${code}/leave`, {});
+    }
 
     async get(path) {
         return this.doRequest('GET', path);
@@ -55,8 +55,8 @@ class Client {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-				'X-Player-Name': this.name,
-				'Authorization': `Bearer ${this.key}`,
+                'X-Player-Name': this.name,
+                'Authorization': `Bearer ${this.key}`,
             },
             body: body ? JSON.stringify(body) : null,
         });
@@ -77,5 +77,5 @@ class Client {
 
 
 export default function clientFor(name, key) {
-	return new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080', name, key);
+    return new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080', name, key);
 }

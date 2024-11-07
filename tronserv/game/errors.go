@@ -23,4 +23,7 @@ var (
 	ErrNoLine                   = errors.New("no line to play on")
 	ErrTileOutOfBounds          = errors.New("tile out of bounds")
 	ErrGameOver                 = errors.New("game is over")
+	ErrMustPickChickenFoot      = errors.New("must pick chicken foot")
+	ErrMustDrawTile             = errors.New("must draw tile")
+	ErrNoSuchPlayer             = errors.New("no such player... who are you")
 )

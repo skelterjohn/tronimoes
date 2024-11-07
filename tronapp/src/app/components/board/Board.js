@@ -17,9 +17,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer, hints }) {
-	const [playA, setPlayA] = useState(undefined);
-
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
@@ -42,38 +40,41 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 	const [cellSpan, setCellSpan] = useState("");
 	const [gutterSpan, setGutterSpan] = useState("");
 	useEffect(() => {
-		setCellSpan(`${100/width+1}%`);
-		setGutterSpan(`${50/width+1}%`);
+		setCellSpan(`${100 / width + 1}%`);
+		setGutterSpan(`${50 / width + 1}%`);
 	}, [width]);
 
 	function clickSquare(x, y) {
-		if (selectedTile===undefined) {
+		// useful for choosing your chicken-foot
+		if (selectedTile === undefined) {
+			setPlayA({ x: x, y: y });
 			return;
 		}
-		if (playA===undefined) {
-			setPlayA({x:x, y:y});
-		} else {
-			var orientation = undefined;
-			if (x === playA.x+1 && y === playA.y) {
-				orientation = "right";
-			} else if (x === playA.x-1 && y === playA.y) {
-				orientation = "left";
-			} else if (x === playA.x && y === playA.y+1) {
-				orientation = "down";
-			} else if (x === playA.x && y === playA.y-1) {
-				orientation = "up";
-			} else {
-				setPlayA({x:x, y:y});
-				return;
-			}
-			playTile({
-				a:selectedTile.a, b:selectedTile.b,
-				x:playA.x, y:playA.y,
-				orientation:orientation,
-				dead:false,
-			});
-			setPlayA(undefined);
+		if (playA === undefined) {
+			setPlayA({ x: x, y: y });
+			return;
 		}
+
+		var orientation = undefined;
+		if (x === playA.x + 1 && y === playA.y) {
+			orientation = "right";
+		} else if (x === playA.x - 1 && y === playA.y) {
+			orientation = "left";
+		} else if (x === playA.x && y === playA.y + 1) {
+			orientation = "down";
+		} else if (x === playA.x && y === playA.y - 1) {
+			orientation = "up";
+		} else {
+			setPlayA({ x: x, y: y });
+			return;
+		}
+		playTile({
+			a: selectedTile.a, b: selectedTile.b,
+			x: playA.x, y: playA.y,
+			orientation: orientation,
+			dead: false,
+		});
+		setPlayA(undefined);
 	}
 
 	return (
@@ -82,22 +83,22 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 				<div className="aspect-square">
 					<table className="w-full h-full table-fixed">
 						<tbody>
-							{Array.from({length: height}, (_, y) => (
+							{Array.from({ length: height }, (_, y) => (
 								<tr key={y}>
 									<td className={`p-0 border-0`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
-									{Array.from({length: width}, (_, x) => (
-										<td key={y*width+x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
+									{Array.from({ length: width }, (_, x) => (
+										<td key={y * width + x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
-												{ hints[`${x},${y}`] && (
+												{hints[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
-														<Hint 
+														<Hint
 															color={activePlayer.color} />
 													</div>
 												)}
-												{ tiles[`${x},${y}`] && (
+												{tiles[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute">
-														<Tile 
+														<Tile
 															pipsa={tiles[`${x},${y}`].a}
 															pipsb={tiles[`${x},${y}`].b}
 															orientation={tiles[`${x},${y}`].orientation}
@@ -108,27 +109,27 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 															setIndicated={setIndicated} />
 													</div>
 												)}
-												{ chickenFeet[`${x},${y}`] && (
+												{chickenFeet[`${x},${y}`] && (
 													<div className="w-full h-full z-30 absolute pointer-events-none">
-														<ChickenFoot 
+														<ChickenFoot
 															color={chickenFeet[`${x},${y}`]} />
 													</div>
 												)}
 												<div
 													className="z-10 absolute inset-0"
-													onClick={()=>clickSquare(x, y)}
+													onClick={() => clickSquare(x, y)}
 												>
 													<Square
 														x={x} y={y}
-														center={y == (height-1)/2 && (x == (width/2)-1 || x == (width/2))}
-														clicked={playA!==undefined && playA.x==x && playA.y==y}
+														center={y == (height - 1) / 2 && (x == (width / 2) - 1 || x == (width / 2))}
+														clicked={playA !== undefined && playA.x == x && playA.y == y}
 														pips={selectedTile?.a}
 													/>
 												</div>
 											</div>
 										</td>
 									))}
-									<td className={`p-0 border-0`}  style={{ height: cellSpan, width: gutterSpan }}>
+									<td className={`p-0 border-0`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 								</tr>
 							))}

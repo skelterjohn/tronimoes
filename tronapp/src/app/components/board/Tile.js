@@ -104,7 +104,6 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 	const [hinted, setHinted] = useState(false);
 	useEffect(() => {
 		let h = false;
-		console.log(hintedTiles);
 		hintedTiles && hintedTiles.forEach((ht) => {
 			if (ht.a == pipsa && ht.b == pipsb) {
 				h = true;

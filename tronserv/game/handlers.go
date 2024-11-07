@@ -2,7 +2,6 @@ package game
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -171,6 +170,11 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 	s.encodeFilteredGame(w, name, g)
 }
 
+type ChickenFoot struct {
+	SelectedX int `json:"selected_x"`
+	SelectedY int `json:"selected_y"`
+}
+
 func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -179,6 +183,13 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	chickenFoot := &ChickenFoot{}
+	if err := json.NewDecoder(r.Body).Decode(chickenFoot); err != nil {
+		log.Printf("Error decoding chicken-foot pacement %q / %q: %v", name, code, err)
+		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
@@ -212,9 +223,9 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !g.Pass(player.Name) {
-		log.Print("Could not pass")
-		writeErr(w, errors.New("had trouble passing"), http.StatusBadRequest)
+	if err := g.Pass(player.Name, chickenFoot.SelectedX, chickenFoot.SelectedY); err != nil {
+		log.Printf("Could not pass: %v", err)
+		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 

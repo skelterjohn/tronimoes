@@ -261,6 +261,7 @@ function Game({ code }) {
 	}
 
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
+	const [playA, setPlayA] = useState(undefined);
 
 	function playTile(tile) {
 		tile.color = player.color;
@@ -276,7 +277,7 @@ function Game({ code }) {
 			indicated: {
 				pips_a: indicated !== undefined ? indicated.a : -1,
 				pips_b: indicated !== undefined ? indicated.b : -1,
-			}
+			},
 		}).then((resp) => {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
@@ -294,16 +295,21 @@ function Game({ code }) {
 			console.log("drew tile", resp);
 		}).catch((error) => {
 			console.error("error", error);
+			setPlayErrorMessage(error.data.error);
 		});
 	}
 
 
 	function passTurn() {
 		setSelectedTile(undefined);
-		client.Pass(code).then((resp) => {
+		client.Pass(code, {
+			selected_x: playA !== undefined ? playA.x : -1,
+			selected_y: playA !== undefined ? playA.y : -1,
+		}).then((resp) => {
 			console.log("passed");
 		}).catch((error) => {
 			console.error("error", error);
+			setPlayErrorMessage(error.data.error);
 		});
 	}
 
@@ -389,6 +395,8 @@ function Game({ code }) {
 						playerTurn={myTurn}
 						activePlayer={roundInProgress && players[turnIndex]}
 						hints={hints}
+						playA={playA}
+						setPlayA={setPlayA}
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
