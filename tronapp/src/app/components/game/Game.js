@@ -212,6 +212,7 @@ function Game({code}) {
 	const [indicated, setIndicated] = useState(undefined);
 
 	const [hints, setHints] = useState({});
+	const [hintedTiles, setHintedTiles] = useState([]);
 	useEffect(()=>{
 		if (!selectedTile) {
 			
@@ -222,7 +223,11 @@ function Game({code}) {
 			setHints({});
 			return;
 		}
+		let ht = [];
 		player.hand.forEach((t, i) => {
+			if (player.hints[i] !== null && player.hints[i].length > 0) {
+				ht.push(t);
+			}
 			if (t !== selectedTile) {
 				return;
 			}
@@ -236,6 +241,7 @@ function Game({code}) {
 			})
 			setHints(hintSet);
 		})
+		setHintedTiles(ht);
 	}, [selectedTile, player]);
 
 	function startRound() {
@@ -394,6 +400,7 @@ function Game({code}) {
 							drawTile={drawTile}
 							passTurn={passTurn}
 							roundInProgress={roundInProgress}
+							hintedTiles={hintedTiles}
 						/>
 					</div>
 				</div>
