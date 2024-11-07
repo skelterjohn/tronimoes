@@ -164,7 +164,7 @@ func (g *Game) Start() error {
 		g.Bag[i], g.Bag[j] = g.Bag[j], g.Bag[i]
 	})
 
-	switch g.Code {
+	switch g.Code[:6] {
 	case "AAAAAA":
 		log.Print("secret code")
 		g.Bag = []*Tile{{
@@ -199,6 +199,26 @@ func (g *Game) Start() error {
 			PipsA: 0, PipsB: 0,
 		}}
 		for i := 2; i <= g.MaxPips; i++ {
+			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
+		}
+	case "BBBBBB":
+		log.Print("secret code")
+		g.Bag = []*Tile{{
+			PipsA: 0, PipsB: 0,
+		}, {
+			PipsA: 0, PipsB: 1,
+		}, {
+			PipsA: 0, PipsB: 2,
+		}, {
+			PipsA: 0, PipsB: 3,
+		}, {
+			PipsA: 0, PipsB: 4,
+		}, {
+			PipsA: 0, PipsB: 5,
+		}, {
+			PipsA: 0, PipsB: 6,
+		}}
+		for i := 1; i <= g.MaxPips; i++ {
 			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
 		}
 	}
