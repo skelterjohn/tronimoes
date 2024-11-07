@@ -637,6 +637,95 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 		}
 
 		// then consider new free lines
+		if t.PipsA != t.PipsB {
+			continue
+		}
+		if t.PipsA < r.PlayerLines[name][0].Tile.PipsA {
+			continue
+		}
+		isHigher := true
+		for _, l := range r.FreeLines {
+			if t.PipsA < l[0].Tile.PipsA {
+				isHigher = false
+				break
+			}
+		}
+		if !isHigher {
+			continue
+		}
+
+		// potential free liner
+
+		tryFromCoord := func(x1, y1 int) {
+
+			tryToCoord := func(x2, y2 int) {
+				if x2 < 0 || x2 >= g.BoardWidth {
+					return
+				}
+				if y2 < 0 || y2 >= g.BoardHeight {
+					return
+				}
+				if x2 < x1 {
+					x1, x2 = x2, x1
+				}
+				if y2 < y1 {
+					y1, y2 = y2, y1
+				}
+				if !sixPathFrom(squarePips, x1, y1, x2, y2) {
+					return
+				}
+				log.Printf("path from %d,%d to %d,%d", x1, y1, x2, y2)
+				isOpen := func(x, y int) bool {
+					if x < 0 || y < 0 || x >= g.BoardWidth || y >= g.BoardHeight {
+						return false
+					}
+					if _, ok := squarePips[fmt.Sprintf("%d,%d", x, y)]; ok {
+						return false
+					}
+					if x1 <= x && x <= x2 && y1 <= y && y <= y2 {
+						return false
+					}
+					return true
+				}
+				tryA := func(x, y int) {
+					log.Printf("trying A=%d,%d", x, y)
+					if !isOpen(x, y) {
+						return
+					}
+					mark := func(x2, y2 int) {
+						log.Printf("trying B=%d,%d", x2, y2)
+						if isOpen(x2, y2) {
+							hints[i][fmt.Sprintf("%d,%d", x, y)] = true
+							hints[i][fmt.Sprintf("%d,%d", x2, y2)] = true
+						}
+					}
+					mark(x+1, y)
+					mark(x-1, y)
+					mark(x, y+1)
+					mark(x, y-1)
+				}
+				tryA(x2+1, y2)
+				tryA(x2-1, y2)
+				tryA(x2, y2+1)
+				tryA(x2, y2-1)
+			}
+			tryToCoord(x1+5, y1)
+			tryToCoord(x1-5, y1)
+			tryToCoord(x1, y1+5)
+			tryToCoord(x1, y1-5)
+		}
+		tryFreeFrom := func(head *LaidTile) {
+			tryFromCoord(head.CoordAX()-1, head.CoordAY())
+			tryFromCoord(head.CoordAX()+1, head.CoordAY())
+			tryFromCoord(head.CoordAX(), head.CoordAY()-1)
+			tryFromCoord(head.CoordAX(), head.CoordAY()+1)
+		}
+		for _, l := range r.PlayerLines {
+			tryFreeFrom(l[0])
+		}
+		for _, l := range r.FreeLines {
+			tryFreeFrom(l[0])
+		}
 	}
 	p.Hints = make([][]string, len(p.Hand))
 	for i, hintList := range hints {
@@ -701,6 +790,39 @@ func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int) {
 		}
 	}
 	return false, 0
+}
+
+func sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int) bool {
+	switch {
+	case x1 == x2:
+		if y1 > y2 {
+			y1, y2 = y2, y1
+		}
+		if y2-y1 != 5 {
+			return false
+		}
+		for y := y1; y <= y2; y++ {
+			if _, ok := squarePips[fmt.Sprintf("%d,%d", x1, y)]; ok {
+				return false
+			}
+		}
+		return true
+	case y1 == y2:
+		if x1 > x2 {
+			x1, x2 = x2, x1
+		}
+		if x2-x1 != 5 {
+			return false
+		}
+		for x := x1; x <= x2; x++ {
+			if _, ok := squarePips[fmt.Sprintf("%d,%d", x, y1)]; ok {
+				return false
+			}
+		}
+		return true
+	default:
+		return false
+	}
 }
 
 func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
@@ -836,42 +958,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 	}
 
-	sixPathFrom := func(x1, y1, x2, y2 int) bool {
-		switch {
-		case x1 == x2:
-			if y1 > y2 {
-				y1, y2 = y2, y1
-			}
-			if y2-y1 != 5 {
-				return false
-			}
-			for y := y1; y <= y2; y++ {
-				if _, ok := squarePips[fmt.Sprintf("%d,%d", x1, y)]; ok {
-					return false
-				}
-			}
-			return true
-		case y1 == y2:
-			if x1 > x2 {
-				x1, x2 = x2, x1
-			}
-			if x2-x1 != 5 {
-				return false
-			}
-			for x := x1; x <= x2; x++ {
-				if _, ok := squarePips[fmt.Sprintf("%d,%d", x, y1)]; ok {
-					return false
-				}
-			}
-			return true
-		default:
-			return false
-		}
-	}
-
 	if lt.Tile.PipsA == lt.Tile.PipsB {
 		isHigher := true
-		if lt.Tile.PipsA < r.PlayerLines[lt.PlayerName][0].Tile.PipsA {
+		if lt.Tile.PipsA < r.PlayerLines[g.Players[0].Name][0].Tile.PipsA {
 			isHigher = false
 		}
 		for _, l := range r.FreeLines {
@@ -920,9 +1009,8 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			}}
 			for _, headPair := range pairsHead {
 				for _, ltPair := range pairsLT {
-					if sixPathFrom(headPair.x, headPair.y, ltPair.x, ltPair.y) {
+					if sixPathFrom(squarePips, headPair.x, headPair.y, ltPair.x, ltPair.y) {
 						return true
-					} else {
 					}
 				}
 			}
@@ -944,8 +1032,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			}
 			if canBeFree {
 				playedALine = true
+				lt.PlayerName = ""
 				r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
 				lt.NextPips = lt.Tile.PipsA
+				g.Note(fmt.Sprintf("%s started a free line", name))
 			}
 		}
 	}

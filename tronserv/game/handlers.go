@@ -68,9 +68,11 @@ func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *G
 
 	// Add legal moves for this player to see.
 	r := g.CurrentRound()
-	p := g.Players[g.Turn]
-	if !g.Done && r != nil && p.Name == name {
-		r.FindHints(g, name, p)
+	if len(g.Players) >= g.Turn {
+		p := g.Players[g.Turn]
+		if !g.Done && r != nil && p.Name == name {
+			r.FindHints(g, name, p)
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
