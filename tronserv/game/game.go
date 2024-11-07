@@ -836,6 +836,120 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		}
 	}
 
+	sixPathFrom := func(x1, y1, x2, y2 int) bool {
+		switch {
+		case x1 == x2:
+			if y1 > y2 {
+				y1, y2 = y2, y1
+			}
+			if y2-y1 != 5 {
+				return false
+			}
+			for y := y1; y <= y2; y++ {
+				if _, ok := squarePips[fmt.Sprintf("%d,%d", x1, y)]; ok {
+					return false
+				}
+			}
+			return true
+		case y1 == y2:
+			if x1 > x2 {
+				x1, x2 = x2, x1
+			}
+			if x2-x1 != 5 {
+				return false
+			}
+			for x := x1; x <= x2; x++ {
+				if _, ok := squarePips[fmt.Sprintf("%d,%d", x, y1)]; ok {
+					return false
+				}
+			}
+			return true
+		default:
+			return false
+		}
+	}
+
+	if lt.Tile.PipsA == lt.Tile.PipsB {
+		isHigher := true
+		if lt.Tile.PipsA < r.PlayerLines[lt.PlayerName][0].Tile.PipsA {
+			isHigher = false
+		}
+		for _, l := range r.FreeLines {
+			if lt.Tile.PipsA < l[0].Tile.PipsA {
+				isHigher = false
+			}
+		}
+		// can we start a free line
+		canStartFreeLineOff := func(head *LaidTile) bool {
+			type pair struct {
+				x, y int
+			}
+			pairsHead := []pair{{
+				head.CoordAX() - 1, head.CoordAY(),
+			}, {
+				head.CoordAX() + 1, head.CoordAY(),
+			}, {
+				head.CoordAX(), head.CoordAY() - 1,
+			}, {
+				head.CoordAX(), head.CoordAY() + 1,
+			}, {
+				head.CoordBX() - 1, head.CoordBY(),
+			}, {
+				head.CoordBX() + 1, head.CoordBY(),
+			}, {
+				head.CoordBX(), head.CoordBY() - 1,
+			}, {
+				head.CoordBX(), head.CoordBY() + 1,
+			}}
+			pairsLT := []pair{{
+				lt.CoordAX() - 1, lt.CoordAY(),
+			}, {
+				lt.CoordAX() + 1, lt.CoordAY(),
+			}, {
+				lt.CoordAX(), lt.CoordAY() - 1,
+			}, {
+				lt.CoordAX(), lt.CoordAY() + 1,
+			}, {
+				lt.CoordBX() - 1, lt.CoordBY(),
+			}, {
+				lt.CoordBX() + 1, lt.CoordBY(),
+			}, {
+				lt.CoordBX(), lt.CoordBY() - 1,
+			}, {
+				lt.CoordBX(), lt.CoordBY() + 1,
+			}}
+			for _, headPair := range pairsHead {
+				for _, ltPair := range pairsLT {
+					if sixPathFrom(headPair.x, headPair.y, ltPair.x, ltPair.y) {
+						return true
+					} else {
+					}
+				}
+			}
+			return false
+		}
+		if isHigher {
+			canBeFree := false
+			for _, l := range r.PlayerLines {
+				if canStartFreeLineOff(l[len(l)-1]) {
+					canBeFree = true
+					break
+				}
+			}
+			for _, l := range r.FreeLines {
+				if canStartFreeLineOff(l[len(l)-1]) {
+					canBeFree = true
+					break
+				}
+			}
+			if canBeFree {
+				playedALine = true
+				r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
+				lt.NextPips = lt.Tile.PipsA
+			}
+		}
+	}
+
 	if !playedALine {
 		return ErrNoLine
 	}
