@@ -18,7 +18,7 @@ const availableColors = [
 	"fuchsia",
 ]
 
-function Game({code}) {
+function Game({ code }) {
 	const router = useRouter();
 	const { playerName, client } = useGameState();
 
@@ -83,7 +83,7 @@ function Game({code}) {
 				if (timeoutDuration < 10000) {
 					console.log(`request timed out quickly in ${timeoutDuration}ms`)
 					setTimeout(getGame, 5000);
-				} 
+				}
 			});
 		};
 
@@ -95,7 +95,7 @@ function Game({code}) {
 		};
 	}, [code, version]);
 
-	useEffect(()=> {
+	useEffect(() => {
 		if (!playerName) {
 			// this is definitely lower than the version on the server,
 			// so we get this loop started.
@@ -119,7 +119,7 @@ function Game({code}) {
 				name: p.name,
 				color: availableColors[i],
 				hand: p.hand?.map((t) => ({
-					a: t.pips_a, 
+					a: t.pips_a,
 					b: t.pips_b,
 				})),
 				hints: p.hints,
@@ -134,7 +134,7 @@ function Game({code}) {
 
 		let allLaidTiles = {}
 		if (game.rounds?.length > 0) {
-			const lastRound = game.rounds[game.rounds.length-1]
+			const lastRound = game.rounds[game.rounds.length - 1]
 			lastRound?.laid_tiles?.forEach((lt) => {
 				allLaidTiles[`${lt.x},${lt.y}`] = {
 					a: lt.tile.pips_a,
@@ -145,7 +145,7 @@ function Game({code}) {
 				}
 			});
 			setLineHeads(Object.values(lastRound?.player_lines).map((line) => {
-				return line[line.length-1];
+				return line[line.length - 1];
 			}))
 			setRoundHistory(lastRound.history || []);
 		}
@@ -168,12 +168,12 @@ function Game({code}) {
 			return;
 		}
 		var oppList = [];
-		for (let offset=1; offset<players.length; offset++) {
-			const opp = players[(playerIndex+offset)%players.length];
+		for (let offset = 1; offset < players.length; offset++) {
+			const opp = players[(playerIndex + offset) % players.length];
 			oppList.push(opp);
 		}
 		setOpponents(oppList);
-		
+
 		if (playerIndex === -1) {
 			return;
 		}
@@ -184,7 +184,7 @@ function Game({code}) {
 
 	const [roundInProgress, setRoundInProgress] = useState(false);
 	useEffect(() => {
-		const round = game?.rounds?.[game?.rounds?.length-1];
+		const round = game?.rounds?.[game?.rounds?.length - 1];
 		if (round === undefined) {
 			setRoundInProgress(false);
 		} else {
@@ -213,9 +213,9 @@ function Game({code}) {
 
 	const [hints, setHints] = useState({});
 	const [hintedTiles, setHintedTiles] = useState([]);
-	useEffect(()=>{
+	useEffect(() => {
 		if (!selectedTile) {
-			
+
 			setHints({});
 			return;
 		}
@@ -257,7 +257,7 @@ function Game({code}) {
 	function playTile(tile) {
 		tile.color = player.color;
 		client.LayTile(code, {
-			tile:{
+			tile: {
 				pips_a: tile.a,
 				pips_b: tile.b,
 			},
@@ -272,6 +272,7 @@ function Game({code}) {
 		}).then((resp) => {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
+			setHints({});
 			console.log("laid tile", resp);
 		}).catch((error) => {
 			console.error("error", error);
@@ -317,14 +318,14 @@ function Game({code}) {
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
 	return (
-		<div className="h-full " onClick={()=>setPlayErrorMessage("")}>
+		<div className="h-full " onClick={() => setPlayErrorMessage("")}>
 			<div className="flex justify-between items-center mb-4">
 				<span className="text-left text-5xl font-bold">
 					#{code} {game?.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
-						<Button 
+						<Button
 							type="primary"
 							size="large"
 							className="w-28"
@@ -333,7 +334,7 @@ function Game({code}) {
 						>
 							Start Round
 						</Button>
-						<Button 
+						<Button
 							type="primary"
 							size="large"
 							className="w-28"
@@ -347,7 +348,7 @@ function Game({code}) {
 					}
 				</div>
 			</div>
-			
+
 			<div className="flex justify-center items-center gap-4 h-32 max-h-32">
 				{opponents.map((o, i) => (
 					<div key={i} className="flex-1 overflow-x-auto">
@@ -365,7 +366,7 @@ function Game({code}) {
 			</div>
 			<div className="flex gap-4 justify-center h-[75vh] overflow-hidden">
 				<span className="w-96 hidden landscape:block">
-					<History history={gameHistory}/>
+					<History history={gameHistory} />
 				</span>
 				<div className="border-black border-8 min-h-0 min-w-0 flex-1 relative">
 					<Board
@@ -384,10 +385,10 @@ function Game({code}) {
 					<WhyNot message={playErrorMessage} />
 				</div>
 				<span className="w-96 hidden landscape:block">
-					<History history={roundHistory}/>
+					<History history={roundHistory} />
 				</span>
 			</div>
-			{player && 
+			{player &&
 				<div className="flex justify-center items-center gap-4 h-32 max-h-32">
 					<div className="overflow-x-auto w-full">
 						<Hand
