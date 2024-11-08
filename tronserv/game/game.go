@@ -390,7 +390,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	}
 
 	firstTile := len(round.LaidTiles) == 0
-	if err := round.LayTile(g, name, tile); err != nil {
+	if err := round.LayTile(g, name, tile, false); err != nil {
 		return fmt.Errorf("laying tile: %w", err)
 	}
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
@@ -552,59 +552,21 @@ func (r *Round) Note(n string) {
 }
 
 func (r *Round) FindHints(g *Game, name string, p *Player) {
+	squarePips := r.MapTiles()
+
 	hints := make([]map[string]bool, len(p.Hand))
 	for i := range hints {
 		hints[i] = map[string]bool{}
 	}
 
-	squarePips := r.MapTiles()
-
-	// identify any chicken-feet that are on the round leader and cannot be blocked
-	offLimits := map[string]bool{}
-	for _, p := range g.Players {
-		if !p.ChickenFoot {
-			continue
-		}
-		if len(r.PlayerLines[p.Name]) > 1 {
-			continue
-		}
-		available := map[string]bool{}
-		checkCanPlayOn := func(x, y int) bool {
-			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
-				return false
-			}
-			key := fmt.Sprintf("%d,%d", x, y)
-			if _, ok := squarePips[key]; ok {
-				return false
-			}
-			available[key] = true
-			return true
-		}
-		offLimits[fmt.Sprintf("%d,%d", p.ChickenFootX, p.ChickenFootY)] = true
-		checkCanPlayOn(p.ChickenFootX+1, p.ChickenFootY)
-		checkCanPlayOn(p.ChickenFootX-1, p.ChickenFootY)
-		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY+1)
-		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY-1)
-		if len(available) == 1 {
-			for k := range available {
-				offLimits[k] = true
-			}
-		}
-	}
 
 	hintAt := func(i int, coord string) {
-		// off limits, unless this is playing on their line
-		t := p.Hand[i]
-		roundLeader := r.PlayerLines[name][0]
-		canLead := t.PipsA == roundLeader.NextPips || t.PipsB == roundLeader.NextPips
-		if !canLead && offLimits[coord] {
-			return
-		}
 		hints[i][coord] = true
 	}
 
 	for i, t := range p.Hand {
-		movesOffSquare := func(head *LaidTile, x, y int) {
+		movesOffSquare := func(head *LaidTile, x, y int, op *Player) {
+
 			for _, orientation := range []string{"up", "down", "left", "right"} {
 				lt := &LaidTile{
 					Tile:        t,
@@ -612,47 +574,23 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					X:           x,
 					Y:           y,
 				}
-				// check if this tile is blocked
-				if _, ok := squarePips[lt.CoordA()]; ok {
-					continue
-				}
-				if lt.CoordAX() < 0 || lt.CoordAX() >= g.BoardWidth {
-					continue
-				}
-				if lt.CoordAY() < 0 || lt.CoordAY() >= g.BoardHeight {
-					continue
-				}
-				if _, ok := squarePips[lt.CoordB()]; ok {
-					continue
-				}
-				if lt.CoordBX() < 0 || lt.CoordBX() >= g.BoardWidth {
-					continue
-				}
-				if lt.CoordBY() < 0 || lt.CoordBY() >= g.BoardHeight {
-					continue
-				}
-				if ok, _ := r.canPlayOnTile(lt, head); ok {
+				if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
 					hintAt(i, lt.CoordA())
 					hintAt(i, lt.CoordB())
-				}
-				rt := lt.Reverse()
-				if ok, _ := r.canPlayOnTile(rt, head); ok {
-					hintAt(i, rt.CoordA())
-					hintAt(i, rt.CoordB())
 				}
 			}
 
 		}
 
-		movesOffTile := func(head *LaidTile) {
-			movesOffSquare(head, head.CoordAX()-1, head.CoordAY())
-			movesOffSquare(head, head.CoordAX()+1, head.CoordAY())
-			movesOffSquare(head, head.CoordAX(), head.CoordAY()-1)
-			movesOffSquare(head, head.CoordAX(), head.CoordAY()+1)
-			movesOffSquare(head, head.CoordBX()-1, head.CoordBY())
-			movesOffSquare(head, head.CoordBX()+1, head.CoordBY())
-			movesOffSquare(head, head.CoordBX(), head.CoordBY()-1)
-			movesOffSquare(head, head.CoordBX(), head.CoordBY()+1)
+		movesOffTile := func(head *LaidTile, op *Player) {
+			movesOffSquare(head, head.CoordAX()-1, head.CoordAY(), op)
+			movesOffSquare(head, head.CoordAX()+1, head.CoordAY(), op)
+			movesOffSquare(head, head.CoordAX(), head.CoordAY()-1, op)
+			movesOffSquare(head, head.CoordAX(), head.CoordAY()+1, op)
+			movesOffSquare(head, head.CoordBX()-1, head.CoordBY(), op)
+			movesOffSquare(head, head.CoordBX()+1, head.CoordBY(), op)
+			movesOffSquare(head, head.CoordBX(), head.CoordBY()-1, op)
+			movesOffSquare(head, head.CoordBX(), head.CoordBY()+1, op)
 		}
 		p := g.GetPlayer(name)
 
@@ -667,7 +605,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					continue
 				}
 			}
-			movesOffTile(line[len(line)-1])
+			movesOffTile(line[len(line)-1], op)
 		}
 		if p.ChickenFoot {
 			// no free line activity allowed
@@ -728,32 +666,19 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				if !sixPathFrom(squarePips, x1, y1, x2, y2) {
 					return
 				}
-				isOpen := func(x, y int) bool {
-					if x < 0 || y < 0 || x >= g.BoardWidth || y >= g.BoardHeight {
-						return false
-					}
-					if _, ok := squarePips[fmt.Sprintf("%d,%d", x, y)]; ok {
-						return false
-					}
-					if x1 <= x && x <= x2 && y1 <= y && y <= y2 {
-						return false
-					}
-					return true
-				}
 				tryA := func(x, y int) {
-					if !isOpen(x, y) {
-						return
-					}
-					mark := func(x2, y2 int) {
-						if isOpen(x2, y2) {
-							hintAt(i, fmt.Sprintf("%d,%d", x, y))
-							hintAt(i, fmt.Sprintf("%d,%d", x2, y2))
+					for _, orientation := range []string{"up", "down", "left", "right"} {
+						lt := &LaidTile{
+							Tile:        t,
+							Orientation: orientation,
+							X:           x,
+							Y:           y,
+						}
+						if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
+							hintAt(i, lt.CoordA())
+							hintAt(i, lt.CoordB())
 						}
 					}
-					mark(x+1, y)
-					mark(x-1, y)
-					mark(x, y+1)
-					mark(x, y-1)
 				}
 				tryA(x2+1, y2)
 				tryA(x2-1, y2)
@@ -884,7 +809,7 @@ func sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int) bool {
 	}
 }
 
-func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
+func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
@@ -917,11 +842,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 
 	squarePips := r.MapTiles()
 	if ot, ok := squarePips[lt.CoordA()]; ok {
-		log.Printf("%s A-blocked by %s", lt, ot.LaidTile)
 		return ErrTileOccluded
 	}
 	if ot, ok := squarePips[lt.CoordB()]; ok {
-		log.Printf("%s B-blocked by %s", lt, ot.LaidTile)
 		return ErrTileOccluded
 	}
 
@@ -972,7 +895,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 
 	playedALine := false
 
-	player := g.GetPlayer(lt.PlayerName)
+	player := g.GetPlayer(name)
 	if !player.Dead && !isInRoundLeaderChickenfoot {
 		mainLine := r.PlayerLines[player.Name]
 
@@ -988,8 +911,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
 			if ok, nextPips := r.canPlayOnLine(lt, mainLine); ok {
 				playedALine = true
-				r.PlayerLines[player.Name] = append(mainLine, lt)
-				lt.NextPips = nextPips
+				if !dryRun {
+					r.PlayerLines[player.Name] = append(mainLine, lt)
+					lt.NextPips = nextPips
+				}
 			}
 		}
 	}
@@ -1023,9 +948,11 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			}
 			if ok, nextPips := r.canPlayOnLine(lt, line); ok {
 				playedALine = true
-				lt.PlayerName = oname
-				r.PlayerLines[oname] = append(line, lt)
-				lt.NextPips = nextPips
+				if !dryRun {
+					lt.PlayerName = oname
+					r.PlayerLines[oname] = append(line, lt)
+					lt.NextPips = nextPips
+				}
 			}
 		}
 		for i, line := range r.FreeLines {
@@ -1034,9 +961,11 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			}
 			if ok, nextPips := r.canPlayOnLine(lt, line); ok {
 				playedALine = true
-				lt.PlayerName = ""
-				r.FreeLines[i] = append(line, lt)
-				lt.NextPips = nextPips
+				if !dryRun {
+					lt.PlayerName = ""
+					r.FreeLines[i] = append(line, lt)
+					lt.NextPips = nextPips
+				}
 			}
 		}
 	}
@@ -1115,10 +1044,12 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			}
 			if canBeFree {
 				playedALine = true
-				lt.PlayerName = ""
-				r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
-				lt.NextPips = lt.Tile.PipsA
-				g.Note(fmt.Sprintf("%s started a free line", name))
+				if !dryRun {
+					lt.PlayerName = ""
+					r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
+					lt.NextPips = lt.Tile.PipsA
+					g.Note(fmt.Sprintf("%s started a free line", name))
+				}
 			}
 		}
 	}
@@ -1193,33 +1124,35 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 		return true
 	}
 
-	// Kill lines as needed
-	newFreeLines := [][]*LaidTile{}
-	for _, line := range r.FreeLines {
-		if isCutOff(line) {
-			g.Note(fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
-			continue
+	if !dryRun {
+		// Kill lines as needed
+		newFreeLines := [][]*LaidTile{}
+		for _, line := range r.FreeLines {
+			if isCutOff(line) {
+				g.Note(fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
+				continue
+			}
+			newFreeLines = append(newFreeLines, line)
 		}
-		newFreeLines = append(newFreeLines, line)
-	}
-	r.FreeLines = newFreeLines
+		r.FreeLines = newFreeLines
 
-	for _, p := range g.Players {
-		if !isCutOff(r.PlayerLines[p.Name]) {
-			continue
+		for _, p := range g.Players {
+			if !isCutOff(r.PlayerLines[p.Name]) {
+				continue
+			}
+			if p.Name == player.Name {
+				g.Note(fmt.Sprintf("%s cut-off their own line", player.Name))
+			} else {
+				g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
+			}
+			player.Score += 1
+			p.Score -= 1
+			p.Dead = true
+			p.ChickenFoot = false
 		}
-		if p.Name == player.Name {
-			g.Note(fmt.Sprintf("%s cut-off their own line", player.Name))
-		} else {
-			g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
-		}
-		player.Score += 1
-		p.Score -= 1
-		p.Dead = true
-		p.ChickenFoot = false
-	}
 
-	r.LaidTiles = append(r.LaidTiles, lt)
+		r.LaidTiles = append(r.LaidTiles, lt)
+	}
 	return nil
 }
 
