@@ -4,20 +4,12 @@ import { useRouter } from "next/navigation";
 
 import { useGameState } from '../../components/GameState';
 
-import clientFor from '../../../client/Client';
-
 export default function Joiner() {
 	const router = useRouter();
 
-	const [name, setName] = useState("");
-
-	const { setGameCode, setPlayerName, client } = useGameState();
+	const { setGameCode, playerName, setPlayerName, client } = useGameState();
 
 	const inputRef = useRef(null);
-
-	useEffect(() => {
-		setPlayerName(name);
-	}, [name]);
 
 	useEffect(() => {
 		// Focus the input when component mounts
@@ -25,8 +17,8 @@ export default function Joiner() {
 	}, []);
 
 	function joinCode(code) {
-		console.log('joining', name, code);
-		client.JoinGame(code, name).then((resp) => {
+		console.log('joining', playerName, code);
+		client.JoinGame(code, playerName).then((resp) => {
 			console.log('joined game', resp);
 			setGameCode(resp.code);
 			router.push(`/gameboard/${resp.code}`);
@@ -47,8 +39,8 @@ export default function Joiner() {
 			placeholder="enter your designation"
 			size="large"
 			className="text-lg"
-			value={name}
-			onChange={(e) => setName(e.target.value)}
+			value={playerName}
+			onChange={(e) => setPlayerName(e.target.value)}
 			onPressEnter={joinPickup}
 		/>
 		<div className="flex gap-2 text-white">
@@ -58,7 +50,7 @@ export default function Joiner() {
 				size="large"
 				className="text-lg"
 				formatter={(str) => str.toUpperCase()}
-				disabled={name === ""}
+				disabled={playerName === ""}
 				onChange={joinCode}
 			/>
 		</div>
@@ -66,7 +58,7 @@ export default function Joiner() {
 			<Button
 				type="primary"
 				size="large"
-				disabled={name === ""}
+				disabled={playerName === ""}
 				onClick={joinPickup}
 			>
 				pick-up game

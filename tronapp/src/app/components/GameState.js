@@ -7,8 +7,8 @@ import clientFor from '../../client/Client';
 const GameContext = createContext();
 
 export function GameProvider({ children }) {
-    const [gameCode, setGameCode] = useState("");
-	const [playerName, setPlayerName] = useState(undefined);
+	const [gameCode, setGameCode] = useState("");
+	const [playerName, setPlayerName] = useState("");
 	const [playerKey, setPlayerKey] = useState(uuidv4());
 	const [client, setClient] = useState(undefined);
 
@@ -17,18 +17,18 @@ export function GameProvider({ children }) {
 		setClient(clientFor(playerName, playerKey));
 	}, [playerName, playerKey]);
 
-    return (
-        <GameContext.Provider value={{
+	return (
+		<GameContext.Provider value={{
 			gameCode, setGameCode,
 			playerName, setPlayerName,
 			playerKey, setPlayerKey,
 			client, setClient,
 		}}>
-            {children}
-        </GameContext.Provider>
-    );
+			{children}
+		</GameContext.Provider>
+	);
 }
 
 export function useGameState() {
-    return useContext(GameContext);
+	return useContext(GameContext);
 }
