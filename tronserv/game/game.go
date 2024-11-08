@@ -943,10 +943,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			if len(line) == 1 {
 				// round leader, need to play on top of chickenfoot.
 				isOnMyFoot := false
-				if lt.CoordAX() == op.ChickenFootX && lt.CoordAY() == op.ChickenFootY {
+				if lt.CoordAX() == op.ChickenFootX && lt.CoordAY() == op.ChickenFootY && lt.Tile.PipsA == line[0].NextPips {
 					isOnMyFoot = true
 				}
-				if lt.CoordBX() == op.ChickenFootX && lt.CoordBY() == op.ChickenFootY {
+				if lt.CoordBX() == op.ChickenFootX && lt.CoordBY() == op.ChickenFootY && lt.Tile.PipsB == line[0].NextPips {
 					isOnMyFoot = true
 				}
 				if !isOnMyFoot {
