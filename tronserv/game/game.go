@@ -559,6 +559,45 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 
 	squarePips := r.MapTiles()
 
+	// identify any chicken-feet that are on the round leader and cannot be blocked
+	offLimits := map[string]bool{}
+	for _, p := range g.Players {
+		if !p.ChickenFoot {
+			continue
+		}
+		if len(r.PlayerLines[p.Name]) > 1 {
+			continue
+		}
+		available := map[string]bool{}
+		checkCanPlayOn := func(x, y int) bool {
+			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
+				return false
+			}
+			key := fmt.Sprintf("%d,%d", x, y)
+			if _, ok := squarePips[key]; ok {
+				return false
+			}
+			available[key] = true
+			return true
+		}
+		checkCanPlayOn(p.ChickenFootX+1, p.ChickenFootY)
+		checkCanPlayOn(p.ChickenFootX-1, p.ChickenFootY)
+		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY+1)
+		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY-1)
+		if len(available) == 1 {
+			for k := range available {
+				offLimits[k] = true
+			}
+		}
+	}
+
+	hintAt := func(i int, coord string) {
+		if _, ok := offLimits[coord]; ok {
+			return
+		}
+		hints[i][coord] = true
+	}
+
 	for i, t := range p.Hand {
 		movesOffSquare := func(head *LaidTile, x, y int) {
 			for _, orientation := range []string{"up", "down", "left", "right"} {
@@ -588,13 +627,13 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					continue
 				}
 				if ok, _ := r.canPlayOnTile(lt, head); ok {
-					hints[i][lt.CoordA()] = true
-					hints[i][lt.CoordB()] = true
+					hintAt(i, lt.CoordA())
+					hintAt(i, lt.CoordB())
 				}
 				rt := lt.Reverse()
 				if ok, _ := r.canPlayOnTile(rt, head); ok {
-					hints[i][rt.CoordA()] = true
-					hints[i][rt.CoordB()] = true
+					hintAt(i, rt.CoordA())
+					hintAt(i, rt.CoordB())
 				}
 			}
 
@@ -702,8 +741,8 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					}
 					mark := func(x2, y2 int) {
 						if isOpen(x2, y2) {
-							hints[i][fmt.Sprintf("%d,%d", x, y)] = true
-							hints[i][fmt.Sprintf("%d,%d", x2, y2)] = true
+							hintAt(i, fmt.Sprintf("%d,%d", x, y))
+							hintAt(i, fmt.Sprintf("%d,%d", x2, y2))
 						}
 					}
 					mark(x+1, y)
