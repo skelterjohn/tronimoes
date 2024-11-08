@@ -580,6 +580,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			available[key] = true
 			return true
 		}
+		offLimits[fmt.Sprintf("%d,%d", p.ChickenFootX, p.ChickenFootY)] = true
 		checkCanPlayOn(p.ChickenFootX+1, p.ChickenFootY)
 		checkCanPlayOn(p.ChickenFootX-1, p.ChickenFootY)
 		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY+1)
@@ -592,7 +593,11 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	}
 
 	hintAt := func(i int, coord string) {
-		if _, ok := offLimits[coord]; ok {
+		// off limits, unless this is playing on their line
+		t := p.Hand[i]
+		roundLeader := r.PlayerLines[name][0]
+		canLead := t.PipsA == roundLeader.NextPips || t.PipsB == roundLeader.NextPips
+		if !canLead && offLimits[coord] {
 			return
 		}
 		hints[i][coord] = true
