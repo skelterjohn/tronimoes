@@ -26,4 +26,5 @@ var (
 	ErrMustPickChickenFoot      = errors.New("must pick chicken foot")
 	ErrMustDrawTile             = errors.New("must draw tile")
 	ErrNoSuchPlayer             = errors.New("no such player... who are you")
+	ErrNoBlockingFeet           = errors.New("no blocking chicken-feet on the round leader")
 )

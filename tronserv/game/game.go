@@ -900,6 +900,30 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile) error {
 			isInRoundLeaderChickenfoot = true
 			break
 		}
+		// we're not playing on this chicken-foot, so we can't block it.
+		available := map[string]bool{}
+		checkCanPlayOn := func(x, y int) bool {
+			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
+				return false
+			}
+			key := fmt.Sprintf("%d,%d", x, y)
+			if _, ok := squarePips[key]; ok {
+				return false
+			}
+			available[key] = true
+			return true
+		}
+		checkCanPlayOn(p.ChickenFootX+1, p.ChickenFootY)
+		checkCanPlayOn(p.ChickenFootX-1, p.ChickenFootY)
+		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY+1)
+		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY-1)
+		if len(available) == 1 {
+			for k := range available {
+				if lt.CoordA() == k || lt.CoordB() == k {
+					return ErrNoBlockingFeet
+				}
+			}
+		}
 	}
 
 	playedALine := false
