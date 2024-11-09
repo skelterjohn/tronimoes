@@ -632,8 +632,10 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			continue
 		}
 
+		log.Printf("potential free liner: %s", t)
 		// potential free liner
 		tryFromCoord := func(x1, y1 int) {
+			log.Printf(" trying from %d,%d", x1, y1)
 			if x1 < 0 || x1 >= g.BoardWidth {
 				return
 			}
@@ -644,15 +646,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				return
 			}
 			tryToCoord := func(x2, y2 int) {
-				if x2 < 0 || x2 >= g.BoardWidth {
-					return
-				}
-				if y2 < 0 || y2 >= g.BoardHeight {
-					return
-				}
-				if _, ok := squarePips[fmt.Sprintf("%d,%d", x2, y2)]; ok {
-					return
-				}
+				log.Printf(" trying to %d,%d", x2, y2)
 				if x2 < 0 || x2 >= g.BoardWidth {
 					return
 				}
@@ -1028,6 +1022,12 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			}}
 			for _, headPair := range pairsHead {
 				for _, ltPair := range pairsLT {
+					if lt.CoordAX() >= headPair.x && lt.CoordAX() <= ltPair.x && lt.CoordAY() >= headPair.y && lt.CoordAY() <= ltPair.y {
+						continue
+					}
+					if lt.CoordBX() >= headPair.x && lt.CoordBX() <= ltPair.x && lt.CoordBY() >= headPair.y && lt.CoordBY() <= ltPair.y {
+						continue
+					}
 					if sixPathFrom(squarePips, headPair.x, headPair.y, ltPair.x, ltPair.y) {
 						return true
 					}
