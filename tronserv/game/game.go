@@ -1234,7 +1234,8 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		freeLines := 0
 		newFreeLines := [][]*LaidTile{}
 		for _, fl := range r.FreeLines {
-			if canConsume(fl[len(fl)-1]) {
+			head := fl[len(fl)-1]
+			if head != lt && canConsume(head) {
 				freeLines += 1
 				for _, lt := range fl {
 					lt.Dead = true
