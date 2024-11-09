@@ -476,6 +476,7 @@ type LaidTile struct {
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`
 	NextPips    int    `json:"next_pips"`
+	Dead        bool   `json:"dead"`
 	Indicated   *Tile  `json:"indicated"`
 }
 
@@ -1157,6 +1158,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			player.Score += 1
 			p.Score -= 1
 			p.Dead = true
+			for _, lt := range r.PlayerLines[p.Name][1:] {
+				lt.Dead = true
+			}
 			p.ChickenFoot = false
 		}
 
@@ -1164,7 +1168,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	// look for il ouroboros
-	if !dryRun {
+	if !dryRun && !player.ChickenFoot {
 		consumed := []string{}
 
 		canConsume := func(head *LaidTile) bool {
@@ -1223,14 +1227,36 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				consumed = append(consumed, op.Name)
 			}
 		}
+
+		freeLines := 0
+		newFreeLines := [][]*LaidTile{}
+		for _, fl := range r.FreeLines {
+			if canConsume(fl[len(fl)-1]) {
+				freeLines += 1
+				for _, lt := range fl {
+					lt.Dead = true
+				}
+			} else {
+				newFreeLines = append(newFreeLines, fl)
+			}
+		}
+		r.FreeLines = newFreeLines
+
 		if len(consumed) > 0 {
 			if lt.PlayerName != "" {
 				consumed = append(consumed, lt.PlayerName)
 			}
-			g.Note(fmt.Sprintf("%s's IL OUROBOROS consumes %s", name, strings.Join(consumed, ", ")))
+			freeLineNote := ""
+			if freeLines > 0 {
+				freeLineNote = fmt.Sprintf("%d free line(s)", freeLines)
+			}
+			g.Note(fmt.Sprintf("%s's IL OUROBOROS consumes %s", name, strings.Join(append(consumed, freeLineNote), ", ")))
 			for _, n := range consumed {
 				op := g.GetPlayer(n)
 				op.Dead = true
+				for _, lt := range r.PlayerLines[op.Name][1:] {
+					lt.Dead = true
+				}
 				op.Score -= 1
 				player.Score += 1
 			}

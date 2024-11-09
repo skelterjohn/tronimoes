@@ -141,7 +141,7 @@ function Game({ code }) {
 					b: lt.tile.pips_b,
 					orientation: lt.orientation,
 					color: playerColors[lt.player_name],
-					dead: false,
+					dead: lt.dead,
 				}
 			});
 			setLineHeads(Object.values(lastRound?.player_lines).map((line) => {
