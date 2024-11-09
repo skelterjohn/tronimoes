@@ -3,7 +3,7 @@ package game
 import (
 	"fmt"
 	"log"
-
+	"strings"
 	"math/rand"
 )
 
@@ -321,6 +321,7 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 
 func (g *Game) Note(n string) {
 	g.History = append(g.History, n)
+	log.Print(n)
 }
 
 func (g *Game) CurrentRound() *Round {
@@ -723,12 +724,17 @@ func (r *Round) canPlayOnLine(lt *LaidTile, line []*LaidTile) (bool, int) {
 	last := line[len(line)-1]
 	return r.canPlayOnTile(lt, last)
 }
+
 func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int) {
 	if lt.Indicated != nil && lt.Indicated.PipsA != -1 {
 		if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
 			return false, 0
 		}
 	}
+	return r.canPlayOnTileWithoutIndication(lt, last)
+}
+
+func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int) {
 	if lt.Tile.PipsA == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsA {
 			if last.CoordAX() == lt.CoordAX() &&
@@ -841,10 +847,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	squarePips := r.MapTiles()
-	if ot, ok := squarePips[lt.CoordA()]; ok {
+	if _, ok := squarePips[lt.CoordA()]; ok {
 		return ErrTileOccluded
 	}
-	if ot, ok := squarePips[lt.CoordB()]; ok {
+	if _, ok := squarePips[lt.CoordB()]; ok {
 		return ErrTileOccluded
 	}
 
@@ -1137,6 +1143,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		r.FreeLines = newFreeLines
 
 		for _, p := range g.Players {
+			if p.Dead {
+				continue
+			}
 			if !isCutOff(r.PlayerLines[p.Name]) {
 				continue
 			}
@@ -1153,6 +1162,81 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 		r.LaidTiles = append(r.LaidTiles, lt)
 	}
+
+	// look for il ouroboros
+	if !dryRun {
+		consumed := []string{}
+
+		canConsume := func(head *LaidTile) bool {
+			if lt.NextPips != head.NextPips {
+				return false
+			}
+			checkLTCoord := func(x, y int) bool {
+				adjacent := func(x2, y2 int) bool {
+					if x == x2 && (y == y2-1 || y == y2+1) {
+						return true
+					}
+					if y == y2 && (x == x2-1 || x == x2+1) {
+						return true
+					}
+					return false
+				}
+				if head.Tile.PipsA == head.NextPips {
+					if adjacent(head.CoordAX(), head.CoordAY()) {
+						return true
+					}
+				}
+				if head.Tile.PipsB == head.NextPips {
+					if adjacent(head.CoordBX(), head.CoordBY()) {
+						return true
+					}
+				}
+				return false
+			}
+			if lt.Tile.PipsA == lt.NextPips {
+				if checkLTCoord(lt.CoordAX(), lt.CoordAY()) {
+					return true
+				}
+			}
+			if lt.Tile.PipsB == lt.NextPips {
+				if checkLTCoord(lt.CoordBX(), lt.CoordBY()) {
+					return true
+				}
+			}
+			return false
+		}
+
+		for _, op := range g.Players {
+			if !op.ChickenFoot && op.Name != name {
+				continue
+			}
+			if op.Dead {
+				continue
+			}
+			playerLine := r.PlayerLines[op.Name]
+			head := playerLine[len(playerLine)-1]
+			if lt == head {
+				continue
+			}
+			
+			if canConsume(head) {
+				consumed = append(consumed, op.Name)
+			}
+		}
+		if len(consumed) > 0 {
+			if lt.PlayerName != "" {
+				consumed = append(consumed, lt.PlayerName)
+			}
+			g.Note(fmt.Sprintf("%s's IL OUROBOROS consumes %s", name, strings.Join(consumed, ", ")))
+			for _, n := range consumed {
+				op := g.GetPlayer(n)
+				op.Dead = true
+				op.Score -= 1
+				player.Score += 1
+			}
+		}
+	}
+
 	return nil
 }
 
