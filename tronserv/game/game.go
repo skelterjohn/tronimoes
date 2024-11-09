@@ -1131,6 +1131,8 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return true
 	}
 
+	deadTileKeys := map[string]bool{}
+
 	if !dryRun {
 		// Kill lines as needed
 		newFreeLines := [][]*LaidTile{}
@@ -1160,6 +1162,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			p.Dead = true
 			for _, lt := range r.PlayerLines[p.Name][1:] {
 				lt.Dead = true
+				deadTileKeys[lt.Tile.String()] = true
 			}
 			p.ChickenFoot = false
 		}
@@ -1235,6 +1238,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				freeLines += 1
 				for _, lt := range fl {
 					lt.Dead = true
+					deadTileKeys[lt.Tile.String()] = true
 				}
 			} else {
 				newFreeLines = append(newFreeLines, fl)
@@ -1256,10 +1260,17 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				op.Dead = true
 				for _, lt := range r.PlayerLines[op.Name][1:] {
 					lt.Dead = true
+					deadTileKeys[lt.Tile.String()] = true
 				}
 				op.Score -= 1
 				player.Score += 1
-			}
+			} 
+		}
+	}
+
+	for _, lt := range r.LaidTiles {
+		if deadTileKeys[lt.Tile.String()] {
+			lt.Dead = true
 		}
 	}
 
