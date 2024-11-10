@@ -333,8 +333,8 @@ function Game({ code }) {
 
 	return (
 		<div className="h-full " onClick={() => setPlayErrorMessage("")}>
-			<div className="flex justify-between items-center mb-4">
-				<span className="text-left text-5xl font-bold">
+			<div className="flex justify-end items-center mb-4">
+				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
@@ -363,7 +363,7 @@ function Game({ code }) {
 				</div>
 			</div>
 
-			<div className="flex justify-center items-center gap-4 h-32 max-h-32">
+			<div className="flex justify-center items-center gap-4 max-h-32">
 				{opponents.map((o, i) => (
 					<div key={i} className="flex-1 overflow-x-auto">
 						<Hand
@@ -378,8 +378,8 @@ function Game({ code }) {
 					</div>
 				))}
 			</div>
-			<div className="flex gap-4 justify-center h-[75vh] overflow-hidden">
-				<span className="w-96 hidden landscape:block">
+			<div className="flex gap-4 justify-center max-h-[75vh] overflow-hidden">
+				<span className="w-96 hidden landscape:block md:block">
 					<History history={gameHistory} />
 				</span>
 				<div className="border-black border-8 min-h-0 min-w-0 flex-1 relative">
@@ -400,12 +400,12 @@ function Game({ code }) {
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
-				<span className="w-96 hidden landscape:block">
+				<span className="w-96 hidden landscape:block md:block">
 					<History history={roundHistory} />
 				</span>
 			</div>
 			{player &&
-				<div className="flex justify-center items-center gap-4 h-32 max-h-32">
+				<div className="flex justify-center items-center gap-4">
 					<div className="overflow-x-auto w-full">
 						<Hand
 							player={player}

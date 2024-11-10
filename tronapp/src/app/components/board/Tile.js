@@ -15,7 +15,7 @@ const TileHalf = ({ pips, back, orientation }) => {
 	}
 	return (
 		<div className={outercnm}>
-			<div className="w-full h-full bg-transparent flex items-center justify-center p-1">
+			<div className="w-full h-full bg-transparent flex items-center justify-center">
 				{!back && <Pips pips={pips} />}
 			</div>
 		</div>
@@ -134,8 +134,8 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 
 	return (
 		<div className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
-			<div className={height + " w-[100%] p-1"}>
-				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-4`} onClick={() => tileClicked()}>
+			<div className={height + " w-[100%]"}>
+				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							<tr><td>
