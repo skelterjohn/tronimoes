@@ -3,8 +3,8 @@ package game
 import (
 	"fmt"
 	"log"
-	"strings"
 	"math/rand"
+	"strings"
 )
 
 var Colors = []string{"red", "blue", "green"}
@@ -561,7 +561,6 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 		hints[i] = map[string]bool{}
 	}
 
-
 	hintAt := func(i int, coord string) {
 		hints[i][coord] = true
 	}
@@ -971,7 +970,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		}
 	}
 
-	if lt.Tile.PipsA == lt.Tile.PipsB {
+	if (player.Dead || !player.ChickenFoot) && lt.Tile.PipsA == lt.Tile.PipsB {
 		isHigher := true
 		if lt.Tile.PipsA < r.PlayerLines[g.Players[0].Name][0].Tile.PipsA {
 			isHigher = false
@@ -1226,7 +1225,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			if lt == head {
 				continue
 			}
-			
+
 			if canConsume(head) {
 				consumed = append(consumed, op.Name)
 			}
@@ -1267,7 +1266,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				}
 				op.Score -= 1
 				player.Score += 1
-			} 
+			}
 		}
 	}
 
