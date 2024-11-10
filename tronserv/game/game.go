@@ -293,7 +293,7 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	}
 	r.Note(fmt.Sprintf("%s passed", name))
 
-	if !player.ChickenFoot {
+	if !player.ChickenFoot && !player.Dead {
 		player.ChickenFoot = true
 		g.Note(fmt.Sprintf("%s is chicken-footed", name))
 
@@ -1160,6 +1160,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			player.Score += 1
 			p.Score -= 1
 			p.Dead = true
+			p.ChickenFoot = false
 			for _, lt := range r.PlayerLines[p.Name][1:] {
 				lt.Dead = true
 				deadTileKeys[lt.Tile.String()] = true
@@ -1259,6 +1260,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			for _, n := range consumed {
 				op := g.GetPlayer(n)
 				op.Dead = true
+				op.ChickenFoot = false
 				for _, lt := range r.PlayerLines[op.Name][1:] {
 					lt.Dead = true
 					deadTileKeys[lt.Tile.String()] = true
