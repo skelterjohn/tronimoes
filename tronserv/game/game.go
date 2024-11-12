@@ -87,23 +87,23 @@ func (g *Game) AddPlayer(player *Player) error {
 	case 2:
 		g.BoardWidth = 8
 		g.BoardHeight = 9
-		g.MaxPips = 8
+		g.MaxPips = 7
 	case 3:
 		g.BoardWidth = 10
 		g.BoardHeight = 11
-		g.MaxPips = 10
+		g.MaxPips = 8
 	case 4:
 		g.BoardWidth = 12
 		g.BoardHeight = 13
-		g.MaxPips = 12
+		g.MaxPips = 10
 	case 5:
 		g.BoardWidth = 14
 		g.BoardHeight = 15
-		g.MaxPips = 14
+		g.MaxPips = 11
 	case 6:
 		g.BoardWidth = 16
 		g.BoardHeight = 17
-		g.MaxPips = 16
+		g.MaxPips = 12
 	}
 
 	return nil
