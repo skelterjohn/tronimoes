@@ -4,14 +4,25 @@ import { Button } from "antd";
 
 function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles }) {
 	const [handOrder, setHandOrder] = useState([]);
+	const [touchStartPos, setTouchStartPos] = useState(null);
+	const [draggedTile, setDraggedTile] = useState(null);
 
 	function moveTile(tile, toTile) {
 		let newOrder = [];
+		let fromEarlier = false;
 		handOrder.forEach(t => {
 			if (t.a === toTile.a && t.b === toTile.b) {
-				newOrder.push(tile);
+				if (fromEarlier) {
+					newOrder.push(t);
+					newOrder.push(tile);
+				} else {
+					newOrder.push(tile);
+					newOrder.push(t);
+				}
+				return;
 			}
 			if (t.a === tile.a && t.b === tile.b) {
+				fromEarlier = true;
 				return;
 			}
 			newOrder.push(t);
@@ -85,6 +96,87 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 		e.preventDefault();
 	}
 
+	function handleTouchStart(tile, e) {
+		if (hidden) return;
+		
+		// Create ghost element
+		const ghost = e.target.cloneNode(true);
+		ghost.id = 'touch-ghost';
+		ghost.style.position = 'fixed';
+		ghost.style.width = '4rem';
+		ghost.style.height = '6rem';
+		ghost.style.transform = 'scale(1)';
+		ghost.style.opacity = '0.8';
+		ghost.style.pointerEvents = 'none';
+		ghost.style.zIndex = '1000';
+		
+		// Position the ghost at the touch point
+		const touch = e.touches[0];
+		ghost.style.left = `${touch.clientX - 32}px`;
+		ghost.style.top = `${touch.clientY - 48}px`;
+		
+		document.body.appendChild(ghost);
+		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+		setDraggedTile(tile);
+	}
+
+	function handleTouchMove(e) {
+		if (!touchStartPos) return;
+		e.preventDefault();
+		
+		// Move the ghost element
+		const ghost = document.getElementById('touch-ghost');
+		if (ghost) {
+			const touch = e.touches[0];
+			ghost.style.left = `${touch.clientX - 32}px`;
+			ghost.style.top = `${touch.clientY - 48}px`;
+		}
+	}
+
+	function handleTouchEnd(targetTile, e) {
+		if (!draggedTile || !touchStartPos) return;
+		
+		// Remove the ghost element
+		const ghost = document.getElementById('touch-ghost');
+		if (ghost) {
+			ghost.remove();
+		}
+		
+		// Get the element under the touch point
+		const touch = e.changedTouches[0];
+		const element = document.elementFromPoint(touch.clientX, touch.clientY);
+		
+		// Find the tile container element
+		const tileContainer = element?.closest('[draggable="true"]');
+		if (tileContainer) {
+			const endTile = JSON.parse(tileContainer.dataset.tile);
+			if (draggedTile !== endTile) {
+				moveTile(draggedTile, endTile);
+			}
+		}
+		
+		setTouchStartPos(null);
+		setDraggedTile(null);
+	}
+
+	// Add useEffect for touch event setup
+	useEffect(() => {
+		// Get all draggable tile elements
+		const tileElements = document.querySelectorAll('[draggable="true"]');
+		
+		// Add non-passive touch move listeners
+		tileElements.forEach(element => {
+			element.addEventListener('touchmove', handleTouchMove, { passive: false });
+		});
+
+		// Cleanup
+		return () => {
+			tileElements.forEach(element => {
+				element.removeEventListener('touchmove', handleTouchMove);
+			});
+		};
+	}, [touchStartPos]); // Re-run when touchStartPos changes
+
 	return <div className="h-full flex flex-col items-center p-2">
 		<div className="text-center font-bold">
 			{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
@@ -98,10 +190,13 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 								key={i}
 								className={hidden ? "w-[1rem]" : "w-[4rem] pr-1 pt-1"}
 								draggable={!hidden}
+								data-tile={JSON.stringify(t)}
 								onClick={() => tileClicked(t)}
 								onDragStart={(e) => handleDragStart(t, e)}
 								onDrop={(e) => handleDrop(t, e)}
 								onDragOver={handleDragOver}
+								onTouchStart={(e) => handleTouchStart(t, e)}
+								onTouchEnd={(e) => handleTouchEnd(t, e)}
 							>
 								<div className="pointer-events-none">
 									<Tile
@@ -113,7 +208,7 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 										dead={dead}
 										hintedTiles={hintedTiles}
 										selected={playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b}
-										/>
+									/>
 								</div>
 							</div>
 						);
