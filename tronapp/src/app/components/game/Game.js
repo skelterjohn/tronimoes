@@ -222,7 +222,7 @@ function Game({ code }) {
 			return;
 		}
 		player.hand.forEach((t, i) => {
-			if (t !== selectedTile) {
+			if (t?.a !== selectedTile?.a || t?.b != selectedTile?.b) {
 				return;
 			}
 			if (player.hints[i] === null) {
