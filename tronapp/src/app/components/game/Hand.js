@@ -1,7 +1,48 @@
+import { useState, useEffect } from "react";
 import Tile from '../board/Tile';
 import { Button } from "antd";
 
 function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles }) {
+	const [handOrder, setHandOrder] = useState([]);
+
+	function moveTile(tile, toTile) {
+		let newOrder = [];
+		handOrder.forEach(t => {
+			if (t.a === toTile.a && t.b === toTile.b) {
+				newOrder.push(tile);
+			}
+			if (t.a === tile.a && t.b === tile.b) {
+				return;
+			}
+			newOrder.push(t);
+		});
+		setHandOrder(newOrder);
+	}
+	useEffect(() => {
+		let allOrdered = {};
+		handOrder.forEach(t => {
+			allOrdered[t] = true;
+		});
+		let missing = [];
+		player?.hand?.forEach(t => {
+			if (!allOrdered[t]) {
+				missing.push(t);
+			} else {
+				allOrdered[t] = false;
+			}
+		});
+		let newHandOrder = [];
+		missing.forEach(t => {
+			newHandOrder.push(t);
+		});
+		Object.keys(allOrdered).forEach(t => {
+			if (!allOrdered[t]) {
+				newHandOrder.push(t);
+			}
+		});
+		setHandOrder(newHandOrder);
+	}, [player]);
+
 	function tileClicked(tile) {
 		if (hidden) {
 			return;
@@ -37,7 +78,7 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 		e.preventDefault();
 		const sourceTile = JSON.parse(e.dataTransfer.getData('text/plain'));
 		// Here you can add logic to swap tiles in the hand
-		console.log('Dragged', sourceTile, 'to', targetTile);
+		moveTile(sourceTile, targetTile);
 	}
 
 	function handleDragOver(e) {
@@ -51,7 +92,7 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 		<div className="flex items-start justify-center h-full">
 			<div className="overflow-y-auto max-h-[calc(100%-2rem)]">
 				<div className="flex flex-wrap content-start">
-					{player?.hand?.map((t, i) => {
+					{handOrder.map((t, i) => {
 						return (
 							<div
 								key={i}
