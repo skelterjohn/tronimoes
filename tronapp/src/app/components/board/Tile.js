@@ -110,7 +110,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 			}
 		});
 		setHinted(h);
-	}, [hintedTiles]);
+	}, [hintedTiles, pipsa, pipsb]);
 
 	useEffect(() => {
 		setBgcolor(dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]));
