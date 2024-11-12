@@ -392,7 +392,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 
 	firstTile := len(round.LaidTiles) == 0
 	if err := round.LayTile(g, name, tile, false); err != nil {
-		return fmt.Errorf("laying tile: %w", err)
+		return err
 	}
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
 		g.Turn = (g.Turn + 1) % len(g.Players)
