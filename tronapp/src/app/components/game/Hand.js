@@ -29,28 +29,27 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 		});
 		setHandOrder(newOrder);
 	}
+
 	useEffect(() => {
-		let allOrdered = {};
+		const oldTileKeys = new Set(handOrder.map(t => `${t.a}:${t.b}`));
+		const newTileKeys = new Set(player.hand.map(t => `${t.a}:${t.b}`));
+
+		let newHandOrder = []
+		// old tiles in the order they were, if they're in the new hand.
 		handOrder.forEach(t => {
-			allOrdered[t] = true;
-		});
-		let missing = [];
-		player?.hand?.forEach(t => {
-			if (!allOrdered[t]) {
-				missing.push(t);
-			} else {
-				allOrdered[t] = false;
-			}
-		});
-		let newHandOrder = [];
-		missing.forEach(t => {
-			newHandOrder.push(t);
-		});
-		Object.keys(allOrdered).forEach(t => {
-			if (!allOrdered[t]) {
+			const key = `${t.a}:${t.b}`;
+			if (newTileKeys.has(key)) {
 				newHandOrder.push(t);
 			}
 		});
+		// new tiles at the end.
+		player.hand.forEach(t => {
+			const key = `${t.a}:${t.b}`;
+			if (!oldTileKeys.has(key)) {
+				newHandOrder.push(t);
+			}
+		});
+
 		setHandOrder(newHandOrder);
 	}, [player]);
 
