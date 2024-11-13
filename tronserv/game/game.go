@@ -428,6 +428,11 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 
 	firstTile := len(round.LaidTiles) == 0
 	if err := round.LayTile(g, name, tile, false); err != nil {
+		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
+			// try it with the indicated tile
+			tile.Indicated = nil
+			return round.LayTile(g, name, tile, false)
+		}
 		return err
 	}
 	round.Spacer = nil
