@@ -31,8 +31,12 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 	}
 
 	useEffect(() => {
-		const oldTileKeys = new Set(handOrder.map(t => `${t.a}:${t.b}`));
-		const newTileKeys = new Set(player.hand.map(t => `${t.a}:${t.b}`));
+		if (!player?.hand) {
+			setHandOrder([]);
+			return;
+		}
+		const oldTileKeys = new Set(handOrder);
+		const newTileKeys = new Set(player.hand);
 
 		let newHandOrder = []
 		// old tiles in the order they were, if they're in the new hand.
