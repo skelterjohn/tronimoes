@@ -410,20 +410,23 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 			livingPlayers = append(livingPlayers, p)
 		}
 	}
-	if len(livingPlayers) == 1 && len(g.Players) > 1 {
-		round.Done = true
-		g.Note(fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
-		livingPlayers[0].Score += 2
-	} else if len(livingPlayers) == 0 {
-		round.Done = true
-		g.Note("you win I guess")
-	} else {
-		for _, p := range livingPlayers {
-			if len(p.Hand) == 0 {
-				round.Done = true
-				g.Note(fmt.Sprintf("%s wins the round", p.Name))
-				p.Score += 2
-			}
+
+	// playing all tiles immediately wins, even if it causes you to die.
+	for _, p := range livingPlayers {
+		if len(p.Hand) == 0 {
+			round.Done = true
+			g.Note(fmt.Sprintf("%s wins the round", p.Name))
+			p.Score += 2
+		}
+	}
+	if !round.Done {
+		if len(livingPlayers) == 1 && len(g.Players) > 1 {
+			round.Done = true
+			g.Note(fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
+			livingPlayers[0].Score += 2
+		} else if len(livingPlayers) == 0 {
+			round.Done = true
+			g.Note("you win I guess")
 		}
 	}
 
