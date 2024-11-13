@@ -225,14 +225,14 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 							</div>
 							
 				{!hidden && (
-					<div>
+					<div className="pl-2">
 						<div className="text-center">
 							{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
 						</div>
-						<div className="flex flex-row gap-1 ml-4 mt-2">
+						<div className="flex flex-row gap-1 mt-2">
 							<Button
 								type="primary"
-								size="large"
+								size="small"
 								className="w-14"
 								disabled={!roundInProgress || !playerTurn || player?.just_drew}
 								onClick={drawTile}
@@ -241,7 +241,7 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 							</Button>
 							<Button
 								type="primary"
-								size="large"
+								size="small"
 								className="w-14"
 								disabled={!roundInProgress || !playerTurn || !player?.just_drew}
 								onClick={passTurn}
