@@ -857,6 +857,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			// It's ok to play on our own foot.
 			continue
 		}
+		// this only matters for that initial chickenfoot.
+		if len(r.PlayerLines[p.Name]) > 1 {
+			continue
+		}
 		// we don't check if this is a round-leader chickenfoot, because
 		// otherwise it would be blocked by a tile and already illegal.
 		if lt.CoordAX() == p.ChickenFootX && lt.CoordAY() == p.ChickenFootY {
