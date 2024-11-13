@@ -295,12 +295,25 @@ function Game({ code }) {
 			setPlayErrorMessage(error.data.error);
 		});
 	}
+
 	function playSpacer(spacer) {
 		client.LaySpacer(code, spacer).then((resp) => {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
 			setHints({});
 			console.log("laid spacer", resp);
+		}).catch((error) => {
+			console.error("error", error);
+			setPlayErrorMessage(error.data.error);
+		});
+	}
+
+	function clearSpacer() {
+		client.LaySpacer(code, {}).then((resp) => {
+			setSelectedTile(undefined);
+			setIndicated(undefined);
+			setHints({});
+			console.log("cleared spacer", resp);
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
@@ -409,6 +422,7 @@ function Game({ code }) {
 						selectedTile={selectedTile}
 						playTile={playTile}
 						playSpacer={playSpacer}
+						clearSpacer={clearSpacer}
 						chickenFeet={chickenFeet}
 						indicated={indicated}
 						setIndicated={setIndicated}

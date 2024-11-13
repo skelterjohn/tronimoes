@@ -858,6 +858,11 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 		return ErrRoundAlreadyDone
 	}
 
+	if spacer.X1 == 0 && spacer.Y1 == 0 && spacer.X2 == 0 && spacer.Y2 == 0 {
+		r.Spacer = nil
+		return nil
+	}
+
 	if spacer.X1 != spacer.X2 && spacer.Y1 != spacer.Y2 {
 		return ErrSpacerNotStraight
 	}

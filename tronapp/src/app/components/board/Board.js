@@ -18,11 +18,12 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints }) {
+export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints, clearSpacer }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
 		setIndicated(undefined);
+		clearSpacer();
 	}
 
 	useEffect(() => {
