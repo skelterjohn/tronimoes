@@ -444,6 +444,7 @@ type Player struct {
 	Score        int        `json:"score"`
 	Hand         []*Tile    `json:"hand"`
 	Hints        [][]string `json:"hints"`
+	SpacerHints  []string   `json:"spacer_hints"`
 	ChickenFoot  bool       `json:"chicken_foot"`
 	Dead         bool       `json:"dead"`
 	JustDrew     bool       `json:"just_drew"`
@@ -661,7 +662,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				if y2 < y1 {
 					y1, y2 = y2, y1
 				}
-				if !sixPathFrom(squarePips, x1, y1, x2, y2) {
+				if !g.sixPathFrom(squarePips, x1, y1, x2, y2) {
 					return
 				}
 				tryA := func(x, y int) {
@@ -713,6 +714,56 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	for i, hintList := range hints {
 		for h := range hintList {
 			p.Hints[i] = append(p.Hints[i], h)
+		}
+	}
+
+	p.SpacerHints = []string{}
+	if !p.ChickenFoot {
+		hintSpacerFrom := func(x, y int) {
+			if g.sixPathFrom(squarePips, x, y, x+5, y) {
+				for sx := x; sx <= x+5; sx++ {
+					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", sx, y))
+				}
+			}
+			if g.sixPathFrom(squarePips, x-5, y, x, y) {
+				for sx := x - 5; sx <= x; sx++ {
+					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", sx, y))
+				}
+			}
+			if g.sixPathFrom(squarePips, x, y, x, y+5) {
+				for sy := y; sy <= y+5; sy++ {
+					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", x, sy))
+				}
+			}
+			if g.sixPathFrom(squarePips, x, y-5, x, y) {
+				for sy := y - 5; sy <= y; sy++ {
+					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", x, sy))
+				}
+			}
+		}
+		hintSpacerFromTileCoord := func(x, y int) {
+			hintSpacerFrom(x+1, y)
+			hintSpacerFrom(x-1, y)
+			hintSpacerFrom(x, y+1)
+			hintSpacerFrom(x, y-1)
+		}
+		hintSpacerFromTile := func(head *LaidTile) {
+			if head.NextPips == head.Tile.PipsA {
+				hintSpacerFromTileCoord(head.CoordAX(), head.CoordAY())
+			}
+			if head.NextPips == head.Tile.PipsB {
+				hintSpacerFromTileCoord(head.CoordBX(), head.CoordBY())
+			}
+		}
+		for _, line := range r.PlayerLines {
+			if len(line) == 1 {
+				// No spacers off the round leader.
+				continue
+			}
+			hintSpacerFromTile(line[len(line)-1])
+		}
+		for _, line := range r.FreeLines {
+			hintSpacerFromTile(line[len(line)-1])
 		}
 	}
 }
@@ -779,7 +830,13 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int) {
 	return false, 0
 }
 
-func sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int) bool {
+func (g *Game) sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int) bool {
+	if x1 < 0 || x1 >= g.BoardWidth || y1 < 0 || y1 >= g.BoardHeight {
+		return false
+	}
+	if x2 < 0 || x2 >= g.BoardWidth || y2 < 0 || y2 >= g.BoardHeight {
+		return false
+	}
 	switch {
 	case x1 == x2:
 		if y1 > y2 {
@@ -1045,7 +1102,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					if lt.CoordBX() >= headPair.x && lt.CoordBX() <= ltPair.x && lt.CoordBY() >= headPair.y && lt.CoordBY() <= ltPair.y {
 						continue
 					}
-					if sixPathFrom(squarePips, headPair.x, headPair.y, ltPair.x, ltPair.y) {
+					if g.sixPathFrom(squarePips, headPair.x, headPair.y, ltPair.x, ltPair.y) {
 						return true
 					}
 				}

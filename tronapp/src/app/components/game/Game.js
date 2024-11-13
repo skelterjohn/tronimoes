@@ -123,6 +123,7 @@ function Game({ code }) {
 					b: t.pips_b,
 				})),
 				hints: p.hints,
+				spacer_hints: p.spacer_hints,
 				score: p.score,
 				dead: p.dead,
 				chickenFoot: p.chicken_foot,
