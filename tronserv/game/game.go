@@ -1018,7 +1018,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	playedALine := false
 
 	player := g.GetPlayer(name)
-	if !player.Dead && !isInRoundLeaderChickenfoot {
+	if r.Spacer == nil && !player.Dead && !isInRoundLeaderChickenfoot {
 		mainLine := r.PlayerLines[player.Name]
 
 		onFoot := false
@@ -1040,7 +1040,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			}
 		}
 	}
-	if !player.Dead || !player.ChickenFoot {
+	if r.Spacer == nil && (!player.Dead || !player.ChickenFoot) {
 		for oname, line := range r.PlayerLines {
 			if playedALine {
 				continue
