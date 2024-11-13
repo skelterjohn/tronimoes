@@ -657,9 +657,9 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			}
 			movesOffTile(line[len(line)-1], op)
 		}
-		if p.ChickenFoot {
+		if p.ChickenFoot || r.Spacer == nil {
 			// no free line activity allowed
-			return
+			continue
 		}
 
 		// then consider new free lines
@@ -680,80 +680,27 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			continue
 		}
 
-		// log.Printf("potential free liner: %s", t)
-		// potential free liner
-		tryFromCoord := func(x1, y1 int) {
-			// log.Printf(" trying from %d,%d", x1, y1)
-			if x1 < 0 || x1 >= g.BoardWidth {
-				return
-			}
-			if y1 < 0 || y1 >= g.BoardHeight {
-				return
-			}
-			if _, ok := squarePips[fmt.Sprintf("%d,%d", x1, y1)]; ok {
-				return
-			}
-			tryToCoord := func(x2, y2 int) {
-				// log.Printf(" trying to %d,%d", x2, y2)
-				if x2 < 0 || x2 >= g.BoardWidth {
-					return
-				}
-				if y2 < 0 || y2 >= g.BoardHeight {
-					return
-				}
-				if x2 < x1 {
-					x1, x2 = x2, x1
-				}
-				if y2 < y1 {
-					y1, y2 = y2, y1
-				}
-				if !g.sixPathFrom(squarePips, x1, y1, x2, y2) {
-					return
-				}
-				tryA := func(x, y int) {
-					for _, orientation := range []string{"up", "down", "left", "right"} {
-						lt := &LaidTile{
-							Tile:        t,
-							Orientation: orientation,
-							X:           x,
-							Y:           y,
-						}
-						if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
-							hintAt(i, lt.CoordA())
-							hintAt(i, lt.CoordB())
-						}
+		tryToCoord := func(x2, y2 int) {
+			tryA := func(x, y int) {
+				for _, orientation := range []string{"up", "down", "left", "right"} {
+					lt := &LaidTile{
+						Tile:        t,
+						Orientation: orientation,
+						X:           x,
+						Y:           y,
+					}
+					if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
+						hintAt(i, lt.CoordA())
+						hintAt(i, lt.CoordB())
 					}
 				}
-				tryA(x2+1, y2)
-				tryA(x2-1, y2)
-				tryA(x2, y2+1)
-				tryA(x2, y2-1)
 			}
-			tryToCoord(x1+5, y1)
-			tryToCoord(x1-5, y1)
-			tryToCoord(x1, y1+5)
-			tryToCoord(x1, y1-5)
+			tryA(x2+1, y2)
+			tryA(x2-1, y2)
+			tryA(x2, y2+1)
+			tryA(x2, y2-1)
 		}
-		tryFreeFrom := func(head *LaidTile) {
-			if head.NextPips == t.PipsA {
-				tryFromCoord(head.CoordAX()-1, head.CoordAY())
-				tryFromCoord(head.CoordAX()+1, head.CoordAY())
-				tryFromCoord(head.CoordAX(), head.CoordAY()-1)
-				tryFromCoord(head.CoordAX(), head.CoordAY()+1)
-			}
-			if head.NextPips == t.PipsB {
-				tryFromCoord(head.CoordBX()-1, head.CoordBY())
-				tryFromCoord(head.CoordBX()+1, head.CoordBY())
-				tryFromCoord(head.CoordBX(), head.CoordBY()-1)
-				tryFromCoord(head.CoordBX(), head.CoordBY()+1)
-			}
-		}
-		for _, l := range r.PlayerLines {
-			tryFreeFrom(l[len(l)-1])
-		}
-		for _, l := range r.FreeLines {
-			tryFreeFrom(l[len(l)-1])
-		}
+		tryToCoord(r.Spacer.X2, r.Spacer.Y2)
 	}
 	p.Hints = make([][]string, len(p.Hand))
 	for i, hintList := range hints {
@@ -1151,7 +1098,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 	playedAtLeastOne := len(r.PlayerLines[player.Name]) > 1
 	isDouble := lt.Tile.PipsA == lt.Tile.PipsB
-	if (player.Dead || !player.ChickenFoot) && isDouble && playedAtLeastOne {
+	if r.Spacer != nil && (player.Dead || !player.ChickenFoot) && isDouble && playedAtLeastOne {
 		isHigher := true
 		if lt.Tile.PipsA < r.PlayerLines[g.Players[0].Name][0].Tile.PipsA {
 			isHigher = false
@@ -1162,73 +1109,31 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			}
 		}
 		// can we start a free line
-		canStartFreeLineOff := func(head *LaidTile) bool {
-			type pair struct {
-				x, y int
-			}
-			pairsHead := []pair{{
-				head.CoordAX() - 1, head.CoordAY(),
-			}, {
-				head.CoordAX() + 1, head.CoordAY(),
-			}, {
-				head.CoordAX(), head.CoordAY() - 1,
-			}, {
-				head.CoordAX(), head.CoordAY() + 1,
-			}, {
-				head.CoordBX() - 1, head.CoordBY(),
-			}, {
-				head.CoordBX() + 1, head.CoordBY(),
-			}, {
-				head.CoordBX(), head.CoordBY() - 1,
-			}, {
-				head.CoordBX(), head.CoordBY() + 1,
-			}}
-			pairsLT := []pair{{
-				lt.CoordAX() - 1, lt.CoordAY(),
-			}, {
-				lt.CoordAX() + 1, lt.CoordAY(),
-			}, {
-				lt.CoordAX(), lt.CoordAY() - 1,
-			}, {
-				lt.CoordAX(), lt.CoordAY() + 1,
-			}, {
-				lt.CoordBX() - 1, lt.CoordBY(),
-			}, {
-				lt.CoordBX() + 1, lt.CoordBY(),
-			}, {
-				lt.CoordBX(), lt.CoordBY() - 1,
-			}, {
-				lt.CoordBX(), lt.CoordBY() + 1,
-			}}
-			for _, headPair := range pairsHead {
-				for _, ltPair := range pairsLT {
-					if lt.CoordAX() >= headPair.x && lt.CoordAX() <= ltPair.x && lt.CoordAY() >= headPair.y && lt.CoordAY() <= ltPair.y {
-						continue
-					}
-					if lt.CoordBX() >= headPair.x && lt.CoordBX() <= ltPair.x && lt.CoordBY() >= headPair.y && lt.CoordBY() <= ltPair.y {
-						continue
-					}
-					if g.sixPathFrom(squarePips, headPair.x, headPair.y, ltPair.x, ltPair.y) {
-						return true
-					}
-				}
-			}
-			return false
-		}
 		if isHigher {
 			canBeFree := false
-			for _, l := range r.PlayerLines {
-				if canStartFreeLineOff(l[len(l)-1]) {
-					canBeFree = true
-					break
-				}
+			if lt.X == r.Spacer.X2-1 && lt.Y == r.Spacer.Y2 {
+				canBeFree = true
 			}
-			for _, l := range r.FreeLines {
-				if canStartFreeLineOff(l[len(l)-1]) {
-					canBeFree = true
-					break
-				}
+			if lt.X == r.Spacer.X2+1 && lt.Y == r.Spacer.Y2 {
+				canBeFree = true
 			}
+			if lt.X == r.Spacer.X2 && lt.Y == r.Spacer.Y2-1 {
+				canBeFree = true
+			}
+			if lt.X == r.Spacer.X2 && lt.Y == r.Spacer.Y2+1 {
+				canBeFree = true
+			}
+
+			inSpacer := func(x, y int) bool {
+				if x >= r.Spacer.X1 && x <= r.Spacer.X2 && y >= r.Spacer.Y1 && y <= r.Spacer.Y2 {
+					return true
+				}
+				return false
+			}
+			if inSpacer(lt.CoordAX(), lt.CoordAY()) || inSpacer(lt.CoordBX(), lt.CoordBY()) {
+				canBeFree = false
+			}
+
 			if canBeFree {
 				playedALine = true
 				if !dryRun {
