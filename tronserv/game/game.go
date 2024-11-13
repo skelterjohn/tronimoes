@@ -718,27 +718,19 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	}
 
 	p.SpacerHints = []string{}
-	if !p.ChickenFoot {
+	if !p.ChickenFoot && len(r.PlayerLines[name]) > 1 {
 		hintSpacerFrom := func(x, y int) {
 			if g.sixPathFrom(squarePips, x, y, x+5, y) {
-				for sx := x; sx <= x+5; sx++ {
-					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", sx, y))
-				}
+				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x+5, y))
 			}
-			if g.sixPathFrom(squarePips, x-5, y, x, y) {
-				for sx := x - 5; sx <= x; sx++ {
-					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", sx, y))
-				}
+			if g.sixPathFrom(squarePips, x, y, x-5, y) {
+				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x-5, y))
 			}
 			if g.sixPathFrom(squarePips, x, y, x, y+5) {
-				for sy := y; sy <= y+5; sy++ {
-					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", x, sy))
-				}
+				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x, y+5))
 			}
-			if g.sixPathFrom(squarePips, x, y-5, x, y) {
-				for sy := y - 5; sy <= y; sy++ {
-					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d", x, sy))
-				}
+			if g.sixPathFrom(squarePips, x, y, x, y-5) {
+				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x, y-5))
 			}
 		}
 		hintSpacerFromTileCoord := func(x, y int) {
