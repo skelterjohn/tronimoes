@@ -415,14 +415,14 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	for _, p := range livingPlayers {
 		if len(p.Hand) == 0 {
 			round.Done = true
-			g.Note(fmt.Sprintf("%s wins the round", p.Name))
+			g.Note(fmt.Sprintf("%s wins the round through efficiency", p.Name))
 			p.Score += 2
 		}
 	}
 	if !round.Done {
 		if len(livingPlayers) == 1 && len(g.Players) > 1 {
 			round.Done = true
-			g.Note(fmt.Sprintf("%s wins the round", livingPlayers[0].Name))
+			g.Note(fmt.Sprintf("%s wins the round through attrition", livingPlayers[0].Name))
 			livingPlayers[0].Score += 2
 		} else if len(livingPlayers) == 0 {
 			round.Done = true
