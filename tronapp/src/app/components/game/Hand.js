@@ -8,6 +8,9 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 	const [draggedTile, setDraggedTile] = useState(null);
 
 	function moveTile(tile, toTile) {
+		if (tile.a === toTile.a && tile.b === toTile.b) {
+			return;
+		}
 		let newOrder = [];
 		let fromEarlier = false;
 		handOrder.forEach(t => {
