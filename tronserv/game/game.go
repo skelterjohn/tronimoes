@@ -952,6 +952,15 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					lt.PlayerName = oname
 					r.PlayerLines[oname] = append(line, lt)
 					lt.NextPips = nextPips
+					// Update the chicken-foot.
+					if lt.NextPips == lt.Tile.PipsA {
+						op.ChickenFootX = lt.CoordBX()
+						op.ChickenFootY = lt.CoordBY()
+					}
+					if lt.NextPips == lt.Tile.PipsB {
+						op.ChickenFootX = lt.CoordAX()
+						op.ChickenFootY = lt.CoordAY()
+					}
 				}
 			}
 		}
