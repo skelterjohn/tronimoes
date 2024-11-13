@@ -2,10 +2,28 @@ import { useState, useEffect } from "react";
 import Tile from '../board/Tile';
 import { Button } from "antd";
 
-function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles }) {
+function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer }) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
+	const [spacerAvailable, setSpacerAvailable] = useState(false);
+	const [spacerColor, setSpacerColor] = useState("white");
+
+	useEffect(() => {
+		setSpacerAvailable(hintedSpacer);
+	}, [hintedSpacer]);
+
+	useEffect(() => {
+		if (selectedTile?.a == -1 && selectedTile?.b == -1) {
+			setSpacerColor("bg-white");
+			return;
+		}
+		if (spacerAvailable) {
+			setSpacerColor("bg-gray-200");
+		} else {
+			setSpacerColor("bg-gray-500");
+		}
+	}, [spacerAvailable, selectedTile]);
 
 	function moveTile(tile, toTile) {
 		if (tile.a === toTile.a && tile.b === toTile.b) {
@@ -65,6 +83,13 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 			return;
 		}
 		setSelectedTile(tile);
+	}
+
+	function spacerClicked() {
+		if (hidden) {
+			return;
+		}
+		setSelectedTile({ a: -1, b: -1 });
 	}
 
 	function handleDragStart(tile, e) {
@@ -183,66 +208,76 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 		};
 	}, [touchStartPos]); // Re-run when touchStartPos changes
 
-	return <div className="h-full flex flex-col items-center p-2">
-		<div className="text-center font-bold">
-			{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
-		</div>
-		<div className="flex items-start justify-center h-full">
-			<div className="overflow-y-auto max-h-[calc(100%-2rem)]">
-				<div className="flex flex-wrap content-start">
-					{handOrder.map((t, i) => {
-						return (
-							<div
-								key={i}
-								className={hidden ? "w-[1rem]" : "w-[4rem] pr-1 pt-1"}
-								draggable={!hidden}
-								data-tile={JSON.stringify(t)}
-								onClick={() => tileClicked(t)}
-								onDragStart={(e) => handleDragStart(t, e)}
-								onDrop={(e) => handleDrop(t, e)}
-								onDragOver={handleDragOver}
-								onTouchStart={(e) => handleTouchStart(t, e)}
-								onTouchEnd={(e) => handleTouchEnd(t, e)}
-							>
-								<div className="pointer-events-none">
-									<Tile
-										draggable={false}
-										color={player?.color}
-										pipsa={t.a}
-										pipsb={t.b}
-										back={hidden}
-										dead={dead}
-										hintedTiles={hintedTiles}
-										selected={playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b}
-									/>
-								</div>
-							</div>
-						);
-					})}
-				</div>
+	return (
+		<div className="h-full flex flex-col items-center p-2">
+			<div className="text-center font-bold">
+				{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
 			</div>
-			{!hidden && <div className="flex flex-col ml-4 mt-2">
-				<Button
-					type="primary"
-					size="large"
-					className="w-14"
-					disabled={!roundInProgress || !playerTurn || player?.just_drew}
-					onClick={drawTile}
-				>
-					Draw
-				</Button>
-				<Button
-					type="primary"
-					size="large"
-					className="w-14"
-					disabled={!roundInProgress || !playerTurn || !player?.just_drew}
-					onClick={passTurn}
-				>
-					Pass
-				</Button>
-			</div>}
+			<div className="flex flex-col items-center h-full">
+				<div className="overflow-y-auto max-h-[calc(100%-14rem)]">
+					{!hidden && (
+						<div
+							className={`${spacerColor} w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center`}
+							onClick={spacerClicked}
+						>
+							FREE LINE SPACER
+						</div>
+					)}
+					<div className="flex flex-wrap content-start">
+						{handOrder.map((t, i) => {
+							return (
+								<div
+									key={i}
+									className={hidden ? "w-[1rem]" : "w-[4rem] pr-1 pt-1"}
+									draggable={!hidden}
+									data-tile={JSON.stringify(t)}
+									onClick={() => tileClicked(t)}
+									onDragStart={(e) => handleDragStart(t, e)}
+									onDrop={(e) => handleDrop(t, e)}
+									onDragOver={handleDragOver}
+									onTouchStart={(e) => handleTouchStart(t, e)}
+									onTouchEnd={(e) => handleTouchEnd(t, e)}
+								>
+									<div className="pointer-events-none">
+										<Tile
+											draggable={false}
+											color={player?.color}
+											pipsa={t.a}
+											pipsb={t.b}
+											back={hidden}
+											dead={dead}
+											hintedTiles={hintedTiles}
+											selected={playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b}
+										/>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+				{!hidden && <div className="flex flex-col ml-4 mt-2">
+					<Button
+						type="primary"
+						size="large"
+						className="w-14"
+						disabled={!roundInProgress || !playerTurn || player?.just_drew}
+						onClick={drawTile}
+					>
+						Draw
+					</Button>
+					<Button
+						type="primary"
+						size="large"
+						className="w-14"
+						disabled={!roundInProgress || !playerTurn || !player?.just_drew}
+						onClick={passTurn}
+					>
+						Pass
+					</Button>
+				</div>}
+			</div>
 		</div>
-	</div>;
+	);
 }
 
 export default Hand;

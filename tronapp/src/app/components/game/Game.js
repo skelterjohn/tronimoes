@@ -419,6 +419,7 @@ function Game({ code }) {
 							passTurn={passTurn}
 							roundInProgress={roundInProgress}
 							hintedTiles={hintedTiles}
+							hintedSpacer={player.spacer_hints}
 						/>
 					</div>
 				</div>
