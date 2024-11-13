@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
+import Spacer from "./Spacer";
 import Square from "./Square";
 import Tile from "./Tile";
 import ChickenFoot from './ChickenFoot';
@@ -17,7 +18,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints }) {
+export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
@@ -107,6 +108,11 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 		setPlayA(undefined);
 	}
 
+	const [spacerA, setSpacerA] = useState(undefined);
+	useEffect(() => {
+		setSpacerA(`${spacer?.x1},${spacer?.y1}`);
+	}, [spacer]);
+
 	return (
 		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
@@ -130,6 +136,11 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint
 															color={activePlayer.color} />
+													</div>
+												)}
+												{spacerA === `${x},${y}` && (
+													<div className="w-full h-full z-20 absolute">
+														<Spacer spacer={spacer} />
 													</div>
 												)}
 												{tiles[`${x},${y}`] && (
