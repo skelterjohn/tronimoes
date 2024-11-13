@@ -218,6 +218,10 @@ function Game({ code }) {
 			setHints({});
 			return;
 		}
+		if (selectedTile.a == -1 && selectedTile.b == -1) {
+			setHints({});
+			return;
+		}
 		if (player?.hints === null || player?.hints === undefined) {
 			setHints({});
 			return;
@@ -398,6 +402,7 @@ function Game({ code }) {
 						hints={hints}
 						playA={playA}
 						setPlayA={setPlayA}
+						spacerHints={player?.spacer_hints}
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>

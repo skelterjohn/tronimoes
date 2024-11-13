@@ -17,7 +17,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA }) {
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
@@ -77,6 +77,19 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 		setPlayA(undefined);
 	}
 
+	const [spacerHintPrefix, setSpacerHintPrefix] = useState({});
+	useEffect(() => {
+		let prefix = {};
+		if (selectedTile?.a == -1 && selectedTile?.b == -1 && spacerHints) {
+			spacerHints.forEach(hint => {
+				const [first, second] = hint.split("-");
+			prefix[first] = second;
+			prefix[second] = first;
+			});
+		}
+		setSpacerHintPrefix(prefix);
+	}, [spacerHints, selectedTile, hints]);
+
 	return (
 		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
@@ -91,6 +104,12 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 										<td key={y * width + x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
 												{hints[`${x},${y}`] && (
+													<div className="w-full h-full z-20 absolute pointer-events-none">
+														<Hint
+															color={activePlayer.color} />
+													</div>
+												)}
+												{spacerHintPrefix[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint
 															color={activePlayer.color} />

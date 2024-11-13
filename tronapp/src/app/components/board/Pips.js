@@ -2,6 +2,9 @@ import Image from 'next/image';
 
 
 export default function Pips({pips}) {
+	if (pips === -1) {
+		return <div></div>
+	}
 	return (
 		<div className="w-full flex justify-center items-center">
 			<Image 
