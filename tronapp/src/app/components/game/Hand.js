@@ -234,7 +234,7 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 								type="primary"
 								size="small"
 								className="w-14"
-								disabled={!roundInProgress || !playerTurn || player?.just_drew}
+								disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
 								onClick={drawTile}
 							>
 								Draw
@@ -243,7 +243,7 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 								type="primary"
 								size="small"
 								className="w-14"
-								disabled={!roundInProgress || !playerTurn || !player?.just_drew}
+								disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
 								onClick={passTurn}
 							>
 								Pass

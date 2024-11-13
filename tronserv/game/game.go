@@ -284,10 +284,18 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 		return ErrNoSuchPlayer
 	}
 
-	if !player.JustDrew {
+	if len(g.Bag) > 0 && !player.JustDrew {
 		return ErrMustDrawTile
 	}
+
 	round := g.CurrentRound()
+
+	if !player.JustDrew && len(g.Bag) == 0 {
+		round.BaglessPasses++
+	} else {
+		round.BaglessPasses = 0
+	}
+
 	if round != nil {
 		round.Spacer = nil
 	}
@@ -297,6 +305,7 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	if r == nil {
 		return ErrRoundNotStarted
 	}
+
 	if round.BaglessPasses != 0 {
 		r.Note(fmt.Sprintf("%s passed on an empty bag", name))
 	} else {
@@ -369,13 +378,9 @@ func (g *Game) DrawTile(name string) bool {
 		return false
 	}
 
-	round := g.CurrentRound()
 	if len(g.Bag) > 0 {
 		player.Hand = append(player.Hand, g.Bag[0])
 		g.Bag = g.Bag[1:]
-		round.BaglessPasses = 0
-	} else {
-		round.BaglessPasses++
 	}
 
 	player.JustDrew = true
@@ -458,7 +463,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		}
 		return err
 	}
-	round.BaglessPasses = 0
+
 	round.Spacer = nil
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
 		g.Turn = (g.Turn + 1) % len(g.Players)
