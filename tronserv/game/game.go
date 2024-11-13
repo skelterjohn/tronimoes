@@ -1115,19 +1115,6 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		}
 		// can we start a free line
 		if isHigher {
-			canBeFree := false
-			if lt.X == r.Spacer.X2-1 && lt.Y == r.Spacer.Y2 {
-				canBeFree = true
-			}
-			if lt.X == r.Spacer.X2+1 && lt.Y == r.Spacer.Y2 {
-				canBeFree = true
-			}
-			if lt.X == r.Spacer.X2 && lt.Y == r.Spacer.Y2-1 {
-				canBeFree = true
-			}
-			if lt.X == r.Spacer.X2 && lt.Y == r.Spacer.Y2+1 {
-				canBeFree = true
-			}
 
 			inSpacer := func(x, y int) bool {
 				if x >= r.Spacer.X1 && x <= r.Spacer.X2 && y >= r.Spacer.Y1 && y <= r.Spacer.Y2 {
@@ -1135,6 +1122,22 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				}
 				return false
 			}
+			adjSpacer := func(x, y int) bool {
+				if x == r.Spacer.X2-1 && y == r.Spacer.Y2 {
+					return true
+				}
+				if x == r.Spacer.X2+1 && y == r.Spacer.Y2 {
+					return true
+				}
+				if x == r.Spacer.X2 && y == r.Spacer.Y2-1 {
+					return true
+				}
+				if x == r.Spacer.X2 && y == r.Spacer.Y2+1 {
+					return true
+				}
+				return false
+			}
+			canBeFree := adjSpacer(lt.CoordAX(), lt.CoordAY()) || adjSpacer(lt.CoordBX(), lt.CoordBY())
 			if inSpacer(lt.CoordAX(), lt.CoordAY()) || inSpacer(lt.CoordBX(), lt.CoordBY()) {
 				canBeFree = false
 			}
