@@ -353,6 +353,20 @@ func (g *Game) DrawTile(name string) bool {
 	if len(g.Bag) > 0 {
 		player.Hand = append(player.Hand, g.Bag[0])
 		g.Bag = g.Bag[1:]
+	} else {
+		round := g.CurrentRound()
+		// no tiles in the bag, and the last tile laid was by this player
+		if round.LaidTiles[len(round.LaidTiles)-1].PlayerName == name {
+			g.Note("stalemate")
+			round.Done = true
+			for _, lt := range round.LaidTiles {
+				lt.Dead = true
+			}
+			for _, op := range g.Players {
+				op.Dead = true
+				op.ChickenFoot = false
+			}
+		}
 	}
 
 	player.JustDrew = true
@@ -470,6 +484,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 					continue
 				}
 				op.Dead = true
+				op.ChickenFoot = false
 			}
 		}
 	}
