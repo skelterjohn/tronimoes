@@ -295,7 +295,11 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	if r == nil {
 		return ErrRoundNotStarted
 	}
-	r.Note(fmt.Sprintf("%s passed", name))
+	if round.BaglessPasses != 0 {
+		r.Note(fmt.Sprintf("%s passed on an empty bag", name))
+	} else {
+		r.Note(fmt.Sprintf("%s passed", name))
+	}
 
 	if !player.ChickenFoot && !player.Dead {
 		player.ChickenFoot = true
@@ -320,6 +324,19 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 			player.ChickenFootY = chickenFootY
 		}
 	}
+
+	if round.BaglessPasses >= len(g.Players) {
+		g.Note("stalemate")
+		round.Done = true
+		for _, lt := range round.LaidTiles {
+			lt.Dead = true
+		}
+		for _, op := range g.Players {
+			op.Dead = true
+			op.ChickenFoot = false
+		}
+	}
+
 	return nil
 }
 
@@ -350,23 +367,13 @@ func (g *Game) DrawTile(name string) bool {
 		return false
 	}
 
+	round := g.CurrentRound()
 	if len(g.Bag) > 0 {
 		player.Hand = append(player.Hand, g.Bag[0])
 		g.Bag = g.Bag[1:]
+		round.BaglessPasses = 0
 	} else {
-		round := g.CurrentRound()
-		// no tiles in the bag, and the last tile laid was by this player
-		if round.LaidTiles[len(round.LaidTiles)-1].PlayerName == name {
-			g.Note("stalemate")
-			round.Done = true
-			for _, lt := range round.LaidTiles {
-				lt.Dead = true
-			}
-			for _, op := range g.Players {
-				op.Dead = true
-				op.ChickenFoot = false
-			}
-		}
+		round.BaglessPasses++
 	}
 
 	player.JustDrew = true
@@ -449,6 +456,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		}
 		return err
 	}
+	round.BaglessPasses = 0
 	round.Spacer = nil
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
 		g.Turn = (g.Turn + 1) % len(g.Players)
@@ -618,13 +626,14 @@ func (lt *LaidTile) String() string {
 }
 
 type Round struct {
-	Turn        int                    `json:"turn"`
-	LaidTiles   []*LaidTile            `json:"laid_tiles"`
-	Spacer      *Spacer                `json:"spacer"`
-	Done        bool                   `json:"done"`
-	History     []string               `json:"history"`
-	PlayerLines map[string][]*LaidTile `json:"player_lines"`
-	FreeLines   [][]*LaidTile          `json:"free_lines"`
+	Turn          int                    `json:"turn"`
+	LaidTiles     []*LaidTile            `json:"laid_tiles"`
+	Spacer        *Spacer                `json:"spacer"`
+	Done          bool                   `json:"done"`
+	History       []string               `json:"history"`
+	PlayerLines   map[string][]*LaidTile `json:"player_lines"`
+	FreeLines     [][]*LaidTile          `json:"free_lines"`
+	BaglessPasses int                    `json:"bagless_passes"`
 }
 
 func (r *Round) Note(n string) {
