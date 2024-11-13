@@ -27,4 +27,6 @@ var (
 	ErrMustDrawTile             = errors.New("must draw tile")
 	ErrNoSuchPlayer             = errors.New("no such player... who are you")
 	ErrNoBlockingFeet           = errors.New("no blocking chicken-feet on the round leader")
+	ErrSpacerNotStraight        = errors.New("spacer not straight")
+	ErrWrongLengthSpacer        = errors.New("spacer must span 6 squares")
 )

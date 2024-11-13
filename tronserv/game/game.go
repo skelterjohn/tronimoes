@@ -899,6 +899,18 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 		return ErrRoundAlreadyDone
 	}
 
+	if spacer.X1 != spacer.X2 && spacer.Y1 != spacer.Y2 {
+		return ErrSpacerNotStraight
+	}
+	switch 5 {
+	case spacer.X1 - spacer.X2:
+	case spacer.X2 - spacer.X1:
+	case spacer.Y1 - spacer.Y2:
+	case spacer.Y2 - spacer.Y1:
+	default:
+		return ErrWrongLengthSpacer
+	}
+
 	if !g.sixPathFrom(r.MapTiles(), spacer.X1, spacer.Y1, spacer.X2, spacer.Y2) {
 		return ErrTileOccluded
 	}
