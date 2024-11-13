@@ -149,10 +149,10 @@ func (g *Game) Start() error {
 		PlayerLines: playerLines,
 	})
 
-	// Fill the bag with tiles.z
+	// Fill the bag with tiles
 	g.Bag = nil
-	for a := 0; a < g.MaxPips; a++ {
-		for b := a; b < g.MaxPips; b++ {
+	for a := 0; a <= g.MaxPips; a++ {
+		for b := a; b <= g.MaxPips; b++ {
 			g.Bag = append(g.Bag, &Tile{
 				PipsA: a,
 				PipsB: b,
@@ -479,7 +479,11 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	for _, p := range livingPlayers {
 		if len(p.Hand) == 0 {
 			round.Done = true
-			g.Note(fmt.Sprintf("%s wins the round through efficiency", p.Name))
+			if len(g.Players) == 1 {
+				g.Note("you win I guess")
+			} else {
+				g.Note(fmt.Sprintf("%s wins the round through efficiency", p.Name))
+			}
 			p.Score += 2
 			for _, lt := range round.LaidTiles {
 				if lt.PlayerName == p.Name {
@@ -503,7 +507,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 			livingPlayers[0].Score += 2
 		} else if len(livingPlayers) == 0 {
 			round.Done = true
-			g.Note("you win I guess")
+			g.Note("congrats, you played yourself")
 		}
 	}
 
