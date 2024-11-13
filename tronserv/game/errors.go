@@ -29,4 +29,6 @@ var (
 	ErrNoBlockingFeet           = errors.New("no blocking chicken-feet on the round leader")
 	ErrSpacerNotStraight        = errors.New("spacer not straight")
 	ErrWrongLengthSpacer        = errors.New("spacer must span 6 squares")
+	ErrSpacerNotStartedOnLine   = errors.New("spacer not started on a line")
+	ErrSpacerNoChickenFoot      = errors.New("cannot lay spacer while chicken-footed")
 )

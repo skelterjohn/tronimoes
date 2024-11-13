@@ -375,6 +375,14 @@ func (g *Game) LaySpacer(name string, spacer *Spacer) error {
 		return ErrPlayerNotFound
 	}
 
+	if player.ChickenFoot {
+		return ErrSpacerNoChickenFoot
+	}
+
+	if g.Players[g.Turn].Name != name {
+		return ErrNotYourTurn
+	}
+
 	round := g.CurrentRound()
 	if round == nil {
 		return ErrRoundNotStarted
@@ -412,6 +420,10 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	round := g.CurrentRound()
 	if round == nil {
 		return ErrRoundNotStarted
+	}
+
+	if g.Players[g.Turn].Name != name {
+		return ErrNotYourTurn
 	}
 
 	firstTile := len(round.LaidTiles) == 0
@@ -913,6 +925,50 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 
 	if !g.sixPathFrom(r.MapTiles(), spacer.X1, spacer.Y1, spacer.X2, spacer.Y2) {
 		return ErrTileOccluded
+	}
+
+	// verify that x1,y1 is adjacent to a line head.
+	checkLineHead := func(lt *LaidTile) bool {
+		adj := func(x, y int) bool {
+			if x == spacer.X1 {
+				if y == spacer.Y1-1 || y == spacer.Y1+1 {
+					return true
+				}
+			}
+			if y == spacer.Y1 {
+				if x == spacer.X1-1 || x == spacer.X1+1 {
+					return true
+				}
+			}
+			return false
+		}
+		if lt.NextPips == lt.Tile.PipsA {
+			if adj(lt.CoordAX(), lt.CoordAY()) {
+				return true
+			}
+		}
+		if lt.NextPips == lt.Tile.PipsB {
+			if adj(lt.CoordBX(), lt.CoordBY()) {
+				return true
+			}
+		}
+		return false
+	}
+	isOnLineHead := false
+	for _, line := range r.PlayerLines {
+		if checkLineHead(line[len(line)-1]) {
+			isOnLineHead = true
+			break
+		}
+	}
+	for _, line := range r.FreeLines {
+		if checkLineHead(line[len(line)-1]) {
+			isOnLineHead = true
+			break
+		}
+	}
+	if !isOnLineHead {
+		return ErrSpacerNotStartedOnLine
 	}
 
 	r.Spacer = spacer
