@@ -17,7 +17,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints }) {
+export default function Board({ width = 10, height = 11, tiles, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
@@ -55,6 +55,11 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 			return;
 		}
 
+		if (selectedTile.a == -1 && selectedTile.b == -1) {
+			clickForSpacer(x, y);
+			return;
+		}
+
 		var orientation = undefined;
 		if (x === playA.x + 1 && y === playA.y) {
 			orientation = "right";
@@ -89,6 +94,18 @@ export default function Board({ width = 10, height = 11, tiles, lineHeads, selec
 		}
 		setSpacerHintPrefix(prefix);
 	}, [spacerHints, selectedTile, hints]);
+
+	function clickForSpacer(x, y) {
+		if (!(`${x},${y}` in spacerHintPrefix)) {
+			setPlayA(undefined);
+			return;
+		}
+		playSpacer({
+			x1: playA.x, y1: playA.y,
+			x2: x, y2: y,
+		});
+		setPlayA(undefined);
+	}
 
 	return (
 		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>

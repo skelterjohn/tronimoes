@@ -22,6 +22,10 @@ class Client {
         return this.post(`/game/${code}/tile`, tile);
     }
 
+    async LaySpacer(code, spacer) {
+        return this.post(`/game/${code}/spacer`, spacer);
+    }
+
     async DrawTile(code) {
         return this.post(`/game/${code}/draw`, {});
     }

@@ -293,6 +293,17 @@ function Game({ code }) {
 			setPlayErrorMessage(error.data.error);
 		});
 	}
+	function playSpacer(spacer) {
+		client.LaySpacer(code, spacer).then((resp) => {
+			setSelectedTile(undefined);
+			setIndicated(undefined);
+			setHints({});
+			console.log("laid spacer", resp);
+		}).catch((error) => {
+			console.error("error", error);
+			setPlayErrorMessage(error.data.error);
+		});
+	}
 
 	function drawTile() {
 		setSelectedTile(undefined);
@@ -394,6 +405,7 @@ function Game({ code }) {
 						lineHeads={lineHeads}
 						selectedTile={selectedTile}
 						playTile={playTile}
+						playSpacer={playSpacer}
 						chickenFeet={chickenFeet}
 						indicated={indicated}
 						setIndicated={setIndicated}

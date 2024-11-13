@@ -22,6 +22,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Put("/game/{code}", gs.HandlePutGame)
 	r.Post("/game/{code}/start", gs.HandleStartRound)
 	r.Post("/game/{code}/tile", gs.HandleLayTile)
+	r.Post("/game/{code}/spacer", gs.HandleLaySpacer)
 	r.Post("/game/{code}/draw", gs.HandleDrawTile)
 	r.Post("/game/{code}/pass", gs.HandlePass)
 	r.Post("/game/{code}/leave", gs.HandleLeaveOrQuit)
@@ -295,6 +296,69 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	if err := g.LayTile(name, lt); err != nil {
 		log.Printf("Error laying tile for %q / %q: %v", name, code, err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	s.encodeFilteredGame(w, name, g)
+}
+
+func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		log.Printf("Error getting name: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	g, err := s.store.ReadGame(ctx, code)
+	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
+		if err == ErrNoSuchGame {
+			writeErr(w, err, http.StatusNotFound)
+			return
+		}
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	player := g.Players[g.Turn]
+	if player.Name != name {
+		log.Printf("Player %q is not in turn for game %q", name, code)
+		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
+		return
+	}
+
+	if len(g.Rounds) == 0 {
+		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
+		return
+	}
+	round := g.Rounds[len(g.Rounds)-1]
+	if round.Done {
+		log.Printf("Player %q tried to play game %q but the round is done", name, code)
+		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
+		return
+	}
+
+	sp := &Spacer{}
+	if err := json.NewDecoder(r.Body).Decode(sp); err != nil {
+		log.Printf("Error decoding spacerfor %q / %q: %v", name, code, err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := g.LaySpacer(name, sp); err != nil {
+		log.Printf("Error laying spacer for %q / %q: %v", name, code, err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}

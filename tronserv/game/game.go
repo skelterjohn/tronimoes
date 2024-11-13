@@ -285,6 +285,10 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	if !player.JustDrew {
 		return ErrMustDrawTile
 	}
+	round := g.CurrentRound()
+	if round != nil {
+		round.Spacer = nil
+	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 	player.JustDrew = false
 	r := g.CurrentRound()
@@ -365,6 +369,26 @@ func (g *Game) GetPlayer(name string) *Player {
 	return nil
 }
 
+func (g *Game) LaySpacer(name string, spacer *Spacer) error {
+	player := g.GetPlayer(name)
+	if player == nil {
+		return ErrPlayerNotFound
+	}
+
+	round := g.CurrentRound()
+	if round == nil {
+		return ErrRoundNotStarted
+	}
+
+	round.Spacer = nil
+
+	if err := round.LaySpacer(g, name, spacer); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (g *Game) LayTile(name string, tile *LaidTile) error {
 	player := g.GetPlayer(tile.PlayerName)
 	if player == nil {
@@ -394,6 +418,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	if err := round.LayTile(g, name, tile, false); err != nil {
 		return err
 	}
+	round.Spacer = nil
 	if firstTile || tile.Tile.PipsA != tile.Tile.PipsB {
 		g.Turn = (g.Turn + 1) % len(g.Players)
 	}
@@ -473,6 +498,13 @@ func (t *Tile) String() string {
 	return fmt.Sprintf("%d:%d", t.PipsA, t.PipsB)
 }
 
+type Spacer struct {
+	X1 int `json:"x1"`
+	Y1 int `json:"y1"`
+	X2 int `json:"x2"`
+	Y2 int `json:"y2"`
+}
+
 type LaidTile struct {
 	Tile        *Tile  `json:"tile"`
 	X           int    `json:"x"`
@@ -544,6 +576,7 @@ func (lt *LaidTile) String() string {
 type Round struct {
 	Turn        int                    `json:"turn"`
 	LaidTiles   []*LaidTile            `json:"laid_tiles"`
+	Spacer      *Spacer                `json:"spacer"`
 	Done        bool                   `json:"done"`
 	History     []string               `json:"history"`
 	PlayerLines map[string][]*LaidTile `json:"player_lines"`
@@ -859,6 +892,19 @@ func (g *Game) sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int)
 	default:
 		return false
 	}
+}
+
+func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
+	if r.Done {
+		return ErrRoundAlreadyDone
+	}
+
+	if !g.sixPathFrom(r.MapTiles(), spacer.X1, spacer.Y1, spacer.X2, spacer.Y2) {
+		return ErrTileOccluded
+	}
+
+	r.Spacer = spacer
+	return nil
 }
 
 func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
