@@ -197,6 +197,8 @@ func (g *Game) Start() error {
 			PipsA: 13, PipsB: 15,
 		}, {
 			PipsA: 0, PipsB: 0,
+		}, {
+			PipsA: 2, PipsB: 3,
 		}}
 		for i := 2; i <= g.MaxPips; i++ {
 			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
@@ -507,7 +509,11 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 			livingPlayers[0].Score += 2
 		} else if len(livingPlayers) == 0 {
 			round.Done = true
-			g.Note("congrats, you played yourself")
+			if len(g.Players) == 1 {
+				g.Note("congrats, you played yourself")
+			} else {
+				g.Note(fmt.Sprintf("%s took their ball home", name))
+			}
 		}
 	}
 
