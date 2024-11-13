@@ -1152,7 +1152,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		newFreeLines := [][]*LaidTile{}
 		for _, line := range r.FreeLines {
 			if isCutOff(line) {
-				g.Note(fmt.Sprintf("%s cut-off a free line", lt.PlayerName))
+				g.Note(fmt.Sprintf("%s cut-off a free line", name))
 				continue
 			}
 			newFreeLines = append(newFreeLines, line)
