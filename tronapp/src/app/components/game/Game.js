@@ -104,6 +104,8 @@ function Game({ code }) {
 		}
 	}, [playerName]);
 
+	const [bagCount, setBagCount] = useState(0);
+
 	useEffect(() => {
 		console.log('game', game);
 
@@ -157,6 +159,7 @@ function Game({ code }) {
 		setLaidTiles(allLaidTiles);
 		setBoardWidth(game.board_width);
 		setBoardHeight(game.board_height);
+		setBagCount(game.bag?.length || 0);
 	}, [game]);
 
 
@@ -454,6 +457,7 @@ function Game({ code }) {
 							roundInProgress={roundInProgress}
 							hintedTiles={hintedTiles}
 							hintedSpacer={player.spacer_hints}
+							bagCount={bagCount}
 						/>
 					</div>
 				</div>

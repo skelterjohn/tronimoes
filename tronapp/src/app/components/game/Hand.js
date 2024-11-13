@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Tile from '../board/Tile';
 import { Button } from "antd";
 
-function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer }) {
+function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount }) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
@@ -224,26 +224,33 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 								FREE LINE SPACER
 							</div>
 							
-				{!hidden && <div className="flex flex-row gap-1 ml-4 mt-2">
-					<Button
-						type="primary"
-						size="large"
-						className="w-14"
-						disabled={!roundInProgress || !playerTurn || player?.just_drew}
-						onClick={drawTile}
-					>
-						Draw
-					</Button>
-					<Button
-						type="primary"
-						size="large"
-						className="w-14"
-						disabled={!roundInProgress || !playerTurn || !player?.just_drew}
-						onClick={passTurn}
-					>
-						Pass
-					</Button>
-				</div>}
+				{!hidden && (
+					<div>
+						<div className="text-center">
+							{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
+						</div>
+						<div className="flex flex-row gap-1 ml-4 mt-2">
+							<Button
+								type="primary"
+								size="large"
+								className="w-14"
+								disabled={!roundInProgress || !playerTurn || player?.just_drew}
+								onClick={drawTile}
+							>
+								Draw
+							</Button>
+							<Button
+								type="primary"
+								size="large"
+								className="w-14"
+								disabled={!roundInProgress || !playerTurn || !player?.just_drew}
+								onClick={passTurn}
+							>
+								Pass
+							</Button>
+						</div>
+					</div>
+				)}
 						</div>
 					)}
 					<div className="flex flex-wrap content-start">
