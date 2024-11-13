@@ -459,6 +459,18 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 			round.Done = true
 			g.Note(fmt.Sprintf("%s wins the round through efficiency", p.Name))
 			p.Score += 2
+			for _, lt := range round.LaidTiles {
+				if lt.PlayerName == p.Name {
+					continue
+				}
+				lt.Dead = true
+			}
+			for _, op := range g.Players {
+				if op.Name == p.Name {
+					continue
+				}
+				op.Dead = true
+			}
 		}
 	}
 	if !round.Done {
