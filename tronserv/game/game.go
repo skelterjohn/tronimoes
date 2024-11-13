@@ -634,10 +634,10 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			continue
 		}
 
-		log.Printf("potential free liner: %s", t)
+		// log.Printf("potential free liner: %s", t)
 		// potential free liner
 		tryFromCoord := func(x1, y1 int) {
-			log.Printf(" trying from %d,%d", x1, y1)
+			// log.Printf(" trying from %d,%d", x1, y1)
 			if x1 < 0 || x1 >= g.BoardWidth {
 				return
 			}
@@ -648,7 +648,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				return
 			}
 			tryToCoord := func(x2, y2 int) {
-				log.Printf(" trying to %d,%d", x2, y2)
+				// log.Printf(" trying to %d,%d", x2, y2)
 				if x2 < 0 || x2 >= g.BoardWidth {
 					return
 				}
@@ -1155,7 +1155,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		newFreeLines := [][]*LaidTile{}
 		for _, line := range r.FreeLines {
 			if isCutOff(line) {
-				g.Note(fmt.Sprintf("%s cut-off a free line", name))
+				g.Note(fmt.Sprintf("what kind of reprobate cuts off a free line? (%s)", name))
 				continue
 			}
 			newFreeLines = append(newFreeLines, line)
