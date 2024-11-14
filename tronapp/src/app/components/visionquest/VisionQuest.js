@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 const TENOR_API_KEY = 'AIzaSyBPpZRb23wy2zTKQ2j5eJHS8YVPtjIvcGQ';
 const TENOR_CLIENT_KEY = 'tronimoes'; // Replace with your app name
 
-function VisionQuest({ isOpen, onClose, setChickenFootID }) {
+function VisionQuest({ isOpen, onClose, setChickenFootURL }) {
 	const [path, setPath] = useState("");
 	const [gifs, setGifs] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -25,13 +25,12 @@ function VisionQuest({ isOpen, onClose, setChickenFootID }) {
 		setLoading(true);
 		try {
 			const response = await fetch(
-				`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(searchTerm)}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=9`
+				`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(searchTerm)}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=9&searchfilter=sticker`
 			);
 			const data = await response.json();
-			console.log("data", data);
 			setGifs(data.results);
 		} catch (error) {
-			console.error('Error fetching GIFs:', error);
+			console.error('Error fetching stickers:', error);
 		} finally {
 			setLoading(false);
 		}
@@ -40,6 +39,7 @@ function VisionQuest({ isOpen, onClose, setChickenFootID }) {
 	return (
 		<Modal
 			title="Vision Quest"
+			
 			open={isOpen}
 			onCancel={onClose}
 			footer={null}
@@ -61,17 +61,17 @@ function VisionQuest({ isOpen, onClose, setChickenFootID }) {
 			)}
 
 			<div className="grid grid-cols-3 gap-4">
-				{gifs && gifs.map((gif) => (
+				{gifs.map((gif) => (
 					<div 
 						key={gif.id} 
-						className="cursor-pointer hover:opacity-80 transition-opacity"
+						className="cursor-pointer hover:opacity-80 transition-opacity border-2 border "
 						onClick={() => {
-							setChickenFootID(gif.id);
+							setChickenFootURL(gif.media_formats.tinygif_transparent.url);
 							onClose();
 						}}
 					>
 						<img 
-							src={gif.media_formats.gif.url} 
+							src={gif.media_formats.tinygif_transparent.url}
 							alt={gif.content_description}
 							className="w-full h-auto rounded"
 						/>

@@ -335,11 +335,11 @@ function Game({ code }) {
 	}
 
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
-	const [chickenFootID, setChickenFootID] = useState(undefined);
+	const [chickenFootURL, setChickenFootURL] = useState(undefined);
 
 	function passTurn() {
 		setSelectedTile(undefined);
-		if (chickenFootID === undefined) {
+		if (chickenFootURL === undefined) {
 			setShowVisionQuestModal(true);
 		}
 		
@@ -473,7 +473,7 @@ function Game({ code }) {
 				<VisionQuest
 					onClose={() => setShowVisionQuestModal(false)}
 					isOpen={showVisionQuestModal}
-					setChickenFootID={setChickenFootID}
+					setChickenFootURL={setChickenFootURL}
 				/>
 			)}
 		</div>
