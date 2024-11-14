@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import Tile from '../board/Tile';
+import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 
-function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount }) {
+function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount }) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
@@ -208,10 +209,32 @@ function Hand({ player, hidden = false, dead = false, selectedTile, setSelectedT
 		};
 	}, [touchStartPos]); // Re-run when touchStartPos changes
 
+	const [killedPlayers, setKilledPlayers] = useState([]);
+	useEffect(() => {
+		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
+	}, [player, players]);
+	useEffect(() => {
+		console.log(killedPlayers);
+	}, [killedPlayers]);
+
 	return (
 		<div className="h-full flex flex-col items-center p-2">
 			<div className="text-center font-bold">
+				{killedPlayers?.map(kp => (
+					<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
+						<div className="absolute inset-0">
+							<ChickenFoot url={kp.chickenFootURL} color={kp.color} />
+						</div>
+					</div>
+				))}
 				{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
+				{!player?.chickenFoot && !player?.dead &&
+					<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
+						<div className="absolute inset-0">
+							<ChickenFoot url={player.chickenFootURL} color={player.color} />
+						</div>
+					</div>
+				}
 			</div>
 			<div className="flex flex-col items-center h-full">
 				<div className="overflow-y-auto max-h-[calc(100%-14rem)]">

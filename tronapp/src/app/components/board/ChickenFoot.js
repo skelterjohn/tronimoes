@@ -18,9 +18,9 @@ export default function ChickenFoot({ url, color }) {
         <div className="w-full h-full flex items-center justify-center">
             <div className={`w-3/4 h-3/4 rounded-full ${colorMap[color]} opacity-50 relative`}>
             </div>
-            <div className="w-3/4 h-3/4 absolute ">
-                <img src={url} alt="Chicken Foot" className="w-full h-full" />
-            </div>
+            {url && <div className="w-3/4 h-3/4 absolute">
+                <img src={url} alt="Chicken Foot" className="w-full h-full object-contain" />
+            </div>}
         </div>
     )
 }

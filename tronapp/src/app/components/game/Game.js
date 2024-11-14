@@ -135,6 +135,7 @@ function Game({ code }) {
 				chickenFootY: p.chicken_foot_y,
 				chickenFootURL: p.chicken_foot_url || undefined,
 				just_drew: p.just_drew,
+				kills: p.kills,
 			}
 		}));
 
@@ -426,6 +427,7 @@ function Game({ code }) {
 					<div key={i} className="flex-1 overflow-x-auto">
 						<Hand
 							player={o}
+							players={players}
 							name={o.name}
 							score={o.score}
 							color={o.color}
@@ -472,6 +474,7 @@ function Game({ code }) {
 					<div className="overflow-x-auto w-full">
 						<Hand
 							player={player}
+							players={players}
 							name={playerName}
 							hidden={false}
 							selectedTile={selectedTile}

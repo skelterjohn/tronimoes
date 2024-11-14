@@ -171,6 +171,7 @@ func (g *Game) Start() error {
 		p.ChickenFoot = false
 		p.JustDrew = false
 		p.Hand = nil
+		p.Kills = nil
 	}
 
 	g.Rounds = append(g.Rounds, &Round{
@@ -577,6 +578,7 @@ type Player struct {
 	ChickenFootX   int        `json:"chicken_foot_x"`
 	ChickenFootY   int        `json:"chicken_foot_y"`
 	ChickenFootURL string     `json:"chicken_foot_url"`
+	Kills          []string   `json:"kills"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {
@@ -1356,6 +1358,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
 			}
 			player.Score += 1
+			player.Kills = append(player.Kills, p.Name)
 			p.Score -= 1
 			p.Dead = true
 			p.ChickenFoot = false
@@ -1465,6 +1468,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				}
 				op.Score -= 1
 				player.Score += 1
+				player.Kills = append(player.Kills, op.Name)
 			}
 		}
 	}
