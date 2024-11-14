@@ -1131,7 +1131,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			}
 		}
 	}
-	if r.Spacer == nil && (!player.Dead || !player.ChickenFoot) {
+
+	canPlayOtherLines := r.Spacer == nil && (player.Dead || !player.ChickenFoot)
+
+	if canPlayOtherLines {
 		for oname, line := range r.PlayerLines {
 			if playedALine {
 				continue
@@ -1194,7 +1197,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 	playedAtLeastOne := len(r.PlayerLines[player.Name]) > 1
 	isDouble := lt.Tile.PipsA == lt.Tile.PipsB
-	if r.Spacer != nil && (player.Dead || !player.ChickenFoot) && isDouble && playedAtLeastOne {
+	if canPlayOtherLines && isDouble && playedAtLeastOne {
 		isHigher := true
 		if lt.Tile.PipsA < r.PlayerLines[g.Players[0].Name][0].Tile.PipsA {
 			isHigher = false
@@ -1366,7 +1369,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	// look for il ouroboros
-	if !dryRun && !player.ChickenFoot {
+	if !dryRun && canPlayOtherLines {
 		consumed := []string{}
 
 		canConsume := func(head *LaidTile) bool {
