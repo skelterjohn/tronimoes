@@ -19,3 +19,16 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.vision-quest-modal {
+    /* Optional custom styling */
+    .ant-modal-content {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+    }
+}
+
+/* If you want to add a backdrop blur effect when modal is open */
+.ant-modal-wrap {
+    backdrop-filter: blur(4px);
+}

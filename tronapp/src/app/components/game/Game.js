@@ -8,6 +8,7 @@ import Hand from './Hand';
 import History from './History';
 import { Button, Modal } from 'antd';
 import WhyNot from './WhyNot';
+import VisionQuest from '../visionquest/VisionQuest';
 
 const availableColors = [
 	"red",
@@ -333,9 +334,15 @@ function Game({ code }) {
 		});
 	}
 
+	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
+	const [chickenFootID, setChickenFootID] = useState(undefined);
 
 	function passTurn() {
 		setSelectedTile(undefined);
+		if (chickenFootID === undefined) {
+			setShowVisionQuestModal(true);
+		}
+		
 		client.Pass(code, {
 			selected_x: playA !== undefined ? playA.x : -1,
 			selected_y: playA !== undefined ? playA.y : -1,
@@ -462,6 +469,13 @@ function Game({ code }) {
 					</div>
 				</div>
 			}
+			{showVisionQuestModal && (
+				<VisionQuest
+					onClose={() => setShowVisionQuestModal(false)}
+					isOpen={showVisionQuestModal}
+					setChickenFootID={setChickenFootID}
+				/>
+			)}
 		</div>
 	);
 }
