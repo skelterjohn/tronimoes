@@ -77,7 +77,7 @@ func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name strin
 
 func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error) {
 	c := s.games(ctx)
-	iter := c.Where("code_prefix", "==", code).Where("open", "==", true).Documents(ctx)
+	iter := c.Where("code_prefix", "==", code).Where("open", "==", true).Where("done", "==", false).Documents(ctx)
 	docs, err := iter.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("could not query: %v", err)
