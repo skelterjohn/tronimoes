@@ -1195,9 +1195,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		}
 	}
 
+	canStartFreeLine := r.Spacer != nil && (player.Dead || !player.ChickenFoot)
 	playedAtLeastOne := len(r.PlayerLines[player.Name]) > 1
 	isDouble := lt.Tile.PipsA == lt.Tile.PipsB
-	if canPlayOtherLines && isDouble && playedAtLeastOne {
+	if canStartFreeLine && isDouble && playedAtLeastOne {
 		isHigher := true
 		if lt.Tile.PipsA < r.PlayerLines[g.Players[0].Name][0].Tile.PipsA {
 			isHigher = false
