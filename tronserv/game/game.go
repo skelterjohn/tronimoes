@@ -562,16 +562,17 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 }
 
 type Player struct {
-	Name         string     `json:"name"`
-	Score        int        `json:"score"`
-	Hand         []*Tile    `json:"hand"`
-	Hints        [][]string `json:"hints"`
-	SpacerHints  []string   `json:"spacer_hints"`
-	ChickenFoot  bool       `json:"chicken_foot"`
-	Dead         bool       `json:"dead"`
-	JustDrew     bool       `json:"just_drew"`
-	ChickenFootX int        `json:"chicken_foot_x"`
-	ChickenFootY int        `json:"chicken_foot_y"`
+	Name           string     `json:"name"`
+	Score          int        `json:"score"`
+	Hand           []*Tile    `json:"hand"`
+	Hints          [][]string `json:"hints"`
+	SpacerHints    []string   `json:"spacer_hints"`
+	ChickenFoot    bool       `json:"chicken_foot"`
+	Dead           bool       `json:"dead"`
+	JustDrew       bool       `json:"just_drew"`
+	ChickenFootX   int        `json:"chicken_foot_x"`
+	ChickenFootY   int        `json:"chicken_foot_y"`
+	ChickenFootURL string     `json:"chicken_foot_url"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {

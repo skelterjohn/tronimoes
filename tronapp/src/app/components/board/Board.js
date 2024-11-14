@@ -18,7 +18,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints, clearSpacer }) {
+export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, chickenFeetURLs, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints, clearSpacer }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
@@ -160,6 +160,7 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 												{chickenFeet[`${x},${y}`] && (
 													<div className="w-full h-full z-30 absolute pointer-events-none">
 														<ChickenFoot
+															url={chickenFeetURLs[`${x},${y}`]}
 															color={chickenFeet[`${x},${y}`]} />
 													</div>
 												)}

@@ -31,4 +31,5 @@ var (
 	ErrWrongLengthSpacer        = errors.New("spacer must span 6 squares")
 	ErrSpacerNotStartedOnLine   = errors.New("spacer not started on a line")
 	ErrSpacerNoChickenFoot      = errors.New("cannot lay spacer while chicken-footed")
+	ErrNoURL                    = errors.New("no url provided")
 )

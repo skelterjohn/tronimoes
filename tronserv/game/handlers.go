@@ -26,6 +26,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/game/{code}/draw", gs.HandleDrawTile)
 	r.Post("/game/{code}/pass", gs.HandlePass)
 	r.Post("/game/{code}/leave", gs.HandleLeaveOrQuit)
+	r.Post("/game/{code}/foot", gs.HandleChickenFoot)
 }
 func RandomString(n int) string {
 	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -555,5 +556,56 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	g.CheckForDupes("start-write")
+	s.encodeFilteredGame(w, name, g)
+}
+
+func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	code := chi.URLParam(r, "code")
+	name, err := s.getName(r)
+	if err != nil {
+		log.Printf("Error getting name: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	g, err := s.store.ReadGame(ctx, code)
+	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	g.CheckForDupes("foot-read")
+
+	reqBody := map[string]string{}
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		log.Printf("Error decoding chickenfoot for %q / %q: %v", name, code, err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	url, ok := reqBody["url"]
+	if !ok {
+		log.Printf("No url provided for %q / %q", name, code)
+		writeErr(w, ErrNoURL, http.StatusBadRequest)
+		return
+	}
+
+	player := g.GetPlayer(name)
+	if player == nil {
+		log.Printf("Player %q not found in game %q", name, code)
+		writeErr(w, ErrPlayerNotFound, http.StatusNotFound)
+		return
+	}
+
+	player.ChickenFootURL = url
+
+	if err := s.store.WriteGame(r.Context(), g); err != nil {
+		log.Printf("Error writing game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	g.CheckForDupes("foot-write")
 	s.encodeFilteredGame(w, name, g)
 }

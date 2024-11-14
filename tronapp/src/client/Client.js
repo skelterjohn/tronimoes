@@ -30,6 +30,10 @@ class Client {
         return this.post(`/game/${code}/draw`, {});
     }
 
+    async SetChickenFoot(code, url) {
+        return this.post(`/game/${code}/foot`, { url: url });
+    }
+
     async Pass(code, selected) {
         return this.post(`/game/${code}/pass`, selected);
     }

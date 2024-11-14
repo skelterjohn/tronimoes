@@ -133,6 +133,7 @@ function Game({ code }) {
 				chickenFoot: p.chicken_foot,
 				chickenFootX: p.chicken_foot_x,
 				chickenFootY: p.chicken_foot_y,
+				chickenFootURL: p.chicken_foot_url || undefined,
 				just_drew: p.just_drew,
 			}
 		}));
@@ -205,15 +206,20 @@ function Game({ code }) {
 	}, [game]);
 
 	const [chickenFeet, setChickenFeet] = useState({});
+	const [chickenFeetURLs, setChickenFeetURLs] = useState({});
 	useEffect(() => {
 		let allFeet = {};
+		let allURLs = {};
 		players.forEach((p) => {
 			if (!p.chickenFoot) {
 				return;
 			}
 			allFeet[`${p.chickenFootX},${p.chickenFootY}`] = p.color;
+			allURLs[`${p.chickenFootX},${p.chickenFootY}`] = p.chickenFootURL;
+			console.log(p.chickenFootURL);
 		});
 		setChickenFeet(allFeet);
+		setChickenFeetURLs(allURLs);
 	}, [players]);
 
 	const [indicated, setIndicated] = useState(undefined);
@@ -337,6 +343,17 @@ function Game({ code }) {
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFootURL, setChickenFootURL] = useState(undefined);
 
+	useEffect(() => {
+		setChickenFootURL(player?.chickenFootURL);
+	}, [player]);
+
+	useEffect(() => {
+		if (chickenFootURL === undefined) {
+			return;
+		}
+		client.SetChickenFoot(code, chickenFootURL);
+	}, [chickenFootURL]);
+
 	function passTurn() {
 		setSelectedTile(undefined);
 		if (chickenFootURL === undefined) {
@@ -434,6 +451,7 @@ function Game({ code }) {
 						playSpacer={playSpacer}
 						clearSpacer={clearSpacer}
 						chickenFeet={chickenFeet}
+						chickenFeetURLs={chickenFeetURLs}
 						indicated={indicated}
 						setIndicated={setIndicated}
 						playerTurn={myTurn}
