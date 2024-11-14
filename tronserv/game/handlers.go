@@ -141,6 +141,8 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	g.CheckForDupes("draw-read")
+
 	player := g.Players[g.Turn]
 	if player.Name != name {
 		log.Printf("Player %q is not in turn for game %q", name, code)
@@ -168,6 +170,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	g.CheckForDupes("draw-write")
 	s.encodeFilteredGame(w, name, g)
 }
 
@@ -204,6 +207,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
+	g.CheckForDupes("pass-read")
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
@@ -236,6 +240,8 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	g.CheckForDupes("pass-write")
+
 	s.encodeFilteredGame(w, name, g)
 }
 
@@ -260,6 +266,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
+	g.CheckForDupes("lay-read")
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
@@ -305,6 +312,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
+	g.CheckForDupes("lay-write")
 
 	s.encodeFilteredGame(w, name, g)
 }
@@ -330,6 +338,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
+	g.CheckForDupes("spacer-read")
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
@@ -368,7 +377,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
-
+	g.CheckForDupes("spacer-write")
 	s.encodeFilteredGame(w, name, g)
 }
 
@@ -407,6 +416,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 	// We aleady have something newer.
 	if g.Version > version {
+		g.CheckForDupes("get")
 		s.encodeFilteredGame(w, name, g)
 		return
 	}
@@ -417,6 +427,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s broke connection for %q", name, code)
 		return
 	case g := <-s.store.WatchGame(ctx, code, version):
+		g.CheckForDupes("watch")
 		s.encodeFilteredGame(w, name, g)
 	}
 }
@@ -524,7 +535,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
-
+	g.CheckForDupes("start-read")
 	// Only the first player can start the round.
 	if g.Players[0].Name != name {
 		log.Printf("In game %q, player %q tried to start game for %q", code, name, g.Players[0].Name)
@@ -543,6 +554,6 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
-
+	g.CheckForDupes("start-write")
 	s.encodeFilteredGame(w, name, g)
 }
