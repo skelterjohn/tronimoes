@@ -216,6 +216,29 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		console.log(killedPlayers);
 	}, [killedPlayers]);
 
+	function DrawPassButtons() {
+		return <div className="flex flex-row gap-1 mt-2 justify-center">
+			<Button
+				type="primary"
+				size="small"
+				className="w-14"
+				disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
+				onClick={drawTile}
+			>
+				Draw
+			</Button>
+			<Button
+				type="primary"
+				size="small"
+				className="w-14"
+				disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
+				onClick={passTurn}
+			>
+				Pass
+			</Button>
+		</div>;
+	}
+
 	return (
 		<div className="h-full flex flex-col items-center p-2">
 			<div className="text-center font-bold">
@@ -242,24 +265,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							<div className="w-full max-w-[24rem]">
 								{!hidden && <div className="w-full pb-1 justify-center lg:hidden">
 									<div className="flex flex-row gap-1 mt-2 justify-center">
-										<Button
-											type="primary"
-											size="small"
-											className="w-14"
-											disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
-											onClick={drawTile}
-										>
-											Draw
-										</Button>
-										<Button
-											type="primary"
-											size="small"
-											className="w-14"
-											disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
-											onClick={passTurn}
-										>
-											Pass
-										</Button>
+										<DrawPassButtons/>
 									</div>
 								</div>}
 								<div
@@ -276,24 +282,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 										{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
 									</div>
 									<div className="flex flex-row gap-1 mt-2">
-										<Button
-											type="primary"
-											size="small"
-											className="w-14"
-											disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
-											onClick={drawTile}
-										>
-											Draw
-										</Button>
-										<Button
-											type="primary"
-											size="small"
-											className="w-14"
-											disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
-											onClick={passTurn}
-										>
-											Pass
-										</Button>
+										<DrawPassButtons/>
 									</div>
 								</div>
 							)}
