@@ -112,6 +112,10 @@ func (s *GameServer) getName(r *http.Request) (string, error) {
 	tempName := r.Header.Get("X-Player-Name")
 	_, err := s.store.GetPlayer(ctx, tempName)
 	if err == nil {
+		if userID == "" && err == ErrNoRegisteredPlayer {
+			// anonymous play is ok with unregistered names.
+			return tempName, nil
+		}
 		return "", ErrNotYourPlayer
 	}
 	return tempName, nil
@@ -686,11 +690,25 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
+	pi.Id = playerID
 
-	if err := s.store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
-		log.Printf("Error registering player %q: %v", pi.Name, err)
-		writeErr(w, err, http.StatusBadRequest)
-		return
+	if rpi, err := s.store.GetPlayerByName(r.Context(), pi.Name); err == nil {
+		if rpi.Id != playerID {
+			log.Printf("Player %q already registered to %q", pi.Name, rpi.Id)
+			writeErr(w, ErrPlayerAlreadyRegistered, http.StatusConflict)
+			return
+		}
+	}
+
+	if playerID != "" {
+		if err := s.store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
+			log.Printf("Error registering player %q: %v", pi.Name, err)
+			writeErr(w, err, http.StatusBadRequest)
+			return
+		}
+		log.Printf("Registered player %q", pi)
+	} else {
+		log.Printf("Anonymous player %q", pi.Name)
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(pi)

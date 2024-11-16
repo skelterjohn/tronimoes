@@ -18,11 +18,12 @@ export default function Joiner({userInfo}) {
 	}, []);
 
 	useEffect(() => {
-		if (userInfo === undefined) {
-			return;
-		}
 		setPlayerKey(userInfo?.accessToken);
 		setPlayerID(userInfo?.uid);
+		if (userInfo === undefined) {
+			setIsRegistered(false);
+			setPlayerName('');
+		}
 	}, [userInfo]);
 
 	useEffect(() => {

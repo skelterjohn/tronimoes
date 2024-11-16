@@ -192,19 +192,7 @@ func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName
 	if pi, err := s.GetPlayer(ctx, playerID); err == nil {
 		return fmt.Errorf("already registered as %q", pi.Name)
 	}
-
-	doc, err := s.players(ctx).Doc(playerID).Get(ctx)
-	if err != nil && status.Code(err) != codes.NotFound {
-		return fmt.Errorf("could not read player: %v", err)
-	}
-	if doc.Exists() {
-		registeredID := doc.Data()["id"].(string)
-		if registeredID != playerID {
-			return fmt.Errorf("%q already registered to someone else", playerName)
-		}
-		return nil
-	}
-	_, err = s.players(ctx).Doc(playerID).Set(ctx, map[string]any{
+	_, err := s.players(ctx).Doc(playerID).Set(ctx, map[string]any{
 		"name": playerName,
 		"id":   playerID,
 	})
@@ -212,17 +200,16 @@ func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName
 }
 
 func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error) {
-	iter := s.players(ctx).Where("id", "==", playerID).Documents(ctx)
-	docs, err := iter.GetAll()
-	if err != nil {
-		return PlayerInfo{}, fmt.Errorf("could not query: %v", err)
+	doc, err := s.players(ctx).Doc(playerID).Get(ctx)
+	if err != nil && status.Code(err) == codes.NotFound {
+		return PlayerInfo{}, ErrNoRegisteredPlayer
 	}
-	if len(docs) == 0 {
-		return PlayerInfo{}, fmt.Errorf("no player registered")
+	if err != nil {
+		return PlayerInfo{}, fmt.Errorf("could not read: %v", err)
 	}
 	return PlayerInfo{
-		Name: docs[0].Data()["name"].(string),
-		Id:   docs[0].Data()["id"].(string),
+		Name: doc.Data()["name"].(string),
+		Id:   doc.Data()["id"].(string),
 	}, nil
 }
 
@@ -233,7 +220,7 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 		return PlayerInfo{}, fmt.Errorf("could not query: %v", err)
 	}
 	if len(docs) == 0 {
-		return PlayerInfo{}, fmt.Errorf("no player registered")
+		return PlayerInfo{}, ErrPlayerNotFound
 	}
 	return PlayerInfo{
 		Name: docs[0].Data()["name"].(string),

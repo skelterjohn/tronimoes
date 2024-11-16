@@ -172,7 +172,10 @@ func (s *MemoryStore) WatchGame(ctx context.Context, code string, version int64)
 func (s *MemoryStore) RegisterPlayerName(ctx context.Context, playerID, playerName string) error {
 	s.playersMu.Lock()
 	defer s.playersMu.Unlock()
-	s.players[playerID] = PlayerInfo{Name: playerName}
+	s.players[playerID] = PlayerInfo{
+		Name: playerName,
+		Id:   playerID,
+	}
 	return nil
 }
 

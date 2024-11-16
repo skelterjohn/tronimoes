@@ -6,13 +6,15 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import Joiner from './components/landing/Joiner';
 import SignIn from './components/landing/SignIn';
 import { auth } from "@/config";
+import { signOut } from "firebase/auth";
 
 export default function Home() {
 	const [persistentUser, loading, error] = useAuthState(auth);
-	const [userInfo, setUserInfo] = useState(undefined);
+	const [userInfo, setUserInfo] = useState(null);
 	const [showSignIn, setShowSignIn] = useState(false);
 
 	useEffect(()=> {
+		console.log('persistentUser', persistentUser);
 		if (error !== undefined) {
 			console.dir(error);
 			setUserInfo(undefined);
@@ -36,13 +38,19 @@ export default function Home() {
 				<Joiner userInfo={userInfo} />
 			</div>
 			<div className="absolute top-4 right-4 w-fit text-white">
-				{!loading && userInfo === undefined && (
+				{!loading && userInfo === null && (
 					<div onClick={() => setShowSignIn(true)} className="cursor-pointer">
 						sign in
 					</div>
 				)}
-				{!loading && userInfo !== undefined && (
-					<div onClick={() => setUserInfo(undefined)} className="cursor-pointer">
+				{!loading && userInfo !== null && (
+					<div onClick={() => {
+						signOut(auth).then(() => {
+							setUserInfo(undefined);
+						}).catch((error) => {
+							console.error("Sign out error:", error);
+						});
+					}} className="cursor-pointer">
 						sign out
 					</div>
 				)}
