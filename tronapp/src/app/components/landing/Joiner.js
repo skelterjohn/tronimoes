@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { useGameState } from '../../components/GameState';
 
-export default function Joiner({userInfo}) {
+export default function Joiner({userInfo, loading}) {
 	const router = useRouter();
 
 	const { setGameCode, playerName, setPlayerName, setPlayerKey, setPlayerID, client } = useGameState();
@@ -68,9 +68,16 @@ export default function Joiner({userInfo}) {
 		registerAndJoinCode("PICKUP");
 	}
 
+	if (loading) {
+		return (
+			<div className="bg-black rounded-lg p-4 border-white border text-white">
+				<p className="font-[Roboto_Mono] text-xl tracking-wider">checking connection...</p>
+			</div>
+		);
+	}
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
 		{isRegistered ? (
-			<div className="bg-black rounded-lg p-4 text-white">
+			<div className="bg-black rounded-lg p-4 border-white border text-white">
 				<p className="font-[Roboto_Mono] text-xl tracking-wider">designation: {playerName}</p>
 			</div>
 		) : (
