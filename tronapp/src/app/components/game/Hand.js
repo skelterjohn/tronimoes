@@ -239,40 +239,64 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 				<div className="overflow-y-auto max-h-[calc(100%-14rem)]">
 					{!hidden && (
 						<div className="flex justify-center">
-							<div
-								className={`${spacerColor} w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center text-center`}
-								onClick={spacerClicked}
-							>
-								FREE LINE SPACER
+							<div>
+								{!hidden && <div className="w-full pb-1 justify-center lg:hidden">
+									<div className="flex flex-row gap-1 mt-2 justify-center">
+										<Button
+											type="primary"
+											size="small"
+											className="w-14"
+											disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
+											onClick={drawTile}
+										>
+											Draw
+										</Button>
+										<Button
+											type="primary"
+											size="small"
+											className="w-14"
+											disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
+											onClick={passTurn}
+										>
+											Pass
+										</Button>
+									</div>
+								</div>}
+								<div
+									className={`${spacerColor} w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center text-center`}
+									onClick={spacerClicked}
+								>
+									FREE LINE SPACER
+								</div>
 							</div>
 							
-				{!hidden && (
-					<div className="pl-2">
-						<div className="text-center">
-							{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
-						</div>
-						<div className="flex flex-row gap-1 mt-2">
-							<Button
-								type="primary"
-								size="small"
-								className="w-14"
-								disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
-								onClick={drawTile}
-							>
-								Draw
-							</Button>
-							<Button
-								type="primary"
-								size="small"
-								className="w-14"
-								disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
-								onClick={passTurn}
-							>
-								Pass
-							</Button>
-						</div>
-					</div>
-				)}
+							{!hidden && (
+								<div className="pl-2 hidden md:block">
+									<div className="text-center">
+										{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
+									</div>
+									<div className="flex flex-row gap-1 mt-2">
+										<Button
+											type="primary"
+											size="small"
+											className="w-14"
+											disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
+											onClick={drawTile}
+										>
+											Draw
+										</Button>
+										<Button
+											type="primary"
+											size="small"
+											className="w-14"
+											disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
+											onClick={passTurn}
+										>
+											Pass
+										</Button>
+									</div>
+								</div>
+							)}
 						</div>
 					)}
 					<div className="flex flex-wrap content-start">
