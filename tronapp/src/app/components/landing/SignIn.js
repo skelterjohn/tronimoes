@@ -4,7 +4,7 @@ import { Button } from "antd";
 import { auth } from "@/config";
 
 
-export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
+export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) {
 	const signInAsGuest = async () => {
 		try {
 			const result = await signInAnonymously(auth);
@@ -13,6 +13,7 @@ export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
 			onClose();
 		} catch (error) {
 			console.error("Error signing in anonymously:", error);
+			setErrorMessage("Error signing in anonymously");
 			onClose();
 		}
 	};
@@ -25,6 +26,7 @@ export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
 			onClose();
 		} catch (error) {
 			console.error("Error signing in with Google:", error);
+			setErrorMessage("Error signing in with Google");
 			onClose();
 		}
 	};
@@ -44,6 +46,7 @@ export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
 				onClose();
 			} else {
 				console.error("Error signing in with Facebook:", error);
+				setErrorMessage("Error signing in with Facebook");
 				onClose();
 			}
 		}

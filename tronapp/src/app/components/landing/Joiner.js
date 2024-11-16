@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { useGameState } from '../../components/GameState';
 
-export default function Joiner({userInfo, loading}) {
+export default function Joiner({userInfo, loading, setErrorMessage}) {
 	const router = useRouter();
 
 	const { setGameCode, playerName, setPlayerName, setPlayerKey, setPlayerID, client } = useGameState();
@@ -47,6 +47,7 @@ export default function Joiner({userInfo, loading}) {
 				joinCode(code);
 			}).catch((error) => {
 				console.error('register error', error);
+				setErrorMessage(error.data.error);
 			});
 		} else {
 			joinCode(code);
@@ -61,6 +62,7 @@ export default function Joiner({userInfo, loading}) {
 		}).catch((error) => {
 			console.error('join error', error);
 			setPlayerName('');
+			setErrorMessage(error.data.error);
 		});
 	}
 
