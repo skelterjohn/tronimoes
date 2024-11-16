@@ -115,28 +115,26 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 	}, [spacer]);
 
 	return (
-		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center overflow-hidden ${gutterColor}`}>
+		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
 				<div className="aspect-square">
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							{Array.from({ length: height }, (_, y) => (
 								<tr key={y}>
-									<td className={`p-0 border-0`} style={{ height: cellSpan, width: gutterSpan }}>
+									<td className={`p-0 border-0 ${gutterColor}`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 									{Array.from({ length: width }, (_, x) => (
 										<td key={y * width + x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
 												{hints[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
-														<Hint
-															color={activePlayer.color} />
+														<Hint />
 													</div>
 												)}
 												{spacerHintPrefix[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
-														<Hint
-															color={activePlayer.color} />
+														<Hint />
 													</div>
 												)}
 												{spacerA === `${x},${y}` && (
@@ -178,7 +176,7 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 											</div>
 										</td>
 									))}
-									<td className={`p-0 border-0`} style={{ height: cellSpan, width: gutterSpan }}>
+									<td className={`p-0 border-0 ${gutterColor}`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 								</tr>
 							))}

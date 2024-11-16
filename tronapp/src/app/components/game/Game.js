@@ -438,11 +438,11 @@ function Game({ code }) {
 					</div>
 				))}
 			</div>
-			<div className="flex gap-4 justify-center max-h-[75vh] overflow-hidden">
+			<div className="flex gap-4 justify-center max-h-[75vh]">
 				<span className="w-96 hidden landscape:block md:block">
 					<History history={gameHistory} />
 				</span>
-				<div className="border-black border-8 min-h-0 min-w-0 flex-1 relative">
+				<div className="border-black border-8 flex-1 overflow-auto">
 					<Board
 						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
@@ -465,7 +465,7 @@ function Game({ code }) {
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
-				<span className="w-96 hidden landscape:block md:block">
+				<span className="w-40 hidden landscape:block md:block">
 					<History history={roundHistory} />
 				</span>
 			</div>
