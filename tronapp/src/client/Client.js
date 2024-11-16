@@ -1,7 +1,8 @@
 class Client {
-    constructor(baseURL, name, key) {
+    constructor(baseURL, name, userid, key) {
         this.baseURL = baseURL;
         this.name = name;
+        this.userid = userid;
         this.key = key;
     }
 
@@ -58,14 +59,20 @@ class Client {
 
 
     async doRequest(method, path, body = null) {
+		headers =  {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+			'X-Player-Name': this.name,
+		}
+		if (this.key !== undefined) {
+			headers['Authorization'] = `Bearer ${this.key}`;
+		}
+		if (this.userid !== undefined) {
+			headers['X-Player-Id'] = this.userid;
+		}
         const response = await fetch(`${this.baseURL}${path}`, {
             method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-Player-Name': this.name,
-                'Authorization': `Bearer ${this.key}`,
-            },
+            headers: headers,
             body: body ? JSON.stringify(body) : null,
         });
 

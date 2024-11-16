@@ -1,12 +1,27 @@
 "use client";
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import Joiner from './components/landing/Joiner';
 import SignIn from './components/landing/SignIn';
+import { auth } from "@/config";
+
 export default function Home() {
+	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(undefined);
 	const [showSignIn, setShowSignIn] = useState(false);
+
+	useEffect(()=> {
+		if (error !== undefined) {
+			console.dir(error);
+			setUserInfo(undefined);
+			return;
+		}
+		if (!loading) {
+			setUserInfo(persistentUser);
+		}
+	}, [persistentUser, loading, error]);
 
 	return (
 		<main className="relative min-h-screen w-screen bg-slate-800">
@@ -18,7 +33,7 @@ export default function Home() {
 				priority
 			/>
 			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit space-y-4">
-				<Joiner/>
+				<Joiner userInfo={userInfo} />
 			</div>
 			<div className="absolute top-4 right-4 w-fit text-white">
 				{userInfo === undefined && (

@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 
 import { useGameState } from '../../components/GameState';
 
-export default function Joiner() {
+export default function Joiner({userInfo}) {
 	const router = useRouter();
 
-	const { setGameCode, playerName, setPlayerName, client } = useGameState();
+	const { setGameCode, playerName, setPlayerName, setPlayerKey, client } = useGameState();
 
 	const inputRef = useRef(null);
 
@@ -15,6 +15,11 @@ export default function Joiner() {
 		// Focus the input when component mounts
 		inputRef.current?.focus();
 	}, []);
+
+	useEffect(() => {
+		setPlayerKey(userInfo?.accessToken);
+	}, [userInfo]);
+
 
 	function joinCode(code) {
 		console.log('joining', playerName, code);
