@@ -115,7 +115,7 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 	}, [spacer]);
 
 	return (
-		<div onContextMenu={rightClick} className={`h-full w-full flex items-center justify-center ${gutterColor}`}>
+		<div onContextMenu={rightClick} className={`aspect-square h-full  flex items-center justify-center ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
 				<div className="aspect-square">
 					<table className="w-full h-full table-fixed">
