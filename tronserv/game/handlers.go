@@ -1,6 +1,7 @@
 package game
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,8 +9,22 @@ import (
 	"net/http"
 	"strconv"
 
+	firebase "firebase.google.com/go/v4"
 	"github.com/go-chi/chi/v5"
 )
+
+var fbApp *firebase.App
+
+func init() {
+	ctx := context.Background()
+	var err error
+	fbApp, err = firebase.NewApp(ctx, &firebase.Config{
+		ProjectID: "tronimoes",
+	})
+	if err != nil {
+		log.Fatalf("Error initializing Firebase app: %v", err)
+	}
+}
 
 func writeErr(w http.ResponseWriter, err error, code int) {
 	w.WriteHeader(code)
@@ -43,13 +58,63 @@ type GameServer struct {
 	store Store
 }
 
-func (s *GameServer) getName(r *http.Request) (string, error) {
-	// TODO: validate bearer token
+func (s *GameServer) validateToken(r *http.Request) error {
 	token := r.Header.Get("Authorization")
 	if token == "" {
-		return "", ErrMissingToken
+		return ErrMissingToken
 	}
-	return r.Header.Get("X-Player-Name"), nil
+	userID := r.Header.Get("X-Player-Id")
+	if userID == "" {
+		return ErrMissingUserID
+	}
+
+	// Remove "Bearer " prefix if present
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	}
+
+	// Verify the Firebase token
+	ctx := r.Context()
+	client, err := fbApp.Auth(ctx)
+	if err != nil {
+		return fmt.Errorf("error getting Auth client: %v", err)
+	}
+
+	decodedToken, err := client.VerifyIDToken(ctx, token)
+	if err != nil {
+		return fmt.Errorf("error verifying ID token: %v", err)
+	}
+
+	// Verify that the token's UID matches the X-Player-Id
+	if decodedToken.UID != userID {
+		return ErrInvalidToken
+	}
+
+	return nil
+}
+
+func (s *GameServer) getName(r *http.Request) (string, error) {
+	ctx := r.Context()
+	userID := r.Header.Get("X-Player-Id")
+	if userID != "" {
+		log.Printf("logged in %s", userID)
+		if err := s.validateToken(r); err != nil {
+			return "", err
+		}
+
+		pi, err := s.store.GetPlayer(ctx, userID)
+		if err == nil {
+			return pi.Name, nil
+		}
+		return "", err
+	}
+
+	tempName := r.Header.Get("X-Player-Name")
+	_, err := s.store.GetPlayer(ctx, tempName)
+	if err == nil {
+		return "", ErrNotYourPlayer
+	}
+	return tempName, nil
 }
 
 func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *Game) {
@@ -612,10 +677,6 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 	s.encodeFilteredGame(w, name, g)
 }
 
-type PlayerInfo struct {
-	Name string `json:"name"`
-}
-
 func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Request) {
 	playerID := r.Header.Get("X-Player-ID")
 
@@ -636,7 +697,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 }
 
 func (s *GameServer) HandleGetPlayerName(w http.ResponseWriter, r *http.Request) {
-	name, err := s.store.GetPlayerName(r.Context(), r.Header.Get("X-Player-ID"))
+	pi, err := s.store.GetPlayer(r.Context(), r.Header.Get("X-Player-ID"))
 	if err != nil {
 		if err == ErrNoRegisteredPlayer {
 			writeErr(w, err, http.StatusNotFound)
@@ -647,7 +708,5 @@ func (s *GameServer) HandleGetPlayerName(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(PlayerInfo{
-		Name: name,
-	})
+	json.NewEncoder(w).Encode(pi)
 }

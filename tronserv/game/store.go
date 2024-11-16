@@ -8,6 +8,11 @@ import (
 	"sync"
 )
 
+type PlayerInfo struct {
+	Name string `json:"name"`
+	Id   string `json:"id"`
+}
+
 type Store interface {
 	FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error)
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
@@ -15,23 +20,24 @@ type Store interface {
 	WriteGame(ctx context.Context, game *Game) error
 	WatchGame(ctx context.Context, code string, version int64) <-chan *Game
 	RegisterPlayerName(ctx context.Context, playerID, playerName string) error
-	GetPlayerName(ctx context.Context, playerID string) (string, error)
+	GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error)
+	GetPlayerByName(ctx context.Context, playerName string) (PlayerInfo, error)
 }
 
 type MemoryStore struct {
-	games         map[string]*Game
-	gamesMu       sync.Mutex
-	watchChans    map[string][]chan *Game
-	watchMu       sync.Mutex
-	playerNames   map[string]string
-	playerNamesMu sync.Mutex
+	games      map[string]*Game
+	gamesMu    sync.Mutex
+	watchChans map[string][]chan *Game
+	watchMu    sync.Mutex
+	players    map[string]PlayerInfo
+	playersMu  sync.Mutex
 }
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
-		games:       make(map[string]*Game),
-		watchChans:  make(map[string][]chan *Game),
-		playerNames: make(map[string]string),
+		games:      make(map[string]*Game),
+		watchChans: make(map[string][]chan *Game),
+		players:    make(map[string]PlayerInfo),
 	}
 }
 
@@ -164,18 +170,29 @@ func (s *MemoryStore) WatchGame(ctx context.Context, code string, version int64)
 }
 
 func (s *MemoryStore) RegisterPlayerName(ctx context.Context, playerID, playerName string) error {
-	s.playerNamesMu.Lock()
-	defer s.playerNamesMu.Unlock()
-	s.playerNames[playerID] = playerName
+	s.playersMu.Lock()
+	defer s.playersMu.Unlock()
+	s.players[playerID] = PlayerInfo{Name: playerName}
 	return nil
 }
 
-func (s *MemoryStore) GetPlayerName(ctx context.Context, playerID string) (string, error) {
-	s.playerNamesMu.Lock()
-	defer s.playerNamesMu.Unlock()
-	name, ok := s.playerNames[playerID]
+func (s *MemoryStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error) {
+	s.playersMu.Lock()
+	defer s.playersMu.Unlock()
+	pi, ok := s.players[playerID]
 	if ok {
-		return name, nil
+		return pi, nil
 	}
-	return "", ErrNoRegisteredPlayer
+	return PlayerInfo{}, ErrNoRegisteredPlayer
+}
+
+func (s *MemoryStore) GetPlayerByName(ctx context.Context, playerName string) (PlayerInfo, error) {
+	s.playersMu.Lock()
+	defer s.playersMu.Unlock()
+	for _, pi := range s.players {
+		if pi.Name == playerName {
+			return pi, nil
+		}
+	}
+	return PlayerInfo{}, ErrNoRegisteredPlayer
 }

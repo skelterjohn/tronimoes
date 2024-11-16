@@ -189,8 +189,8 @@ func (s *FireStore) players(ctx context.Context) *firestore.CollectionRef {
 }
 
 func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName string) error {
-	if n, err := s.GetPlayerName(ctx, playerID); err == nil {
-		return fmt.Errorf("already registered as %q", n)
+	if pi, err := s.GetPlayer(ctx, playerID); err == nil {
+		return fmt.Errorf("already registered as %q", pi.Name)
 	}
 
 	doc, err := s.players(ctx).Doc(playerID).Get(ctx)
@@ -211,14 +211,32 @@ func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName
 	return err
 }
 
-func (s *FireStore) GetPlayerName(ctx context.Context, playerID string) (string, error) {
+func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error) {
 	iter := s.players(ctx).Where("id", "==", playerID).Documents(ctx)
 	docs, err := iter.GetAll()
 	if err != nil {
-		return "", fmt.Errorf("could not query: %v", err)
+		return PlayerInfo{}, fmt.Errorf("could not query: %v", err)
 	}
 	if len(docs) == 0 {
-		return "", fmt.Errorf("no player registered")
+		return PlayerInfo{}, fmt.Errorf("no player registered")
 	}
-	return docs[0].Data()["name"].(string), nil
+	return PlayerInfo{
+		Name: docs[0].Data()["name"].(string),
+		Id:   docs[0].Data()["id"].(string),
+	}, nil
+}
+
+func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (PlayerInfo, error) {
+	iter := s.players(ctx).Where("name", "==", playerName).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return PlayerInfo{}, fmt.Errorf("could not query: %v", err)
+	}
+	if len(docs) == 0 {
+		return PlayerInfo{}, fmt.Errorf("no player registered")
+	}
+	return PlayerInfo{
+		Name: docs[0].Data()["name"].(string),
+		Id:   docs[0].Data()["id"].(string),
+	}, nil
 }

@@ -33,4 +33,7 @@ var (
 	ErrSpacerNoChickenFoot      = errors.New("cannot lay spacer while chicken-footed")
 	ErrNoURL                    = errors.New("no url provided")
 	ErrNoRegisteredPlayer       = errors.New("no registered player")
+	ErrNotYourPlayer            = errors.New("not your player")
+	ErrMissingUserID            = errors.New("missing user id")
+	ErrInvalidToken             = errors.New("invalid token")
 )
