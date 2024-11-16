@@ -9,19 +9,21 @@ const GameContext = createContext();
 export function GameProvider({ children }) {
 	const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("");
-	const [playerKey, setPlayerKey] = useState(uuidv4());
+	const [playerKey, setPlayerKey] = useState("");
+	const [playerID, setPlayerID] = useState("");
 	const [client, setClient] = useState(undefined);
 
 
 	useEffect(() => {
-		setClient(clientFor(playerName, playerKey));
-	}, [playerName, playerKey]);
+		setClient(clientFor(playerName, playerID, playerKey));
+	}, [playerName, playerKey, playerID]);
 
 	return (
 		<GameContext.Provider value={{
 			gameCode, setGameCode,
 			playerName, setPlayerName,
 			playerKey, setPlayerKey,
+			playerID, setPlayerID,
 			client, setClient,
 		}}>
 			{children}

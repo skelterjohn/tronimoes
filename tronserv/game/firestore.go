@@ -36,6 +36,7 @@ func NewFirestore(ctx context.Context, project, env string) (*FireStore, error) 
 func (s *FireStore) games(ctx context.Context) *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("games")
 }
+
 func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
 	c := s.games(ctx)
 	iter := c.Where("code_prefix", "==", code).Where("done", "==", false).Documents(ctx)
@@ -181,4 +182,43 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 	}()
 
 	return updates
+}
+
+func (s *FireStore) players(ctx context.Context) *firestore.CollectionRef {
+	return s.storeClient.Collection("envs").Doc(s.env).Collection("players")
+}
+
+func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName string) error {
+	if n, err := s.GetPlayerName(ctx, playerID); err == nil {
+		return fmt.Errorf("already registered as %q", n)
+	}
+
+	doc, err := s.players(ctx).Doc(playerID).Get(ctx)
+	if err != nil && status.Code(err) != codes.NotFound {
+		return fmt.Errorf("could not read player: %v", err)
+	}
+	if doc.Exists() {
+		registeredID := doc.Data()["id"].(string)
+		if registeredID != playerID {
+			return fmt.Errorf("%q already registered to someone else", playerName)
+		}
+		return nil
+	}
+	_, err = s.players(ctx).Doc(playerID).Set(ctx, map[string]any{
+		"name": playerName,
+		"id":   playerID,
+	})
+	return err
+}
+
+func (s *FireStore) GetPlayerName(ctx context.Context, playerID string) (string, error) {
+	iter := s.players(ctx).Where("id", "==", playerID).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return "", fmt.Errorf("could not query: %v", err)
+	}
+	if len(docs) == 0 {
+		return "", fmt.Errorf("no player registered")
+	}
+	return docs[0].Data()["name"].(string), nil
 }

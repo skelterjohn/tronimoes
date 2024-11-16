@@ -7,7 +7,8 @@ import { useGameState } from '../../components/GameState';
 export default function Joiner({userInfo}) {
 	const router = useRouter();
 
-	const { setGameCode, playerName, setPlayerName, setPlayerKey, client } = useGameState();
+	const { setGameCode, playerName, setPlayerName, setPlayerKey, setPlayerID, client } = useGameState();
+	const [isRegistered, setIsRegistered] = useState(false);
 
 	const inputRef = useRef(null);
 
@@ -17,10 +18,39 @@ export default function Joiner({userInfo}) {
 	}, []);
 
 	useEffect(() => {
+		if (userInfo === undefined) {
+			return;
+		}
 		setPlayerKey(userInfo?.accessToken);
+		setPlayerID(userInfo?.uid);
 	}, [userInfo]);
 
+	useEffect(() => {
+		console.log('client', client);
+		if (!client?.key || !client?.userid) {
+			return;
+		}
+		client?.GetPlayerName().then((resp) => {
+			setPlayerName(resp.name);
+			setIsRegistered(true);
+		}).catch((error) => {
+			console.error('get player name error', error);
+		});
+	}, [client]);
 
+	function registerAndJoinCode(code) {
+		if (!isRegistered) {
+			console.log('registering', playerName);
+			client.RegisterPlayerName(playerName).then(() => {
+				setIsRegistered(true);
+				joinCode(code);
+			}).catch((error) => {
+				console.error('register error', error);
+			});
+		} else {
+			joinCode(code);
+		}
+	}
 	function joinCode(code) {
 		console.log('joining', playerName, code);
 		client.JoinGame(code, playerName).then((resp) => {
@@ -29,25 +59,31 @@ export default function Joiner({userInfo}) {
 			router.push(`/gameboard/${resp.code}`);
 		}).catch((error) => {
 			console.error('join error', error);
-			setGameCode('');
-			//window.location.reload();
+			setPlayerName('');
 		});
 	}
 
 	function joinPickup() {
-		joinCode("<>");
+		registerAndJoinCode("PICKUP");
 	}
 
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
-		<Input
-			ref={inputRef}
-			placeholder="enter your designation"
-			size="large"
-			className="text-lg"
-			value={playerName}
-			onChange={(e) => setPlayerName(e.target.value)}
-			onPressEnter={joinPickup}
-		/>
+		{isRegistered ? (
+			<div className="bg-black rounded-lg p-4 text-white">
+				<p className="font-[Roboto_Mono] text-xl tracking-wider">designation: {playerName}</p>
+			</div>
+		) : (
+			<Input
+				ref={inputRef}
+				placeholder="enter your designation"
+				size="large"
+				className="text-lg"
+				value={playerName}
+				disabled={isRegistered}
+				onChange={(e) => setPlayerName(e.target.value)}
+				onPressEnter={joinPickup}
+			/>
+		)}
 		<div className="flex gap-2 text-white">
 			<span className="text-3xl text-white font-bold">#</span>
 			<Input.OTP
@@ -56,7 +92,7 @@ export default function Joiner({userInfo}) {
 				className="text-lg"
 				formatter={(str) => str.toUpperCase()}
 				disabled={playerName === ""}
-				onChange={joinCode}
+				onChange={registerAndJoinCode}
 			/>
 		</div>
 		<div className="flex justify-end gap-2 items-center">

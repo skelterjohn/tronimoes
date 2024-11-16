@@ -32,6 +32,7 @@ func main() {
 		AllowedHeaders: []string{
 			"Accept", "Authorization", "Content-Type", "X-CSRF-Token",
 			"X-Player-Name", "Authorization",
+			"X-Player-ID",
 		},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,

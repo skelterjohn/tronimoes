@@ -43,6 +43,14 @@ class Client {
         return this.post(`/game/${code}/leave`, {});
     }
 
+    async RegisterPlayerName(name) {
+        return this.post(`/players`, { name: name });
+    }
+
+    async GetPlayerName() {
+        return this.get(`/players`);
+    }
+
     async get(path) {
         return this.doRequest('GET', path);
     }
@@ -59,7 +67,7 @@ class Client {
 
 
     async doRequest(method, path, body = null) {
-		headers =  {
+		let headers =  {
 			'Content-Type': 'application/json',
 			'Accept': 'application/json',
 			'X-Player-Name': this.name,
@@ -91,6 +99,6 @@ class Client {
 }
 
 
-export default function clientFor(name, key) {
-    return new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080', name, key);
+export default function clientFor(name, id, key) {
+    return new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080', name, id, key);
 }

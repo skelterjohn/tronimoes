@@ -32,4 +32,5 @@ var (
 	ErrSpacerNotStartedOnLine   = errors.New("spacer not started on a line")
 	ErrSpacerNoChickenFoot      = errors.New("cannot lay spacer while chicken-footed")
 	ErrNoURL                    = errors.New("no url provided")
+	ErrNoRegisteredPlayer       = errors.New("no registered player")
 )

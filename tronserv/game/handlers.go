@@ -27,6 +27,8 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/game/{code}/pass", gs.HandlePass)
 	r.Post("/game/{code}/leave", gs.HandleLeaveOrQuit)
 	r.Post("/game/{code}/foot", gs.HandleChickenFoot)
+	r.Post("/players", gs.HandleRegisterPlayerName)
+	r.Get("/players", gs.HandleGetPlayerName)
 }
 func RandomString(n int) string {
 	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -608,4 +610,44 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 	}
 	g.CheckForDupes("foot-write")
 	s.encodeFilteredGame(w, name, g)
+}
+
+type PlayerInfo struct {
+	Name string `json:"name"`
+}
+
+func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Request) {
+	playerID := r.Header.Get("X-Player-ID")
+
+	pi := &PlayerInfo{}
+	if err := json.NewDecoder(r.Body).Decode(pi); err != nil {
+		log.Printf("Error decoding player info: %v", err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
+		log.Printf("Error registering player %q: %v", pi.Name, err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(pi)
+}
+
+func (s *GameServer) HandleGetPlayerName(w http.ResponseWriter, r *http.Request) {
+	name, err := s.store.GetPlayerName(r.Context(), r.Header.Get("X-Player-ID"))
+	if err != nil {
+		if err == ErrNoRegisteredPlayer {
+			writeErr(w, err, http.StatusNotFound)
+			return
+		}
+		log.Printf("Error getting player name for %q: %v", r.Header.Get("X-Player-ID"), err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(PlayerInfo{
+		Name: name,
+	})
 }
