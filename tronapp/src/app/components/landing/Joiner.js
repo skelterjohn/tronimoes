@@ -20,7 +20,7 @@ export default function Joiner({userInfo}) {
 	useEffect(() => {
 		setPlayerKey(userInfo?.accessToken);
 		setPlayerID(userInfo?.uid);
-		if (userInfo === undefined) {
+		if (userInfo === undefined || userInfo === null) {
 			setIsRegistered(false);
 			setPlayerName('');
 		}

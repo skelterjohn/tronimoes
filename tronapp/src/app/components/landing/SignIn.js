@@ -1,5 +1,5 @@
 import { Modal } from "antd";
-import { signInAnonymously, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, fetchSignInMethodsForEmail, signInWithCredential, linkWithCredential } from "firebase/auth";
 import { Button } from "antd";
 import { auth } from "@/config";
 
@@ -13,6 +13,7 @@ export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
 			onClose();
 		} catch (error) {
 			console.error("Error signing in anonymously:", error);
+			onClose();
 		}
 	};
 
@@ -24,6 +25,27 @@ export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
 			onClose();
 		} catch (error) {
 			console.error("Error signing in with Google:", error);
+			onClose();
+		}
+	};
+
+	const signInWithFacebook = async () => {
+		try {
+			const provider = new FacebookAuthProvider();
+			const result = await signInWithPopup(auth, provider);
+			setUserInfo(result.user);
+			onClose();
+		} catch (error) {
+			if (error.code === 'auth/account-exists-with-different-credential') {
+				setUserInfo({
+					accessToken: error.customData._tokenResponse.oauthAccessToken,
+					uid: error.customData._tokenResponse.localId,
+				});
+				onClose();
+			} else {
+				console.error("Error signing in with Facebook:", error);
+				onClose();
+			}
 		}
 	};
 
@@ -32,6 +54,9 @@ export default function SignIn({userInfo, setUserInfo, isOpen, onClose}) {
 			<div className="flex flex-col items-center gap-4 p-4">
 				<Button onClick={signInWithGoogle} size="large">
 					Sign in with Google
+				</Button>
+				<Button onClick={signInWithFacebook} size="large">
+					Sign in with Facebook
 				</Button>
 				<Button onClick={signInAsGuest} size="large">
 					Anonymous

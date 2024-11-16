@@ -46,7 +46,7 @@ export default function Home() {
 				{!loading && userInfo !== null && (
 					<div onClick={() => {
 						signOut(auth).then(() => {
-							setUserInfo(undefined);
+							setUserInfo(null);
 						}).catch((error) => {
 							console.error("Sign out error:", error);
 						});
