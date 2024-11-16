@@ -95,7 +95,7 @@ function Game({ code }) {
 		return () => {
 			isActive = false;
 		};
-	}, [code, version]);
+	}, [code, version, client, router]);
 
 	useEffect(() => {
 		if (!playerName) {
@@ -353,7 +353,7 @@ function Game({ code }) {
 			return;
 		}
 		client.SetChickenFoot(code, chickenFootURL);
-	}, [chickenFootURL]);
+	}, [chickenFootURL, client, code]);
 
 	function passTurn() {
 		setSelectedTile(undefined);

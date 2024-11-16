@@ -28,7 +28,7 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 
 	useEffect(() => {
 		setPlayA(undefined);
-	}, [selectedTile]);
+	}, [selectedTile, setPlayA]);
 
 	const [gutterColor, setGutterColor] = useState("bg-gray")
 	useEffect(() => {

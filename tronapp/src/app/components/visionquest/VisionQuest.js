@@ -1,6 +1,5 @@
 import { Modal, Input, Spin } from 'antd';
 import { useState, useEffect } from 'react';
-
 // Replace with your actual Tenor API key
 const TENOR_API_KEY = 'AIzaSyBPpZRb23wy2zTKQ2j5eJHS8YVPtjIvcGQ';
 const TENOR_CLIENT_KEY = 'tronimoes'; // Replace with your app name

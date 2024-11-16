@@ -152,19 +152,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		setDraggedTile(tile);
 	}
 
-	function handleTouchMove(e) {
-		if (!touchStartPos) return;
-		e.preventDefault();
-		
-		// Move the ghost element
-		const ghost = document.getElementById('touch-ghost');
-		if (ghost) {
-			const touch = e.touches[0];
-			ghost.style.left = `${touch.clientX - 32}px`;
-			ghost.style.top = `${touch.clientY - 48}px`;
-		}
-	}
-
 	function handleTouchEnd(targetTile, e) {
 		if (!draggedTile || !touchStartPos) return;
 		
@@ -193,6 +180,18 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 
 	// Add useEffect for touch event setup
 	useEffect(() => {
+		function handleTouchMove(e) {
+			if (!touchStartPos) return;
+			e.preventDefault();
+			
+			// Move the ghost element
+			const ghost = document.getElementById('touch-ghost');
+			if (ghost) {
+				const touch = e.touches[0];
+				ghost.style.left = `${touch.clientX - 32}px`;
+				ghost.style.top = `${touch.clientY - 48}px`;
+			}
+		}
 		// Get all draggable tile elements
 		const tileElements = document.querySelectorAll('[draggable="true"]');
 		
@@ -221,7 +220,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		<div className="h-full flex flex-col items-center p-2">
 			<div className="text-center font-bold">
 				{killedPlayers?.map(kp => (
-					<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
+					<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
 						<div className="absolute inset-0">
 							<ChickenFoot url={kp.chickenFootURL} color={kp.color} />
 						</div>

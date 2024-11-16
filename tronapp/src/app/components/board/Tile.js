@@ -23,42 +23,8 @@ const TileHalf = ({ pips, back, orientation }) => {
 }
 
 export default function Tile({ pipsa, pipsb, orientation, back = false, color = "white", dead = false, selected = false, lineHeads, indicated, setIndicated, hintedTiles }) {
-	const colorMap = {
-		red: "bg-red-100",
-		blue: "bg-blue-100",
-		green: "bg-green-100",
-		indigo: "bg-indigo-100",
-		orange: "bg-orange-100",
-		fuchsia: "bg-fuchsia-100",
-		white: "bg-white"
-	};
-	const borderColorMap = {
-		red: "border-red-300",
-		blue: "border-blue-300",
-		green: "border-green-300",
-		indigo: "border-indigo-300",
-		orange: "border-orange-300",
-		fuchsia: "border-fuchsia-300",
-		white: "border-white"
-	};
-	const lineHeadBorderColorMap = {
-		red: "border-red-500",
-		blue: "border-blue-500",
-		green: "border-green-500",
-		indigo: "border-indigo-500",
-		orange: "border-orange-500",
-		fuchsia: "border-fuchsia-500",
-		white: "border-white"
-	};
-	const selectedColorMap = {
-		red: "bg-red-300",
-		blue: "bg-blue-300",
-		green: "bg-green-300",
-		indigo: "bg-indigo-300",
-		orange: "bg-orange-300",
-		fuchsia: "bg-fuchsia-300",
-		white: "bg-gray-200"
-	};
+
+
 
 	var squareBar = <div className="absolute bottom-[-2px] left-[15%] w-[70%] h-[4px] bg-gray-300" />;
 	var bar = <div className="absolute left-[15%] w-[70%] h-[4px] bg-gray-300" />;
@@ -96,7 +62,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 			}
 			setIsLineHead(true);
 		});
-	}, [lineHeads])
+	}, [pipsa, pipsb, lineHeads])
 
 	const [bgcolor, setBgcolor] = useState("bg-gray-500");
 	const [bordercolor, setBordercolor] = useState("border-black");
@@ -113,6 +79,42 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 	}, [hintedTiles, pipsa, pipsb]);
 
 	useEffect(() => {
+		const colorMap = {
+			red: "bg-red-100",
+			blue: "bg-blue-100",
+			green: "bg-green-100",
+			indigo: "bg-indigo-100",
+			orange: "bg-orange-100",
+			fuchsia: "bg-fuchsia-100",
+			white: "bg-white"
+		};
+		const borderColorMap = {
+			red: "border-red-300",
+			blue: "border-blue-300",
+			green: "border-green-300",
+			indigo: "border-indigo-300",
+			orange: "border-orange-300",
+			fuchsia: "border-fuchsia-300",
+			white: "border-white"
+		};
+		const lineHeadBorderColorMap = {
+			red: "border-red-500",
+			blue: "border-blue-500",
+			green: "border-green-500",
+			indigo: "border-indigo-500",
+			orange: "border-orange-500",
+			fuchsia: "border-fuchsia-500",
+			white: "border-white"
+		};
+		const selectedColorMap = {
+			red: "bg-red-300",
+			blue: "bg-blue-300",
+			green: "bg-green-300",
+			indigo: "bg-indigo-300",
+			orange: "bg-orange-300",
+			fuchsia: "bg-fuchsia-300",
+			white: "bg-gray-200"
+		};
 		setBgcolor(dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]));
 		if (dead) {
 			setBordercolor(borderColorMap[color]);
@@ -123,7 +125,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		} else {
 			setBordercolor("border-black")
 		}
-	}, [selected, dead, isLineHead, indicated]);
+	}, [selected, dead, isLineHead, indicated, color, pipsa, pipsb]);
 
 	function tileClicked() {
 		if (!isLineHead || dead) {

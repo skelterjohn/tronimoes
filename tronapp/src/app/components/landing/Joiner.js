@@ -24,7 +24,7 @@ export default function Joiner({userInfo}) {
 			setIsRegistered(false);
 			setPlayerName('');
 		}
-	}, [userInfo]);
+	}, [userInfo, setPlayerKey, setPlayerID, setPlayerName]);
 
 	useEffect(() => {
 		console.log('client', client);
@@ -37,7 +37,7 @@ export default function Joiner({userInfo}) {
 		}).catch((error) => {
 			console.error('get player name error', error);
 		});
-	}, [client]);
+	}, [client, setPlayerName]);
 
 	function registerAndJoinCode(code) {
 		if (!isRegistered) {

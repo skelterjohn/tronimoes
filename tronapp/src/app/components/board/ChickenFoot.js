@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-
 export default function ChickenFoot({ url, color }) {
 	const colorMap = {
         red: "bg-red-500",
@@ -11,9 +10,7 @@ export default function ChickenFoot({ url, color }) {
         purple: "bg-purple-500",
         transparent: "bg-transparent"
     };
-	useEffect(() => {
-		console.log(url);
-	}, [url]);
+
 	return (
         <div className="w-full h-full flex items-center justify-center">
             <div className={`w-3/4 h-3/4 rounded-full ${colorMap[color]} opacity-50 relative`}>
