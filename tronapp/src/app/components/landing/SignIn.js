@@ -54,16 +54,25 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 
 	return (
 		<Modal open={isOpen} title="sign in to tronimoes" onCancel={onClose} footer={null} centered width={800}>
-			<div className="flex flex-col items-center gap-4 p-4">
-				<Button onClick={signInWithGoogle} size="large">
-					Sign in with Google
-				</Button>
-				<Button onClick={signInWithFacebook} size="large">
-					Sign in with Facebook
-				</Button>
-				<Button onClick={signInAsGuest} size="large">
-					Anonymous
-				</Button>
+			<div className="flex">
+				<div className="w-1/2">
+					<img 
+						src="/fallingtiles.png" 
+						alt="Falling Tiles" 
+						className="object-cover w-full h-full"
+					/>
+				</div>
+				<div className="w-1/2 flex flex-col items-center gap-4 p-4">
+					<Button onClick={signInWithGoogle} size="large" className="w-48">
+						Sign in with Google
+					</Button>
+					<Button onClick={signInWithFacebook} size="large" className="w-48">
+						Sign in with Facebook
+					</Button>
+					<Button onClick={signInAsGuest} size="large" className="w-48">
+						Anonymous
+					</Button>
+				</div>
 			</div>
 		</Modal>
 	);
