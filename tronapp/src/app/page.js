@@ -36,12 +36,12 @@ export default function Home() {
 				<Joiner userInfo={userInfo} />
 			</div>
 			<div className="absolute top-4 right-4 w-fit text-white">
-				{userInfo === undefined && (
+				{!loading && userInfo === undefined && (
 					<div onClick={() => setShowSignIn(true)} className="cursor-pointer">
 						sign in
 					</div>
 				)}
-				{userInfo !== undefined && (
+				{!loading && userInfo !== undefined && (
 					<div onClick={() => setUserInfo(undefined)} className="cursor-pointer">
 						sign out
 					</div>
