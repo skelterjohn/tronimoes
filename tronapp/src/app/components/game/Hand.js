@@ -235,11 +235,11 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 					</div>
 				}
 			</div>
-			<div className="flex flex-col items-center h-full">
-				<div className="overflow-y-auto max-h-[calc(100%-14rem)]">
+			<div className="w-full flex flex-col items-center h-full">
+				<div className="w-full flex flex-col justify-center overflow-y-auto max-h-[calc(100%-14rem)]">
 					{!hidden && (
 						<div className="flex justify-center">
-							<div>
+							<div className="w-full max-w-[24rem]">
 								{!hidden && <div className="w-full pb-1 justify-center lg:hidden">
 									<div className="flex flex-row gap-1 mt-2 justify-center">
 										<Button
@@ -263,7 +263,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 									</div>
 								</div>}
 								<div
-									className={`${spacerColor} w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center text-center`}
+									className={`${spacerColor} max-w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center text-center`}
 									onClick={spacerClicked}
 								>
 									FREE LINE SPACER
@@ -271,7 +271,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							</div>
 							
 							{!hidden && (
-								<div className="pl-2 hidden md:block">
+								<div className="pl-2 hidden lg:block">
 									<div className="text-center">
 										{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
 									</div>
@@ -299,7 +299,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							)}
 						</div>
 					)}
-					<div className="flex flex-wrap content-start">
+					<div className="w-full justify-center flex flex-wrap content-start">
 						{handOrder.map((t, i) => {
 							return (
 								<div
