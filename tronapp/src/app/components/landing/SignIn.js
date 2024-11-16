@@ -55,14 +55,14 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 	return (
 		<Modal open={isOpen} title="sign in to tronimoes" onCancel={onClose} footer={null} centered width={800}>
 			<div className="flex">
-				<div className="w-1/2">
+				<div className="hidden md:block w-1/2">
 					<img 
 						src="/fallingtiles.png" 
 						alt="Falling Tiles" 
 						className="object-cover w-full h-full"
 					/>
 				</div>
-				<div className="w-1/2 flex flex-col items-center gap-4 p-4">
+				<div className="w-full flex flex-col items-center gap-4 p-4">
 					<Button onClick={signInWithGoogle} size="large" className="w-48">
 						Sign in with Google
 					</Button>
