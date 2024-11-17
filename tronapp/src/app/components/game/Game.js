@@ -392,7 +392,7 @@ function Game({ code }) {
 
 	return (
 		<div className="h-full " onClick={() => setPlayErrorMessage("")}>
-			<div className="flex justify-end items-center mb-4">
+			<div className="flex justify-end items-center mb-4 pl-3 pr-3">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
