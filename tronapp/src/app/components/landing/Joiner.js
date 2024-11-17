@@ -27,7 +27,6 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	}, [userInfo, setPlayerKey, setPlayerID, setPlayerName]);
 
 	useEffect(() => {
-		console.log('client', client);
 		if (!client?.key || !client?.userid) {
 			return;
 		}

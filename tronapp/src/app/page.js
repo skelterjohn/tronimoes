@@ -15,9 +15,8 @@ export default function Home() {
 	const [errorMessage, setErrorMessage] = useState(null);
 
 	useEffect(()=> {
-		console.log('persistentUser', persistentUser);
 		if (error !== undefined) {
-			console.dir(error);
+			setErrorMessage(error.message);
 			setUserInfo(undefined);
 			return;
 		}

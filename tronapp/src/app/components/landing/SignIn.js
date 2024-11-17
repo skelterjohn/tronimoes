@@ -3,13 +3,33 @@ import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWith
 import { Button } from "antd";
 import { auth } from "@/config";
 
+const setupTokenRefresh = (user, setUserInfo) => {
+	// Force token refresh every 55 minutes (tokens expire after 1 hour)
+	const refreshInterval = setInterval(async () => {
+		try {
+			const newToken = await user.getIdToken(true);
+			setUserInfo(prevState => ({
+				...prevState,
+				stsTokenManager: {
+					...prevState.stsTokenManager,
+					accessToken: newToken
+				}
+			}));
+		} catch (error) {
+			console.error("Error refreshing token:", error);
+		}
+	}, 55 * 60 * 1000); // 55 minutes
+
+	// Cleanup interval on component unmount
+	return () => clearInterval(refreshInterval);
+};
 
 export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) {
 	const signInAsGuest = async () => {
 		try {
 			const result = await signInAnonymously(auth);
-			console.log(result);
 			setUserInfo(result.user);
+			setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			console.error("Error signing in anonymously:", error);
@@ -23,6 +43,7 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 			const provider = new GoogleAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			setUserInfo(result.user);
+			setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			console.error("Error signing in with Google:", error);
@@ -36,19 +57,45 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 			const provider = new FacebookAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			setUserInfo(result.user);
+			setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			if (error.code === 'auth/account-exists-with-different-credential') {
-				setUserInfo({
-					accessToken: error.customData._tokenResponse.oauthAccessToken,
-					uid: error.customData._tokenResponse.localId,
-				});
-				onClose();
+				try {
+					// 1. Get the email from the error
+					const email = error.customData.email;
+					
+					const methods = error.customData._tokenResponse.verifiedProvider;
+					
+					// 3. If the user has previously signed in with Google
+					if (methods.includes('google.com')) {
+						// Sign in with Google
+						const googleProvider = new GoogleAuthProvider();
+						googleProvider.setCustomParameters({ login_hint: email });
+						const googleResult = await signInWithPopup(auth, googleProvider);
+						
+						// Get Facebook credential
+						const fbCredential = FacebookAuthProvider.credentialFromError(error);
+						
+						// Link the Facebook credential to the Google account
+						await linkWithCredential(googleResult.user, fbCredential);
+						
+						// Update user info and set up token refresh
+						setUserInfo(googleResult.user);
+						setupTokenRefresh(googleResult.user, setUserInfo);
+						onClose();
+					} else {
+						setErrorMessage(`Please sign in with ${methods[0]}`);
+					}
+				} catch (linkError) {
+					console.error("Error linking accounts:", linkError);
+					setErrorMessage("Error linking accounts");
+				}
 			} else {
 				console.error("Error signing in with Facebook:", error);
 				setErrorMessage("Error signing in with Facebook");
-				onClose();
 			}
+			onClose();
 		}
 	};
 
