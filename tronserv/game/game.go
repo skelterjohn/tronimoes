@@ -862,6 +862,10 @@ func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int, error) {
 func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, error) {
 	var potentialError error
 	cerr := func(err error) {
+		if err == ErrWrongSide || potentialError == ErrWrongSide {
+			potentialError = ErrWrongSide
+			return
+		}
 		if potentialError != nil {
 			return
 		}
@@ -906,8 +910,7 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 			}
 			cerr(ErrNotAdjacent)
 		}
-	}
-	if lt.Tile.PipsB == last.NextPips {
+	} else if lt.Tile.PipsB == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsB {
 			if last.CoordAX() == lt.CoordBX() &&
 				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
@@ -917,7 +920,12 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
 				return true, lt.Tile.PipsA, nil
 			}
-			if lt.Tile.PipsA == last.NextPips {
+			if last.CoordAX() == lt.CoordAX() &&
+				(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
+				cerr(ErrWrongSide)
+			}
+			if last.CoordAY() == lt.CoordAY() &&
+				(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
@@ -931,13 +939,19 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
 				return true, lt.Tile.PipsA, nil
 			}
-			if lt.Tile.PipsA == last.NextPips {
+			if last.CoordBX() == lt.CoordAX() &&
+				(last.CoordBY() == lt.CoordAY()+1 || last.CoordBY() == lt.CoordAY()-1) {
+				cerr(ErrWrongSide)
+			}
+			if last.CoordBY() == lt.CoordAY() &&
+				(last.CoordBX() == lt.CoordAX()+1 || last.CoordBX() == lt.CoordAX()-1) {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
+	} else {
+		cerr(ErrMustMatchPips)
 	}
-	cerr(ErrMustMatchPips)
 	return false, 0, potentialError
 }
 
@@ -1098,6 +1112,17 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	var potentialError error
+	cerr := func(err error) {
+		log.Printf("cerr: %v", err)
+		precedence := []error{ErrWrongSide, ErrMustMatchPips, ErrNotAdjacent}
+		for _, e := range precedence {
+			if potentialError == e || err == e {
+				potentialError = err
+				return
+			}
+		}
+		potentialError = err
+	}
 
 	playedALine := false
 
@@ -1125,7 +1150,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					lt.NextPips = nextPips
 				}
 			} else {
-				potentialError = err
+				cerr(err)
 			}
 		}
 	}
@@ -1177,9 +1202,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					}
 				}
 			} else {
-				if potentialError == nil {
-					potentialError = err
-				}
+				cerr(err)
 			}
 		}
 		for i, line := range r.FreeLines {
@@ -1194,9 +1217,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					lt.NextPips = nextPips
 				}
 			} else {
-				if potentialError == nil {
-					potentialError = err
-				}
+				cerr(err)
 			}
 		}
 	}
