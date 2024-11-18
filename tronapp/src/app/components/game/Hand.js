@@ -212,9 +212,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	useEffect(() => {
 		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
 	}, [player, players]);
-	useEffect(() => {
-		console.log(killedPlayers);
-	}, [killedPlayers]);
 
 	function DrawPassButtons() {
 		return <div className="flex flex-row gap-1 mt-2 justify-center">
