@@ -1059,59 +1059,14 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return ErrTileOccluded
 	}
 
-	isInRoundLeaderChickenfoot := false
-	for _, p := range g.Players {
-		if !p.ChickenFoot {
-			continue
-		}
-		if p.Name == name {
-			// It's ok to play on our own foot.
-			continue
-		}
-		// this only matters for that initial chickenfoot.
-		if len(r.PlayerLines[p.Name]) > 1 {
-			continue
-		}
-		// we don't check if this is a round-leader chickenfoot, because
-		// otherwise it would be blocked by a tile and already illegal.
-		if lt.CoordAX() == p.ChickenFootX && lt.CoordAY() == p.ChickenFootY {
-			isInRoundLeaderChickenfoot = true
-			break
-		}
-		if lt.CoordBX() == p.ChickenFootX && lt.CoordBY() == p.ChickenFootY {
-			isInRoundLeaderChickenfoot = true
-			break
-		}
-		// we're not playing on this chicken-foot, so we can't block it.
-		available := map[string]bool{}
-		checkCanPlayOn := func(x, y int) bool {
-			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
-				return false
-			}
-			key := fmt.Sprintf("%d,%d", x, y)
-			if _, ok := squarePips[key]; ok {
-				return false
-			}
-			available[key] = true
-			return true
-		}
-		checkCanPlayOn(p.ChickenFootX+1, p.ChickenFootY)
-		checkCanPlayOn(p.ChickenFootX-1, p.ChickenFootY)
-		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY+1)
-		checkCanPlayOn(p.ChickenFootX, p.ChickenFootY-1)
-		if len(available) == 1 {
-			for k := range available {
-				if lt.CoordA() == k || lt.CoordB() == k {
-					return ErrNoBlockingFeet
-				}
-			}
-		}
+	if r.BlockingFeet(g, squarePips, lt) {
+		return ErrNoBlockingFeet
 	}
 
 	playedALine := false
 
 	player := g.GetPlayer(name)
-	if r.Spacer == nil && !player.Dead && !isInRoundLeaderChickenfoot {
+	if r.Spacer == nil && !player.Dead {
 		mainLine := r.PlayerLines[player.Name]
 
 		onFoot := false
@@ -1480,6 +1435,108 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	return nil
+}
+
+func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, lt *LaidTile) bool {
+	if len(r.LaidTiles) <= 1 {
+		return false
+	}
+	allFrom := func(x, y int, orientations []string) []*LaidTile {
+		lts := []*LaidTile{}
+		for _, o := range orientations {
+			lts = append(lts, &LaidTile{
+				X:           x,
+				Y:           y,
+				Orientation: o,
+			})
+		}
+		return lts
+	}
+
+	blocks := map[string]bool{}
+	for coord := range squarePips {
+		blocks[coord] = true
+	}
+
+	playersToSatisfy := []*Player{}
+	// Does this set of blocks prevent any player from starting their main line?
+	for pn, pline := range r.PlayerLines {
+		if lt.PlayerName == pn {
+			continue
+		}
+		if len(pline) > 1 {
+			continue
+		}
+		p := g.GetPlayer(pn)
+		// if p.ChickenFoot {
+		// 	blocks[fmt.Sprintf("%d,%d", p.ChickenFootX, p.ChickenFootY)] = true
+		// }
+		playersToSatisfy = append(playersToSatisfy, p)
+	}
+
+	// returns true if the player can be satisfied.
+	var recursiveEnsurePlayersOK func(playersLeft []*Player, prevBlocks map[string]bool, lt *LaidTile) bool
+	recursiveEnsurePlayersOK = func(playersLeft []*Player, prevBlocks map[string]bool, lt *LaidTile) bool {
+		if len(playersLeft) == 0 {
+			return true
+		}
+
+		blocks := map[string]bool{}
+		for coord := range prevBlocks {
+			blocks[coord] = true
+		}
+		blocks[lt.CoordA()] = true
+		blocks[lt.CoordB()] = true
+
+		p := playersLeft[0]
+
+		isOpen := func(x, y int) bool {
+			return !blocks[fmt.Sprintf("%d,%d", x, y)]
+		}
+		checkCoord := func(x, y int, orientations []string) bool {
+			if !isOpen(x, y) {
+				return false
+			}
+			possibilities := allFrom(x, y, orientations)
+			for _, pos := range possibilities {
+				if !isOpen(pos.CoordBX(), pos.CoordBY()) {
+					continue
+				}
+				if recursiveEnsurePlayersOK(playersLeft[1:], blocks, pos) {
+					return true
+				}
+			}
+			return false
+		}
+
+		if p.ChickenFoot {
+			return checkCoord(p.ChickenFootX, p.ChickenFootY, []string{"up", "down", "left", "right"})
+		}
+
+		// iterate around the round leader
+		rl := r.PlayerLines[p.Name][0]
+		if checkCoord(rl.CoordAX()-1, rl.CoordAY(), []string{"left", "up", "down"}) {
+			return true
+		}
+		if checkCoord(rl.CoordAX(), rl.CoordAY()+1, []string{"up", "left", "right"}) {
+			return true
+		}
+		if checkCoord(rl.CoordAX(), rl.CoordAY()-1, []string{"down", "left", "right"}) {
+			return true
+		}
+		if checkCoord(rl.CoordBX()+1, rl.CoordBY(), []string{"right", "up", "down"}) {
+			return true
+		}
+		if checkCoord(rl.CoordBX(), rl.CoordBY()+1, []string{"up", "left", "right"}) {
+			return true
+		}
+		if checkCoord(rl.CoordBX(), rl.CoordBY()-1, []string{"down", "left", "right"}) {
+			return true
+		}
+		return false
+	}
+
+	return !recursiveEnsurePlayersOK(playersToSatisfy, blocks, lt)
 }
 
 type SquarePips struct {
