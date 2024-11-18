@@ -88,8 +88,8 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		{isRegistered ? (
 			<div>
 				<div className="font-[Roboto_Mono] text-white">designation</div>
-				<div className="bg-black rounded-lg p-4 border-white border text-white">
-				<p className="font-[Roboto_Mono] text-xl tracking-wider">{playerName}</p>
+				<div className="bg-black rounded-lg h-[4rem] p-4 border-white border text-white">
+					<p className="font-[Roboto_Mono] text-xl tracking-wider">{playerName}</p>
 				</div>
 			</div>
 		) : (
