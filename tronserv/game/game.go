@@ -845,66 +845,100 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	}
 }
 
-func (r *Round) canPlayOnLine(lt *LaidTile, line []*LaidTile) (bool, int) {
+func (r *Round) canPlayOnLine(lt *LaidTile, line []*LaidTile) (bool, int, error) {
 	last := line[len(line)-1]
 	return r.canPlayOnTile(lt, last)
 }
 
-func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int) {
+func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int, error) {
 	if lt.Indicated != nil && lt.Indicated.PipsA != -1 {
 		if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
-			return false, 0
+			return false, 0, ErrMustMatchPips
 		}
 	}
 	return r.canPlayOnTileWithoutIndication(lt, last)
 }
 
-func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int) {
+func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, error) {
+	var potentialError error
+	cerr := func(err error) {
+		if potentialError != nil {
+			return
+		}
+		potentialError = err
+	}
 	if lt.Tile.PipsA == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsA {
 			if last.CoordAX() == lt.CoordAX() &&
 				(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
-				return true, lt.Tile.PipsB
+				return true, lt.Tile.PipsB, nil
 			}
 			if last.CoordAY() == lt.CoordAY() &&
 				(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
-				return true, lt.Tile.PipsB
+				return true, lt.Tile.PipsB, nil
 			}
+			if last.CoordAX() == lt.CoordBX() &&
+				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
+				cerr(ErrWrongSide)
+			}
+			if last.CoordAY() == lt.CoordBY() &&
+				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
+				cerr(ErrWrongSide)
+			}
+			cerr(ErrNotAdjacent)
 		}
 		if last.Tile.PipsB == lt.Tile.PipsA {
 			if last.CoordBX() == lt.CoordAX() &&
 				(last.CoordBY() == lt.CoordAY()+1 || last.CoordBY() == lt.CoordAY()-1) {
-				return true, lt.Tile.PipsB
+				return true, lt.Tile.PipsB, nil
 			}
 			if last.CoordBY() == lt.CoordAY() &&
 				(last.CoordBX() == lt.CoordAX()+1 || last.CoordBX() == lt.CoordAX()-1) {
-				return true, lt.Tile.PipsB
+				return true, lt.Tile.PipsB, nil
 			}
+			if last.CoordBX() == lt.CoordBX() &&
+				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
+				cerr(ErrWrongSide)
+			}
+			if last.CoordBY() == lt.CoordBY() &&
+				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
+				cerr(ErrWrongSide)
+			}
+			cerr(ErrNotAdjacent)
 		}
 	}
 	if lt.Tile.PipsB == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsB {
 			if last.CoordAX() == lt.CoordBX() &&
 				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
-				return true, lt.Tile.PipsA
+				return true, lt.Tile.PipsA, nil
 			}
 			if last.CoordAY() == lt.CoordBY() &&
 				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
-				return true, lt.Tile.PipsA
+				return true, lt.Tile.PipsA, nil
 			}
+			if lt.Tile.PipsA == last.NextPips {
+				cerr(ErrWrongSide)
+			}
+			cerr(ErrNotAdjacent)
 		}
 		if last.Tile.PipsB == lt.Tile.PipsB {
 			if last.CoordBX() == lt.CoordBX() &&
 				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
-				return true, lt.Tile.PipsA
+				return true, lt.Tile.PipsA, nil
 			}
 			if last.CoordBY() == lt.CoordBY() &&
 				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
-				return true, lt.Tile.PipsA
+				return true, lt.Tile.PipsA, nil
 			}
+			if lt.Tile.PipsA == last.NextPips {
+				cerr(ErrWrongSide)
+			}
+			cerr(ErrNotAdjacent)
 		}
 	}
-	return false, 0
+	cerr(ErrMustMatchPips)
+	return false, 0, potentialError
 }
 
 func (g *Game) sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int) bool {
@@ -1063,6 +1097,8 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return ErrNoBlockingFeet
 	}
 
+	var potentialError error
+
 	playedALine := false
 
 	player := g.GetPlayer(name)
@@ -1078,13 +1114,18 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				onFoot = true
 			}
 		}
+		if len(mainLine) == 1 && !onFoot && player.ChickenFoot {
+			return ErrMustPlayOnFoot
+		}
 		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
-			if ok, nextPips := r.canPlayOnLine(lt, mainLine); ok {
+			if ok, nextPips, err := r.canPlayOnLine(lt, mainLine); ok {
 				playedALine = true
 				if !dryRun {
 					r.PlayerLines[player.Name] = append(mainLine, lt)
 					lt.NextPips = nextPips
 				}
+			} else {
+				potentialError = err
 			}
 		}
 	}
@@ -1119,7 +1160,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					continue
 				}
 			}
-			if ok, nextPips := r.canPlayOnLine(lt, line); ok {
+			if ok, nextPips, err := r.canPlayOnLine(lt, line); ok {
 				playedALine = true
 				if !dryRun {
 					lt.PlayerName = oname
@@ -1135,18 +1176,26 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 						op.ChickenFootY = lt.CoordAY()
 					}
 				}
+			} else {
+				if potentialError == nil {
+					potentialError = err
+				}
 			}
 		}
 		for i, line := range r.FreeLines {
 			if playedALine {
 				continue
 			}
-			if ok, nextPips := r.canPlayOnLine(lt, line); ok {
+			if ok, nextPips, err := r.canPlayOnLine(lt, line); ok {
 				playedALine = true
 				if !dryRun {
 					lt.PlayerName = ""
 					r.FreeLines[i] = append(line, lt)
 					lt.NextPips = nextPips
+				}
+			} else {
+				if potentialError == nil {
+					potentialError = err
 				}
 			}
 		}
@@ -1207,6 +1256,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	if !playedALine {
+		if potentialError != nil {
+			return potentialError
+		}
 		return ErrNoLine
 	}
 
