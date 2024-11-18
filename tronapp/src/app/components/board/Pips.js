@@ -11,6 +11,16 @@ export default function Pips({pips}) {
 			</div>
 		);
 	}
+	if (pips === undefined) {
+		return (
+			<div className="w-full h-full flex justify-center items-center">
+				<div className="w-[90%] h-[90%] flex flex-col justify-center items-center border border-black rounded-lg bg-gray-400">
+					<div>choose</div>
+					<div>tile</div>
+				</div>
+			</div>
+		);
+	}
 	return (
 		<div className="w-full flex justify-center items-center">
 			<Image 

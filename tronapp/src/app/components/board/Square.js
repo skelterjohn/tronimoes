@@ -15,6 +15,6 @@ export default function Square({ x, y, center = false, clicked = false, pips }) 
 	}
 
 	return <div className={cnm}>
-		{clicked && pips !== undefined && <Pips pips={pips} />}
+		{clicked && <Pips pips={pips} />}
 	</div>;
 }
