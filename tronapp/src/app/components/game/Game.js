@@ -54,6 +54,7 @@ function Game({ code }) {
 				isActive = false;
 				return;
 			}
+			let requestTime = new Date();
 			client.GetGame(code, version).then((resp) => {
 				// Only update state if component is still mounted
 				if (!isActive) return;
