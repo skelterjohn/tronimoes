@@ -86,8 +86,11 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	}
 	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
 		{isRegistered ? (
-			<div className="bg-black rounded-lg p-4 border-white border text-white">
-				<p className="font-[Roboto_Mono] text-xl tracking-wider">designation: {playerName}</p>
+			<div>
+				<div className="font-[Roboto_Mono] text-white">designation</div>
+				<div className="bg-black rounded-lg p-4 border-white border text-white">
+				<p className="font-[Roboto_Mono] text-xl tracking-wider">{playerName}</p>
+				</div>
 			</div>
 		) : (
 			<Input
