@@ -1059,7 +1059,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return ErrTileOccluded
 	}
 
-	if r.BlockingFeet(g, squarePips, lt) {
+	if r.BlockingFeet(g, squarePips, lt, name) {
 		return ErrNoBlockingFeet
 	}
 
@@ -1437,10 +1437,11 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	return nil
 }
 
-func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, lt *LaidTile) bool {
-	if len(r.LaidTiles) <= 1 {
-		return false
-	}
+func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *LaidTile, name string) bool {
+	lt := &LaidTile{}
+	*lt = *ot
+	lt.PlayerName = name
+
 	allFrom := func(x, y int, orientations []string) []*LaidTile {
 		lts := []*LaidTile{}
 		for _, o := range orientations {
@@ -1459,6 +1460,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, lt *Laid
 	}
 
 	playersToSatisfy := []*Player{}
+	playerChickenFeetCoords := map[string]string{}
 	// Does this set of blocks prevent any player from starting their main line?
 	for pn, pline := range r.PlayerLines {
 		if lt.PlayerName == pn {
@@ -1468,17 +1470,46 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, lt *Laid
 			continue
 		}
 		p := g.GetPlayer(pn)
-		// if p.ChickenFoot {
-		// 	blocks[fmt.Sprintf("%d,%d", p.ChickenFootX, p.ChickenFootY)] = true
-		// }
+		if p.ChickenFoot {
+			cfCoord := fmt.Sprintf("%d,%d", p.ChickenFootX, p.ChickenFootY)
+			playerChickenFeetCoords[p.Name] = cfCoord
+			if cfCoord == lt.CoordA() || cfCoord == lt.CoordB() {
+				lt.PlayerName = p.Name
+			}
+		}
 		playersToSatisfy = append(playersToSatisfy, p)
 	}
+
+	// depth := 0
+	// l := func(fmt string, items ...any) {
+	// 	prefix := strings.Repeat(" ", depth)
+	// 	log.Printf(prefix+fmt, items...)
+	// }
 
 	// returns true if the player can be satisfied.
 	var recursiveEnsurePlayersOK func(playersLeft []*Player, prevBlocks map[string]bool, lt *LaidTile) bool
 	recursiveEnsurePlayersOK = func(playersLeft []*Player, prevBlocks map[string]bool, lt *LaidTile) bool {
+		// l("dropping %s:%s for %s", lt.CoordA(), lt.CoordB(), lt.PlayerName)
+
+		// depth += 1
+		// defer func() { depth -= 1 }()
+
 		if len(playersLeft) == 0 {
+			// l("looks good")
 			return true
+		}
+
+		p := playersLeft[0]
+		// l("considering player %s", p.Name)
+		// Definitely not on someone else's reserved foot.
+		for op, coord := range playerChickenFeetCoords {
+			if op == lt.PlayerName {
+				continue
+			}
+			if coord == lt.CoordA() || coord == lt.CoordB() {
+				// l("on %s's foot", op)
+				return false
+			}
 		}
 
 		blocks := map[string]bool{}
@@ -1488,49 +1519,78 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, lt *Laid
 		blocks[lt.CoordA()] = true
 		blocks[lt.CoordB()] = true
 
-		p := playersLeft[0]
-
 		isOpen := func(x, y int) bool {
+			if playerChickenFeetCoords[p.Name] == fmt.Sprintf("%d,%d", x, y) {
+				return true
+			}
 			return !blocks[fmt.Sprintf("%d,%d", x, y)]
 		}
-		checkCoord := func(x, y int, orientations []string) bool {
+		checkCoord := func(x, y int, orientations []string) (bool, bool) {
+			// l("checking coord A %d,%d", x, y)
 			if !isOpen(x, y) {
-				return false
+				// l("%s A-blocked at %d,%d", p.Name, x, y)
+				return false, false
 			}
 			possibilities := allFrom(x, y, orientations)
+			canFitMyself := false
 			for _, pos := range possibilities {
+				pos.PlayerName = p.Name
+				// l("checking coord B %s", pos.CoordB())
 				if !isOpen(pos.CoordBX(), pos.CoordBY()) {
+					// l("%s B-blocked at %s:%s", p.Name, pos.CoordA(), pos.CoordB())
 					continue
 				}
+				canFitMyself = true
+				// l("trying %s:%s with %v", pos.CoordA(), pos.CoordB(), playersLeft[1:])
 				if recursiveEnsurePlayersOK(playersLeft[1:], blocks, pos) {
-					return true
+					return true, canFitMyself
 				}
 			}
-			return false
+			return false, canFitMyself
 		}
 
 		if p.ChickenFoot {
-			return checkCoord(p.ChickenFootX, p.ChickenFootY, []string{"up", "down", "left", "right"})
+			success, _ := checkCoord(p.ChickenFootX, p.ChickenFootY, []string{"up", "down", "left", "right"})
+			// We ignore the canFitMyself return value because this is the only place they can try.
+			return success
 		}
 
 		// iterate around the round leader
 		rl := r.PlayerLines[p.Name][0]
-		if checkCoord(rl.CoordAX()-1, rl.CoordAY(), []string{"left", "up", "down"}) {
+		var success, canFitMyself bool
+		if success, canFitMyself = checkCoord(rl.CoordAX()-1, rl.CoordAY(), []string{"left", "up", "down"}); success {
 			return true
 		}
-		if checkCoord(rl.CoordAX(), rl.CoordAY()+1, []string{"up", "left", "right"}) {
+		// we stop early, no point in checking further since this tile could just swap with
+		// other unplayed lines. This prevents a lot of branching.
+		if canFitMyself {
+			return false
+		}
+		if success, canFitMyself = checkCoord(rl.CoordAX(), rl.CoordAY()+1, []string{"down", "left", "right"}); success {
 			return true
 		}
-		if checkCoord(rl.CoordAX(), rl.CoordAY()-1, []string{"down", "left", "right"}) {
+		if canFitMyself {
+			return false
+		}
+		if success, canFitMyself = checkCoord(rl.CoordAX(), rl.CoordAY()-1, []string{"up", "left", "right"}); success {
 			return true
 		}
-		if checkCoord(rl.CoordBX()+1, rl.CoordBY(), []string{"right", "up", "down"}) {
+		if canFitMyself {
+			return false
+		}
+		if success, canFitMyself = checkCoord(rl.CoordBX()+1, rl.CoordBY(), []string{"right", "up", "down"}); success {
 			return true
 		}
-		if checkCoord(rl.CoordBX(), rl.CoordBY()+1, []string{"up", "left", "right"}) {
+		if canFitMyself {
+			return false
+		}
+		if success, canFitMyself = checkCoord(rl.CoordBX(), rl.CoordBY()+1, []string{"down", "left", "right"}); success {
 			return true
 		}
-		if checkCoord(rl.CoordBX(), rl.CoordBY()-1, []string{"down", "left", "right"}) {
+		if canFitMyself {
+			return false
+		}
+		if success, _ = checkCoord(rl.CoordBX(), rl.CoordBY()-1, []string{"up", "left", "right"}); success {
 			return true
 		}
 		return false
