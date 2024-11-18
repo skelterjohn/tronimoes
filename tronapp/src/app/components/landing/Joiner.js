@@ -13,9 +13,17 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	const inputRef = useRef(null);
 
 	useEffect(() => {
-		// Focus the input when component mounts
-		inputRef.current?.focus();
-	}, []);
+		if (!isRegistered) {
+			// Add a small delay to ensure DOM is ready and other focus events have completed
+			const timer = setTimeout(() => {
+				if (inputRef.current && document.activeElement !== inputRef.current) {
+					inputRef.current.focus();
+				}
+			}, 100);
+			
+			return () => clearTimeout(timer);
+		}
+	}, [isRegistered]);
 
 	useEffect(() => {
 		setPlayerKey(userInfo?.accessToken);
