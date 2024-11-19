@@ -351,19 +351,19 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 		if len(mainLine) > 1 {
 			mostRecent := mainLine[len(mainLine)-1]
 			if mostRecent.NextPips == mostRecent.Tile.PipsA {
-				player.ChickenFootX = mostRecent.CoordBX()
-				player.ChickenFootY = mostRecent.CoordBY()
+				player.ChickenFootCoord.X = mostRecent.CoordBX()
+				player.ChickenFootCoord.Y = mostRecent.CoordBY()
 			} else {
-				player.ChickenFootX = mostRecent.CoordAX()
-				player.ChickenFootY = mostRecent.CoordAY()
+				player.ChickenFootCoord.X = mostRecent.CoordAX()
+				player.ChickenFootCoord.Y = mostRecent.CoordAY()
 			}
 		} else {
 			// we have to pick a viable spot left around the round leader
 			if chickenFootX == -1 || chickenFootY == -1 {
 				return ErrMustPickChickenFoot
 			}
-			player.ChickenFootX = chickenFootX
-			player.ChickenFootY = chickenFootY
+			player.ChickenFootCoord.X = chickenFootX
+			player.ChickenFootCoord.Y = chickenFootY
 		}
 	}
 
@@ -567,18 +567,17 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 }
 
 type Player struct {
-	Name           string     `json:"name"`
-	Score          int        `json:"score"`
-	Hand           []*Tile    `json:"hand"`
-	Hints          [][]string `json:"hints"`
-	SpacerHints    []string   `json:"spacer_hints"`
-	ChickenFoot    bool       `json:"chicken_foot"`
-	Dead           bool       `json:"dead"`
-	JustDrew       bool       `json:"just_drew"`
-	ChickenFootX   int        `json:"chicken_foot_x"`
-	ChickenFootY   int        `json:"chicken_foot_y"`
-	ChickenFootURL string     `json:"chicken_foot_url"`
-	Kills          []string   `json:"kills"`
+	Name             string     `json:"name"`
+	Score            int        `json:"score"`
+	Hand             []*Tile    `json:"hand"`
+	Hints            [][]string `json:"hints"`
+	SpacerHints      []string   `json:"spacer_hints"`
+	ChickenFoot      bool       `json:"chicken_foot"`
+	Dead             bool       `json:"dead"`
+	JustDrew         bool       `json:"just_drew"`
+	ChickenFootCoord Coord      `json:"chicken_foot_coord"`
+	ChickenFootURL   string     `json:"chicken_foot_url"`
+	Kills            []string   `json:"kills"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {
@@ -1117,10 +1116,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	playerFoot := ""
 	// if this is on someone's foot, it's definitely made part of their line.
 	for _, p := range g.Players {
-		if p.ChickenFootX == lt.CoordAX() && p.ChickenFootY == lt.CoordAY() {
+		if p.ChickenFootCoord.X == lt.CoordAX() && p.ChickenFootCoord.Y == lt.CoordAY() {
 			playerFoot = p.Name
 		}
-		if p.ChickenFootX == lt.CoordBX() && p.ChickenFootY == lt.CoordBY() {
+		if p.ChickenFootCoord.X == lt.CoordBX() && p.ChickenFootCoord.Y == lt.CoordBY() {
 			playerFoot = p.Name
 		}
 	}
@@ -1147,10 +1146,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 		onFoot := false
 		if player.ChickenFoot && len(mainLine) == 1 {
-			if player.ChickenFootX == lt.CoordAX() && player.ChickenFootY == lt.CoordAY() {
+			if player.ChickenFootCoord.X == lt.CoordAX() && player.ChickenFootCoord.Y == lt.CoordAY() {
 				onFoot = true
 			}
-			if player.ChickenFootX == lt.CoordBX() && player.ChickenFootY == lt.CoordBY() {
+			if player.ChickenFootCoord.X == lt.CoordBX() && player.ChickenFootCoord.Y == lt.CoordBY() {
 				onFoot = true
 			}
 		}
@@ -1193,10 +1192,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			if len(line) == 1 {
 				// round leader, need to play on top of chickenfoot.
 				isOnMyFoot := false
-				if lt.CoordAX() == op.ChickenFootX && lt.CoordAY() == op.ChickenFootY && lt.Tile.PipsA == line[0].NextPips {
+				if lt.CoordAX() == op.ChickenFootCoord.X && lt.CoordAY() == op.ChickenFootCoord.Y && lt.Tile.PipsA == line[0].NextPips {
 					isOnMyFoot = true
 				}
-				if lt.CoordBX() == op.ChickenFootX && lt.CoordBY() == op.ChickenFootY && lt.Tile.PipsB == line[0].NextPips {
+				if lt.CoordBX() == op.ChickenFootCoord.X && lt.CoordBY() == op.ChickenFootCoord.Y && lt.Tile.PipsB == line[0].NextPips {
 					isOnMyFoot = true
 				}
 				if !isOnMyFoot {
@@ -1211,12 +1210,12 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					lt.NextPips = nextPips
 					// Update the chicken-foot.
 					if lt.NextPips == lt.Tile.PipsA {
-						op.ChickenFootX = lt.CoordBX()
-						op.ChickenFootY = lt.CoordBY()
+						op.ChickenFootCoord.X = lt.CoordBX()
+						op.ChickenFootCoord.Y = lt.CoordBY()
 					}
 					if lt.NextPips == lt.Tile.PipsB {
-						op.ChickenFootX = lt.CoordAX()
-						op.ChickenFootY = lt.CoordAY()
+						op.ChickenFootCoord.X = lt.CoordAX()
+						op.ChickenFootCoord.Y = lt.CoordAY()
 					}
 				}
 			} else {
@@ -1562,7 +1561,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *Laid
 		}
 		p := g.GetPlayer(pn)
 		if p.ChickenFoot {
-			cfCoord := fmt.Sprintf("%d,%d", p.ChickenFootX, p.ChickenFootY)
+			cfCoord := fmt.Sprintf("%d,%d", p.ChickenFootCoord.X, p.ChickenFootCoord.Y)
 			playerChickenFeetCoords[p.Name] = cfCoord
 			if cfCoord == lt.CoordA() || cfCoord == lt.CoordB() {
 				lt.PlayerName = p.Name
@@ -1641,7 +1640,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *Laid
 		}
 
 		if p.ChickenFoot {
-			success, _ := checkCoord(p.ChickenFootX, p.ChickenFootY, []string{"up", "down", "left", "right"})
+			success, _ := checkCoord(p.ChickenFootCoord.X, p.ChickenFootCoord.Y, []string{"up", "down", "left", "right"})
 			// We ignore the canFitMyself return value because this is the only place they can try.
 			return success
 		}
