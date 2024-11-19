@@ -77,7 +77,10 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 		}
 		playTile({
 			a: selectedTile.a, b: selectedTile.b,
-			x: playA.x, y: playA.y,
+			coord: {
+				x: playA.x,
+				y: playA.y,
+			},
 			orientation: orientation,
 			dead: false,
 		});

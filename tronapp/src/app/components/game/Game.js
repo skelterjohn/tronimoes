@@ -144,7 +144,7 @@ function Game({ code }) {
 		if (game.rounds?.length > 0) {
 			const lastRound = game.rounds[game.rounds.length - 1]
 			lastRound?.laid_tiles?.forEach((lt) => {
-				allLaidTiles[`${lt.x},${lt.y}`] = {
+				allLaidTiles[`${lt.coord.x},${lt.coord.y}`] = {
 					a: lt.tile.pips_a,
 					b: lt.tile.pips_b,
 					orientation: lt.orientation,
@@ -289,8 +289,7 @@ function Game({ code }) {
 				pips_a: tile.a,
 				pips_b: tile.b,
 			},
-			x: tile.x,
-			y: tile.y,
+			coord: tile.coord,
 			orientation: tile.orientation,
 			player_name: player.name,
 			indicated: {

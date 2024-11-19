@@ -295,8 +295,10 @@ func (g *Game) Start() error {
 		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
 		PlayerName:  g.Players[g.Turn].Name,
 		Orientation: "right",
-		X:           g.BoardWidth/2 - 1,
-		Y:           g.BoardHeight / 2,
+		Coord: Coord{
+			X: g.BoardWidth/2 - 1,
+			Y: g.BoardHeight / 2,
+		},
 	}); err != nil {
 		return fmt.Errorf("laying round leader tile: %w", err)
 	}
@@ -606,6 +608,40 @@ type Coord struct {
 	Y int `json:"y"`
 }
 
+func (c Coord) Up() Coord {
+	return Coord{X: c.X, Y: c.Y - 1}
+}
+
+func (c Coord) Down() Coord {
+	return Coord{X: c.X, Y: c.Y + 1}
+}
+
+func (c Coord) Left() Coord {
+	return Coord{X: c.X - 1, Y: c.Y}
+}
+
+func (c Coord) Right() Coord {
+	return Coord{X: c.X + 1, Y: c.Y}
+}
+
+func (c Coord) Adj(o Coord) bool {
+	return c.Up() == o || c.Down() == o || c.Left() == o || c.Right() == o
+}
+
+func (c Coord) Orientation(o string) Coord {
+	switch o {
+	case "up":
+		return c.Up()
+	case "down":
+		return c.Down()
+	case "left":
+		return c.Left()
+	case "right":
+		return c.Right()
+	}
+	return c
+}
+
 type Spacer struct {
 	A Coord `json:"a"`
 	B Coord `json:"b"`
@@ -613,8 +649,7 @@ type Spacer struct {
 
 type LaidTile struct {
 	Tile        *Tile  `json:"tile"`
-	X           int    `json:"x"`
-	Y           int    `json:"y"`
+	Coord       Coord  `json:"coord"`
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`
 	NextPips    int    `json:"next_pips"`
@@ -625,7 +660,7 @@ type LaidTile struct {
 func (lt *LaidTile) Reverse() *LaidTile {
 	rt := &LaidTile{}
 	*rt = *lt
-	rt.X, rt.Y = rt.CoordBX(), rt.CoordBY()
+	rt.Coord.X, rt.Coord.Y = rt.CoordBX(), rt.CoordBY()
 	switch lt.Orientation {
 	case "up":
 		rt.Orientation = "down"
@@ -640,35 +675,35 @@ func (lt *LaidTile) Reverse() *LaidTile {
 }
 
 func (lt *LaidTile) CoordA() string {
-	return fmt.Sprintf("%d,%d", lt.X, lt.Y)
+	return fmt.Sprintf("%d,%d", lt.Coord.X, lt.Coord.Y)
 }
 
 func (lt *LaidTile) CoordAX() int {
-	return lt.X
+	return lt.Coord.X
 }
 
 func (lt *LaidTile) CoordAY() int {
-	return lt.Y
+	return lt.Coord.Y
 }
 
 func (lt *LaidTile) CoordBX() int {
 	switch lt.Orientation {
 	case "right":
-		return lt.X + 1
+		return lt.Coord.X + 1
 	case "left":
-		return lt.X - 1
+		return lt.Coord.X - 1
 	}
-	return lt.X
+	return lt.Coord.X
 }
 
 func (lt *LaidTile) CoordBY() int {
 	switch lt.Orientation {
 	case "up":
-		return lt.Y - 1
+		return lt.Coord.Y - 1
 	case "down":
-		return lt.Y + 1
+		return lt.Coord.Y + 1
 	}
-	return lt.Y
+	return lt.Coord.Y
 }
 
 func (lt *LaidTile) CoordB() string {
@@ -716,8 +751,10 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				lt := &LaidTile{
 					Tile:        t,
 					Orientation: orientation,
-					X:           x,
-					Y:           y,
+					Coord: Coord{
+						X: x,
+						Y: y,
+					},
 				}
 				if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
 					hintAt(i, lt.CoordA())
@@ -781,8 +818,10 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					lt := &LaidTile{
 						Tile:        t,
 						Orientation: orientation,
-						X:           x,
-						Y:           y,
+						Coord: Coord{
+							X: x,
+							Y: y,
+						},
 					}
 					if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
 						hintAt(i, lt.CoordA())
@@ -1536,8 +1575,10 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *Laid
 		lts := []*LaidTile{}
 		for _, o := range orientations {
 			lts = append(lts, &LaidTile{
-				X:           x,
-				Y:           y,
+				Coord: Coord{
+					X: x,
+					Y: y,
+				},
 				Orientation: o,
 			})
 		}
