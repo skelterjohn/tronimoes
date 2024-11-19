@@ -1111,6 +1111,17 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return ErrNoBlockingFeet
 	}
 
+	playerFoot := ""
+	// if this is on someone's foot, it's definitely made part of their line.
+	for _, p := range g.Players {
+		if p.ChickenFootX == lt.CoordAX() && p.ChickenFootY == lt.CoordAY() {
+			playerFoot = p.Name
+		}
+		if p.ChickenFootX == lt.CoordBX() && p.ChickenFootY == lt.CoordBY() {
+			playerFoot = p.Name
+		}
+	}
+
 	var potentialError error
 	cerr := func(err error) {
 		log.Printf("cerr: %v", err)
@@ -1127,7 +1138,8 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	playedALine := false
 
 	player := g.GetPlayer(name)
-	if r.Spacer == nil && !player.Dead {
+
+	if r.Spacer == nil && !player.Dead && (playerFoot == "" || playerFoot == player.Name) {
 		mainLine := r.PlayerLines[player.Name]
 
 		onFoot := false
@@ -1159,6 +1171,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 	if canPlayOtherLines {
 		for oname, line := range r.PlayerLines {
+			if playerFoot != "" && playerFoot != oname {
+				continue
+			}
 			if playedALine {
 				continue
 			}

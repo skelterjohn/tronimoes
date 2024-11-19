@@ -97,13 +97,13 @@ func (s *GameServer) getName(r *http.Request) (string, error) {
 	ctx := r.Context()
 	userID := r.Header.Get("X-Player-Id")
 	if userID != "" {
-		log.Printf("logged in %s", userID)
 		if err := s.validateToken(r); err != nil {
 			return "", err
 		}
 
 		pi, err := s.store.GetPlayer(ctx, userID)
 		if err == nil {
+			log.Printf("logged in %s as %s", userID, pi.Name)
 			return pi.Name, nil
 		}
 		return "", err
