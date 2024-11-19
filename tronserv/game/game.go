@@ -616,6 +616,10 @@ func (c Coord) String() string {
 	return fmt.Sprintf("%d,%d", c.X, c.Y)
 }
 
+func (c Coord) Plus(dx, dy int) Coord {
+	return Coord{X: c.X + dx, Y: c.Y + dy}
+}
+
 func (c Coord) Up() Coord {
 	return Coord{X: c.X, Y: c.Y - 1}
 }
@@ -630,6 +634,22 @@ func (c Coord) Left() Coord {
 
 func (c Coord) Right() Coord {
 	return Coord{X: c.X + 1, Y: c.Y}
+}
+
+func (c Coord) OrientationTo(o Coord) string {
+	if c.X == o.X {
+		if c.Y < o.Y {
+			return "down"
+		}
+		return "up"
+	}
+	if c.Y == o.Y {
+		if c.X < o.X {
+			return "right"
+		}
+		return "left"
+	}
+	return ""
 }
 
 func (c Coord) Adj(o Coord) bool {
@@ -857,32 +877,30 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 
 	p.SpacerHints = []string{}
 	if !p.ChickenFoot && len(r.PlayerLines[name]) > 1 {
-		hintSpacerFrom := func(x, y int) {
-			if g.sixPathFrom(squarePips, x, y, x+5, y) {
-				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x+5, y))
+		hintSpacerFrom := func(src Coord) {
+			fourWays := []Coord{
+				src.Plus(5, 0),
+				src.Plus(-5, 0),
+				src.Plus(0, 5),
+				src.Plus(0, -5),
 			}
-			if g.sixPathFrom(squarePips, x, y, x-5, y) {
-				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x-5, y))
-			}
-			if g.sixPathFrom(squarePips, x, y, x, y+5) {
-				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x, y+5))
-			}
-			if g.sixPathFrom(squarePips, x, y, x, y-5) {
-				p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%d,%d-%d,%d", x, y, x, y-5))
+			for _, dst := range fourWays {
+				if g.sixPathFrom(squarePips, src, dst) {
+					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%s-%s", src, dst))
+				}
 			}
 		}
-		hintSpacerFromTileCoord := func(x, y int) {
-			hintSpacerFrom(x+1, y)
-			hintSpacerFrom(x-1, y)
-			hintSpacerFrom(x, y+1)
-			hintSpacerFrom(x, y-1)
+		hintSpacerFromTileCoord := func(tc Coord) {
+			for _, n := range tc.Neighbors() {
+				hintSpacerFrom(n)
+			}
 		}
 		hintSpacerFromTile := func(head *LaidTile) {
 			if head.NextPips == head.Tile.PipsA {
-				hintSpacerFromTileCoord(head.CoordAX(), head.CoordAY())
+				hintSpacerFromTileCoord(head.CoordA())
 			}
 			if head.NextPips == head.Tile.PipsB {
-				hintSpacerFromTileCoord(head.CoordBX(), head.CoordBY())
+				hintSpacerFromTileCoord(head.CoordB())
 			}
 		}
 		for _, line := range r.PlayerLines {
@@ -1008,43 +1026,48 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 	return false, 0, potentialError
 }
 
-func (g *Game) sixPathFrom(squarePips map[Coord]SquarePips, x1, y1, x2, y2 int) bool {
-	if x1 < 0 || x1 >= g.BoardWidth || y1 < 0 || y1 >= g.BoardHeight {
+func (g *Game) sixPathFrom(squarePips map[Coord]SquarePips, src, dst Coord) bool {
+	if !g.InBounds(src) {
 		return false
 	}
-	if x2 < 0 || x2 >= g.BoardWidth || y2 < 0 || y2 >= g.BoardHeight {
+	if !g.InBounds(dst) {
 		return false
 	}
-	switch {
-	case x1 == x2:
-		if y1 > y2 {
-			y1, y2 = y2, y1
-		}
-		if y2-y1 != 5 {
+
+	dx := dst.X - src.X
+	dy := dst.Y - src.Y
+
+	if dx < 0 {
+		dx *= -1
+	}
+	if dy < 0 {
+		dy *= -1
+	}
+
+	if dx == 0 && dy != 5 {
+		return false
+	}
+	if dy == 0 && dx != 5 {
+		return false
+	}
+
+	orientation := src.OrientationTo(dst)
+	cur := src
+
+	check := func(c Coord) bool {
+		if _, ok := squarePips[c]; ok {
 			return false
 		}
-		for y := y1; y <= y2; y++ {
-			if _, ok := squarePips[Coord{X: x1, Y: y}]; ok {
-				return false
-			}
-		}
 		return true
-	case y1 == y2:
-		if x1 > x2 {
-			x1, x2 = x2, x1
-		}
-		if x2-x1 != 5 {
+	}
+
+	for i := 0; i < 5; i++ {
+		if !check(cur) {
 			return false
 		}
-		for x := x1; x <= x2; x++ {
-			if _, ok := squarePips[Coord{X: x, Y: y1}]; ok {
-				return false
-			}
-		}
-		return true
-	default:
-		return false
+		cur = cur.Orientation(orientation)
 	}
+	return check(cur)
 }
 
 func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
@@ -1069,7 +1092,7 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 		return ErrWrongLengthSpacer
 	}
 
-	if !g.sixPathFrom(r.MapTiles(), spacer.A.X, spacer.A.Y, spacer.B.X, spacer.B.Y) {
+	if !g.sixPathFrom(r.MapTiles(), spacer.A, spacer.B) {
 		return ErrTileOccluded
 	}
 
