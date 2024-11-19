@@ -944,78 +944,38 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 	}
 	if lt.Tile.PipsA == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsA {
-			if last.CoordAX() == lt.CoordAX() &&
-				(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
+			if last.CoordA().Adj(lt.CoordA()) {
 				return true, lt.Tile.PipsB, nil
 			}
-			if last.CoordAY() == lt.CoordAY() &&
-				(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
-				return true, lt.Tile.PipsB, nil
-			}
-			if last.CoordAX() == lt.CoordBX() &&
-				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
-				cerr(ErrWrongSide)
-			}
-			if last.CoordAY() == lt.CoordBY() &&
-				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
+			if last.CoordA().Adj(lt.CoordB()) {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
 		if last.Tile.PipsB == lt.Tile.PipsA {
-			if last.CoordBX() == lt.CoordAX() &&
-				(last.CoordBY() == lt.CoordAY()+1 || last.CoordBY() == lt.CoordAY()-1) {
+			if last.CoordB().Adj(lt.CoordA()) {
 				return true, lt.Tile.PipsB, nil
 			}
-			if last.CoordBY() == lt.CoordAY() &&
-				(last.CoordBX() == lt.CoordAX()+1 || last.CoordBX() == lt.CoordAX()-1) {
-				return true, lt.Tile.PipsB, nil
-			}
-			if last.CoordBX() == lt.CoordBX() &&
-				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
-				cerr(ErrWrongSide)
-			}
-			if last.CoordBY() == lt.CoordBY() &&
-				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
+			if last.CoordB().Adj(lt.CoordB()) {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
 	} else if lt.Tile.PipsB == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsB {
-			if last.CoordAX() == lt.CoordBX() &&
-				(last.CoordAY() == lt.CoordBY()+1 || last.CoordAY() == lt.CoordBY()-1) {
-				return true, lt.Tile.PipsA, nil
+			if last.CoordA().Adj(lt.CoordB()) {
+				return true, lt.Tile.PipsB, nil
 			}
-			if last.CoordAY() == lt.CoordBY() &&
-				(last.CoordAX() == lt.CoordBX()+1 || last.CoordAX() == lt.CoordBX()-1) {
-				return true, lt.Tile.PipsA, nil
-			}
-			if last.CoordAX() == lt.CoordAX() &&
-				(last.CoordAY() == lt.CoordAY()+1 || last.CoordAY() == lt.CoordAY()-1) {
-				cerr(ErrWrongSide)
-			}
-			if last.CoordAY() == lt.CoordAY() &&
-				(last.CoordAX() == lt.CoordAX()+1 || last.CoordAX() == lt.CoordAX()-1) {
+			if last.CoordA().Adj(lt.CoordA()) {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
 		if last.Tile.PipsB == lt.Tile.PipsB {
-			if last.CoordBX() == lt.CoordBX() &&
-				(last.CoordBY() == lt.CoordBY()+1 || last.CoordBY() == lt.CoordBY()-1) {
-				return true, lt.Tile.PipsA, nil
+			if last.CoordB().Adj(lt.CoordB()) {
+				return true, lt.Tile.PipsB, nil
 			}
-			if last.CoordBY() == lt.CoordBY() &&
-				(last.CoordBX() == lt.CoordBX()+1 || last.CoordBX() == lt.CoordBX()-1) {
-				return true, lt.Tile.PipsA, nil
-			}
-			if last.CoordBX() == lt.CoordAX() &&
-				(last.CoordBY() == lt.CoordAY()+1 || last.CoordBY() == lt.CoordAY()-1) {
-				cerr(ErrWrongSide)
-			}
-			if last.CoordBY() == lt.CoordAY() &&
-				(last.CoordBX() == lt.CoordAX()+1 || last.CoordBX() == lt.CoordAX()-1) {
+			if last.CoordB().Adj(lt.CoordA()) {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
