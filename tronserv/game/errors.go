@@ -40,5 +40,5 @@ var (
 	ErrMustPlayOnFoot           = errors.New("you must play on your own foot")
 	ErrMustMatchPips            = errors.New("you must match the pips of the previous tile")
 	ErrNotAdjacent              = errors.New("tile is not adjacent to the previous tile")
-	ErrWrongSide                = errors.New("the side you chose does not match the previous tile")
+	ErrWrongSide                = errors.New("this tile could be played if reversed")
 )
