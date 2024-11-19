@@ -438,6 +438,7 @@ function Game({ code }) {
 							hidden={true}
 							dead={o.dead}
 							tiles={o.hand}
+							turnIndex={turnIndex}
 						/>
 					</div>
 				))}
@@ -490,6 +491,7 @@ function Game({ code }) {
 							hintedTiles={hintedTiles}
 							hintedSpacer={player.spacer_hints}
 							bagCount={bagCount}
+							turnIndex={turnIndex}
 						/>
 					</div>
 				</div>

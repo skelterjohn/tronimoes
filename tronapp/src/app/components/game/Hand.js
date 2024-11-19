@@ -3,12 +3,17 @@ import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 
-function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount }) {
+function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount, turnIndex }) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
 	const [spacerAvailable, setSpacerAvailable] = useState(false);
 	const [spacerColor, setSpacerColor] = useState("white");
+	const [myTurn, setMyTurn] = useState(false);
+
+	useEffect(() => {
+		setMyTurn(player?.name === players[turnIndex]?.name);
+	}, [turnIndex, player, players]);
 
 	useEffect(() => {
 		setSpacerAvailable(hintedSpacer);
@@ -237,7 +242,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}
 
 	return (
-		<div className="h-full flex flex-col items-center p-2">
+		<div className={`h-full flex flex-col items-center p-2 ${myTurn ? "border-2 border-black" : ""}`}>
 			<div className="text-center font-bold">
 				{killedPlayers?.map(kp => (
 					<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
