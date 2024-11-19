@@ -712,7 +712,7 @@ func (lt *LaidTile) CoordB() Coord {
 }
 
 func (lt *LaidTile) String() string {
-	return fmt.Sprintf("%d:%d %s:%s", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB())
+	return fmt.Sprintf("{%d:%d %s:%s %d}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), lt.NextPips)
 }
 
 type Round struct {
@@ -927,7 +927,7 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 	} else if lt.Tile.PipsB == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsB {
 			if last.CoordA().Adj(lt.CoordB()) {
-				return true, lt.Tile.PipsB, nil
+				return true, lt.Tile.PipsA, nil
 			}
 			if last.CoordA().Adj(lt.CoordA()) {
 				cerr(ErrWrongSide)
@@ -936,7 +936,7 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 		}
 		if last.Tile.PipsB == lt.Tile.PipsB {
 			if last.CoordB().Adj(lt.CoordB()) {
-				return true, lt.Tile.PipsB, nil
+				return true, lt.Tile.PipsA, nil
 			}
 			if last.CoordB().Adj(lt.CoordA()) {
 				cerr(ErrWrongSide)
