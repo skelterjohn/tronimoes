@@ -9,7 +9,7 @@
    id="svg1"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
    sodipodi:docname="16.svg"
-   inkscape:export-filename="Documents\GitHub\tronimoes\tronapp\public\tilesets\beehive\0.png"
+   inkscape:export-filename="16.png"
    inkscape:export-xdpi="47.393879"
    inkscape:export-ydpi="47.393879"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -29,11 +29,11 @@
      inkscape:zoom="0.69"
      inkscape:cx="411.5942"
      inkscape:cy="507.97101"
-     inkscape:window-width="1920"
-     inkscape:window-height="991"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1147"
+     inkscape:window-height="1211"
+     inkscape:window-x="1434"
+     inkscape:window-y="72"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      inkscape:export-bgcolor="#ffffff00" />
   <defs
@@ -189,6 +189,21 @@
        style="fill:#0000ff;stroke:#000000;stroke-width:1.44928;stroke-opacity:1"
        d="m 151.02752,116.55084 -6.21886,-10.89234 6.14489,-10.800263 6.14489,-10.800266 13.11745,0.01539 13.11744,0.01539 6.23578,10.94061 6.23577,10.940609 -6.23577,10.76536 -6.23578,10.76535 -13.04347,-0.0288 -13.04348,-0.0288 z"
        id="path149"
+       transform="scale(0.26458333)" />
+    <path
+       style="fill:#ffffff;stroke-width:1.44928"
+       d="m 70.314539,164.9156 c -3.31264,-5.7457 -6.140757,-10.85794 -6.284703,-11.36053 -0.143946,-0.50259 2.583605,-5.91026 6.061226,-12.01704 l 6.322945,-11.10325 h 12.017603 12.0176 l 3.95166,6.88406 c 2.17342,3.78623 5.15113,8.88675 6.61714,11.33448 l 2.66547,4.45042 -6.51483,11.12929 -6.51483,11.12929 H 88.49567 76.337522 Z"
+       id="path1"
+       transform="scale(0.26458333)" />
+    <path
+       style="fill:#ffffff;stroke-width:1.44928"
+       d="m 109.97407,93.584475 -5.96795,-10.700816 6.37962,-11.007047 6.37962,-11.007047 12.63182,0.01539 12.63181,0.01539 6.18622,10.854174 6.18623,10.854175 -6.18623,10.854174 -6.18622,10.854172 -13.04348,-0.0159 -13.04348,-0.0159 z"
+       id="path2"
+       transform="scale(0.26458333)" />
+    <path
+       style="fill:#ffffff;stroke-width:1.44928"
+       d="m 151.76618,164.71671 c -3.3627,-5.91029 -6.11401,-11.17132 -6.11401,-11.69116 0,-0.51984 2.77174,-5.8085 6.15942,-11.75258 l 6.15942,-10.80741 12.39281,-0.0154 12.39281,-0.0154 6.35254,11.16523 6.35253,11.16522 -5.93906,10.93623 -5.93906,10.93622 -12.85169,0.41251 -12.85169,0.41251 z"
+       id="path3"
        transform="scale(0.26458333)" />
   </g>
 </svg>
