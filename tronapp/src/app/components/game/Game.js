@@ -218,7 +218,6 @@ function Game({ code }) {
 			}
 			allFeet[`${p.chickenFootX},${p.chickenFootY}`] = p.color;
 			allURLs[`${p.chickenFootX},${p.chickenFootY}`] = p.chickenFootURL;
-			console.log(p.chickenFootURL);
 		});
 		setChickenFeet(allFeet);
 		setChickenFeetURLs(allURLs);
@@ -299,6 +298,7 @@ function Game({ code }) {
 		}).then((resp) => {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
+			setPlayA(undefined);
 			setHints({});
 			console.log("laid tile", resp);
 		}).catch((error) => {
@@ -312,6 +312,7 @@ function Game({ code }) {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
 			setHints({});
+			setPlayA(undefined);
 			console.log("laid spacer", resp);
 		}).catch((error) => {
 			console.error("error", error);
@@ -324,6 +325,7 @@ function Game({ code }) {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
 			setHints({});
+			setPlayA(undefined);
 			console.log("cleared spacer", resp);
 		}).catch((error) => {
 			console.error("error", error);
@@ -335,6 +337,7 @@ function Game({ code }) {
 		setSelectedTile(undefined);
 		client.DrawTile(code).then((resp) => {
 			console.log("drew tile", resp);
+			setPlayA(undefined);
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
@@ -366,6 +369,7 @@ function Game({ code }) {
 			selected_y: playA !== undefined ? playA.y : -1,
 		}).then((resp) => {
 			console.log("passed");
+			setPlayA(undefined);
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
