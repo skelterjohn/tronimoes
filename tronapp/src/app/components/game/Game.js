@@ -439,7 +439,7 @@ function Game({ code }) {
 				))}
 			</div>
 			<div className="flex gap-4 justify-center max-h-[75vh]">
-				<span className="w-96 hidden lg:block">
+				<span className="w-[20rem] hidden lg:block">
 					<History history={gameHistory} />
 				</span>
 				<div className="border-black border-8 flex-1 overflow-auto">
@@ -465,7 +465,7 @@ function Game({ code }) {
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
-				<span className="w-40 hidden lg:block">
+				<span className="w-[12rem] hidden lg:block">
 					<History history={roundHistory} />
 				</span>
 			</div>

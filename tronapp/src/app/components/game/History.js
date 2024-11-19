@@ -16,7 +16,7 @@ export default function History({ history }) {
 				{history.map((h, i) => (
 					<li 
 						key={i} 
-						className="whitespace-nowrap overflow-hidden text-ellipsis"
+						className="whitespace-normal break-words"
 					>
 						{h}
 					</li>
