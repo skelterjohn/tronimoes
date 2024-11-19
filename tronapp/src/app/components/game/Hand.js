@@ -321,13 +321,8 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							);
 						})}
 						{hidden && (
-							<div
-							className={hidden ? "w-[1rem]" : "w-[4rem] pr-1 pt-1"}
-							draggable={false}
-						>
-							<div className="pointer-events-none">
+							<div className="w-[1rem]">
 								<Tile
-									draggable={false}
 									color={player?.color}
 									pipsa={0}
 									pipsb={0}
@@ -335,7 +330,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 									dead={dead}
 								/>
 							</div>
-						</div>
 						)}
 						{hidden && (
 							<div>x{handOrder.length}</div>
