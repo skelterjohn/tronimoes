@@ -1139,16 +1139,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return nil
 	}
 
-	if lt.CoordAX() < 0 || lt.CoordAX() >= g.BoardWidth {
+	if !g.InBounds(lt.CoordA()) {
 		return ErrTileOutOfBounds
 	}
-	if lt.CoordAY() < 0 || lt.CoordAY() >= g.BoardHeight {
-		return ErrTileOutOfBounds
-	}
-	if lt.CoordBX() < 0 || lt.CoordBX() >= g.BoardWidth {
-		return ErrTileOutOfBounds
-	}
-	if lt.CoordBY() < 0 || lt.CoordBY() >= g.BoardHeight {
+	if !g.InBounds(lt.CoordB()) {
 		return ErrTileOutOfBounds
 	}
 
@@ -1177,7 +1171,6 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 	var potentialError error
 	cerr := func(err error) {
-		log.Printf("cerr: %v", err)
 		precedence := []error{ErrWrongSide, ErrMustMatchPips, ErrNotAdjacent}
 		for _, e := range precedence {
 			if potentialError == e || err == e {
@@ -1444,35 +1437,26 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			if lt.NextPips != head.NextPips {
 				return false
 			}
-			checkLTCoord := func(x, y int) bool {
-				adjacent := func(x2, y2 int) bool {
-					if x == x2 && (y == y2-1 || y == y2+1) {
-						return true
-					}
-					if y == y2 && (x == x2-1 || x == x2+1) {
-						return true
-					}
-					return false
-				}
+			checkLTCoord := func(src Coord) bool {
 				if head.Tile.PipsA == head.NextPips {
-					if adjacent(head.CoordAX(), head.CoordAY()) {
+					if src.Adj(head.CoordA()) {
 						return true
 					}
 				}
 				if head.Tile.PipsB == head.NextPips {
-					if adjacent(head.CoordBX(), head.CoordBY()) {
+					if src.Adj(head.CoordB()) {
 						return true
 					}
 				}
 				return false
 			}
 			if lt.Tile.PipsA == lt.NextPips {
-				if checkLTCoord(lt.CoordAX(), lt.CoordAY()) {
+				if checkLTCoord(lt.CoordA()) {
 					return true
 				}
 			}
 			if lt.Tile.PipsB == lt.NextPips {
-				if checkLTCoord(lt.CoordBX(), lt.CoordBY()) {
+				if checkLTCoord(lt.CoordB()) {
 					return true
 				}
 			}
@@ -1551,14 +1535,11 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 	*lt = *ot
 	lt.PlayerName = name
 
-	allFrom := func(x, y int, orientations []string) []*LaidTile {
+	allFrom := func(src Coord, orientations []string) []*LaidTile {
 		lts := []*LaidTile{}
 		for _, o := range orientations {
 			lts = append(lts, &LaidTile{
-				Coord: Coord{
-					X: x,
-					Y: y,
-				},
+				Coord:       src,
 				Orientation: o,
 			})
 		}
@@ -1629,24 +1610,24 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 		blocks[lt.CoordA()] = true
 		blocks[lt.CoordB()] = true
 
-		isOpen := func(x, y int) bool {
-			if playerChickenFeetCoords[p.Name] == (Coord{X: x, Y: y}) {
+		isOpen := func(src Coord) bool {
+			if playerChickenFeetCoords[p.Name] == src {
 				return true
 			}
-			return !blocks[Coord{X: x, Y: y}]
+			return !blocks[src]
 		}
-		checkCoord := func(x, y int, orientations []string) (bool, bool) {
+		checkCoord := func(src Coord, orientations []string) (bool, bool) {
 			// l("checking coord A %d,%d", x, y)
-			if !isOpen(x, y) {
+			if !isOpen(src) {
 				// l("%s A-blocked at %d,%d", p.Name, x, y)
 				return false, false
 			}
-			possibilities := allFrom(x, y, orientations)
+			possibilities := allFrom(src, orientations)
 			canFitMyself := false
 			for _, pos := range possibilities {
 				pos.PlayerName = p.Name
 				// l("checking coord B %s", pos.CoordB())
-				if !isOpen(pos.CoordBX(), pos.CoordBY()) {
+				if !isOpen(pos.CoordB()) {
 					// l("%s B-blocked at %s:%s", p.Name, pos.CoordA(), pos.CoordB())
 					continue
 				}
@@ -1660,7 +1641,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 		}
 
 		if p.ChickenFoot {
-			success, _ := checkCoord(p.ChickenFootCoord.X, p.ChickenFootCoord.Y, []string{"up", "down", "left", "right"})
+			success, _ := checkCoord(p.ChickenFootCoord, []string{"up", "down", "left", "right"})
 			// We ignore the canFitMyself return value because this is the only place they can try.
 			return success
 		}
@@ -1668,7 +1649,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 		// iterate around the round leader
 		rl := r.PlayerLines[p.Name][0]
 		var success, canFitMyself bool
-		if success, canFitMyself = checkCoord(rl.CoordAX()-1, rl.CoordAY(), []string{"left", "up", "down"}); success {
+		if success, canFitMyself = checkCoord(rl.CoordA().Left(), []string{"left", "up", "down"}); success {
 			return true
 		}
 		// we stop early, no point in checking further since this tile could just swap with
@@ -1676,31 +1657,31 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 		if canFitMyself {
 			return false
 		}
-		if success, canFitMyself = checkCoord(rl.CoordAX(), rl.CoordAY()+1, []string{"down", "left", "right"}); success {
+		if success, canFitMyself = checkCoord(rl.CoordA().Down(), []string{"down", "left", "right"}); success {
 			return true
 		}
 		if canFitMyself {
 			return false
 		}
-		if success, canFitMyself = checkCoord(rl.CoordAX(), rl.CoordAY()-1, []string{"up", "left", "right"}); success {
+		if success, canFitMyself = checkCoord(rl.CoordA().Up(), []string{"up", "left", "right"}); success {
 			return true
 		}
 		if canFitMyself {
 			return false
 		}
-		if success, canFitMyself = checkCoord(rl.CoordBX()+1, rl.CoordBY(), []string{"right", "up", "down"}); success {
+		if success, canFitMyself = checkCoord(rl.CoordB().Right(), []string{"right", "up", "down"}); success {
 			return true
 		}
 		if canFitMyself {
 			return false
 		}
-		if success, canFitMyself = checkCoord(rl.CoordBX(), rl.CoordBY()+1, []string{"down", "left", "right"}); success {
+		if success, canFitMyself = checkCoord(rl.CoordB().Down(), []string{"down", "left", "right"}); success {
 			return true
 		}
 		if canFitMyself {
 			return false
 		}
-		if success, _ = checkCoord(rl.CoordBX(), rl.CoordBY()-1, []string{"up", "left", "right"}); success {
+		if success, _ = checkCoord(rl.CoordB().Up(), []string{"up", "left", "right"}); success {
 			return true
 		}
 		return false
