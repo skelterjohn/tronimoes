@@ -8,16 +8,16 @@ export default function Spacer({ spacer }) {
 		if (!spacer) {
 			return;
 		}
-		if (spacer.x2 > spacer.x1) {
+		if (spacer.b.x > spacer.a.x) {
 			setRotate("-rotate-90");
 		}
-		if (spacer.x2 < spacer.x1) {
+		if (spacer.b.x < spacer.a.x) {
 			setRotate("rotate-90");
 		}
-		if (spacer.y2 > spacer.y1) {
+		if (spacer.b.y > spacer.a.y) {
 			setRotate("");
 		}
-		if (spacer.y2 < spacer.y1) {
+		if (spacer.b.y < spacer.a.y) {
 			setRotate("rotate-180");
 		}
 	}, [spacer]);

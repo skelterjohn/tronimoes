@@ -103,15 +103,15 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 			return;
 		}
 		playSpacer({
-			x1: playA.x, y1: playA.y,
-			x2: x, y2: y,
+			a: playA,
+			b: {x: x, y: y},
 		});
 		setPlayA(undefined);
 	}
 
 	const [spacerA, setSpacerA] = useState(undefined);
 	useEffect(() => {
-		setSpacerA(`${spacer?.x1},${spacer?.y1}`);
+		setSpacerA(`${spacer?.a.x},${spacer?.a.y}`);
 	}, [spacer]);
 
 	return (

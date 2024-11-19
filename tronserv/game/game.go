@@ -602,11 +602,14 @@ func (t *Tile) String() string {
 	return fmt.Sprintf("%d:%d", t.PipsA, t.PipsB)
 }
 
+type Coord struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
 type Spacer struct {
-	X1 int `json:"x1"`
-	Y1 int `json:"y1"`
-	X2 int `json:"x2"`
-	Y2 int `json:"y2"`
+	A Coord `json:"a"`
+	B Coord `json:"b"`
 }
 
 type LaidTile struct {
@@ -793,7 +796,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			tryA(x2, y2+1)
 			tryA(x2, y2-1)
 		}
-		tryToCoord(r.Spacer.X2, r.Spacer.Y2)
+		tryToCoord(r.Spacer.B.X, r.Spacer.B.Y)
 	}
 	p.Hints = make([][]string, len(p.Hand))
 	for i, hintList := range hints {
@@ -999,37 +1002,37 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 		return ErrRoundAlreadyDone
 	}
 
-	if spacer.X1 == 0 && spacer.Y1 == 0 && spacer.X2 == 0 && spacer.Y2 == 0 {
+	if spacer.A.X == 0 && spacer.A.Y == 0 && spacer.B.X == 0 && spacer.B.Y == 0 {
 		r.Spacer = nil
 		return nil
 	}
 
-	if spacer.X1 != spacer.X2 && spacer.Y1 != spacer.Y2 {
+	if spacer.A.X != spacer.B.X && spacer.A.Y != spacer.B.Y {
 		return ErrSpacerNotStraight
 	}
 	switch 5 {
-	case spacer.X1 - spacer.X2:
-	case spacer.X2 - spacer.X1:
-	case spacer.Y1 - spacer.Y2:
-	case spacer.Y2 - spacer.Y1:
+	case spacer.A.X - spacer.B.X:
+	case spacer.B.X - spacer.A.X:
+	case spacer.A.Y - spacer.B.Y:
+	case spacer.B.Y - spacer.A.Y:
 	default:
 		return ErrWrongLengthSpacer
 	}
 
-	if !g.sixPathFrom(r.MapTiles(), spacer.X1, spacer.Y1, spacer.X2, spacer.Y2) {
+	if !g.sixPathFrom(r.MapTiles(), spacer.A.X, spacer.A.Y, spacer.B.X, spacer.B.Y) {
 		return ErrTileOccluded
 	}
 
 	// verify that x1,y1 is adjacent to a line head.
 	checkLineHead := func(lt *LaidTile) bool {
 		adj := func(x, y int) bool {
-			if x == spacer.X1 {
-				if y == spacer.Y1-1 || y == spacer.Y1+1 {
+			if x == spacer.A.X {
+				if y == spacer.A.Y-1 || y == spacer.A.Y+1 {
 					return true
 				}
 			}
-			if y == spacer.Y1 {
-				if x == spacer.X1-1 || x == spacer.X1+1 {
+			if y == spacer.A.Y {
+				if x == spacer.A.X-1 || x == spacer.A.X+1 {
 					return true
 				}
 			}
@@ -1254,22 +1257,22 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		if isHigher {
 
 			inSpacer := func(x, y int) bool {
-				if x >= r.Spacer.X1 && x <= r.Spacer.X2 && y >= r.Spacer.Y1 && y <= r.Spacer.Y2 {
+				if x >= r.Spacer.A.X && x <= r.Spacer.B.X && y >= r.Spacer.A.Y && y <= r.Spacer.B.Y {
 					return true
 				}
 				return false
 			}
 			adjSpacer := func(x, y int) bool {
-				if x == r.Spacer.X2-1 && y == r.Spacer.Y2 {
+				if x == r.Spacer.B.X-1 && y == r.Spacer.B.Y {
 					return true
 				}
-				if x == r.Spacer.X2+1 && y == r.Spacer.Y2 {
+				if x == r.Spacer.B.X+1 && y == r.Spacer.B.Y {
 					return true
 				}
-				if x == r.Spacer.X2 && y == r.Spacer.Y2-1 {
+				if x == r.Spacer.B.X && y == r.Spacer.B.Y-1 {
 					return true
 				}
-				if x == r.Spacer.X2 && y == r.Spacer.Y2+1 {
+				if x == r.Spacer.B.X && y == r.Spacer.B.Y+1 {
 					return true
 				}
 				return false
