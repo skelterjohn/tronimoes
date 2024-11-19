@@ -14,7 +14,7 @@ const availableColors = [
 	"red",
 	"blue",
 	"green",
-	"indigo",
+	"yellow",
 	"orange",
 	"fuchsia",
 ]

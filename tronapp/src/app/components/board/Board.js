@@ -12,7 +12,7 @@ const bgColorMap = {
 	red: "bg-red-300",
 	blue: "bg-blue-300",
 	green: "bg-green-300",
-	indigo: "bg-indigo-300",
+	yellow: "bg-yellow-300",
 	orange: "bg-orange-300",
 	fuchsia: "bg-fuchsia-300",
 	white: "bg-white"
