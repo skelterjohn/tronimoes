@@ -1000,7 +1000,7 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 	return false, 0, potentialError
 }
 
-func (g *Game) sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int) bool {
+func (g *Game) sixPathFrom(squarePips map[Coord]SquarePips, x1, y1, x2, y2 int) bool {
 	if x1 < 0 || x1 >= g.BoardWidth || y1 < 0 || y1 >= g.BoardHeight {
 		return false
 	}
@@ -1016,7 +1016,7 @@ func (g *Game) sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int)
 			return false
 		}
 		for y := y1; y <= y2; y++ {
-			if _, ok := squarePips[fmt.Sprintf("%d,%d", x1, y)]; ok {
+			if _, ok := squarePips[Coord{X: x1, Y: y}]; ok {
 				return false
 			}
 		}
@@ -1029,7 +1029,7 @@ func (g *Game) sixPathFrom(squarePips map[string]SquarePips, x1, y1, x2, y2 int)
 			return false
 		}
 		for x := x1; x <= x2; x++ {
-			if _, ok := squarePips[fmt.Sprintf("%d,%d", x, y1)]; ok {
+			if _, ok := squarePips[Coord{X: x, Y: y1}]; ok {
 				return false
 			}
 		}
@@ -1145,10 +1145,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	squarePips := r.MapTiles()
-	if _, ok := squarePips[lt.CoordA().String()]; ok {
+	if _, ok := squarePips[lt.CoordA()]; ok {
 		return ErrTileOccluded
 	}
-	if _, ok := squarePips[lt.CoordB().String()]; ok {
+	if _, ok := squarePips[lt.CoordB()]; ok {
 		return ErrTileOccluded
 	}
 
@@ -1344,21 +1344,21 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	}
 
 	// Add the new tile to the occlusion grid.
-	squarePips[lt.CoordA().String()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsA}
-	squarePips[lt.CoordB().String()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
+	squarePips[lt.CoordA()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsA}
+	squarePips[lt.CoordB()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
 	isOpenFrom := func(x, y int) bool {
-		c := func(x, y int) string {
+		c := func(x, y int) Coord {
 			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
-				return ""
+				return Coord{-1, -1}
 			}
-			return fmt.Sprintf("%d,%d", x, y)
+			return Coord{X: x, Y: y}
 		}
-		adj := func(x, y int) []string {
-			return []string{c(x-1, y), c(x+1, y), c(x, y-1), c(x, y+1)}
+		adj := func(x, y int) []Coord {
+			return []Coord{c(x-1, y), c(x+1, y), c(x, y-1), c(x, y+1)}
 		}
 		if _, ok := squarePips[c(x, y+1)]; !ok {
 			for _, n := range adj(x, y+1) {
-				if n == "" {
+				if n == (Coord{-1, -1}) {
 					continue
 				}
 				if _, ok := squarePips[n]; !ok {
@@ -1368,7 +1368,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		}
 		if _, ok := squarePips[c(x, y-1)]; !ok {
 			for _, n := range adj(x, y-1) {
-				if n == "" {
+				if n == (Coord{-1, -1}) {
 					continue
 				}
 				if _, ok := squarePips[n]; !ok {
@@ -1378,7 +1378,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		}
 		if _, ok := squarePips[c(x+1, y)]; !ok {
 			for _, n := range adj(x+1, y) {
-				if n == "" {
+				if n == (Coord{-1, -1}) {
 					continue
 				}
 				if _, ok := squarePips[n]; !ok {
@@ -1388,7 +1388,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		}
 		if _, ok := squarePips[c(x-1, y)]; !ok {
 			for _, n := range adj(x-1, y) {
-				if n == "" {
+				if n == (Coord{-1, -1}) {
 					continue
 				}
 				if _, ok := squarePips[n]; !ok {
@@ -1570,7 +1570,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	return nil
 }
 
-func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *LaidTile, name string) bool {
+func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidTile, name string) bool {
 	lt := &LaidTile{}
 	*lt = *ot
 	lt.PlayerName = name
@@ -1589,7 +1589,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *Laid
 		return lts
 	}
 
-	blocks := map[string]bool{}
+	blocks := map[Coord]bool{}
 	for coord := range squarePips {
 		blocks[coord] = true
 	}
@@ -1621,8 +1621,8 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *Laid
 	// }
 
 	// returns true if the player can be satisfied.
-	var recursiveEnsurePlayersOK func(playersLeft []*Player, prevBlocks map[string]bool, lt *LaidTile) bool
-	recursiveEnsurePlayersOK = func(playersLeft []*Player, prevBlocks map[string]bool, lt *LaidTile) bool {
+	var recursiveEnsurePlayersOK func(playersLeft []*Player, prevBlocks map[Coord]bool, lt *LaidTile) bool
+	recursiveEnsurePlayersOK = func(playersLeft []*Player, prevBlocks map[Coord]bool, lt *LaidTile) bool {
 		// l("dropping %s:%s for %s", lt.CoordA(), lt.CoordB(), lt.PlayerName)
 
 		// depth += 1
@@ -1646,18 +1646,18 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[string]SquarePips, ot *Laid
 			}
 		}
 
-		blocks := map[string]bool{}
+		blocks := map[Coord]bool{}
 		for coord := range prevBlocks {
 			blocks[coord] = true
 		}
-		blocks[lt.CoordA().String()] = true
-		blocks[lt.CoordB().String()] = true
+		blocks[lt.CoordA()] = true
+		blocks[lt.CoordB()] = true
 
 		isOpen := func(x, y int) bool {
 			if playerChickenFeetCoords[p.Name] == (Coord{X: x, Y: y}) {
 				return true
 			}
-			return !blocks[fmt.Sprintf("%d,%d", x, y)]
+			return !blocks[Coord{X: x, Y: y}]
 		}
 		checkCoord := func(x, y int, orientations []string) (bool, bool) {
 			// l("checking coord A %d,%d", x, y)
@@ -1738,14 +1738,14 @@ type SquarePips struct {
 	Pips     int
 }
 
-func (r *Round) MapTiles() map[string]SquarePips {
-	squarePips := map[string]SquarePips{}
+func (r *Round) MapTiles() map[Coord]SquarePips {
+	squarePips := map[Coord]SquarePips{}
 	for _, lt := range r.LaidTiles {
-		squarePips[lt.CoordA().String()] = SquarePips{
+		squarePips[lt.CoordA()] = SquarePips{
 			LaidTile: lt,
 			Pips:     lt.Tile.PipsA,
 		}
-		squarePips[lt.CoordB().String()] = SquarePips{
+		squarePips[lt.CoordB()] = SquarePips{
 			LaidTile: lt,
 			Pips:     lt.Tile.PipsB,
 		}
