@@ -353,19 +353,16 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 		if len(mainLine) > 1 {
 			mostRecent := mainLine[len(mainLine)-1]
 			if mostRecent.NextPips == mostRecent.Tile.PipsA {
-				player.ChickenFootCoord.X = mostRecent.CoordBX()
-				player.ChickenFootCoord.Y = mostRecent.CoordBY()
+				player.ChickenFootCoord = mostRecent.CoordB()
 			} else {
-				player.ChickenFootCoord.X = mostRecent.CoordAX()
-				player.ChickenFootCoord.Y = mostRecent.CoordAY()
+				player.ChickenFootCoord = mostRecent.CoordA()
 			}
 		} else {
 			// we have to pick a viable spot left around the round leader
 			if chickenFootX == -1 || chickenFootY == -1 {
 				return ErrMustPickChickenFoot
 			}
-			player.ChickenFootCoord.X = chickenFootX
-			player.ChickenFootCoord.Y = chickenFootY
+			player.ChickenFootCoord = Coord{X: chickenFootX, Y: chickenFootY}
 		}
 	}
 
@@ -692,7 +689,7 @@ type LaidTile struct {
 func (lt *LaidTile) Reverse() *LaidTile {
 	rt := &LaidTile{}
 	*rt = *lt
-	rt.Coord.X, rt.Coord.Y = rt.CoordBX(), rt.CoordBY()
+	rt.Coord = rt.CoordB()
 	switch lt.Orientation {
 	case "up":
 		rt.Orientation = "down"
@@ -708,34 +705,6 @@ func (lt *LaidTile) Reverse() *LaidTile {
 
 func (lt *LaidTile) CoordA() Coord {
 	return lt.Coord
-}
-
-func (lt *LaidTile) CoordAX() int {
-	return lt.Coord.X
-}
-
-func (lt *LaidTile) CoordAY() int {
-	return lt.Coord.Y
-}
-
-func (lt *LaidTile) CoordBX() int {
-	switch lt.Orientation {
-	case "right":
-		return lt.Coord.X + 1
-	case "left":
-		return lt.Coord.X - 1
-	}
-	return lt.Coord.X
-}
-
-func (lt *LaidTile) CoordBY() int {
-	switch lt.Orientation {
-	case "up":
-		return lt.Coord.Y - 1
-	case "down":
-		return lt.Coord.Y + 1
-	}
-	return lt.Coord.Y
 }
 
 func (lt *LaidTile) CoordB() Coord {
@@ -777,16 +746,13 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	}
 
 	for i, t := range p.Hand {
-		movesOffSquare := func(head *LaidTile, x, y int, op *Player) {
+		movesOffSquare := func(head *LaidTile, src Coord, op *Player) {
 
 			for _, orientation := range []string{"up", "down", "left", "right"} {
 				lt := &LaidTile{
 					Tile:        t,
 					Orientation: orientation,
-					Coord: Coord{
-						X: x,
-						Y: y,
-					},
+					Coord:       src,
 				}
 				if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
 					hintAt(i, lt.CoordA())
@@ -797,14 +763,14 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 		}
 
 		movesOffTile := func(head *LaidTile, op *Player) {
-			movesOffSquare(head, head.CoordAX()-1, head.CoordAY(), op)
-			movesOffSquare(head, head.CoordAX()+1, head.CoordAY(), op)
-			movesOffSquare(head, head.CoordAX(), head.CoordAY()-1, op)
-			movesOffSquare(head, head.CoordAX(), head.CoordAY()+1, op)
-			movesOffSquare(head, head.CoordBX()-1, head.CoordBY(), op)
-			movesOffSquare(head, head.CoordBX()+1, head.CoordBY(), op)
-			movesOffSquare(head, head.CoordBX(), head.CoordBY()-1, op)
-			movesOffSquare(head, head.CoordBX(), head.CoordBY()+1, op)
+			movesOffSquare(head, head.CoordA().Left(), op)
+			movesOffSquare(head, head.CoordA().Right(), op)
+			movesOffSquare(head, head.CoordA().Up(), op)
+			movesOffSquare(head, head.CoordA().Down(), op)
+			movesOffSquare(head, head.CoordB().Left(), op)
+			movesOffSquare(head, head.CoordB().Right(), op)
+			movesOffSquare(head, head.CoordB().Up(), op)
+			movesOffSquare(head, head.CoordB().Down(), op)
 		}
 		p := g.GetPlayer(name)
 
@@ -1035,7 +1001,7 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 		return ErrRoundAlreadyDone
 	}
 
-	if spacer.A.X == 0 && spacer.A.Y == 0 && spacer.B.X == 0 && spacer.B.Y == 0 {
+	if (*spacer) == (Spacer{}) {
 		r.Spacer = nil
 		return nil
 	}
@@ -1058,28 +1024,11 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 
 	// verify that x1,y1 is adjacent to a line head.
 	checkLineHead := func(lt *LaidTile) bool {
-		adj := func(x, y int) bool {
-			if x == spacer.A.X {
-				if y == spacer.A.Y-1 || y == spacer.A.Y+1 {
-					return true
-				}
-			}
-			if y == spacer.A.Y {
-				if x == spacer.A.X-1 || x == spacer.A.X+1 {
-					return true
-				}
-			}
-			return false
-		}
 		if lt.NextPips == lt.Tile.PipsA {
-			if adj(lt.CoordAX(), lt.CoordAY()) {
-				return true
-			}
+			return spacer.A.Adj(lt.CoordA())
 		}
 		if lt.NextPips == lt.Tile.PipsB {
-			if adj(lt.CoordBX(), lt.CoordBY()) {
-				return true
-			}
+			return spacer.A.Adj(lt.CoordB())
 		}
 		return false
 	}
@@ -1144,10 +1093,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	playerFoot := ""
 	// if this is on someone's foot, it's definitely made part of their line.
 	for _, p := range g.Players {
-		if p.ChickenFootCoord.X == lt.CoordAX() && p.ChickenFootCoord.Y == lt.CoordAY() {
+		if p.ChickenFootCoord == lt.CoordA() {
 			playerFoot = p.Name
 		}
-		if p.ChickenFootCoord.X == lt.CoordBX() && p.ChickenFootCoord.Y == lt.CoordBY() {
+		if p.ChickenFootCoord == lt.CoordB() {
 			playerFoot = p.Name
 		}
 	}
@@ -1173,10 +1122,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 		onFoot := false
 		if player.ChickenFoot && len(mainLine) == 1 {
-			if player.ChickenFootCoord.X == lt.CoordAX() && player.ChickenFootCoord.Y == lt.CoordAY() {
+			if player.ChickenFootCoord == lt.CoordA() {
 				onFoot = true
 			}
-			if player.ChickenFootCoord.X == lt.CoordBX() && player.ChickenFootCoord.Y == lt.CoordBY() {
+			if player.ChickenFootCoord == lt.CoordB() {
 				onFoot = true
 			}
 		}
@@ -1219,10 +1168,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			if len(line) == 1 {
 				// round leader, need to play on top of chickenfoot.
 				isOnMyFoot := false
-				if lt.CoordAX() == op.ChickenFootCoord.X && lt.CoordAY() == op.ChickenFootCoord.Y && lt.Tile.PipsA == line[0].NextPips {
+				if lt.CoordA() == op.ChickenFootCoord && lt.Tile.PipsA == line[0].NextPips {
 					isOnMyFoot = true
 				}
-				if lt.CoordBX() == op.ChickenFootCoord.X && lt.CoordBY() == op.ChickenFootCoord.Y && lt.Tile.PipsB == line[0].NextPips {
+				if lt.CoordB() == op.ChickenFootCoord && lt.Tile.PipsB == line[0].NextPips {
 					isOnMyFoot = true
 				}
 				if !isOnMyFoot {
@@ -1237,12 +1186,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					lt.NextPips = nextPips
 					// Update the chicken-foot.
 					if lt.NextPips == lt.Tile.PipsA {
-						op.ChickenFootCoord.X = lt.CoordBX()
-						op.ChickenFootCoord.Y = lt.CoordBY()
+						op.ChickenFootCoord = lt.CoordB()
 					}
 					if lt.NextPips == lt.Tile.PipsB {
-						op.ChickenFootCoord.X = lt.CoordAX()
-						op.ChickenFootCoord.Y = lt.CoordAY()
+						op.ChickenFootCoord = lt.CoordA()
 					}
 				}
 			} else {
@@ -1282,29 +1229,14 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		// can we start a free line
 		if isHigher {
 
-			inSpacer := func(x, y int) bool {
-				if x >= r.Spacer.A.X && x <= r.Spacer.B.X && y >= r.Spacer.A.Y && y <= r.Spacer.B.Y {
+			inSpacer := func(src Coord) bool {
+				if src.X >= r.Spacer.A.X && src.X <= r.Spacer.B.X && src.Y >= r.Spacer.A.Y && src.Y <= r.Spacer.B.Y {
 					return true
 				}
 				return false
 			}
-			adjSpacer := func(x, y int) bool {
-				if x == r.Spacer.B.X-1 && y == r.Spacer.B.Y {
-					return true
-				}
-				if x == r.Spacer.B.X+1 && y == r.Spacer.B.Y {
-					return true
-				}
-				if x == r.Spacer.B.X && y == r.Spacer.B.Y-1 {
-					return true
-				}
-				if x == r.Spacer.B.X && y == r.Spacer.B.Y+1 {
-					return true
-				}
-				return false
-			}
-			canBeFree := adjSpacer(lt.CoordAX(), lt.CoordAY()) || adjSpacer(lt.CoordBX(), lt.CoordBY())
-			if inSpacer(lt.CoordAX(), lt.CoordAY()) || inSpacer(lt.CoordBX(), lt.CoordBY()) {
+			canBeFree := r.Spacer.B.Adj(lt.CoordA()) || r.Spacer.B.Adj(lt.CoordB())
+			if inSpacer(lt.CoordA()) || inSpacer(lt.CoordB()) {
 				canBeFree = false
 			}
 
