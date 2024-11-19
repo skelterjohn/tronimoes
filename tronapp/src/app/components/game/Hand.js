@@ -291,7 +291,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 						</div>
 					)}
 					<div className="w-full justify-center flex flex-wrap content-start">
-						{handOrder.map((t, i) => {
+						{!hidden && handOrder.map((t, i) => {
 							return (
 								<div
 									key={i}
@@ -320,6 +320,26 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 								</div>
 							);
 						})}
+						{hidden && (
+							<div
+							className={hidden ? "w-[1rem]" : "w-[4rem] pr-1 pt-1"}
+							draggable={false}
+						>
+							<div className="pointer-events-none">
+								<Tile
+									draggable={false}
+									color={player?.color}
+									pipsa={0}
+									pipsb={0}
+									back={true}
+									dead={dead}
+								/>
+							</div>
+						</div>
+						)}
+						{hidden && (
+							<div>x{handOrder.length}</div>
+						)}
 					</div>
 				</div>
 			</div>
