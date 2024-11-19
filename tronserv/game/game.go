@@ -434,6 +434,10 @@ func (g *Game) GetPlayer(name string) *Player {
 	return nil
 }
 
+func (g *Game) InBounds(c Coord) bool {
+	return c.X >= 0 && c.X < g.BoardWidth && c.Y >= 0 && c.Y < g.BoardHeight
+}
+
 func (g *Game) LaySpacer(name string, spacer *Spacer) error {
 	player := g.GetPlayer(name)
 	if player == nil {
@@ -630,6 +634,10 @@ func (c Coord) Right() Coord {
 
 func (c Coord) Adj(o Coord) bool {
 	return c.Up() == o || c.Down() == o || c.Left() == o || c.Right() == o
+}
+
+func (c Coord) Neighbors() []Coord {
+	return []Coord{c.Up(), c.Down(), c.Left(), c.Right()}
 }
 
 func (c Coord) Orientation(o string) Coord {
@@ -1346,64 +1354,32 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	// Add the new tile to the occlusion grid.
 	squarePips[lt.CoordA()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsA}
 	squarePips[lt.CoordB()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
-	isOpenFrom := func(x, y int) bool {
-		c := func(x, y int) Coord {
-			if x < 0 || x >= g.BoardWidth || y < 0 || y >= g.BoardHeight {
-				return Coord{-1, -1}
+	isOpenFrom := func(src Coord) bool {
+		for _, na := range src.Neighbors() {
+			if !g.InBounds(na) {
+				continue
 			}
-			return Coord{X: x, Y: y}
-		}
-		adj := func(x, y int) []Coord {
-			return []Coord{c(x-1, y), c(x+1, y), c(x, y-1), c(x, y+1)}
-		}
-		if _, ok := squarePips[c(x, y+1)]; !ok {
-			for _, n := range adj(x, y+1) {
-				if n == (Coord{-1, -1}) {
+			if _, ok := squarePips[na]; ok {
+				continue
+			}
+			for _, nb := range na.Neighbors() {
+				if !g.InBounds(nb) {
 					continue
 				}
-				if _, ok := squarePips[n]; !ok {
-					return true
-				}
-			}
-		}
-		if _, ok := squarePips[c(x, y-1)]; !ok {
-			for _, n := range adj(x, y-1) {
-				if n == (Coord{-1, -1}) {
+				if _, ok := squarePips[nb]; ok {
 					continue
 				}
-				if _, ok := squarePips[n]; !ok {
-					return true
-				}
-			}
-		}
-		if _, ok := squarePips[c(x+1, y)]; !ok {
-			for _, n := range adj(x+1, y) {
-				if n == (Coord{-1, -1}) {
-					continue
-				}
-				if _, ok := squarePips[n]; !ok {
-					return true
-				}
-			}
-		}
-		if _, ok := squarePips[c(x-1, y)]; !ok {
-			for _, n := range adj(x-1, y) {
-				if n == (Coord{-1, -1}) {
-					continue
-				}
-				if _, ok := squarePips[n]; !ok {
-					return true
-				}
+				return true
 			}
 		}
 		return false
 	}
 	isCutOff := func(line []*LaidTile) bool {
 		last := line[len(line)-1]
-		if last.NextPips == last.Tile.PipsA && isOpenFrom(last.CoordAX(), last.CoordAY()) {
+		if last.NextPips == last.Tile.PipsA && isOpenFrom(last.CoordA()) {
 			return false
 		}
-		if last.NextPips == last.Tile.PipsB && isOpenFrom(last.CoordBX(), last.CoordBY()) {
+		if last.NextPips == last.Tile.PipsB && isOpenFrom(last.CoordB()) {
 			return false
 		}
 		return true
