@@ -1478,6 +1478,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 			playerChickenFeetCoords[p.Name] = p.ChickenFootCoord
 			if p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB() {
 				lt.PlayerName = p.Name
+				return false
 			}
 		}
 		playersToSatisfy = append(playersToSatisfy, p)
