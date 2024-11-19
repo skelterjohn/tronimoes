@@ -810,16 +810,13 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 			continue
 		}
 
-		tryToCoord := func(x2, y2 int) {
-			tryA := func(x, y int) {
+		tryToCoord := func(src Coord) {
+			tryA := func(A Coord) {
 				for _, orientation := range []string{"up", "down", "left", "right"} {
 					lt := &LaidTile{
 						Tile:        t,
 						Orientation: orientation,
-						Coord: Coord{
-							X: x,
-							Y: y,
-						},
+						Coord:       A,
 					}
 					if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
 						hintAt(i, lt.CoordA())
@@ -827,12 +824,12 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					}
 				}
 			}
-			tryA(x2+1, y2)
-			tryA(x2-1, y2)
-			tryA(x2, y2+1)
-			tryA(x2, y2-1)
+			tryA(src.Right())
+			tryA(src.Left())
+			tryA(src.Up())
+			tryA(src.Down())
 		}
-		tryToCoord(r.Spacer.B.X, r.Spacer.B.Y)
+		tryToCoord(r.Spacer.B)
 	}
 	p.Hints = make([][]string, len(p.Hand))
 	for i, hintList := range hints {
