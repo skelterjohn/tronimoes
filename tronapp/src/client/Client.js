@@ -8,6 +8,7 @@ class Client {
 
 
     async JoinGame(code, name) {
+		this.name = name;
         return this.put(`/game/${code}`, { name });
     }
 

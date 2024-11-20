@@ -114,7 +114,7 @@ func (s *GameServer) getName(r *http.Request) (string, error) {
 		// anonymous play is ok with unregistered names.
 		return tempName, nil
 	}
-	if err != nil {
+	if err == nil {
 		return "", ErrNotYourPlayer
 	}
 	return "", err

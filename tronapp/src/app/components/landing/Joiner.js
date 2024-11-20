@@ -58,6 +58,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	}
 	function joinCode(code) {
 		console.log('joining', nameInput, code);
+		setPlayerName(nameInput);
 		client.JoinGame(code, nameInput).then((resp) => {
 			console.log('joined game', resp);
 			setGameCode(resp.code);
@@ -65,6 +66,8 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		}).catch((error) => {
 			console.error('join error', error);
 			setPlayerName('');
+			setNameInput('');
+			setIsRegistered(false);
 			setErrorMessage(error.data.error);
 		});
 	}

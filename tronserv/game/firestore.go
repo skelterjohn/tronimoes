@@ -220,7 +220,7 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 		return PlayerInfo{}, fmt.Errorf("could not query: %v", err)
 	}
 	if len(docs) == 0 {
-		return PlayerInfo{}, ErrPlayerNotFound
+		return PlayerInfo{}, ErrNoRegisteredPlayer
 	}
 	return PlayerInfo{
 		Name: docs[0].Data()["name"].(string),
