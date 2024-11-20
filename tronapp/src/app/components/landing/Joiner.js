@@ -35,9 +35,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	}, [userInfo, setPlayerKey, setPlayerName]);
 
 	useEffect(() => {
-		if (playerName !== '') {
-			setIsRegistered(true);
-		}
+		setIsRegistered(playerName !== '')
 		setNameInput(playerName);
 	}, [playerName]);
 
