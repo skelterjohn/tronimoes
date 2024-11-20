@@ -2,6 +2,7 @@ import { Modal } from "antd";
 import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, fetchSignInMethodsForEmail, signInWithCredential, linkWithCredential } from "firebase/auth";
 import { Button } from "antd";
 import { auth } from "@/config";
+import { useEffect } from "react";
 
 const setupTokenRefresh = (user, setUserInfo) => {
 	// Force token refresh every 55 minutes (tokens expire after 1 hour)
