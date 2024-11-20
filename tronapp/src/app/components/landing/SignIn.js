@@ -8,12 +8,10 @@ const setupTokenRefresh = (user, setUserInfo) => {
 	const refreshInterval = setInterval(async () => {
 		try {
 			const newToken = await user.getIdToken(true);
+			console.log("refreshed token");
 			setUserInfo(prevState => ({
 				...prevState,
-				stsTokenManager: {
-					...prevState.stsTokenManager,
-					accessToken: newToken
-				}
+				accessToken: newToken,
 			}));
 		} catch (error) {
 			console.error("Error refreshing token:", error);
@@ -25,11 +23,21 @@ const setupTokenRefresh = (user, setUserInfo) => {
 };
 
 export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) {
+	var tokenCleanup = undefined;
+
+	useEffect(() => {
+		return () => {
+			if (tokenCleanup) {
+				tokenCleanup();
+			}
+		};
+	}, []);
+
 	const signInAsGuest = async () => {
 		try {
 			const result = await signInAnonymously(auth);
 			setUserInfo(result.user);
-			setupTokenRefresh(result.user, setUserInfo);
+			tokenCleanup = setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			console.error("Error signing in anonymously:", error);
@@ -43,7 +51,7 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 			const provider = new GoogleAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			setUserInfo(result.user);
-			setupTokenRefresh(result.user, setUserInfo);
+			tokenCleanup = setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			console.error("Error signing in with Google:", error);
@@ -57,7 +65,7 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 			const provider = new FacebookAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			setUserInfo(result.user);
-			setupTokenRefresh(result.user, setUserInfo);
+			tokenCleanup = setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			if (error.code === 'auth/account-exists-with-different-credential') {
@@ -82,7 +90,7 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 						
 						// Update user info and set up token refresh
 						setUserInfo(googleResult.user);
-						setupTokenRefresh(googleResult.user, setUserInfo);
+						tokenCleanup = setupTokenRefresh(googleResult.user, setUserInfo);
 						onClose();
 					} else {
 						setErrorMessage(`Please sign in with ${methods[0]}`);
