@@ -10,6 +10,8 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	const { setGameCode, playerName, setPlayerName, setPlayerKey, setPlayerID, client } = useGameState();
 	const [isRegistered, setIsRegistered] = useState(false);
 
+	const [nameInput, setNameInput] = useState('');
+
 	const inputRef = useRef(null);
 
 	useEffect(() => {
@@ -36,12 +38,14 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		if (playerName !== '') {
 			setIsRegistered(true);
 		}
+		setNameInput(playerName);
 	}, [playerName]);
 
 	function registerAndJoinCode(code) {
 		if (!isRegistered) {
-			console.log('registering', playerName);
-			client.RegisterPlayerName(playerName).then(() => {
+			setPlayerName(nameInput);
+			console.log('registering', nameInput);
+			client.RegisterPlayerName(nameInput).then(() => {
 				setIsRegistered(true);
 				joinCode(code);
 			}).catch((error) => {
@@ -53,8 +57,8 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		}
 	}
 	function joinCode(code) {
-		console.log('joining', playerName, code);
-		client.JoinGame(code, playerName).then((resp) => {
+		console.log('joining', nameInput, code);
+		client.JoinGame(code, nameInput).then((resp) => {
 			console.log('joined game', resp);
 			setGameCode(resp.code);
 			router.push(`/gameboard/${resp.code}`);
@@ -90,9 +94,9 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				placeholder="enter your designation"
 				size="large"
 				className="text-lg"
-				value={playerName}
+				value={nameInput}
 				disabled={isRegistered}
-				onChange={(e) => setPlayerName(e.target.value)}
+				onChange={(e) => setNameInput(e.target.value)}
 				onPressEnter={joinPickup}
 			/>
 		)}
