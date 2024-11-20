@@ -108,7 +108,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				size="large"
 				className="text-lg"
 				formatter={(str) => str.toUpperCase()}
-				disabled={playerName === ""}
+				disabled={nameInput === ""}
 				onChange={registerAndJoinCode}
 			/>
 		</div>
@@ -116,7 +116,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 			<Button
 				type="primary"
 				size="large"
-				disabled={playerName === ""}
+				disabled={nameInput === ""}
 				onClick={joinPickup}
 			>
 				pick-up game
