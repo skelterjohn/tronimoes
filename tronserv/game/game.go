@@ -650,7 +650,13 @@ func (c Coord) OrientationTo(o Coord) string {
 }
 
 func (c Coord) Adj(o Coord) bool {
-	return c.Up() == o || c.Down() == o || c.Left() == o || c.Right() == o
+	if c.X == o.X {
+		return c.Y == o.Y+1 || c.Y == o.Y-1
+	}
+	if c.Y == o.Y {
+		return c.X == o.X+1 || c.X == o.X-1
+	}
+	return false
 }
 
 func (c Coord) Neighbors() []Coord {
@@ -905,47 +911,53 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 		}
 		potentialError = err
 	}
+
+	AA := last.CoordA().Adj(lt.CoordA())
+	AB := last.CoordA().Adj(lt.CoordB())
+	BA := last.CoordB().Adj(lt.CoordA())
+	BB := last.CoordB().Adj(lt.CoordB())
+
 	if lt.Tile.PipsA == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsA {
-			if last.CoordA().Adj(lt.CoordA()) {
+			if AA {
 				return true, lt.Tile.PipsB, nil
 			}
-			if last.CoordA().Adj(lt.CoordB()) {
+			if AB {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
 		if last.Tile.PipsB == lt.Tile.PipsA {
-			if last.CoordB().Adj(lt.CoordA()) {
+			if BA {
 				return true, lt.Tile.PipsB, nil
 			}
-			if last.CoordB().Adj(lt.CoordB()) {
+			if BB {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
-	} else if lt.Tile.PipsB == last.NextPips {
+	}
+	if lt.Tile.PipsB == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsB {
-			if last.CoordA().Adj(lt.CoordB()) {
+			if AB {
 				return true, lt.Tile.PipsA, nil
 			}
-			if last.CoordA().Adj(lt.CoordA()) {
+			if AA {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
 		if last.Tile.PipsB == lt.Tile.PipsB {
-			if last.CoordB().Adj(lt.CoordB()) {
+			if BB {
 				return true, lt.Tile.PipsA, nil
 			}
-			if last.CoordB().Adj(lt.CoordA()) {
+			if BA {
 				cerr(ErrWrongSide)
 			}
 			cerr(ErrNotAdjacent)
 		}
-	} else {
-		cerr(ErrMustMatchPips)
 	}
+	cerr(ErrMustMatchPips)
 	return false, 0, potentialError
 }
 
