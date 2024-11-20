@@ -8,22 +8,16 @@ import SignIn from './components/landing/SignIn';
 import { auth } from "@/config";
 import { signOut } from "firebase/auth";
 import Error from './components/landing/Error';
+import { useGameState } from './components/GameState';
+
 export default function Home() {
-	const [persistentUser, loading, error] = useAuthState(auth);
-	const [userInfo, setUserInfo] = useState(null);
-	const [showSignIn, setShowSignIn] = useState(false);
 	const [errorMessage, setErrorMessage] = useState(null);
+	const [showSignIn, setShowSignIn] = useState(false);
+	const { userInfo, setUserInfo, persistentUser, loading, error } = useGameState();
 
 	useEffect(()=> {
-		if (error !== undefined) {
-			setErrorMessage(error.message);
-			setUserInfo(undefined);
-			return;
-		}
-		if (!loading) {
-			setUserInfo(persistentUser);
-		}
-	}, [persistentUser, loading, error]);
+		setErrorMessage(error?.message);
+	}, [error]);
 
 	return (
 		<main onClick={() => setErrorMessage(null)} className="relative min-h-screen w-screen bg-slate-800">

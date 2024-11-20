@@ -1,4 +1,4 @@
-import Game from "../../components/game/Game";
+import Game from "@/app/components/game/Game";
 
 export default function Gameboard({params}) {
   return (

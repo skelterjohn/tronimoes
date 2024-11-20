@@ -26,25 +26,17 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	}, [isRegistered]);
 
 	useEffect(() => {
-		setPlayerKey(userInfo?.accessToken);
-		setPlayerID(userInfo?.uid);
 		if (userInfo === undefined || userInfo === null) {
 			setIsRegistered(false);
 			setPlayerName('');
 		}
-	}, [userInfo, setPlayerKey, setPlayerID, setPlayerName]);
+	}, [userInfo, setPlayerKey, setPlayerName]);
 
 	useEffect(() => {
-		if (!client?.key || !client?.userid) {
-			return;
-		}
-		client?.GetPlayerName().then((resp) => {
-			setPlayerName(resp.name);
+		if (playerName !== '') {
 			setIsRegistered(true);
-		}).catch((error) => {
-			console.error('get player name error', error);
-		});
-	}, [client, setPlayerName]);
+		}
+	}, [playerName]);
 
 	function registerAndJoinCode(code) {
 		if (!isRegistered) {
