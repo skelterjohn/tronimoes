@@ -96,7 +96,15 @@ function Game({ code }) {
 		return () => {
 			isActive = false;
 		};
-	}, [code, version, client, router]);
+	}, [code, version, client, router, playerName]);
+
+
+	useEffect(() => {
+		// we got a new client, so let's totally refresh the game.
+		// if we weren't logged in with the last client, we may have
+		// a game with the right version that has been filtered.
+		setVersion(-1);
+	}, [client, playerName]);
 
 	useEffect(() => {
 		if (!playerName) {
