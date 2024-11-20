@@ -103,22 +103,21 @@ func (s *GameServer) getName(r *http.Request) (string, error) {
 
 		pi, err := s.store.GetPlayer(ctx, userID)
 		if err == nil {
-			log.Printf("logged in %s as %s", userID, pi.Name)
 			return pi.Name, nil
 		}
 		return "", err
 	}
 
 	tempName := r.Header.Get("X-Player-Name")
-	_, err := s.store.GetPlayer(ctx, tempName)
-	if err == nil {
-		if userID == "" && err == ErrNoRegisteredPlayer {
-			// anonymous play is ok with unregistered names.
-			return tempName, nil
-		}
+	_, err := s.store.GetPlayerByName(ctx, tempName)
+	if err == ErrNoRegisteredPlayer {
+		// anonymous play is ok with unregistered names.
+		return tempName, nil
+	}
+	if err != nil {
 		return "", ErrNotYourPlayer
 	}
-	return tempName, nil
+	return "", err
 }
 
 func (s *GameServer) encodeFilteredGame(w http.ResponseWriter, name string, g *Game) {
@@ -706,7 +705,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
-		log.Printf("Registered player %q", pi)
+		log.Printf("Registered player %q for %s", pi, playerID)
 	} else {
 		log.Printf("Anonymous player %q", pi.Name)
 	}
