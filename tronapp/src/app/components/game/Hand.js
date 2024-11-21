@@ -336,6 +336,8 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							);
 						})}
 						</div>
+						{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
+						{!hidden && <div className="w-[1rem]"></div>}
 						{hidden && (
 							<div className="w-[1rem]">
 								<Tile
