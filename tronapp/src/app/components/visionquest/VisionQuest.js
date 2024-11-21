@@ -1,5 +1,5 @@
 import { Modal, Input, Spin } from 'antd';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // Replace with your actual Tenor API key
 const TENOR_API_KEY = 'AIzaSyBPpZRb23wy2zTKQ2j5eJHS8YVPtjIvcGQ';
 const TENOR_CLIENT_KEY = 'tronimoes'; // Replace with your app name
@@ -8,6 +8,19 @@ function VisionQuest({ isOpen, onClose, setChickenFootURL }) {
 	const [path, setPath] = useState("");
 	const [gifs, setGifs] = useState([]);
 	const [loading, setLoading] = useState(false);
+
+	const inputRef = useRef(null);
+
+	useEffect(() => {
+		// Add a small delay to ensure DOM is ready and other focus events have completed
+		const timer = setTimeout(() => {
+			if (inputRef.current && document.activeElement !== inputRef.current) {
+				inputRef.current.focus();
+			}
+		}, 100);
+		
+		return () => clearTimeout(timer);
+	}, []);
 
 	// Debounced search function
 	useEffect(() => {
@@ -47,6 +60,7 @@ function VisionQuest({ isOpen, onClose, setChickenFootURL }) {
 			className="vision-quest-modal"
 		>
 			<Input
+				ref={inputRef}
 				placeholder="enter your path"
 				value={path}
 				onChange={(e) => setPath(e.target.value)}
