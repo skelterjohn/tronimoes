@@ -558,7 +558,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		} else if len(livingPlayers) == 0 {
 			round.Done = true
 			if len(g.Players) == 1 {
-				g.Note("congrats, you played yourself")
+				g.Note("congratulations... you played yourself")
 			} else {
 				g.Note(fmt.Sprintf("%s took their ball home", name))
 			}
@@ -1363,7 +1363,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				continue
 			}
 			if p.Name == player.Name {
-				g.Note(fmt.Sprintf("congratulations... you played yourself %s", player.Name))
+				g.Note(fmt.Sprintf("%s ducked out of that situation", player.Name))
 			} else {
 				g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
 			}
