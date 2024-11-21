@@ -256,8 +256,8 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}
 
 	return (
-		<div className={`h-full flex flex-col items-center p-2 ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
-			<div className="text-center font-bold">
+		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
+			<div className="w-full text-center font-bold ">
 				{killedPlayers?.map(kp => (
 					<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
 						<div className="absolute inset-0">
@@ -274,7 +274,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 					</div>
 				}
 			</div>
-			<div className="w-full flex flex-col items-center flex-1 min-h-0">
+			<div className="w-full flex flex-col items-center flex-1 min-h-0 border-1 border-t border-black">
 				<div className="w-full flex flex-col flex-1 overflow-y-auto">
 					{!hidden && (
 						<div className="flex justify-center flex-shrink-0">
