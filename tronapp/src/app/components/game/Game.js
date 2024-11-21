@@ -403,8 +403,8 @@ function Game({ code }) {
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
 	return (
-		<div className="h-full pl-3 pr-3 flex flex-col" onClick={() => setPlayErrorMessage("")}>
-			<div className="flex justify-end items-center mb-4">
+		<div className="h-full flex flex-col" onClick={() => setPlayErrorMessage("")}>
+			<div className="flex pl-3 pr-3 justify-end items-center">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
