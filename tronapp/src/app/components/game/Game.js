@@ -403,7 +403,7 @@ function Game({ code }) {
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
 	return (
-		<div className="h-full pl-3 pr-3" onClick={() => setPlayErrorMessage("")}>
+		<div className="h-full pl-3 pr-3 flex flex-col" onClick={() => setPlayErrorMessage("")}>
 			<div className="flex justify-end items-center mb-4">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
@@ -483,8 +483,8 @@ function Game({ code }) {
 				</div>
 			</div>
 			{player &&
-				<div className="flex justify-center items-center gap-4">
-					<div className="overflow-x-auto w-full">
+				<div className="flex justify-center items-center gap-4 flex-1 min-h-0">
+					<div className="overflow-x-auto w-full h-full">
 						<Hand
 							player={player}
 							players={players}

@@ -10,6 +10,20 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	const [spacerAvailable, setSpacerAvailable] = useState(false);
 	const [spacerColor, setSpacerColor] = useState("white");
 	const [myTurn, setMyTurn] = useState(false);
+	const [handBackground, setHandBackground] = useState("bg-white");
+
+	useEffect(() => {
+		const colorMap = {
+			red: "bg-red-100",
+			blue: "bg-blue-100",
+			green: "bg-green-100",
+			yellow: "bg-yellow-100",
+			orange: "bg-orange-100",
+			fuchsia: "bg-fuchsia-100",
+			white: "bg-white"
+		};
+		setHandBackground(colorMap[player?.color]);
+	}, [player]);
 
 	useEffect(() => {
 		setMyTurn(player?.name === players[turnIndex]?.name);
@@ -242,7 +256,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}
 
 	return (
-		<div className={`h-full flex flex-col items-center p-2 ${myTurn ? "border-2 border-black" : ""}`}>
+		<div className={`h-full flex flex-col items-center p-2 ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
 			<div className="text-center font-bold">
 				{killedPlayers?.map(kp => (
 					<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
@@ -260,10 +274,10 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 					</div>
 				}
 			</div>
-			<div className="w-full flex flex-col items-center h-full">
-				<div className="w-full flex flex-col justify-center overflow-y-auto max-h-[calc(100%-14rem)]">
+			<div className="w-full flex flex-col items-center flex-1 min-h-0">
+				<div className="w-full flex flex-col flex-1 overflow-y-auto">
 					{!hidden && (
-						<div className="flex justify-center">
+						<div className="flex justify-center flex-shrink-0">
 							<div className="w-full max-w-[24rem]">
 								{!hidden && <div className="w-full pb-1 justify-center lg:hidden">
 									<div className="flex flex-row gap-1 mt-2 justify-center">
@@ -290,7 +304,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							)}
 						</div>
 					)}
-					<div className="w-full justify-center flex flex-wrap content-start">
+					<div className="w-full justify-center flex flex-wrap content-start flex-1 overflow-y-auto">
 						{!hidden && handOrder.map((t, i) => {
 							return (
 								<div
