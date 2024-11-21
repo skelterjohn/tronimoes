@@ -76,8 +76,8 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 			setHandOrder([]);
 			return;
 		}
-		const oldTileKeys = new Set(handOrder);
-		const newTileKeys = new Set(player.hand);
+		const oldTileKeys = new Set(handOrder.map(t => `${t.a}:${t.b}`));
+		const newTileKeys = new Set(player.hand.map(t => `${t.a}:${t.b}`));
 
 		let newHandOrder = []
 		// old tiles in the order they were, if they're in the new hand.
