@@ -532,7 +532,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 			if len(g.Players) == 1 {
 				g.Note("you win I guess")
 			} else {
-				g.Note(fmt.Sprintf("%s wins the round through efficiency", p.Name))
+				g.Note(fmt.Sprintf("%s+2 wins the round through efficiency", p.Name))
 			}
 			p.Score += 2
 			for _, lt := range round.LaidTiles {
@@ -553,7 +553,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	if !round.Done {
 		if len(livingPlayers) == 1 && len(g.Players) > 1 {
 			round.Done = true
-			g.Note(fmt.Sprintf("%s wins the round through attrition", livingPlayers[0].Name))
+			g.Note(fmt.Sprintf("%s+2 wins the round through attrition", livingPlayers[0].Name))
 			livingPlayers[0].Score += 2
 		} else if len(livingPlayers) == 0 {
 			round.Done = true
@@ -1338,7 +1338,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		newFreeLines := [][]*LaidTile{}
 		for _, line := range r.FreeLines {
 			if isCutOff(line) {
-				g.Note(fmt.Sprintf("what kind of reprobate cuts off a free line? (%s)", name))
+				g.Note(fmt.Sprintf("what kind of reprobate cuts off a free line? (%s+0)", name))
 				tilesInFreeLine := map[string]bool{}
 				for _, lt := range line {
 					tilesInFreeLine[lt.Tile.String()] = true
@@ -1363,9 +1363,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				continue
 			}
 			if p.Name == player.Name {
-				g.Note(fmt.Sprintf("%s ducked out of that situation", player.Name))
+				g.Note(fmt.Sprintf("%s+1 ducked out of that situation", player.Name))
 			} else {
-				g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
+				g.Note(fmt.Sprintf("%s+1 cut-off %s's-1 line", player.Name, p.Name))
 			}
 			player.Score += 1
 			player.Kills = append(player.Kills, p.Name)
@@ -1452,13 +1452,13 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 		if len(consumed) > 0 {
 			if lt.PlayerName != "" {
-				consumed = append(consumed, lt.PlayerName)
+				consumed = append(consumed, fmt.Sprintf("%s-1", lt.PlayerName))
 			}
 			freeLineNote := ""
 			if freeLines > 0 {
 				freeLineNote = fmt.Sprintf("%d free line(s)", freeLines)
 			}
-			g.Note(fmt.Sprintf("%s's IL OUROBOROS consumes %s", name, strings.Join(append(consumed, freeLineNote), ", ")))
+			g.Note(fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", name, len(consumed), strings.Join(append(consumed, freeLineNote), ", ")))
 			for _, n := range consumed {
 				op := g.GetPlayer(n)
 				op.Dead = true
