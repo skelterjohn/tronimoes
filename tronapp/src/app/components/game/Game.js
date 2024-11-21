@@ -484,7 +484,7 @@ function Game({ code }) {
 			</div>
 			{player &&
 				<div className="flex justify-center items-center gap-4 flex-1 min-h-0">
-					<div className="overflow-x-auto w-full h-full">
+					<div className="overflow-x-auto overflow-y-auto w-full h-full">
 						<Hand
 							player={player}
 							players={players}

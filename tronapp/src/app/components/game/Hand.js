@@ -304,7 +304,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							)}
 						</div>
 					)}
-					<div className="w-full justify-center flex flex-wrap content-start flex-1 overflow-y-auto">
+					<div className="w-full justify-center flex flex-wrap content-start flex-1">
 						{!hidden && handOrder.map((t, i) => {
 							return (
 								<div
