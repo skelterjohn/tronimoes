@@ -746,7 +746,7 @@ func (r *Round) Note(ctx context.Context, n string) {
 }
 
 func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) {
-	squarePips := r.MapTiles()
+	squarePips := r.MapTiles(ctx)
 
 	hints := make([]map[string]bool, len(p.Hand))
 	for i := range hints {
@@ -915,21 +915,21 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 	}
 }
 
-func (r *Round) canPlayOnLine(lt *LaidTile, line []*LaidTile) (bool, int, error) {
+func (r *Round) canPlayOnLine(ctx context.Context, lt *LaidTile, line []*LaidTile) (bool, int, error) {
 	last := line[len(line)-1]
-	return r.canPlayOnTile(lt, last)
+	return r.canPlayOnTile(ctx, lt, last)
 }
 
-func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int, error) {
+func (r *Round) canPlayOnTile(ctx context.Context, lt, last *LaidTile) (bool, int, error) {
 	if lt.Indicated != nil && lt.Indicated.PipsA != -1 {
 		if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
 			return false, 0, ErrMustMatchPips
 		}
 	}
-	return r.canPlayOnTileWithoutIndication(lt, last)
+	return r.canPlayOnTileWithoutIndication(ctx, lt, last)
 }
 
-func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, error) {
+func (r *Round) canPlayOnTileWithoutIndication(ctx context.Context, lt, last *LaidTile) (bool, int, error) {
 	var potentialError error
 	cerr := func(err error) {
 		if err == ErrWrongSide || potentialError == ErrWrongSide {
@@ -1057,7 +1057,7 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 		return ErrWrongLengthSpacer
 	}
 
-	if !g.sixPathFrom(ctx, r.MapTiles(), spacer.A, spacer.B) {
+	if !g.sixPathFrom(ctx, r.MapTiles(ctx), spacer.A, spacer.B) {
 		return ErrTileOccluded
 	}
 
@@ -1117,7 +1117,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		return ErrTileOutOfBounds
 	}
 
-	squarePips := r.MapTiles()
+	squarePips := r.MapTiles(ctx)
 	if _, ok := squarePips[lt.CoordA()]; ok {
 		return ErrTileOccluded
 	}
@@ -1172,7 +1172,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 			return ErrMustPlayOnFoot
 		}
 		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
-			if ok, nextPips, err := r.canPlayOnLine(lt, mainLine); ok {
+			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, mainLine); ok {
 				playedALine = true
 				if !dryRun {
 					r.PlayerLines[player.Name] = append(mainLine, lt)
@@ -1217,7 +1217,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 					continue
 				}
 			}
-			if ok, nextPips, err := r.canPlayOnLine(lt, line); ok {
+			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
 				playedALine = true
 				if !dryRun {
 					lt.PlayerName = oname
@@ -1239,7 +1239,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 			if playedALine {
 				continue
 			}
-			if ok, nextPips, err := r.canPlayOnLine(lt, line); ok {
+			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
 				playedALine = true
 				if !dryRun {
 					lt.PlayerName = ""
@@ -1650,7 +1650,7 @@ type SquarePips struct {
 	Pips     int
 }
 
-func (r *Round) MapTiles() map[Coord]SquarePips {
+func (r *Round) MapTiles(ctx context.Context) map[Coord]SquarePips {
 	squarePips := map[Coord]SquarePips{}
 	for _, lt := range r.LaidTiles {
 		squarePips[lt.CoordA()] = SquarePips{
