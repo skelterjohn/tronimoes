@@ -339,15 +339,10 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 		return ErrRoundNotStarted
 	}
 
-	if round.BaglessPasses != 0 {
-		r.Note(fmt.Sprintf("%s passed on an empty bag", name))
-	} else {
-		r.Note(fmt.Sprintf("%s passed", name))
-	}
-
+	chickenFootMessage := ""
 	if !player.ChickenFoot && !player.Dead {
 		player.ChickenFoot = true
-		g.Note(fmt.Sprintf("%s is chicken-footed", name))
+		chickenFootMessage = " and is on the foot"
 
 		mainLine := r.PlayerLines[player.Name]
 		if len(mainLine) > 1 {
@@ -364,6 +359,12 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 			}
 			player.ChickenFootCoord = Coord{X: chickenFootX, Y: chickenFootY}
 		}
+	}
+
+	if round.BaglessPasses != 0 {
+		r.Note(fmt.Sprintf("%s passed on an empty bag", name))
+	} else {
+		r.Note(fmt.Sprintf("%s passed%s", name, chickenFootMessage))
 	}
 
 	if round.BaglessPasses >= len(g.Players) {
@@ -510,11 +511,12 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		g.Turn = (g.Turn + 1) % len(g.Players)
 	}
 
-	round.Note(fmt.Sprintf("%s laid %d:%d", name, tile.Tile.PipsA, tile.Tile.PipsB))
+	chickenFootMessage := ""
 	if player.ChickenFoot {
-		g.Note(fmt.Sprintf("%s is no longer chicken-footed", tile.PlayerName))
 		player.ChickenFoot = false
+		chickenFootMessage = " and is off the foot"
 	}
+	round.Note(fmt.Sprintf("%s laid %d:%d%s", name, tile.Tile.PipsA, tile.Tile.PipsB, chickenFootMessage))
 
 	livingPlayers := []*Player{}
 	for _, p := range g.Players {
@@ -1361,7 +1363,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				continue
 			}
 			if p.Name == player.Name {
-				g.Note(fmt.Sprintf("%s cut-off their own line", player.Name))
+				g.Note(fmt.Sprintf("congratulations... you played yourself %s", player.Name))
 			} else {
 				g.Note(fmt.Sprintf("%s cut-off %s's line", player.Name, p.Name))
 			}
