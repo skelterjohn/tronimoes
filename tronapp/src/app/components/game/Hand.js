@@ -30,7 +30,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}, [turnIndex, player, players]);
 
 	useEffect(() => {
-		setSpacerAvailable(hintedSpacer);
+		setSpacerAvailable(hintedSpacer?.length !== 0);
 	}, [hintedSpacer]);
 
 	useEffect(() => {

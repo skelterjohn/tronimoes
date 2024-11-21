@@ -816,6 +816,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				break
 			}
 		}
+
 		if !isHigher {
 			continue
 		}
@@ -849,7 +850,26 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	}
 
 	p.SpacerHints = []string{}
-	if !p.ChickenFoot && len(r.PlayerLines[name]) > 1 {
+
+	highestLeaderPips := r.PlayerLines[name][0].Tile.PipsA
+	for _, line := range r.FreeLines {
+		if line[0].Tile.PipsA > highestLeaderPips {
+			highestLeaderPips = line[0].Tile.PipsA
+		}
+	}
+
+	haveAPossibleFreeLine := false
+	for _, t := range p.Hand {
+		if t.PipsA != t.PipsB {
+			continue
+		}
+		if t.PipsA > highestLeaderPips {
+			haveAPossibleFreeLine = true
+			break
+		}
+	}
+
+	if r.Spacer == nil && haveAPossibleFreeLine && !p.ChickenFoot && len(r.PlayerLines[name]) > 1 {
 		hintSpacerFrom := func(src Coord) {
 			fourWays := []Coord{
 				src.Plus(5, 0),
