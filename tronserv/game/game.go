@@ -497,7 +497,10 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
 			// try it with the indicated tile
 			tile.Indicated = nil
-			return round.LayTile(g, name, tile, false)
+			if reverseErr := round.LayTile(g, name, tile.Reverse(), false); reverseErr != nil {
+				log.Printf("error with the reverse: %v", reverseErr)
+				return err
+			}
 		}
 		return err
 	}
