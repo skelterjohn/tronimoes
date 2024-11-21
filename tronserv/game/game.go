@@ -752,7 +752,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 	}
 
 	for i, t := range p.Hand {
-		movesOffSquare := func(head *LaidTile, src Coord, op *Player) {
+		movesOffSquare := func(head *LaidTile, src Coord) {
 
 			for _, orientation := range []string{"up", "down", "left", "right"} {
 				lt := &LaidTile{
@@ -768,17 +768,14 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 
 		}
 
-		movesOffTile := func(head *LaidTile, op *Player) {
-			movesOffSquare(head, head.CoordA().Left(), op)
-			movesOffSquare(head, head.CoordA().Right(), op)
-			movesOffSquare(head, head.CoordA().Up(), op)
-			movesOffSquare(head, head.CoordA().Down(), op)
-			movesOffSquare(head, head.CoordB().Left(), op)
-			movesOffSquare(head, head.CoordB().Right(), op)
-			movesOffSquare(head, head.CoordB().Up(), op)
-			movesOffSquare(head, head.CoordB().Down(), op)
+		movesOffTile := func(head *LaidTile) {
+			for _, c := range head.CoordA().Neighbors() {
+				movesOffSquare(head, c)
+			}
+			for _, c := range head.CoordB().Neighbors() {
+				movesOffSquare(head, c)
+			}
 		}
-		p := g.GetPlayer(name)
 
 		// first consider direct plays
 		for opname, line := range r.PlayerLines {
@@ -791,8 +788,15 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					continue
 				}
 			}
-			movesOffTile(line[len(line)-1], op)
+			movesOffTile(line[len(line)-1])
 		}
+
+		if p.Dead || !p.ChickenFoot {
+			for _, line := range r.FreeLines {
+				movesOffTile(line[len(line)-1])
+			}
+		}
+
 		if p.ChickenFoot || r.Spacer == nil {
 			// no free line activity allowed
 			continue
