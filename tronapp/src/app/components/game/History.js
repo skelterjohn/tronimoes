@@ -10,7 +10,7 @@ export default function History({ history }) {
 	return (
 		<div 
 			ref={scrollRef}
-			className="space-y-1 h-full overflow-y-scroll"
+			className="pl-2 space-y-1 h-full overflow-y-scroll"
 		>
 			<ol className="list-decimal list-inside">
 				{history.map((h, i) => (

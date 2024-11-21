@@ -451,11 +451,11 @@ function Game({ code }) {
 					</div>
 				))}
 			</div>
-			<div className="flex gap-4 justify-center max-h-[75vh]">
-				<span className="w-[20rem] hidden lg:block">
+			<div className="flex justify-center max-h-[75vh]">
+				<div className="min-w-[15rem] flex justify-right hidden lg:block">
 					<History history={gameHistory} />
-				</span>
-				<div className="border-black border-8 flex-1 overflow-auto">
+				</div>
+				<div className="flex-1 flex justify-center overflow-auto">
 					<Board
 						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
@@ -478,9 +478,9 @@ function Game({ code }) {
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
-				<span className="w-[12rem] hidden lg:block">
+				<div className="w-[15rem] hidden lg:block">
 					<History history={roundHistory} />
-				</span>
+				</div>
 			</div>
 			{player &&
 				<div className="flex justify-center items-center gap-4">
