@@ -1,6 +1,7 @@
 package game
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -25,7 +26,7 @@ type Game struct {
 	History     []string  `json:"history"`
 }
 
-func NewGame(code string) *Game {
+func NewGame(ctx context.Context, code string) *Game {
 	return &Game{
 		Code:        code,
 		Version:     0,
@@ -35,8 +36,8 @@ func NewGame(code string) *Game {
 	}
 }
 
-func (g *Game) CheckForDupes(when string) {
-	if g.CurrentRound() == nil {
+func (g *Game) CheckForDupes(ctx context.Context, when string) {
+	if g.CurrentRound(ctx) == nil {
 		return
 	}
 	seen := map[string]bool{}
@@ -48,7 +49,7 @@ func (g *Game) CheckForDupes(when string) {
 		}
 		seen[t.String()] = true
 	}
-	for _, lt := range g.CurrentRound().LaidTiles {
+	for _, lt := range g.CurrentRound(ctx).LaidTiles {
 		visit(lt.Tile, "laid tiles")
 	}
 	for _, p := range g.Players {
@@ -64,7 +65,7 @@ func (g *Game) CheckForDupes(when string) {
 	}
 }
 
-func (g *Game) LeaveOrQuit(name string) bool {
+func (g *Game) LeaveOrQuit(ctx context.Context, name string) bool {
 	if len(g.Rounds) > 0 {
 		for _, p := range g.Players {
 			if p.Name == name {
@@ -91,7 +92,7 @@ func (g *Game) LeaveOrQuit(name string) bool {
 	return quitting
 }
 
-func (g *Game) AddPlayer(player *Player) error {
+func (g *Game) AddPlayer(ctx context.Context, player *Player) error {
 	if len(g.Players) >= 6 {
 		return ErrGameTooManyPlayers
 	}
@@ -139,7 +140,7 @@ func (g *Game) AddPlayer(player *Player) error {
 	return nil
 }
 
-func (g *Game) LastRoundLeader() int {
+func (g *Game) LastRoundLeader(ctx context.Context) int {
 	if len(g.Rounds) == 0 {
 		return g.MaxPips + 1
 	}
@@ -148,7 +149,7 @@ func (g *Game) LastRoundLeader() int {
 	return firstTile.Tile.PipsA
 }
 
-func (g *Game) Start() error {
+func (g *Game) Start(ctx context.Context) error {
 	if len(g.Players) < 1 {
 		return ErrGameNotEnoughPlayers
 	}
@@ -159,7 +160,7 @@ func (g *Game) Start() error {
 		}
 	}
 
-	lastRoundLeader := g.LastRoundLeader()
+	lastRoundLeader := g.LastRoundLeader(ctx)
 	if lastRoundLeader == 0 {
 		return ErrGameOver
 	}
@@ -285,13 +286,13 @@ func (g *Game) Start() error {
 			break
 		}
 		for _, p := range g.Players {
-			g.DrawTile(p.Name)
+			g.DrawTile(ctx, p.Name)
 		}
 	}
 
-	g.Note(fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
+	g.Note(ctx, fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
 
-	if err := g.LayTile(g.Players[g.Turn].Name, &LaidTile{
+	if err := g.LayTile(ctx, g.Players[g.Turn].Name, &LaidTile{
 		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
 		PlayerName:  g.Players[g.Turn].Name,
 		Orientation: "right",
@@ -306,7 +307,7 @@ func (g *Game) Start() error {
 	return nil
 }
 
-func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
+func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY int) error {
 	var player *Player
 	for _, p := range g.Players {
 		if p.Name == name {
@@ -321,7 +322,7 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 		return ErrMustDrawTile
 	}
 
-	round := g.CurrentRound()
+	round := g.CurrentRound(ctx)
 
 	if !player.JustDrew && len(g.Bag) == 0 {
 		round.BaglessPasses++
@@ -334,7 +335,7 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	}
 	g.Turn = (g.Turn + 1) % len(g.Players)
 	player.JustDrew = false
-	r := g.CurrentRound()
+	r := g.CurrentRound(ctx)
 	if r == nil {
 		return ErrRoundNotStarted
 	}
@@ -362,13 +363,13 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	}
 
 	if round.BaglessPasses != 0 {
-		r.Note(fmt.Sprintf("%s passed on an empty bag", name))
+		r.Note(ctx, fmt.Sprintf("%s passed on an empty bag", name))
 	} else {
-		r.Note(fmt.Sprintf("%s passed%s", name, chickenFootMessage))
+		r.Note(ctx, fmt.Sprintf("%s passed%s", name, chickenFootMessage))
 	}
 
 	if round.BaglessPasses >= len(g.Players) {
-		g.Note("stalemate")
+		g.Note(ctx, "stalemate")
 		round.Done = true
 		for _, lt := range round.LaidTiles {
 			lt.Dead = true
@@ -382,12 +383,12 @@ func (g *Game) Pass(name string, chickenFootX, chickenFootY int) error {
 	return nil
 }
 
-func (g *Game) Note(n string) {
+func (g *Game) Note(ctx context.Context, n string) {
 	g.History = append(g.History, n)
 	log.Print(n)
 }
 
-func (g *Game) CurrentRound() *Round {
+func (g *Game) CurrentRound(ctx context.Context) *Round {
 	if len(g.Rounds) == 0 {
 		return nil
 	}
@@ -398,7 +399,7 @@ func (g *Game) CurrentRound() *Round {
 	return r
 }
 
-func (g *Game) DrawTile(name string) bool {
+func (g *Game) DrawTile(ctx context.Context, name string) bool {
 	var player *Player
 	for _, p := range g.Players {
 		if p.Name == name {
@@ -423,7 +424,7 @@ func (g *Game) DrawTile(name string) bool {
 	return true
 }
 
-func (g *Game) GetPlayer(name string) *Player {
+func (g *Game) GetPlayer(ctx context.Context, name string) *Player {
 	for _, p := range g.Players {
 		if p.Name == name {
 			return p
@@ -432,12 +433,12 @@ func (g *Game) GetPlayer(name string) *Player {
 	return nil
 }
 
-func (g *Game) InBounds(c Coord) bool {
+func (g *Game) InBounds(ctx context.Context, c Coord) bool {
 	return c.X >= 0 && c.X < g.BoardWidth && c.Y >= 0 && c.Y < g.BoardHeight
 }
 
-func (g *Game) LaySpacer(name string, spacer *Spacer) error {
-	player := g.GetPlayer(name)
+func (g *Game) LaySpacer(ctx context.Context, name string, spacer *Spacer) error {
+	player := g.GetPlayer(ctx, name)
 	if player == nil {
 		return ErrPlayerNotFound
 	}
@@ -450,22 +451,22 @@ func (g *Game) LaySpacer(name string, spacer *Spacer) error {
 		return ErrNotYourTurn
 	}
 
-	round := g.CurrentRound()
+	round := g.CurrentRound(ctx)
 	if round == nil {
 		return ErrRoundNotStarted
 	}
 
 	round.Spacer = nil
 
-	if err := round.LaySpacer(g, name, spacer); err != nil {
+	if err := round.LaySpacer(ctx, g, name, spacer); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (g *Game) LayTile(name string, tile *LaidTile) error {
-	player := g.GetPlayer(tile.PlayerName)
+func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
+	player := g.GetPlayer(ctx, tile.PlayerName)
 	if player == nil {
 		return ErrPlayerNotFound
 	}
@@ -484,7 +485,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	}
 	player.Hand = newHand
 
-	round := g.CurrentRound()
+	round := g.CurrentRound(ctx)
 	if round == nil {
 		return ErrRoundNotStarted
 	}
@@ -494,11 +495,11 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	}
 
 	firstTile := len(round.LaidTiles) == 0
-	if err := round.LayTile(g, name, tile, false); err != nil {
+	if err := round.LayTile(ctx, g, name, tile, false); err != nil {
 		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
 			// try it with the indicated tile
 			tile.Indicated = nil
-			if reverseErr := round.LayTile(g, name, tile.Reverse(), false); reverseErr != nil {
+			if reverseErr := round.LayTile(ctx, g, name, tile.Reverse(), false); reverseErr != nil {
 				log.Printf("error with the reverse: %v", reverseErr)
 				return err
 			}
@@ -516,7 +517,7 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		player.ChickenFoot = false
 		chickenFootMessage = " and is off the foot"
 	}
-	round.Note(fmt.Sprintf("%s laid %d:%d%s", name, tile.Tile.PipsA, tile.Tile.PipsB, chickenFootMessage))
+	round.Note(ctx, fmt.Sprintf("%s laid %d:%d%s", name, tile.Tile.PipsA, tile.Tile.PipsB, chickenFootMessage))
 
 	livingPlayers := []*Player{}
 	for _, p := range g.Players {
@@ -530,9 +531,9 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 		if len(p.Hand) == 0 {
 			round.Done = true
 			if len(g.Players) == 1 {
-				g.Note("you win I guess")
+				g.Note(ctx, "you win I guess")
 			} else {
-				g.Note(fmt.Sprintf("%s+2 wins the round through efficiency", p.Name))
+				g.Note(ctx, fmt.Sprintf("%s+2 wins the round through efficiency", p.Name))
 			}
 			p.Score += 2
 			for _, lt := range round.LaidTiles {
@@ -553,19 +554,19 @@ func (g *Game) LayTile(name string, tile *LaidTile) error {
 	if !round.Done {
 		if len(livingPlayers) == 1 && len(g.Players) > 1 {
 			round.Done = true
-			g.Note(fmt.Sprintf("%s+2 wins the round through attrition", livingPlayers[0].Name))
+			g.Note(ctx, fmt.Sprintf("%s+2 wins the round through attrition", livingPlayers[0].Name))
 			livingPlayers[0].Score += 2
 		} else if len(livingPlayers) == 0 {
 			round.Done = true
 			if len(g.Players) == 1 {
-				g.Note("congratulations... you played yourself")
+				g.Note(ctx, "congratulations... you played yourself")
 			} else {
-				g.Note(fmt.Sprintf("%s took their ball home", name))
+				g.Note(ctx, fmt.Sprintf("%s took their ball home", name))
 			}
 		}
 	}
 
-	if round.Done && g.LastRoundLeader() == 0 {
+	if round.Done && g.LastRoundLeader(ctx) == 0 {
 		g.Done = true
 	}
 
@@ -737,14 +738,14 @@ type Round struct {
 	BaglessPasses int                    `json:"bagless_passes"`
 }
 
-func (r *Round) Note(n string) {
+func (r *Round) Note(ctx context.Context, n string) {
 	if r == nil {
 		return
 	}
 	r.History = append(r.History, n)
 }
 
-func (r *Round) FindHints(g *Game, name string, p *Player) {
+func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) {
 	squarePips := r.MapTiles()
 
 	hints := make([]map[string]bool, len(p.Hand))
@@ -765,7 +766,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 					Orientation: orientation,
 					Coord:       src,
 				}
-				if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
+				if r.LayTile(ctx, g, name, lt, true) == nil || r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
 					hintAt(i, lt.CoordA())
 					hintAt(i, lt.CoordB())
 				}
@@ -784,7 +785,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 
 		// first consider direct plays
 		for opname, line := range r.PlayerLines {
-			op := g.GetPlayer(opname)
+			op := g.GetPlayer(ctx, opname)
 			if opname != name {
 				if p.ChickenFoot || p.Dead {
 					continue
@@ -834,7 +835,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 						Orientation: orientation,
 						Coord:       A,
 					}
-					if r.LayTile(g, name, lt, true) == nil || r.LayTile(g, name, lt.Reverse(), true) == nil {
+					if r.LayTile(ctx, g, name, lt, true) == nil || r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
 						hintAt(i, lt.CoordA())
 						hintAt(i, lt.CoordB())
 					}
@@ -883,7 +884,7 @@ func (r *Round) FindHints(g *Game, name string, p *Player) {
 				src.Plus(0, -5),
 			}
 			for _, dst := range fourWays {
-				if g.sixPathFrom(squarePips, src, dst) {
+				if g.sixPathFrom(ctx, squarePips, src, dst) {
 					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%s-%s", src, dst))
 				}
 			}
@@ -990,11 +991,11 @@ func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, e
 	return false, 0, potentialError
 }
 
-func (g *Game) sixPathFrom(squarePips map[Coord]SquarePips, src, dst Coord) bool {
-	if !g.InBounds(src) {
+func (g *Game) sixPathFrom(ctx context.Context, squarePips map[Coord]SquarePips, src, dst Coord) bool {
+	if !g.InBounds(ctx, src) {
 		return false
 	}
-	if !g.InBounds(dst) {
+	if !g.InBounds(ctx, dst) {
 		return false
 	}
 
@@ -1034,7 +1035,7 @@ func (g *Game) sixPathFrom(squarePips map[Coord]SquarePips, src, dst Coord) bool
 	return check(cur)
 }
 
-func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
+func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spacer) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
@@ -1056,7 +1057,7 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 		return ErrWrongLengthSpacer
 	}
 
-	if !g.sixPathFrom(r.MapTiles(), spacer.A, spacer.B) {
+	if !g.sixPathFrom(ctx, r.MapTiles(), spacer.A, spacer.B) {
 		return ErrTileOccluded
 	}
 
@@ -1091,7 +1092,7 @@ func (r *Round) LaySpacer(g *Game, name string, spacer *Spacer) error {
 	return nil
 }
 
-func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
+func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
@@ -1109,10 +1110,10 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return nil
 	}
 
-	if !g.InBounds(lt.CoordA()) {
+	if !g.InBounds(ctx, lt.CoordA()) {
 		return ErrTileOutOfBounds
 	}
-	if !g.InBounds(lt.CoordB()) {
+	if !g.InBounds(ctx, lt.CoordB()) {
 		return ErrTileOutOfBounds
 	}
 
@@ -1124,7 +1125,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		return ErrTileOccluded
 	}
 
-	if r.BlockingFeet(g, squarePips, lt, name) {
+	if r.BlockingFeet(ctx, g, squarePips, lt, name) {
 		return ErrNoBlockingFeet
 	}
 
@@ -1153,7 +1154,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 
 	playedALine := false
 
-	player := g.GetPlayer(name)
+	player := g.GetPlayer(ctx, name)
 
 	if r.Spacer == nil && !player.Dead && (playerFoot == "" || playerFoot == player.Name) {
 		mainLine := r.PlayerLines[player.Name]
@@ -1193,7 +1194,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			if playedALine {
 				continue
 			}
-			op := g.GetPlayer(oname)
+			op := g.GetPlayer(ctx, oname)
 			if oname == player.Name {
 				continue
 			}
@@ -1284,7 +1285,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 					lt.PlayerName = ""
 					r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
 					lt.NextPips = lt.Tile.PipsA
-					g.Note(fmt.Sprintf("%s started a free line", name))
+					g.Note(ctx, fmt.Sprintf("%s started a free line", name))
 				}
 			}
 		}
@@ -1302,14 +1303,14 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	squarePips[lt.CoordB()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
 	isOpenFrom := func(src Coord) bool {
 		for _, na := range src.Neighbors() {
-			if !g.InBounds(na) {
+			if !g.InBounds(ctx, na) {
 				continue
 			}
 			if _, ok := squarePips[na]; ok {
 				continue
 			}
 			for _, nb := range na.Neighbors() {
-				if !g.InBounds(nb) {
+				if !g.InBounds(ctx, nb) {
 					continue
 				}
 				if _, ok := squarePips[nb]; ok {
@@ -1338,7 +1339,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 		newFreeLines := [][]*LaidTile{}
 		for _, line := range r.FreeLines {
 			if isCutOff(line) {
-				g.Note(fmt.Sprintf("what kind of reprobate cuts off a free line? (%s+0)", name))
+				g.Note(ctx, fmt.Sprintf("what kind of reprobate cuts off a free line? (%s+0)", name))
 				tilesInFreeLine := map[string]bool{}
 				for _, lt := range line {
 					tilesInFreeLine[lt.Tile.String()] = true
@@ -1363,9 +1364,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 				continue
 			}
 			if p.Name == player.Name {
-				g.Note(fmt.Sprintf("%s+1 ducked out of that situation", player.Name))
+				g.Note(ctx, fmt.Sprintf("%s+1 ducked out of that situation", player.Name))
 			} else {
-				g.Note(fmt.Sprintf("%s+1 cut-off %s's-1 line", player.Name, p.Name))
+				g.Note(ctx, fmt.Sprintf("%s+1 cut-off %s's-1 line", player.Name, p.Name))
 			}
 			player.Score += 1
 			player.Kills = append(player.Kills, p.Name)
@@ -1458,9 +1459,9 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 			if freeLines > 0 {
 				freeLineNote = fmt.Sprintf("%d free line(s)", freeLines)
 			}
-			g.Note(fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", name, len(consumed), strings.Join(append(consumed, freeLineNote), ", ")))
+			g.Note(ctx, fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", name, len(consumed), strings.Join(append(consumed, freeLineNote), ", ")))
 			for _, n := range consumed {
-				op := g.GetPlayer(n)
+				op := g.GetPlayer(ctx, n)
 				op.Dead = true
 				op.ChickenFoot = false
 				for _, lt := range r.PlayerLines[op.Name][1:] {
@@ -1483,7 +1484,7 @@ func (r *Round) LayTile(g *Game, name string, lt *LaidTile, dryRun bool) error {
 	return nil
 }
 
-func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidTile, name string) bool {
+func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]SquarePips, ot *LaidTile, name string) bool {
 	lt := &LaidTile{}
 	*lt = *ot
 	lt.PlayerName = name
@@ -1514,7 +1515,7 @@ func (r *Round) BlockingFeet(g *Game, squarePips map[Coord]SquarePips, ot *LaidT
 		if len(pline) > 1 {
 			continue
 		}
-		p := g.GetPlayer(pn)
+		p := g.GetPlayer(ctx, pn)
 		if p.ChickenFoot {
 			playerChickenFeetCoords[p.Name] = p.ChickenFootCoord
 			if p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB() {
