@@ -58,7 +58,7 @@ type GameServer struct {
 	store Store
 }
 
-func (s *GameServer) validateToken(r *http.Request) error {
+func (s *GameServer) validateToken(ctx context.Context, r *http.Request) error {
 	token := r.Header.Get("Authorization")
 	if token == "" {
 		return ErrMissingToken
@@ -74,7 +74,6 @@ func (s *GameServer) validateToken(r *http.Request) error {
 	}
 
 	// Verify the Firebase token
-	ctx := r.Context()
 	client, err := fbApp.Auth(ctx)
 	if err != nil {
 		return fmt.Errorf("error getting Auth client: %v", err)
@@ -93,11 +92,10 @@ func (s *GameServer) validateToken(r *http.Request) error {
 	return nil
 }
 
-func (s *GameServer) getName(r *http.Request) (string, error) {
-	ctx := r.Context()
+func (s *GameServer) getName(ctx context.Context, r *http.Request) (string, error) {
 	userID := r.Header.Get("X-Player-Id")
 	if userID != "" {
-		if err := s.validateToken(r); err != nil {
+		if err := s.validateToken(ctx, r); err != nil {
 			return "", err
 		}
 
@@ -157,7 +155,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -181,7 +179,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -194,7 +192,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -235,7 +233,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 
 	g.DrawTile(player.Name)
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -254,7 +252,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -305,7 +303,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -320,7 +318,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -378,7 +376,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -392,7 +390,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -443,7 +441,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -467,7 +465,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -507,7 +505,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -593,7 +591,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -620,7 +618,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -633,7 +631,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	code := chi.URLParam(r, "code")
-	name, err := s.getName(r)
+	name, err := s.getName(ctx, r)
 	if err != nil {
 		log.Printf("Error getting name: %v", err)
 		writeErr(w, err, http.StatusForbidden)
@@ -671,7 +669,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 
 	player.ChickenFootURL = url
 
-	if err := s.store.WriteGame(r.Context(), g); err != nil {
+	if err := s.store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -714,7 +712,9 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 }
 
 func (s *GameServer) HandleGetPlayerName(w http.ResponseWriter, r *http.Request) {
-	pi, err := s.store.GetPlayer(r.Context(), r.Header.Get("X-Player-ID"))
+	ctx := r.Context()
+
+	pi, err := s.store.GetPlayer(ctx, r.Header.Get("X-Player-ID"))
 	if err != nil {
 		if err == ErrNoRegisteredPlayer {
 			writeErr(w, err, http.StatusNotFound)
