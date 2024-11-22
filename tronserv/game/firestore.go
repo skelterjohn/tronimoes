@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -165,7 +166,11 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 				continue
 			}
 
-			docVersion, _ := data["version"].(int64)
+			docVersion, ok := data["version"].(int64)
+			if !ok {
+				log.Printf("bad data type for version: %T", data["version"])
+				continue
+			}
 			if docVersion <= version {
 				continue
 			}
@@ -173,6 +178,7 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 			if gameData, ok := data["game_json"].(string); ok {
 				g := &Game{}
 				if err := json.Unmarshal([]byte(gameData), g); err != nil {
+					log.Printf("could not unmarshal: %v", err)
 					continue
 				}
 				updates <- g

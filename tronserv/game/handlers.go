@@ -45,6 +45,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/players", gs.HandleRegisterPlayerName)
 	r.Get("/players", gs.HandleGetPlayerName)
 }
+
 func RandomString(n int) string {
 	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, n)
