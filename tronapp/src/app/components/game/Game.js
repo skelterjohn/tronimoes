@@ -74,6 +74,9 @@ function Game({ code }) {
 				}
 				if (!isActive) return;
 				if (myCode !== code) {
+					// Initial code is usually just the prefix. The first time a game comes
+					// back, it's the full code. This will trigger a fetch-loop with the full
+					// code, so we ensure this fetch-loop is closes.
 					isActive = false;
 					return;
 				}
