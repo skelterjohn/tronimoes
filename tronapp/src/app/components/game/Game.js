@@ -68,8 +68,8 @@ function Game({ code }) {
 			}).catch((error) => {
 				if (error?.status === 404) {
 					isActive = false;
-					// setGame(undefined);
-					// router.push('/');
+					setGame(undefined);
+					router.push('/');
 					return;
 				}
 				if (!isActive) return;
@@ -79,14 +79,12 @@ function Game({ code }) {
 				}
 				if (error.name !== "AbortError") {
 					console.error("error", error);
-					setTimeout(getGame, 30000);
+					setTimeout(getGame, 3000);
 					return;
 				}
 				const timeoutDuration = new Date() - requestTime;
-				if (timeoutDuration < 10000) {
-					console.log(`request timed out quickly in ${timeoutDuration}ms`)
-					setTimeout(getGame, 5000);
-				}
+				console.log(`request timed out after ${timeoutDuration}ms`)
+				setTimeout(getGame, 3000);
 			});
 		};
 
