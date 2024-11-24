@@ -59,6 +59,14 @@ function Game({ code }) {
 				// Only update state if component is still mounted
 				if (!isActive) return;
 
+				if (myCode !== code) {
+					// Initial code is usually just the prefix. The first time a game comes
+					// back, it's the full code. This will trigger a fetch-loop with the full
+					// code, so we ensure this fetch-loop is closes.
+					isActive = false;
+					return;
+				}
+
 				if (resp.version === version) {
 					// We got back the same one, so let's try again after a bit.
 					setTimeout(getGame, 5000);
@@ -66,18 +74,24 @@ function Game({ code }) {
 				setVersion(resp.version);
 				setGame(resp);
 			}).catch((error) => {
-				if (error?.status === 404) {
-					isActive = false;
-					setGame(undefined);
-					router.push('/');
-					return;
-				}
 				if (!isActive) return;
+
 				if (myCode !== code) {
 					// Initial code is usually just the prefix. The first time a game comes
 					// back, it's the full code. This will trigger a fetch-loop with the full
 					// code, so we ensure this fetch-loop is closes.
 					isActive = false;
+					return;
+				}
+				if (error?.status === 408) {
+					// Request timed out, so try again immediately.
+					setTimeout(getGame, 0);
+					return;
+				}
+				if (error?.status === 404) {
+					isActive = false;
+					setGame(undefined);
+					router.push('/');
 					return;
 				}
 				if (error.name !== "AbortError") {

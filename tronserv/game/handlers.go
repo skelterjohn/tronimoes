@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/go-chi/chi/v5"
@@ -458,6 +459,11 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	// Four minutes before timing out. Client must re-request within one minute
+	// or risk being booted.
+	ctx, cancel := context.WithTimeout(ctx, 200*time.Second)
+	defer cancel()
+
 	code := chi.URLParam(r, "code")
 	versionStr := r.URL.Query().Get("version")
 	var version int64
@@ -477,6 +483,10 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := s.store.RecordPlayerActive(ctx, code, name, time.Now().Unix()); err != nil {
+		log.Printf("Error setting player active for %q / %q: %v", name, code, err)
+	}
+
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
@@ -486,6 +496,37 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		}
 		writeErr(w, err, http.StatusInternalServerError)
 		return
+	}
+
+	// if the game hasn't begun, cull inactive players
+	if len(g.Rounds) > 0 {
+		now := time.Now().Unix()
+		anyBooted := false
+		for _, p := range g.Players {
+			if p.Name == name {
+				continue
+			}
+			lastActive, err := s.store.PlayerLastActive(ctx, code, p.Name)
+			if err != nil {
+				log.Printf("Error getting last active for %q / %q: %v", p.Name, code, err)
+				continue
+			}
+			idleSeconds := now - lastActive
+			if idleSeconds > 300 {
+				log.Printf("last active for %q / %q: %d (%d seconds ago)", p.Name, code, lastActive, idleSeconds)
+				if !g.LeaveOrQuit(ctx, p.Name) {
+					log.Printf("Could not boot inactive player %s from %q", p.Name, code)
+				} else {
+					anyBooted = true
+				}
+			}
+		}
+		if anyBooted {
+			log.Printf("Booted players from %q %v", code, g.Players)
+			if err := s.store.WriteGame(ctx, g); err != nil {
+				log.Printf("Could not store game after booting players: %v", err)
+			}
+		}
 	}
 
 	// We aleady have something newer.
@@ -498,7 +539,18 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	// Otherwise, wait for am update.
 	select {
 	case <-ctx.Done():
-		log.Printf("%s broke connection for %q", name, code)
+		err := ctx.Err()
+		if err == context.DeadlineExceeded {
+			writeErr(w, err, http.StatusRequestTimeout)
+			return
+		}
+		log.Printf("%s broke connection for %q: %v", name, code, err)
+		if err := s.store.RecordPlayerActive(ctx, code, name, 0); err != nil {
+			log.Printf("Error setting player inactive for %q / %q: %v", name, code, err)
+		}
+		if !g.LeaveOrQuit(ctx, name) {
+			log.Printf("Could not boot %s from %q when the connection broke", name, code)
+		}
 		return
 	case g := <-s.store.WatchGame(ctx, code, version):
 		g.CheckForDupes(ctx, "watch")

@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 
@@ -151,7 +152,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <-chan *Game {
 	updates := make(chan *Game)
 
-	go func() {
+	go func(ctx context.Context) {
 		defer close(updates)
 
 		iter := s.games(ctx).Doc(code).Snapshots(ctx)
@@ -185,7 +186,7 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 				return
 			}
 		}
-	}()
+	}(ctx)
 
 	return updates
 }
@@ -232,4 +233,12 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 		Name: docs[0].Data()["name"].(string),
 		Id:   docs[0].Data()["id"].(string),
 	}, nil
+}
+
+func (s *FireStore) RecordPlayerActive(ctx context.Context, code, playerID string, lastActive int64) error {
+	return errors.New("unimplemented")
+}
+
+func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerID string) (int64, error) {
+	return 0, errors.New("unimplemented")
 }

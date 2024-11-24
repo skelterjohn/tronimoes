@@ -60,8 +60,6 @@ func (g *Game) CheckForDupes(ctx context.Context, when string) {
 	if anyDupes {
 		data, _ := json.MarshalIndent(g, "", "  ")
 		log.Printf("dupes during %s: %s", when, string(data))
-	} else {
-		log.Print("no dupes found during " + when)
 	}
 }
 
@@ -81,7 +79,7 @@ func (g *Game) LeaveOrQuit(ctx context.Context, name string) bool {
 	for _, p := range g.Players {
 		if p.Name == name {
 			quitting = true
-			break
+			continue
 		}
 		newPlayers = append(newPlayers, p)
 	}

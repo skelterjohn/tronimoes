@@ -39,6 +39,11 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		setNameInput(playerName);
 	}, [playerName]);
 
+	useEffect(() => {
+		console.log('unsetting game code');
+		setGameCode(undefined);
+	}, []);
+
 	function registerAndJoinCode(code) {
 		if (!isRegistered) {
 			setPlayerName(nameInput);
