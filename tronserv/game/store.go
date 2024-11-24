@@ -18,6 +18,7 @@ type Store interface {
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
 	ReadGame(ctx context.Context, code string) (*Game, error)
 	WriteGame(ctx context.Context, game *Game) error
+	DeleteGame(ctx context.Context, code string) error
 	WatchGame(ctx context.Context, code string, version int64) <-chan *Game
 	RegisterPlayerName(ctx context.Context, playerID, playerName string) error
 	GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error)
@@ -161,6 +162,13 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	s.watchChans[gameCopy.Code] = nil
 	s.watchMu.Unlock()
 
+	return nil
+}
+
+func (s *MemoryStore) DeleteGame(ctx context.Context, code string) error {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+	delete(s.games, code)
 	return nil
 }
 

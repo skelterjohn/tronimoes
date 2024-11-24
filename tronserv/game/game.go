@@ -7,11 +7,14 @@ import (
 	"log"
 	"math/rand"
 	"strings"
+	"time"
 )
 
 var Colors = []string{"red", "blue", "green"}
 
 type Game struct {
+	Created int64 `json:"created"`
+
 	Version int64 `json:"version"`
 	Done    bool  `json:"done"`
 
@@ -28,6 +31,7 @@ type Game struct {
 
 func NewGame(ctx context.Context, code string) *Game {
 	return &Game{
+		Created:     time.Now().Unix(),
 		Code:        code,
 		Version:     0,
 		BoardWidth:  10,

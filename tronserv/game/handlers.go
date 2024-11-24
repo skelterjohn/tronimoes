@@ -3,6 +3,7 @@ package game
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -498,9 +499,19 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if the game hasn't begun, cull inactive players
-	if len(g.Rounds) > 0 {
+	// if the game hasn't begun, cull inactive players or cull the game if it's
+	// been waiting for too long.
+	if len(g.Rounds) == 0 {
 		now := time.Now().Unix()
+		if now-g.Created > 1800 {
+			log.Printf("Culling game %q because it's been waiting too long", code)
+			if err := s.store.DeleteGame(ctx, code); err != nil {
+				log.Printf("Error deleting game %q: %v", code, err)
+			}
+			writeErr(w, errors.New("this game took too long to start"), http.StatusNotFound)
+			return
+		}
+
 		anyBooted := false
 		for _, p := range g.Players {
 			if p.Name == name {

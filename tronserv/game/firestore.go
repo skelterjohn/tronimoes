@@ -139,6 +139,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 	}
 	c := s.games(ctx)
 	if _, err := c.Doc(game.Code).Set(ctx, map[string]any{
+		"created":     game.Created,
 		"code_prefix": game.Code[:6],
 		"open":        open,
 		"done":        game.Done,
@@ -149,6 +150,12 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 	}
 	return nil
 }
+
+func (s *FireStore) DeleteGame(ctx context.Context, code string) error {
+	_, err := s.games(ctx).Doc(code).Delete(ctx)
+	return err
+}
+
 func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <-chan *Game {
 	updates := make(chan *Game)
 
