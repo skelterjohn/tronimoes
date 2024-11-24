@@ -3,7 +3,6 @@ package game
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 
@@ -242,10 +241,17 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 	}, nil
 }
 
-func (s *FireStore) RecordPlayerActive(ctx context.Context, code, playerID string, lastActive int64) error {
-	return errors.New("unimplemented")
+func (s *FireStore) RecordPlayerActive(ctx context.Context, code, playerName string, lastActive int64) error {
+	_, err := s.games(ctx).Doc(code).Collection("active").Doc(playerName).Set(ctx, map[string]any{
+		"last_active": lastActive,
+	})
+	return err
 }
 
-func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerID string) (int64, error) {
-	return 0, errors.New("unimplemented")
+func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerName string) (int64, error) {
+	doc, err := s.games(ctx).Doc(code).Collection("active").Doc(playerName).Get(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("could not read: %v", err)
+	}
+	return doc.Data()["last_active"].(int64), nil
 }
