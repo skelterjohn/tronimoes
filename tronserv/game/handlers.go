@@ -484,10 +484,6 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.RecordPlayerActive(ctx, code, name, time.Now().Unix()); err != nil {
-		log.Printf("Error setting player active for %q / %q: %v", name, code, err)
-	}
-
 	g, err := s.store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
@@ -497,6 +493,15 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		}
 		writeErr(w, err, http.StatusInternalServerError)
 		return
+	}
+
+	for _, p := range g.Players {
+		if p.Name != name {
+			continue
+		}
+		if err := s.store.RecordPlayerActive(ctx, code, name, time.Now().Unix()); err != nil {
+			log.Printf("Error setting player active for %q / %q: %v", name, code, err)
+		}
 	}
 
 	// if the game hasn't begun, cull inactive players or cull the game if it's
