@@ -350,7 +350,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 							</div>
 						)}
 						{hidden && (
-							<div>x{handOrder.length}</div>
+							<div>x{player?.hand?.length}</div>
 						)}
 					</div>
 				</div>
