@@ -177,7 +177,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		// Remove the ghost element
 		const ghost = document.getElementById('touch-ghost');
 		if (ghost) {
-			ghost.remove();
+			ghost.parentElement.removeChild(ghost);
 		}
 		
 		// Get the element under the touch point
