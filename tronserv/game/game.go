@@ -505,10 +505,9 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 			if reverseErr := round.LayTile(ctx, g, name, rt, false); reverseErr != nil {
 				log.Printf("error with the reverse: %v", reverseErr)
 				return err
-			} else {
-				tile = rt
-				err = nil
 			}
+			tile = rt
+			err = nil
 		}
 		if err != nil {
 			return err
