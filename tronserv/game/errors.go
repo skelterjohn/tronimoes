@@ -41,4 +41,5 @@ var (
 	ErrMustMatchPips            = errors.New("you must match the pips of the previous tile")
 	ErrNotAdjacent              = errors.New("tile is not adjacent to the previous tile")
 	ErrWrongSide                = errors.New("this tile could be played if reversed")
+	ErrEmptyBag                 = errors.New("no tiles left in the bag")
 )

@@ -288,7 +288,11 @@ func (g *Game) Start(ctx context.Context) error {
 			break
 		}
 		for _, p := range g.Players {
-			g.DrawTile(ctx, p.Name)
+			if len(g.Bag) == 0 {
+				return ErrEmptyBag
+			}
+			p.Hand = append(p.Hand, g.Bag[0])
+			g.Bag = g.Bag[1:]
 		}
 	}
 
