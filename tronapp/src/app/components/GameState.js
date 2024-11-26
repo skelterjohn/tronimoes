@@ -33,6 +33,24 @@ export function GameProvider({ children }) {
 		setPlayerID(userInfo?.uid);
 	}, [userInfo, setPlayerKey, setPlayerID]);
 
+	useEffect(() => {
+		const refreshInterval = setInterval(async () => {
+			try {
+				const newToken = await userInfo.stsTokenManager.getToken(auth);
+				console.log("refreshed token");
+				setUserInfo(prevState => ({
+					...prevState,
+					accessToken: newToken,
+				}));
+			} catch (error) {
+				console.error("Error refreshing token:", error);
+			}
+		}, 55 * 60 * 1000); // 55 minutes
+	
+		// Cleanup interval on component unmount
+		return () => clearInterval(refreshInterval);
+	}, [userInfo]);
+
 	useEffect(()=> {
 		if (error !== undefined) {
 			setErrorMessage(error.message);

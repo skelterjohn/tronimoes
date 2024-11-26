@@ -4,41 +4,11 @@ import { Button } from "antd";
 import { auth } from "@/config";
 import { useEffect } from "react";
 
-const setupTokenRefresh = (user, setUserInfo) => {
-	// Force token refresh every 55 minutes (tokens expire after 1 hour)
-	const refreshInterval = setInterval(async () => {
-		try {
-			const newToken = await user.getIdToken(true);
-			console.log("refreshed token");
-			setUserInfo(prevState => ({
-				...prevState,
-				accessToken: newToken,
-			}));
-		} catch (error) {
-			console.error("Error refreshing token:", error);
-		}
-	}, 55 * 60 * 1000); // 55 minutes
-
-	// Cleanup interval on component unmount
-	return () => clearInterval(refreshInterval);
-};
-
 export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) {
-	var tokenCleanup = undefined;
-
-	useEffect(() => {
-		return () => {
-			if (tokenCleanup) {
-				tokenCleanup();
-			}
-		};
-	}, []);
-
 	const signInAsGuest = async () => {
 		try {
 			const result = await signInAnonymously(auth);
 			setUserInfo(result.user);
-			tokenCleanup = setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			console.error("Error signing in anonymously:", error);
@@ -52,7 +22,6 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 			const provider = new GoogleAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			setUserInfo(result.user);
-			tokenCleanup = setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			console.error("Error signing in with Google:", error);
@@ -66,7 +35,6 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 			const provider = new FacebookAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			setUserInfo(result.user);
-			tokenCleanup = setupTokenRefresh(result.user, setUserInfo);
 			onClose();
 		} catch (error) {
 			if (error.code === 'auth/account-exists-with-different-credential') {
@@ -91,7 +59,6 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 						
 						// Update user info and set up token refresh
 						setUserInfo(googleResult.user);
-						tokenCleanup = setupTokenRefresh(googleResult.user, setUserInfo);
 						onClose();
 					} else {
 						setErrorMessage(`Please sign in with ${methods[0]}`);
