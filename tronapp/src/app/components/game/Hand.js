@@ -3,7 +3,7 @@ import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 
-function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount, turnIndex }) {
+function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount, turnIndex, playTile }) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
@@ -11,6 +11,20 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	const [spacerColor, setSpacerColor] = useState("white");
 	const [myTurn, setMyTurn] = useState(false);
 	const [handBackground, setHandBackground] = useState("bg-white");
+	const [dragOrientation, setDragOrientation] = useState("down");
+
+	function toggleOrientation() {
+		switch (dragOrientation) {
+			case "down": setDragOrientation("right"); break;
+			case "right": setDragOrientation("up"); break;
+			case "up": setDragOrientation("left"); break;
+			case "left": setDragOrientation("down"); break;
+		}
+	}
+
+	useEffect(() => {
+		console.log(dragOrientation);
+	}, [dragOrientation]);
 
 	useEffect(() => {
 		const colorMap = {
@@ -102,6 +116,11 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		if (hidden) {
 			return;
 		}
+		if (selectedTile === tile) {
+			toggleOrientation();
+		} else {
+			setDragOrientation("down");
+		}
 		setSelectedTile(tile);
 	}
 
@@ -147,6 +166,42 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		e.preventDefault();
 	}
 
+
+	function orientGhost(ghost, x, y, orientation) {
+
+		const r = ghost.getBoundingClientRect();
+		const min_x = r.left;
+		const min_y = r.top;
+		const max_x = r.right;
+		const max_y = r.bottom;
+		const width = max_x - min_x;
+		const height = max_y - min_y;
+
+		switch (orientation) {
+			case "down":
+				ghost.style.left = `${x - width / 2}px`;
+				ghost.style.top = `${y - height / 4}px`;
+				ghost.style.transform = 'rotate(0deg)';
+				break;
+			case "right":
+				ghost.style.left = `${x - width / 4}px`;
+				ghost.style.top = `${y - height / 2}px`;
+				ghost.style.transform = 'rotate(270deg)';
+				break;
+			case "up":
+				ghost.style.left = `${x - width / 2}px`;
+				ghost.style.top = `${y - height * 3 / 4}px`;
+				ghost.style.transform = 'rotate(180deg)';
+				break;
+			case "left":
+				ghost.style.left = `${x - width * 3 / 4}px`;
+				ghost.style.top = `${y - height / 2}px`;
+				ghost.style.transform = 'rotate(90deg)';
+				break;
+		}
+		
+	}
+
 	function handleTouchStart(tile, e) {
 		if (hidden) return;
 		
@@ -161,10 +216,8 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		ghost.style.pointerEvents = 'none';
 		ghost.style.zIndex = '1000';
 		
-		// Position the ghost at the touch point
 		const touch = e.touches[0];
-		ghost.style.left = `${touch.clientX - 32}px`;
-		ghost.style.top = `${touch.clientY - 48}px`;
+		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
 		
 		document.body.appendChild(ghost);
 		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
@@ -184,6 +237,10 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		const touch = e.changedTouches[0];
 		const element = document.elementFromPoint(touch.clientX, touch.clientY);
 		
+		if (element?.dataset?.tron_x && element?.dataset?.tron_y) {
+			dropTile(element.dataset.tron_x, element.dataset.tron_y, dragOrientation);
+		}
+
 		// Find the tile container element
 		const tileContainer = element?.closest('[draggable="true"]');
 		if (tileContainer) {
@@ -197,35 +254,40 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		setDraggedTile(null);
 	}
 
-	// Add useEffect for touch event setup
-	useEffect(() => {
-		function handleTouchMove(e) {
-			if (!touchStartPos) return;
-			e.preventDefault();
-			
-			// Move the ghost element
-			const ghost = document.getElementById('touch-ghost');
-			if (ghost) {
-				const touch = e.touches[0];
-				ghost.style.left = `${touch.clientX - 32}px`;
-				ghost.style.top = `${touch.clientY - 48}px`;
-			}
-		}
-		// Get all draggable tile elements
-		const tileElements = document.querySelectorAll('[draggable="true"]');
+	function handleTouchMove(e) {
+		if (!touchStartPos) return;
 		
-		// Add non-passive touch move listeners
-		tileElements.forEach(element => {
-			element.addEventListener('touchmove', handleTouchMove, { passive: false });
-		});
+		// Move the ghost element
+		const ghost = document.getElementById('touch-ghost');
+		if (!ghost) {
+			return;
+		}
+		const touch = e.touches[0];
+		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
 
-		// Cleanup
-		return () => {
-			tileElements.forEach(element => {
-				element.removeEventListener('touchmove', handleTouchMove);
-			});
-		};
-	}, [touchStartPos]); // Re-run when touchStartPos changes
+		const element = document.elementFromPoint(touch.clientX, touch.clientY);
+		hoverTile(element?.dataset?.tron_x, element?.dataset?.tron_y);
+	}
+
+	function hoverTile(x, y) {
+		console.log("hover", x, y);
+	}
+
+	function dropTile(x, y, orientation) {
+		if (!selectedTile) {
+			return;
+		}
+		console.log("drop", x, y, orientation, selectedTile);
+		playTile({
+			a: selectedTile.a, b: selectedTile.b,
+			coord: {
+				x: parseInt(x),
+				y: parseInt(y),
+			},
+			orientation: orientation,
+			dead: false,
+		});
+	}
 
 	const [killedPlayers, setKilledPlayers] = useState([]);
 	useEffect(() => {
@@ -310,6 +372,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 										onDrop={(e) => handleDrop(t, e)}
 										onDragOver={handleDragOver}
 										onTouchStart={(e) => handleTouchStart(t, e)}
+										onTouchMove={(e) => handleTouchMove(e)}
 										onTouchEnd={(e) => handleTouchEnd(t, e)}
 									>
 										<div className="pointer-events-none">

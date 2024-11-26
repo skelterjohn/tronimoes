@@ -14,7 +14,7 @@ export default function Square({ x, y, center = false, clicked = false, pips }) 
 		cnm = `${cnm} border border-2 border-black`;
 	}
 
-	return <div className={cnm}>
+	return <div data-tron_x={x} data-tron_y={y} className={cnm}>
 		{clicked && <Pips pips={pips} />}
 	</div>;
 }

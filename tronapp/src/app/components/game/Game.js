@@ -305,6 +305,7 @@ function Game({ code }) {
 	const [playA, setPlayA] = useState(undefined);
 
 	function playTile(tile) {
+		console.log("playTile", tile);
 		tile.color = player.color;
 		client.LayTile(code, {
 			tile: {
@@ -515,6 +516,7 @@ function Game({ code }) {
 							hintedSpacer={player.spacer_hints}
 							bagCount={bagCount}
 							turnIndex={turnIndex}
+							playTile={playTile}
 						/>
 					</div>
 				</div>
