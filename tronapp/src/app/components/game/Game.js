@@ -301,6 +301,8 @@ function Game({ code }) {
 		});
 	}
 
+	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
+
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [playA, setPlayA] = useState(undefined);
 
@@ -491,6 +493,7 @@ function Game({ code }) {
 						playA={playA}
 						setPlayA={setPlayA}
 						spacerHints={player?.spacer_hints}
+						hoveredSquares={hoveredSquares}
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
@@ -517,6 +520,7 @@ function Game({ code }) {
 							bagCount={bagCount}
 							turnIndex={turnIndex}
 							playTile={playTile}
+							setHoveredSquares={setHoveredSquares}
 						/>
 					</div>
 				</div>

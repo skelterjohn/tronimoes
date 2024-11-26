@@ -18,7 +18,7 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
-export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, chickenFeetURLs, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints, clearSpacer }) {
+export default function Board({ width = 10, height = 11, tiles, spacer, lineHeads, selectedTile, playTile, playSpacer, chickenFeet, chickenFeetURLs, indicated, setIndicated, activePlayer, hints, playA, setPlayA, spacerHints, clearSpacer, hoveredSquares }) {
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
@@ -171,6 +171,7 @@ export default function Board({ width = 10, height = 11, tiles, spacer, lineHead
 												>
 													<Square
 														x={x} y={y}
+														hoveredSquares={hoveredSquares}
 														center={y == (height - 1) / 2 && (x == (width / 2) - 1 || x == (width / 2))}
 														clicked={playA !== undefined && playA.x == x && playA.y == y}
 														pips={selectedTile?.a}

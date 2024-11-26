@@ -3,7 +3,7 @@ import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 
-function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount, turnIndex, playTile }) {
+function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount, turnIndex, playTile, setHoveredSquares }) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
@@ -252,6 +252,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
+		setHoveredSquares(new Set([]));
 	}
 
 	function handleTouchMove(e) {
@@ -266,11 +267,30 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
 
 		const element = document.elementFromPoint(touch.clientX, touch.clientY);
-		hoverTile(element?.dataset?.tron_x, element?.dataset?.tron_y);
+		hoverTile(parseInt(element?.dataset?.tron_x), parseInt(element?.dataset?.tron_y));
 	}
 
 	function hoverTile(x, y) {
-		console.log("hover", x, y);
+		if (!selectedTile) {
+			return;
+		}
+		setHoveredSquares(`${x},${y}`);
+		let hs = new Set([`${x},${y}`]);
+		switch (dragOrientation) {
+		case "down":
+			hs.add(`${x},${y + 1}`);
+			break;
+		case "right":
+			hs.add(`${x + 1},${y}`);
+			break;
+		case "up":
+			hs.add(`${x},${y - 1}`);
+			break;
+		case "left":
+			hs.add(`${x - 1},${y}`);
+			break;
+		}
+		setHoveredSquares(hs);
 	}
 
 	function dropTile(x, y, orientation) {
