@@ -233,7 +233,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}, [player, players]);
 
 	function DrawPassButtons() {
-		return <div className="flex flex-row gap-1 mt-2 justify-center">
+		return <div className="flex flex-row gap-1 justify-center">
 			<Button
 				type="primary"
 				size="small"
@@ -258,32 +258,37 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	return (
 		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
 			<div className="w-full text-center font-bold ">
-				{killedPlayers?.map(kp => (
-					<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
-						<div className="absolute inset-0">
-							<ChickenFoot url={kp.chickenFootURL} color={kp.color} />
+				<div className="flex flex-row items-center justify-center gap-2">
+					{killedPlayers?.map(kp => (
+						<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
+							<div className="absolute inset-0">
+								<ChickenFoot url={kp.chickenFootURL} color={kp.color} />
+							</div>
 						</div>
-					</div>
-				))}
-				{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
-				{!player?.chickenFoot && !player?.dead &&
-					<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
-						<div className="absolute inset-0">
-							<ChickenFoot url={player.chickenFootURL} color={player.color} />
+					))}
+					<span>
+						{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
+					</span>
+					{!player?.chickenFoot && !player?.dead &&
+						<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
+							<div className="absolute inset-0">
+								<ChickenFoot url={player.chickenFootURL} color={player.color} />
+							</div>
 						</div>
-					</div>
-				}
+					}
+					{!hidden && <div className=" flex items-center gap-2">
+						<DrawPassButtons/>
+						<div className="text-center">
+							{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
+						</div>
+					</div>}
+				</div>
 			</div>
 			<div className="w-full flex flex-col items-center flex-1 min-h-0 border-1 border-t border-black">
 				<div className="w-full flex flex-col flex-1 overflow-y-auto">
 					{!hidden && (
 						<div className="flex justify-center flex-shrink-0">
 							<div className="w-full max-w-[24rem]">
-								{!hidden && <div className="w-full pb-1 justify-center lg:hidden">
-									<div className="flex flex-row gap-1 mt-2 justify-center">
-										<DrawPassButtons/>
-									</div>
-								</div>}
 								<div
 									className={`${spacerColor} max-w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center text-center`}
 									onClick={spacerClicked}
@@ -291,17 +296,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 									FREE LINE SPACER
 								</div>
 							</div>
-							
-							{!hidden && (
-								<div className="pl-2 hidden lg:block">
-									<div className="text-center">
-										{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
-									</div>
-									<div className="flex flex-row gap-1 mt-2">
-										<DrawPassButtons/>
-									</div>
-								</div>
-							)}
 						</div>
 					)}
 					<div className="w-full flex flex-row justify-center">
