@@ -289,7 +289,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-fit flex flex-wrap content-start justify-start">
 							{!hidden && (
-								<div className="w-[4rem] h-full pr-1 pt-1">
+								<div className="w-[4rem] min-h-[8rem] h-full pr-1 pt-1">
 									<div
 										className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
 										onClick={spacerClicked}
