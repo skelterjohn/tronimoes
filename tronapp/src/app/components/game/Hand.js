@@ -30,7 +30,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}, [turnIndex, player, players]);
 
 	useEffect(() => {
-		setSpacerAvailable(hintedSpacer?.length !== 0);
+		setSpacerAvailable(hintedSpacer && hintedSpacer.length !== 0);
 	}, [hintedSpacer]);
 
 	useEffect(() => {
@@ -286,49 +286,47 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 			</div>
 			<div className="w-full flex flex-col items-center flex-1 min-h-0 border-1 border-t border-black">
 				<div className="w-full flex flex-col flex-1 overflow-y-auto">
-					{!hidden && (
-						<div className="flex justify-center flex-shrink-0">
-							<div className="w-full max-w-[24rem]">
-								<div
-									className={`${spacerColor} max-w-[24rem] h-[4rem] border-black rounded-lg border-2 flex items-center justify-center text-center`}
-									onClick={spacerClicked}
-								>
-									FREE LINE SPACER
-								</div>
-							</div>
-						</div>
-					)}
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-fit flex flex-wrap content-start justify-start">
-						{!hidden && handOrder.map((t, i) => {
-							return (
-								<div
-									key={i}
-									className={hidden ? "w-[1rem]" : "w-[4rem] pr-1 pt-1"}
-									draggable={!hidden}
-									data-tile={JSON.stringify(t)}
-									onClick={() => tileClicked(t)}
-									onDragStart={(e) => handleDragStart(t, e)}
-									onDrop={(e) => handleDrop(t, e)}
-									onDragOver={handleDragOver}
-									onTouchStart={(e) => handleTouchStart(t, e)}
-									onTouchEnd={(e) => handleTouchEnd(t, e)}
-								>
-									<div className="pointer-events-none">
-										<Tile
-											draggable={false}
-											color={player?.color}
-											pipsa={t.a}
-											pipsb={t.b}
-											back={hidden}
-											dead={dead}
-											hintedTiles={hintedTiles}
-											selected={playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b}
-										/>
+							{!hidden && (
+								<div className="w-[4rem] h-full pr-1 pt-1">
+									<div
+										className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
+										onClick={spacerClicked}
+									>
+										FREE LINE
 									</div>
 								</div>
-							);
-						})}
+							)}
+							{!hidden && handOrder.map((t, i) => {
+								return (
+									<div
+										key={i}
+										className="w-[4rem] pr-1 pt-1"
+										draggable={true}
+										data-tile={JSON.stringify(t)}
+										onClick={() => tileClicked(t)}
+										onDragStart={(e) => handleDragStart(t, e)}
+										onDrop={(e) => handleDrop(t, e)}
+										onDragOver={handleDragOver}
+										onTouchStart={(e) => handleTouchStart(t, e)}
+										onTouchEnd={(e) => handleTouchEnd(t, e)}
+									>
+										<div className="pointer-events-none">
+											<Tile
+												draggable={false}
+												color={player?.color}
+												pipsa={t.a}
+												pipsb={t.b}
+												back={false}
+												dead={dead}
+												hintedTiles={hintedTiles}
+												selected={playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b}
+											/>
+										</div>
+									</div>
+								);
+							})}
 						</div>
 						{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
 						{!hidden && <div className="w-[1rem]"></div>}
