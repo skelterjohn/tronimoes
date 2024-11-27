@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
+import Image from "next/image";
 
 function Hand({
 		player, players,
@@ -422,8 +423,17 @@ function Hand({
 					}
 					{!hidden && <div className=" flex items-center gap-2">
 						<DrawPassButtons/>
-						<div className="text-center">
-							{`${bagCount} tile${bagCount === 1 ? "" : "s"} in the bag`} 
+						<div className="flex flex-row items-center ">
+							<Image 
+								src="/bag.png" 
+								alt="bag"
+								width={256}
+								height={256}
+								className="object-contain w-8 h-8"
+							/>
+							<div className="text-center">
+							{`x${bagCount}`} 
+							</div>
 						</div>
 					</div>}
 				</div>
