@@ -440,7 +440,7 @@ function Game({ code }) {
 	}, [selectedTile, dragOrientation, playTile]);
 
 	return (
-		<div className="h-full flex flex-col" onClick={() => setPlayErrorMessage("")}>
+		<div className="h-full bg-black text-white flex flex-col" onClick={() => setPlayErrorMessage("")}>
 			<div className="flex pl-3 pr-3 justify-end items-center">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
@@ -448,7 +448,6 @@ function Game({ code }) {
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
 						<Button
-							type="primary"
 							size="large"
 							className="w-28"
 							disabled={!amFirstPlayer || roundInProgress || game?.done}
@@ -457,7 +456,6 @@ function Game({ code }) {
 							Start Round
 						</Button>
 						<Button
-							type="primary"
 							size="large"
 							className="w-28"
 							onClick={() => leaveOrQuit()}

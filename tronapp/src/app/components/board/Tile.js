@@ -80,39 +80,39 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 
 	useEffect(() => {
 		const colorMap = {
-			red: "bg-red-300",
-			blue: "bg-blue-300",
-			green: "bg-green-300",
-			yellow: "bg-yellow-300",
-			orange: "bg-orange-300",
-			fuchsia: "bg-fuchsia-300",
+			red: "bg-red-500",
+			blue: "bg-blue-500",
+			green: "bg-green-500",
+			yellow: "bg-yellow-400",
+			orange: "bg-orange-500",
+			fuchsia: "bg-fuchsia-500",
 			white: "bg-white"
 		};
 		const borderColorMap = {
-			red: "border-red-300",
-			blue: "border-blue-300",
-			green: "border-green-300",
-			yellow: "border-yellow-300",
-			orange: "border-orange-300",
-			fuchsia: "border-fuchsia-300",
-			white: "border-white"
-		};
-		const lineHeadBorderColorMap = {
 			red: "border-red-500",
 			blue: "border-blue-500",
 			green: "border-green-500",
-			yellow: "border-yellow-500",
+			yellow: "border-yellow-400",
 			orange: "border-orange-500",
 			fuchsia: "border-fuchsia-500",
 			white: "border-white"
 		};
+		const lineHeadBorderColorMap = {
+			red: "border-red-700",
+			blue: "border-blue-700",
+			green: "border-green-700",
+			yellow: "border-yellow-600",
+			orange: "border-orange-700",
+			fuchsia: "border-fuchsia-700",
+			white: "border-white"
+		};
 		const selectedColorMap = {
-			red: "bg-red-500",
-			blue: "bg-blue-500",
-			green: "bg-green-500",
-			yellow: "bg-yellow-500",
-			orange: "bg-orange-500",
-			fuchsia: "bg-fuchsia-500",
+			red: "bg-red-700",
+			blue: "bg-blue-700",
+			green: "bg-green-700",
+			yellow: "bg-yellow-600",
+			orange: "bg-orange-700",
+			fuchsia: "bg-fuchsia-700",
 			white: "bg-gray-200"
 		};
 		setBgcolor(dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]));

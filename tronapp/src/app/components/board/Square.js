@@ -18,13 +18,13 @@ export default function Square({
 			return;
 		}
 		if (hovered) {
-			setBgColor("bg-black");
+			setBgColor("bg-white");
 			return;
 		}
 		if ((x + y) % 2 == 0) {
-			setBgColor("bg-blue-200");
+			setBgColor("bg-gray-900");
 		} else {
-			setBgColor("bg-slate-200");
+			setBgColor("bg-green-900");
 		}
 	}, [center, x, y,hovered]);
 

@@ -9,12 +9,12 @@ import ChickenFoot from './ChickenFoot';
 import Hint from './Hint';
 
 const bgColorMap = {
-	red: "bg-red-300",
-	blue: "bg-blue-300",
-	green: "bg-green-300",
-	yellow: "bg-yellow-300",
-	orange: "bg-orange-300",
-	fuchsia: "bg-fuchsia-300",
+	red: "bg-red-500",
+	blue: "bg-blue-500",
+	green: "bg-green-500",
+	yellow: "bg-yellow-500",
+	orange: "bg-orange-500",
+	fuchsia: "bg-fuchsia-500",
 	white: "bg-white"
 };
 
@@ -42,12 +42,12 @@ export default function Board({
 		setPlayA(undefined);
 	}, [selectedTile, setPlayA]);
 
-	const [gutterColor, setGutterColor] = useState("bg-gray")
+	const [gutterColor, setGutterColor] = useState("bg-gray-900")
 	useEffect(() => {
 		if (activePlayer !== undefined) {
 			setGutterColor(bgColorMap[activePlayer.color]);
 		} else {
-			setGutterColor("bg-gray-300");
+			setGutterColor("bg-green-900");
 		}
 	}, [activePlayer])
 
@@ -130,7 +130,7 @@ export default function Board({
 	}, [spacer]);
 
 	return (
-		<div onContextMenu={rightClick} className={`aspect-square h-full border-8 border-black flex items-center justify-center ${gutterColor}`}>
+		<div onContextMenu={rightClick} className={`aspect-square h-full border-8 border-gray-500 flex items-center justify-center ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
 				<div className="aspect-square">
 					<table className="w-full h-full table-fixed">
@@ -140,7 +140,7 @@ export default function Board({
 									<td className={`p-0 border-0 ${gutterColor}`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 									{Array.from({ length: width }, (_, x) => (
-										<td key={y * width + x} className="p-0 border-0 bg-slate-200" style={{ height: cellSpan, width: cellSpan }}>
+										<td key={y * width + x} className="p-0 border-0 bg-green-900" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
 												{hints[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
