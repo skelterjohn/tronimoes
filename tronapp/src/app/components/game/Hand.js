@@ -3,7 +3,7 @@ import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 import Image from "next/image";
-
+import React from "./React";
 function Hand({
 		player, players,
 		hidden = false, dead = false,
@@ -67,6 +67,16 @@ function Hand({
 		}
 	}, [spacerAvailable, selectedTile]);
 
+	const [reactURL, setReactURL] = useState(undefined);
+	const [showReaction, setShowReaction] = useState(false);
+	useEffect(() => {
+		setReactURL(player?.reactURL);
+	}, [player]);
+
+	useEffect(() => {
+		setShowReaction(reactURL !== undefined);
+	}, [reactURL]);
+	
 	function moveTile(tile, toTile) {
 		if (tile.a === toTile.a && tile.b === toTile.b) {
 			return;
@@ -413,6 +423,11 @@ function Hand({
 					<span>
 						{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
 					</span>
+					<React 
+						show={showReaction}
+						setShow={setShowReaction}
+						url={reactURL}
+					/>
 					{!player?.chickenFoot && !player?.dead &&
 						<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
 							<div className="absolute inset-0">

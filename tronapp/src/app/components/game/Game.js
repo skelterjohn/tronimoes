@@ -158,6 +158,7 @@ function Game({ code }) {
 				chickenFootX: p.chicken_foot_coord.x,
 				chickenFootY: p.chicken_foot_coord.y,
 				chickenFootURL: p.chicken_foot_url || undefined,
+				reactURL: p.react_url || undefined,
 				just_drew: p.just_drew,
 				kills: p.kills,
 			}
