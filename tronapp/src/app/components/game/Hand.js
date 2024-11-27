@@ -139,6 +139,12 @@ function Hand({
 		setSelectedTile({ a: -1, b: -1 });
 	}
 
+	useEffect(() => {
+		if (setDragOrientation) {
+			setDragOrientation("down");
+		}
+	}, [selectedTile, setDragOrientation]);
+
 	const [isDragging, setIsDragging] = useState(false);
 
 	const handleDragStart = useCallback((tile, e) => {
