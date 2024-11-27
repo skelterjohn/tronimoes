@@ -52,6 +52,10 @@ class Client {
         return this.get(`/players`);
     }
 
+	async React(code, url) {
+		return this.post(`/game/${code}/react`, { url: url });
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }

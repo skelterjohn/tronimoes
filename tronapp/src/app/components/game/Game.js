@@ -382,6 +382,17 @@ function Game({ code }) {
 	const [reactURL, setReactURL] = useState(undefined);
 
 	useEffect(() => {
+		if (reactURL === undefined) {
+			return;
+		}
+		client.React(code, reactURL).then((resp) => {
+			console.log("reacted", resp);
+		}).catch((error) => {
+			setPlayErrorMessage(error.data.error);
+		});
+	}, [reactURL, client, code]);
+
+	useEffect(() => {
 		setChickenFootURL(player?.chickenFootURL);
 	}, [player]);
 
