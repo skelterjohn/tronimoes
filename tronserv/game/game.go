@@ -154,7 +154,7 @@ func (g *Game) LastRoundLeader(ctx context.Context) int {
 	return firstTile.Tile.PipsA
 }
 
-func (g *Game) Start(ctx context.Context) error {
+func (g *Game) Start(ctx context.Context, name string) error {
 	if len(g.Players) < 1 {
 		return ErrGameNotEnoughPlayers
 	}
@@ -168,6 +168,26 @@ func (g *Game) Start(ctx context.Context) error {
 	lastRoundLeader := g.LastRoundLeader(ctx)
 	if lastRoundLeader == 0 {
 		return ErrGameOver
+	}
+
+	allReady := true
+	for _, p := range g.Players {
+		if p.Name == name {
+			p.Ready = true
+		}
+		if !p.Ready {
+			allReady = false
+			log.Printf("%s is not ready", p.Name)
+		}
+	}
+
+	if !allReady {
+		return nil
+	}
+
+	// set them to not-ready, for the next round.
+	for _, p := range g.Players {
+		p.Ready = false
 	}
 
 	playerLines := map[string][]*LaidTile{}
@@ -591,6 +611,7 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 
 type Player struct {
 	Name             string     `json:"name"`
+	Ready            bool       `json:"ready"`
 	Score            int        `json:"score"`
 	Hand             []*Tile    `json:"hand"`
 	Hints            [][]string `json:"hints"`

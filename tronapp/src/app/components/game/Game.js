@@ -161,6 +161,7 @@ function Game({ code }) {
 				reactURL: p.react_url || undefined,
 				just_drew: p.just_drew,
 				kills: p.kills,
+				ready: p.ready,
 			}
 		}));
 
@@ -465,10 +466,10 @@ function Game({ code }) {
 						<Button
 							size="large"
 							className="w-28"
-							disabled={!amFirstPlayer || roundInProgress || game?.done}
+							disabled={roundInProgress || game?.done || player?.ready}
 							onClick={() => startRound()}
 						>
-							start round
+							ready
 						</Button>
 						<Button
 							size="large"

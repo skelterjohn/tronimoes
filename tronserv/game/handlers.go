@@ -680,14 +680,8 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	g.CheckForDupes(ctx, "start-read")
-	// Only the first player can start the round.
-	if g.Players[0].Name != name {
-		log.Printf("In game %q, player %q tried to start game for %q", code, name, g.Players[0].Name)
-		writeErr(w, ErrNotYourGame, http.StatusForbidden)
-		return
-	}
 
-	if err := g.Start(ctx); err != nil {
+	if err := g.Start(ctx, name); err != nil {
 		log.Printf("Error starting round for game %q: %v", code, err)
 		writeErr(w, err, http.StatusBadRequest)
 		return

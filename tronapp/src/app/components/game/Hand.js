@@ -421,7 +421,9 @@ function Hand({
 						</div>
 					))}
 					<span>
-						{player?.name} - ({player?.score}) {player?.chickenFoot && "(footed)"}
+						{player?.name} - ({player?.score})
+						{player?.chickenFoot && " (footed)"}
+						{player?.ready && " (ready)"}
 					</span>
 					<React 
 						show={showReaction}
