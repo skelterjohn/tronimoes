@@ -302,6 +302,9 @@ function Game({ code }) {
 	}
 
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
+	useEffect(() => {
+		setHoveredSquares(new Set([]));
+	}, [game]);
 	const [mouseIsOver, setMouseIsOver] = useState([-1, -1]);
 
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
