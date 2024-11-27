@@ -264,6 +264,7 @@ function Hand({
 		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
 		
 		document.body.appendChild(ghost);
+		setSelectedTile(tile);
 		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
 		setDraggedTile(tile);
 	}
