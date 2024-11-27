@@ -62,7 +62,7 @@ func (g *Game) CheckForDupes(ctx context.Context, when string) {
 		}
 	}
 	if anyDupes {
-		data, _ := json.MarshalIndent(g, "", "  ")
+		data, _ := json.Marshal(g)
 		log.Printf("dupes during %s: %s", when, string(data))
 	}
 }
