@@ -122,6 +122,7 @@ function Hand({
 		if (hidden) {
 			return;
 		}
+		setHoveredSquares(new Set([]));
 		if (selectedTile === tile) {
 			toggleOrientation();
 		} else {
@@ -131,6 +132,7 @@ function Hand({
 	}
 
 	function spacerClicked() {
+		setHoveredSquares(new Set([]));
 		if (hidden) {
 			return;
 		}
