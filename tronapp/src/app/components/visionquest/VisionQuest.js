@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 const TENOR_API_KEY = 'AIzaSyBPpZRb23wy2zTKQ2j5eJHS8YVPtjIvcGQ';
 const TENOR_CLIENT_KEY = 'tronimoes'; // Replace with your app name
 
-function VisionQuest({ isOpen, onClose, setChickenFootURL }) {
+function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 	const [path, setPath] = useState("");
 	const [gifs, setGifs] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -50,7 +50,7 @@ function VisionQuest({ isOpen, onClose, setChickenFootURL }) {
 
 	return (
 		<Modal
-			title="Vision Quest"
+			title={title}
 			
 			open={isOpen}
 			onCancel={onClose}
@@ -79,7 +79,7 @@ function VisionQuest({ isOpen, onClose, setChickenFootURL }) {
 						key={gif.id} 
 						className="cursor-pointer hover:opacity-80 transition-opacity border-2 border "
 						onClick={() => {
-							setChickenFootURL(gif.media_formats.tinygif_transparent.url);
+							setURL(gif.media_formats.tinygif_transparent.url);
 							onClose();
 						}}
 					>

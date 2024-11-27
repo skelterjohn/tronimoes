@@ -14,7 +14,8 @@ function Hand({
 		hintedTiles, hintedSpacer,
 		bagCount, turnIndex, playTile,
 		setHoveredSquares, mouseIsOver,
-		dragOrientation, setDragOrientation
+		dragOrientation, setDragOrientation,
+		setShowReactModal
 	}) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
@@ -380,7 +381,6 @@ function Hand({
 	function DrawPassButtons() {
 		return <div className="flex flex-row gap-1 justify-center">
 			<Button
-				type="primary"
 				size="small"
 				className="w-14"
 				disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
@@ -389,7 +389,6 @@ function Hand({
 				Draw
 			</Button>
 			<Button
-				type="primary"
 				size="small"
 				className="w-14"
 				disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
@@ -435,6 +434,12 @@ function Hand({
 							{`x${bagCount}`} 
 							</div>
 						</div>
+						<Button
+							size="small"
+							className="w-14"
+							onClick={() => setShowReactModal(true)}>
+							React
+						</Button>
 					</div>}
 				</div>
 			</div>

@@ -377,6 +377,9 @@ function Game({ code }) {
 
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFootURL, setChickenFootURL] = useState(undefined);
+	
+	const [showReactModal, setShowReactModal] = useState(false);
+	const [reactURL, setReactURL] = useState(undefined);
 
 	useEffect(() => {
 		setChickenFootURL(player?.chickenFootURL);
@@ -543,15 +546,25 @@ function Game({ code }) {
 							mouseIsOver={mouseIsOver}
 							dragOrientation={dragOrientation}
 							setDragOrientation={setDragOrientation}
+							setShowReactModal={setShowReactModal}
 						/>
 					</div>
 				</div>
 			}
 			{showVisionQuestModal && (
 				<VisionQuest
+					title="Vision Quest"
 					onClose={() => setShowVisionQuestModal(false)}
 					isOpen={showVisionQuestModal}
-					setChickenFootURL={setChickenFootURL}
+					setURL={setChickenFootURL}
+				/>
+			)}
+			{showReactModal && (
+				<VisionQuest
+					title="React"
+					onClose={() => setShowReactModal(false)}
+					isOpen={showReactModal}
+					setURL={setReactURL}
 				/>
 			)}
 		</div>
