@@ -396,7 +396,7 @@ function Hand({
 				disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
 				onClick={drawTile}
 			>
-				Draw
+				draw
 			</Button>
 			<Button
 				size="small"
@@ -404,7 +404,7 @@ function Hand({
 				disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
 				onClick={passTurn}
 			>
-				Pass
+				pass
 			</Button>
 		</div>;
 	}
@@ -453,7 +453,7 @@ function Hand({
 							size="small"
 							className="w-14"
 							onClick={() => setShowReactModal(true)}>
-							React
+							react
 						</Button>
 					</div>}
 				</div>
