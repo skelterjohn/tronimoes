@@ -300,6 +300,7 @@ function Game({ code }) {
 			console.log("started round", resp);
 		}).catch((error) => {
 			console.error("error", error);
+			setPlayErrorMessage(error.data.error);
 		});
 	}
 
