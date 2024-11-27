@@ -461,19 +461,20 @@ function Game({ code }) {
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
+				<span className="block md:hidden text-left  font-bold mr-auto">
+					#{code} {game?.done && "(done)"}
+				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
 						<Button
-							size="large"
-							className="w-28"
+							className="w-20"
 							disabled={roundInProgress || game?.done || player?.ready}
 							onClick={() => startRound()}
 						>
 							ready
 						</Button>
 						<Button
-							size="large"
-							className="w-28"
+							className="w-20"
 							onClick={() => leaveOrQuit()}
 						>
 							{(gameInProgress && !game?.done) && (<div>quit</div>) || (<div>leave</div>)}
