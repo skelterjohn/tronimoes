@@ -151,6 +151,8 @@ function Hand({
 		ghost.style.width = '4rem';
 		ghost.style.height = '8rem';
 		
+		let x_offset = 32;
+		let y_offset = 32;
 		// Ensure the rotation class is applied
 		if (tile.a === selectedTile?.a && tile.b === selectedTile?.b) {
 			switch (dragOrientation) {
@@ -159,12 +161,17 @@ function Hand({
 				break;
 			case "right": 
 				ghost.classList.add("-rotate-90");
+				x_offset = 32;
+				y_offset = 64;
 				break;
 			case "up": 
 				ghost.classList.add("rotate-180");
+				y_offset = 96;
 				break;
 			case "left": 
 				ghost.classList.add("rotate-90");
+				x_offset = 96;
+				y_offset = 64;
 				break;
 			}
 		}
@@ -172,7 +179,8 @@ function Hand({
 		document.body.appendChild(ghost);
 		setIsDragging(true);
 		
-		e.dataTransfer.setDragImage(ghost, 32, 48);
+
+		e.dataTransfer.setDragImage(ghost, x_offset, y_offset);
 		e.dataTransfer.setData('text/plain', JSON.stringify(tile));
 		setSelectedTile(tile);
 
