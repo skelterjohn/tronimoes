@@ -600,6 +600,7 @@ type Player struct {
 	JustDrew         bool       `json:"just_drew"`
 	ChickenFootCoord Coord      `json:"chicken_foot_coord"`
 	ChickenFootURL   string     `json:"chicken_foot_url"`
+	ReactURL         string     `json:"react_url"`
 	Kills            []string   `json:"kills"`
 }
 
