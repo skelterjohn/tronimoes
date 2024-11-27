@@ -1,9 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 
-function Hand({ player, players, hidden = false, dead = false, selectedTile, setSelectedTile, playerTurn, drawTile, passTurn, roundInProgress, hintedTiles, hintedSpacer, bagCount, turnIndex, playTile, setHoveredSquares }) {
+function Hand({
+		player, players,
+		hidden = false, dead = false,
+		selectedTile, setSelectedTile,
+		playerTurn,
+		drawTile, passTurn,
+		roundInProgress,
+		hintedTiles, hintedSpacer,
+		bagCount, turnIndex, playTile,
+		setHoveredSquares, mouseIsOver,
+		dragOrientation, setDragOrientation
+	}) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
@@ -11,7 +22,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	const [spacerColor, setSpacerColor] = useState("white");
 	const [myTurn, setMyTurn] = useState(false);
 	const [handBackground, setHandBackground] = useState("bg-white");
-	const [dragOrientation, setDragOrientation] = useState("down");
 
 	function toggleOrientation() {
 		switch (dragOrientation) {
@@ -21,10 +31,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 			case "left": setDragOrientation("down"); break;
 		}
 	}
-
-	useEffect(() => {
-		console.log(dragOrientation);
-	}, [dragOrientation]);
 
 	useEffect(() => {
 		const colorMap = {
@@ -131,36 +137,64 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		setSelectedTile({ a: -1, b: -1 });
 	}
 
-	function handleDragStart(tile, e) {
+	const [isDragging, setIsDragging] = useState(false);
+
+	const handleDragStart = useCallback((tile, e) => {
 		if (hidden || e.target !== e.currentTarget) return;
 		
-		// Create a clone of the tile being dragged
-		const dragImage = e.target.cloneNode(true);
-		dragImage.style.position = 'absolute';
-		dragImage.style.top = '-1000px';
-		dragImage.style.width = '4rem';
-		dragImage.style.height = '6rem';
-		dragImage.style.transform = 'scale(1)';
-		document.body.appendChild(dragImage);
+		// Create a clone of the entire tile container including its children
+		const ghost = e.currentTarget.cloneNode(true);
+		ghost.style.position = 'absolute';
+		ghost.style.top = '-1000px';
+		ghost.style.width = '4rem';
+		ghost.style.height = '8rem';
 		
-		// Set the drag image
-		e.dataTransfer.setDragImage(dragImage, 32, 48);
+		// Ensure the rotation class is applied
+		if (tile.a === selectedTile?.a && tile.b === selectedTile?.b) {
+			switch (dragOrientation) {
+			case "down": 
+				ghost.classList.add("rotate-0");
+				break;
+			case "right": 
+				ghost.classList.add("-rotate-90");
+				break;
+			case "up": 
+				ghost.classList.add("rotate-180");
+				break;
+			case "left": 
+				ghost.classList.add("rotate-90");
+				break;
+			}
+		}
+
+		document.body.appendChild(ghost);
+		setIsDragging(true);
+		
+		e.dataTransfer.setDragImage(ghost, 32, 48);
 		e.dataTransfer.setData('text/plain', JSON.stringify(tile));
 		setSelectedTile(tile);
 
-		// Remove the clone after the drag starts
 		requestAnimationFrame(() => {
-			document.body.removeChild(dragImage);
+			document.body.removeChild(ghost);
 		});
-	}
+	}, [dragOrientation, hidden, selectedTile]);
 
 	function handleDrop(targetTile, e) {
+		setIsDragging(false);
+		setHoveredSquares(new Set([]));
 		if (hidden) return;
 		e.preventDefault();
 		const sourceTile = JSON.parse(e.dataTransfer.getData('text/plain'));
 		// Here you can add logic to swap tiles in the hand
 		moveTile(sourceTile, targetTile);
 	}
+
+	useEffect(() => {
+		if (!isDragging || mouseIsOver === undefined || mouseIsOver[0] === -1 || mouseIsOver[1] === -1) {
+			return;
+		}
+		hoverTile(mouseIsOver[0], mouseIsOver[1]);
+	}, [mouseIsOver]);
 
 	function handleDragOver(e) {
 		e.preventDefault();
@@ -225,6 +259,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 	}
 
 	function handleTouchEnd(targetTile, e) {
+		setHoveredSquares(new Set([]));
 		if (!draggedTile || !touchStartPos) return;
 		
 		// Remove the ghost element
@@ -238,7 +273,7 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		const element = document.elementFromPoint(touch.clientX, touch.clientY);
 		
 		if (element?.dataset?.tron_x && element?.dataset?.tron_y) {
-			dropTile(element.dataset.tron_x, element.dataset.tron_y, dragOrientation);
+			dropTile(element.dataset.tron_x, element.dataset.tron_y);
 		}
 
 		// Find the tile container element
@@ -252,7 +287,6 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
-		setHoveredSquares(new Set([]));
 	}
 
 	function handleTouchMove(e) {
@@ -274,7 +308,9 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		if (!selectedTile) {
 			return;
 		}
-		setHoveredSquares(`${x},${y}`);
+		if (setHoveredSquares === undefined) {
+			return;
+		}
 		let hs = new Set([`${x},${y}`]);
 		switch (dragOrientation) {
 		case "down":
@@ -293,21 +329,30 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 		setHoveredSquares(hs);
 	}
 
-	function dropTile(x, y, orientation) {
-		if (!selectedTile) {
+	const dropTile = useCallback((x, y) => {
+		if (!selectedTile || x === undefined || y === undefined) {
 			return;
 		}
-		console.log("drop", x, y, orientation, selectedTile);
 		playTile({
 			a: selectedTile.a, b: selectedTile.b,
 			coord: {
 				x: parseInt(x),
 				y: parseInt(y),
 			},
-			orientation: orientation,
+			orientation: dragOrientation,
 			dead: false,
 		});
-	}
+	}, [selectedTile, dragOrientation]);
+
+	const [selectedTileRotation, setSelectedTileRotation] = useState("rotate-0");
+	useEffect(() => {
+		switch (dragOrientation) {
+			case "down": setSelectedTileRotation("rotate-0"); break;
+			case "right": setSelectedTileRotation("-rotate-90"); break;
+			case "up": setSelectedTileRotation("rotate-180"); break;
+			case "left": setSelectedTileRotation("rotate-90"); break;
+		}
+	}, [dragOrientation]);
 
 	const [killedPlayers, setKilledPlayers] = useState([]);
 	useEffect(() => {
@@ -381,10 +426,10 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 								</div>
 							)}
 							{!hidden && handOrder.map((t, i) => {
+								const isSelected = playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b;
 								return (
 									<div
 										key={i}
-										className="w-[4rem] h-[8rem] pr-1 pt-1"
 										draggable={true}
 										data-tile={JSON.stringify(t)}
 										onClick={() => tileClicked(t)}
@@ -395,17 +440,21 @@ function Hand({ player, players, hidden = false, dead = false, selectedTile, set
 										onTouchMove={(e) => handleTouchMove(e)}
 										onTouchEnd={(e) => handleTouchEnd(t, e)}
 									>
-										<div className="pointer-events-none">
-											<Tile
-												draggable={false}
-												color={player?.color}
-												pipsa={t.a}
-												pipsb={t.b}
-												back={false}
-												dead={dead}
-												hintedTiles={hintedTiles}
-												selected={playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b}
-											/>
+										<div
+											className={`w-[4rem] h-[8rem] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
+											>
+											<div className="pointer-events-none">
+												<Tile
+													draggable={false}
+													color={player?.color}
+													pipsa={t.a}
+													pipsb={t.b}
+													back={false}
+													dead={dead}
+													hintedTiles={hintedTiles}
+													selected={isSelected}
+												/>
+											</div>
 										</div>
 									</div>
 								);

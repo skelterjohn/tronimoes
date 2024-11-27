@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import Pips from "./Pips";
 
-export default function Square({ x, y, center = false, clicked = false, pips, hoveredSquares }) {
+export default function Square({
+		x, y,
+		center = false, clicked = false,
+		pips,
+		hoveredSquares, setMouseIsOver, dropCallback }) {
 	const [hovered, setHovered] = useState(false);
 	useEffect(() => {
 		setHovered(hoveredSquares.has(`${x},${y}`));
@@ -24,13 +28,31 @@ export default function Square({ x, y, center = false, clicked = false, pips, ho
 		}
 	}, [center, x, y,hovered]);
 
-	var cnm = `w-full aspect-square ${bgColor}`;
-	if (clicked) {
-		cnm = `${cnm} border border-2 border-black`;
+	function onDragOver(e) {
+		e.preventDefault();
+		setMouseIsOver([x, y]);
 	}
 
+	function onDragEnter(e) {
+		e.preventDefault();
+	}
 
-	return <div data-tron_x={x} data-tron_y={y} className={cnm}>
+	function onDrop(e) {
+		e.preventDefault();
+		if (dropCallback === undefined) {
+			return;
+		}
+		dropCallback(x, y);
+	}
+
+	return <div
+		onDragOver={onDragOver}
+		onDragEnter={onDragEnter}
+		onDrop={onDrop}
+		data-tron_x={x}
+		data-tron_y={y}
+		className={`w-full aspect-square ${bgColor} ${clicked && "border border-2 border-black"}`}
+	>
 		{clicked && <Pips pips={pips} />}
 	</div>;
 }

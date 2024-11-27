@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameState } from '../GameState';
 import Board from '../board/Board';
@@ -302,6 +302,7 @@ function Game({ code }) {
 	}
 
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
+	const [mouseIsOver, setMouseIsOver] = useState([-1, -1]);
 
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [playA, setPlayA] = useState(undefined);
@@ -420,6 +421,20 @@ function Game({ code }) {
 
 	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
 
+	
+	const [dragOrientation, setDragOrientation] = useState("down");
+	const dropCallback = useCallback((x, y) => {
+		playTile({
+			a: selectedTile.a, b: selectedTile.b,
+			coord: {
+				x: parseInt(x),
+				y: parseInt(y),
+			},
+			orientation: dragOrientation,
+			dead: false,
+		});
+	}, [selectedTile, dragOrientation, playTile]);
+
 	return (
 		<div className="h-full flex flex-col" onClick={() => setPlayErrorMessage("")}>
 			<div className="flex pl-3 pr-3 justify-end items-center">
@@ -494,6 +509,8 @@ function Game({ code }) {
 						setPlayA={setPlayA}
 						spacerHints={player?.spacer_hints}
 						hoveredSquares={hoveredSquares}
+						setMouseIsOver={setMouseIsOver}
+						dropCallback={dropCallback}
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
@@ -521,6 +538,9 @@ function Game({ code }) {
 							turnIndex={turnIndex}
 							playTile={playTile}
 							setHoveredSquares={setHoveredSquares}
+							mouseIsOver={mouseIsOver}
+							dragOrientation={dragOrientation}
+							setDragOrientation={setDragOrientation}
 						/>
 					</div>
 				</div>
