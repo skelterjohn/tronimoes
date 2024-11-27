@@ -301,13 +301,14 @@ function Game({ code }) {
 		});
 	}
 
+	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
 	useEffect(() => {
 		setHoveredSquares(new Set([]));
+		setPlayErrorMessage("");
 	}, [game]);
 	const [mouseIsOver, setMouseIsOver] = useState([-1, -1]);
 
-	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [playA, setPlayA] = useState(undefined);
 
 	function playTile(tile) {
