@@ -53,6 +53,9 @@ func (g *Game) CheckForDupes(ctx context.Context, when string) {
 		}
 		seen[t.String()] = true
 	}
+	for _, t := range g.Bag {
+		visit(t, "bag")
+	}
 	for _, lt := range g.CurrentRound(ctx).LaidTiles {
 		visit(lt.Tile, "laid tiles")
 	}
