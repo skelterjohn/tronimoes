@@ -480,9 +480,6 @@ function Game({ code }) {
 							{(gameInProgress && !game?.done) && (<div>quit</div>) || (<div>leave</div>)}
 						</Button>
 					</div>
-					{!amFirstPlayer && !roundInProgress && (players.length > 0) &&
-						(<span>waiting for {players[0].name} to start the round...</span>)
-					}
 				</div>
 			</div>
 

@@ -460,74 +460,76 @@ function Hand({
 					</div>}
 				</div>
 			</div>
-			<div className="w-full flex flex-col items-center flex-1 min-h-0 border-1 border-t border-black">
-				<div className="w-full flex flex-col flex-1 overflow-y-auto">
-					<div className="w-full flex flex-row justify-center">
-						<div className="w-fit flex flex-wrap content-start justify-start">
-							{!hidden && (
-								<div className="w-[4rem] h-[8rem] p-1">
-									<div
-										className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
-										onClick={spacerClicked}
-									>
-										FREE LINE
-									</div>
-								</div>
-							)}
-							{!hidden && handOrder.map((t, i) => {
-								const isSelected = playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b;
-								return (
-									<div
-										key={i}
-										draggable={true}
-										data-tile={JSON.stringify(t)}
-										onClick={() => tileClicked(t)}
-										onDragStart={(e) => handleDragStart(t, e)}
-										onDrop={(e) => handleDrop(t, e)}
-										onDragOver={handleDragOver}
-										onTouchStart={(e) => handleTouchStart(t, e)}
-										onTouchMove={(e) => handleTouchMove(e)}
-										onTouchEnd={(e) => handleTouchEnd(t, e)}
-									>
+			{hidden && (
+				<div className="flex flex-row items-center gap-1">
+					<div className="w-[1rem]">
+						<Tile
+							color={player?.color}
+							pipsa={0}
+							pipsb={0}
+							back={true}
+							dead={dead}
+						/>
+					</div>
+					<div>x{player?.hand?.length}</div>
+				</div>
+			)}
+			{!hidden && (
+				<div className="w-full flex flex-col items-center flex-1 min-h-0 border-1 border-t border-black">
+					<div className="w-full flex flex-col flex-1 overflow-y-auto">
+						<div className="w-full flex flex-row justify-center">
+							<div className="w-fit flex flex-wrap content-start justify-start">
+								{!hidden && (
+									<div className="w-[4rem] h-[8rem] p-1">
 										<div
-											className={`w-[4rem] h-[8rem] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
-											>
-											<div className="pointer-events-none">
-												<Tile
-													draggable={false}
-													color={player?.color}
-													pipsa={t.a}
-													pipsb={t.b}
-													back={false}
-													dead={dead}
-													hintedTiles={hintedTiles}
-													selected={isSelected}
-												/>
-											</div>
+											className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
+											onClick={spacerClicked}
+										>
+											FREE LINE
 										</div>
 									</div>
-								);
-							})}
-						</div>
-						{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
-						{!hidden && <div className="w-[1rem]"></div>}
-						{hidden && (
-							<div className="w-[1rem]">
-								<Tile
-									color={player?.color}
-									pipsa={0}
-									pipsb={0}
-									back={true}
-									dead={dead}
-								/>
+								)}
+								{!hidden && handOrder.map((t, i) => {
+									const isSelected = playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b;
+									return (
+										<div
+											key={i}
+											draggable={true}
+											data-tile={JSON.stringify(t)}
+											onClick={() => tileClicked(t)}
+											onDragStart={(e) => handleDragStart(t, e)}
+											onDrop={(e) => handleDrop(t, e)}
+											onDragOver={handleDragOver}
+											onTouchStart={(e) => handleTouchStart(t, e)}
+											onTouchMove={(e) => handleTouchMove(e)}
+											onTouchEnd={(e) => handleTouchEnd(t, e)}
+										>
+											<div
+												className={`w-[4rem] h-[8rem] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
+												>
+												<div className="pointer-events-none">
+													<Tile
+														draggable={false}
+														color={player?.color}
+														pipsa={t.a}
+														pipsb={t.b}
+														back={false}
+														dead={dead}
+														hintedTiles={hintedTiles}
+														selected={isSelected}
+													/>
+												</div>
+											</div>
+										</div>
+									);
+								})}
 							</div>
-						)}
-						{hidden && (
-							<div>x{player?.hand?.length}</div>
-						)}
+							{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
+							{!hidden && <div className="w-[1rem]"></div>}
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }
