@@ -228,8 +228,8 @@ function Hand({
 				ghost.style.transform = 'rotate(0deg)';
 				break;
 			case "right":
-				ghost.style.left = `${x - width / 4}px`;
-				ghost.style.top = `${y - height / 2}px`;
+				ghost.style.left = `${x - width / 8}px`;
+				ghost.style.top = `${y - (3*height/4)}px`;
 				ghost.style.transform = 'rotate(270deg)';
 				break;
 			case "up":
@@ -238,8 +238,8 @@ function Hand({
 				ghost.style.transform = 'rotate(180deg)';
 				break;
 			case "left":
-				ghost.style.left = `${x - width * 3 / 4}px`;
-				ghost.style.top = `${y - height / 2}px`;
+				ghost.style.left = `${x - width * 5 / 8}px`;
+				ghost.style.top = `${y - (3*height/4)}px`;
 				ghost.style.transform = 'rotate(90deg)';
 				break;
 		}
