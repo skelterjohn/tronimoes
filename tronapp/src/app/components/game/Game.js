@@ -22,6 +22,7 @@ const availableColors = [
 const dealAudio = new Audio('/sfx/deal.mp3');
 const layAudio = new Audio('/sfx/lay.mp3');
 const drawAudio = new Audio('/sfx/draw.mp3');
+const footedAudio = new Audio('/sfx/footed.mp3');
 
 function Game({ code }) {
 	const router = useRouter();
@@ -483,6 +484,14 @@ function Game({ code }) {
 	useEffect(() => {
 		if (lastRoundHistoryItem?.includes("laid")) {
 			layAudio.play().catch(error => {
+				console.log('Audio playback failed:', error);
+			});
+		}
+	}, [lastRoundHistoryItem]);
+
+	useEffect(() => {
+		if (lastRoundHistoryItem?.includes("and is on the foot")) {
+			footedAudio.play().catch(error => {
 				console.log('Audio playback failed:', error);
 			});
 		}
