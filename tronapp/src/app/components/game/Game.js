@@ -19,6 +19,10 @@ const availableColors = [
 	"fuchsia",
 ]
 
+const dealAudio = new Audio('/sfx/deal.mp3');
+const layAudio = new Audio('/sfx/lay.mp3');
+const drawAudio = new Audio('/sfx/draw.mp3');
+
 function Game({ code }) {
 	const router = useRouter();
 	const { playerName, client } = useGameState();
@@ -440,9 +444,6 @@ function Game({ code }) {
 		myTurn = players.length > 0 && playerTurn.name === playerName;
 	}
 
-	const amFirstPlayer = players.length > 0 && players[0].name === playerName;
-
-	
 	const [dragOrientation, setDragOrientation] = useState("down");
 	const dropCallback = useCallback((x, y) => {
 		playTile({
@@ -455,6 +456,51 @@ function Game({ code }) {
 			dead: false,
 		});
 	}, [selectedTile, dragOrientation, playTile]);
+
+	useEffect(() => {
+		if (!roundInProgress) {
+			return;
+		}
+		const round = game?.rounds?.[game?.rounds?.length - 1];
+		if (round.laid_tiles?.length === 1 && round.history?.length === 1) {
+			dealAudio.play().catch(error => {
+				console.log('Audio playback failed:', error);
+			});
+		}
+	}, [roundInProgress, game]);
+
+	const [tilesInBag, setTilesInBag] = useState(0);
+	const [prevTilesInBag, setPrevTilesInBag] = useState(0);
+	const [lastRoundHistoryItem, setLastRoundHistoryItem] = useState(undefined);
+	const [turnsTaken, setTurnsTaken] = useState(0);
+	useEffect(() => {
+		const round = game?.rounds?.[game?.rounds?.length - 1];
+		setTilesInBag(game?.bag?.length || 0);
+		setLastRoundHistoryItem(round?.history?.[round?.history?.length - 1]);
+		setTurnsTaken(round?.history?.length || 0);
+	}, [game]);
+
+	useEffect(() => {
+		if (lastRoundHistoryItem?.includes("laid")) {
+			layAudio.play().catch(error => {
+				console.log('Audio playback failed:', error);
+			});
+		}
+	}, [lastRoundHistoryItem]);
+
+	const [isFirstTurn, setIsFirstTurn] = useState(true);
+	useEffect(() => {
+		setIsFirstTurn(turnsTaken < 2);
+	}, [turnsTaken]);
+
+	useEffect(() => {
+		if (prevTilesInBag === tilesInBag+1) {
+		drawAudio.play().catch(error => {
+			console.log('Audio playback failed:', error);
+			});
+		}
+		setPrevTilesInBag(tilesInBag);
+	}, [tilesInBag]);
 
 	return (
 		<div className="h-full bg-black text-white flex flex-col" onClick={() => setPlayErrorMessage("")}>
