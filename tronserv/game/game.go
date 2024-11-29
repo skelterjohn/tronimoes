@@ -772,6 +772,7 @@ type Round struct {
 	PlayerLines   map[string][]*LaidTile `json:"player_lines"`
 	FreeLines     [][]*LaidTile          `json:"free_lines"`
 	BaglessPasses int                    `json:"bagless_passes"`
+	HighestLeader int                    `json:"highest_leader"`
 }
 
 func (r *Round) Note(ctx context.Context, n string) {
@@ -1143,6 +1144,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		for n, p := range r.PlayerLines {
 			r.PlayerLines[n] = append(p, lt)
 		}
+		r.HighestLeader = lt.Tile.PipsA
 		return nil
 	}
 
@@ -1292,18 +1294,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	playedAtLeastOne := len(r.PlayerLines[player.Name]) > 1
 	isDouble := lt.Tile.PipsA == lt.Tile.PipsB
 	if canStartFreeLine && isDouble && playedAtLeastOne {
-		isHigher := true
-		if lt.Tile.PipsA < r.PlayerLines[g.Players[0].Name][0].Tile.PipsA {
-			isHigher = false
-		}
-		for _, l := range r.FreeLines {
-			if lt.Tile.PipsA < l[0].Tile.PipsA {
-				isHigher = false
-			}
-		}
-		// can we start a free line
-		if isHigher {
-
+		if lt.Tile.PipsA > r.HighestLeader {
 			inSpacer := func(src Coord) bool {
 				if src.X >= r.Spacer.A.X && src.X <= r.Spacer.B.X && src.Y >= r.Spacer.A.Y && src.Y <= r.Spacer.B.Y {
 					return true
@@ -1321,6 +1312,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 					lt.PlayerName = ""
 					r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
 					lt.NextPips = lt.Tile.PipsA
+					r.HighestLeader = lt.Tile.PipsA
 					g.Note(ctx, fmt.Sprintf("%s started a free line", name))
 				}
 			}
