@@ -1389,7 +1389,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 
 	if !dryRun {
 		if r.Spacer == nil {
-			killKeys := r.findOuroboros(ctx, g, player, squarePips, lt)
+			killKeys := r.findOuroboros(ctx, g, player, lt)
 			for k, v := range killKeys {
 				deadTileKeys[k] = v
 			}
@@ -1411,7 +1411,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	return nil
 }
 
-func (r *Round) findOuroboros(ctx context.Context, g *Game, player *Player, squarePips map[Coord]SquarePips, lt *LaidTile) map[string]bool {
+func (r *Round) findOuroboros(ctx context.Context, g *Game, player *Player, lt *LaidTile) map[string]bool {
 	deadTileKeys := map[string]bool{}
 	consumed := []string{}
 
