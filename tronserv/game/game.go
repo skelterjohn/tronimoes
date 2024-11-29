@@ -1258,9 +1258,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		}
 	}
 
-	canPlayOtherLines := !playedALine && r.Spacer == nil
-
-	if canPlayOtherLines {
+	if !playedALine && r.Spacer == nil {
 		for oname, line := range r.PlayerLines {
 			if playerFoot != "" && playerFoot != oname {
 				// tile is on a foot but not from this line
@@ -1390,7 +1388,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	deadTileKeys := map[string]bool{}
 
 	if !dryRun {
-		if canPlayOtherLines {
+		if r.Spacer == nil {
 			killKeys := r.findOuroboros(ctx, g, player, squarePips, lt)
 			for k, v := range killKeys {
 				deadTileKeys[k] = v
