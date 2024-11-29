@@ -81,7 +81,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 
 	if (loading) {
 		return (
-			<div className="bg-black rounded-lg h-[4rem] p-4 border-white border text-white">
+			<div className="bg-black rounded-lg h-[4rem] min-w-[20rem] p-4 border-white border text-white">
 				<p className="font-[Roboto_Mono] text-xl tracking-wider">checking connection...</p>
 			</div>
 		);
