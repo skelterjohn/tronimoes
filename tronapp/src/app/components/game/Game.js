@@ -413,16 +413,16 @@ function Game({ code }) {
 
 	function passTurn() {
 		setSelectedTile(undefined);
-		if (chickenFootURL === undefined) {
-			setShowVisionQuestModal(true);
-		}
-		
 		client.Pass(code, {
 			selected_x: playA !== undefined ? playA.x : -1,
 			selected_y: playA !== undefined ? playA.y : -1,
 		}).then((resp) => {
 			console.log("passed");
 			setPlayA(undefined);
+			if (chickenFootURL === undefined) {
+				setShowVisionQuestModal(true);
+			}
+			
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
