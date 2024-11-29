@@ -383,11 +383,9 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 				player.ChickenFootCoord = mostRecent.CoordA()
 			}
 		} else {
-			// we have to pick a viable spot left around the round leader
-			if chickenFootX == -1 || chickenFootY == -1 {
-				return ErrMustPickChickenFoot
+			if err := r.SetChickenFoot(ctx, player, Coord{X: chickenFootX, Y: chickenFootY}); err != nil {
+				return err
 			}
-			player.ChickenFootCoord = Coord{X: chickenFootX, Y: chickenFootY}
 		}
 	}
 
@@ -409,6 +407,22 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 		}
 	}
 
+	return nil
+}
+
+func (r *Round) SetChickenFoot(ctx context.Context, player *Player, coord Coord) error {
+	// we have to pick a viable spot left around the round leader
+	if coord.X == -1 || coord.Y == -1 {
+		return ErrMustPickChickenFoot
+	}
+
+	leader := r.PlayerLines[player.Name][0]
+
+	if !leader.CoordA().Adj(coord) && !leader.CoordB().Adj(coord) {
+		return ErrMustBeNearRoundLeader
+	}
+
+	player.ChickenFootCoord = coord
 	return nil
 }
 

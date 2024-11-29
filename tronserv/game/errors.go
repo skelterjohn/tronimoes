@@ -42,4 +42,5 @@ var (
 	ErrNotAdjacent              = errors.New("tile is not adjacent to the previous tile")
 	ErrWrongSide                = errors.New("this tile could be played if reversed")
 	ErrEmptyBag                 = errors.New("no tiles left in the bag")
+	ErrMustBeNearRoundLeader    = errors.New("you must choose a chicken foot location adjacent to the round leader")
 )
