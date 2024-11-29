@@ -1100,11 +1100,11 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 
 	// verify that x1,y1 is adjacent to a line head.
 	checkLineHead := func(lt *LaidTile) bool {
-		if lt.NextPips == lt.Tile.PipsA {
-			return spacer.A.Adj(lt.CoordA())
+		if lt.NextPips == lt.Tile.PipsA && spacer.A.Adj(lt.CoordA()) {
+			return true
 		}
-		if lt.NextPips == lt.Tile.PipsB {
-			return spacer.A.Adj(lt.CoordB())
+		if lt.NextPips == lt.Tile.PipsB && spacer.A.Adj(lt.CoordB()) {
+			return true
 		}
 		return false
 	}
