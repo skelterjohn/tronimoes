@@ -24,7 +24,7 @@ export default function Spacer({ spacer }) {
 
 	return <div className={`absolute w-full h-full ${rotate}`}>
 		<div className="h-[600%] bg-white border-black border-2 rounded-lg flex items-center justify-center">
-			<div className="rotate-90 whitespace-nowrap absolute transform origin-center">
+			<div className="rotate-90 whitespace-nowrap text-black absolute transform origin-center">
 				RIGHT-CLICK TO CLEAR
 			</div>
 		</div>
