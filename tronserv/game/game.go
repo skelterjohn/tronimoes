@@ -383,7 +383,7 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 				player.ChickenFootCoord = mostRecent.CoordA()
 			}
 		} else {
-			if err := r.SetChickenFoot(ctx, player, Coord{X: chickenFootX, Y: chickenFootY}); err != nil {
+			if err := r.SetChickenFoot(ctx, g, player, Coord{X: chickenFootX, Y: chickenFootY}); err != nil {
 				return err
 			}
 		}
@@ -410,7 +410,7 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 	return nil
 }
 
-func (r *Round) SetChickenFoot(ctx context.Context, player *Player, coord Coord) error {
+func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coord Coord) error {
 	// we have to pick a viable spot left around the round leader
 	if coord.X == -1 || coord.Y == -1 {
 		return ErrMustPickChickenFoot
@@ -422,8 +422,19 @@ func (r *Round) SetChickenFoot(ctx context.Context, player *Player, coord Coord)
 		return ErrMustBeNearRoundLeader
 	}
 
-	player.ChickenFootCoord = coord
-	return nil
+	squarePips := r.MapTiles(ctx)
+
+	for _, n := range coord.Neighbors() {
+		if !g.InBounds(ctx, n) {
+			continue
+		}
+		if _, ok := squarePips[n]; ok {
+			continue
+		}
+		player.ChickenFootCoord = coord
+		return nil
+	}
+	return ErrNoOpenAdjacent
 }
 
 func (g *Game) Note(ctx context.Context, n string) {

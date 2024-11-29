@@ -43,4 +43,5 @@ var (
 	ErrWrongSide                = errors.New("this tile could be played if reversed")
 	ErrEmptyBag                 = errors.New("no tiles left in the bag")
 	ErrMustBeNearRoundLeader    = errors.New("you must choose a chicken foot location adjacent to the round leader")
+	ErrNoOpenAdjacent           = errors.New("you need to leave yourself at least one open square next to the foot")
 )
