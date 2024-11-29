@@ -1009,6 +1009,10 @@ func (r *Round) canPlayOnTileWithoutIndication(ctx context.Context, lt, last *La
 	BA := last.CoordB().Adj(lt.CoordA())
 	BB := last.CoordB().Adj(lt.CoordB())
 
+	if !(AA || AB || BA || BB) {
+		return false, 0, ErrNotAdjacent
+	}
+
 	if lt.Tile.PipsA == last.NextPips {
 		if last.Tile.PipsA == lt.Tile.PipsA {
 			if AA {
@@ -1192,20 +1196,29 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		return ErrNoBlockingFeet
 	}
 
+	player := g.GetPlayer(ctx, name)
+
 	playerFoot := ""
 	// if this is on someone's foot, it's definitely made part of their line.
 	for _, p := range g.Players {
-		if p.ChickenFootCoord == lt.CoordA() {
+		if p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB() {
 			playerFoot = p.Name
-		}
-		if p.ChickenFootCoord == lt.CoordB() {
-			playerFoot = p.Name
+
+			if p.Name == player.Name {
+				// you can always play on your own foot.
+				break
+			}
+
+			// verify that this player CAN play on this foot.
+			if player.ChickenFoot {
+				return ErrYouAreFooted
+			}
 		}
 	}
 
 	var potentialError error
 	cerr := func(err error) {
-		precedence := []error{ErrWrongSide, ErrMustMatchPips, ErrNotAdjacent}
+		precedence := []error{ErrYouAreFooted, ErrWrongSide, ErrMustMatchPips, ErrPlayerAlreadyDead, ErrLineIsNotFooted, ErrNotAdjacent}
 		for _, e := range precedence {
 			if potentialError == e || err == e {
 				potentialError = err
@@ -1216,8 +1229,6 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	}
 
 	playedALine := false
-
-	player := g.GetPlayer(ctx, name)
 
 	if r.Spacer == nil && !player.Dead && (playerFoot == "" || playerFoot == player.Name) {
 		mainLine := r.PlayerLines[player.Name]
@@ -1247,40 +1258,54 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		}
 	}
 
-	canPlayOtherLines := r.Spacer == nil && (player.Dead || !player.ChickenFoot)
+	canPlayOtherLines := !playedALine && r.Spacer == nil
 
 	if canPlayOtherLines {
 		for oname, line := range r.PlayerLines {
 			if playerFoot != "" && playerFoot != oname {
-				continue
-			}
-			if playedALine {
+				// tile is on a foot but not from this line
 				continue
 			}
 			op := g.GetPlayer(ctx, oname)
 			if oname == player.Name {
-				continue
-			}
-			if !op.ChickenFoot {
-				continue
-			}
-			if op.Dead {
+				// we already considered the player's own line
 				continue
 			}
 			if len(line) == 1 {
 				// round leader, need to play on top of chickenfoot.
 				isOnMyFoot := false
-				if lt.CoordA() == op.ChickenFootCoord && lt.Tile.PipsA == line[0].NextPips {
+				if lt.CoordA() == op.ChickenFootCoord {
 					isOnMyFoot = true
 				}
-				if lt.CoordB() == op.ChickenFootCoord && lt.Tile.PipsB == line[0].NextPips {
+				if lt.CoordB() == op.ChickenFootCoord {
 					isOnMyFoot = true
 				}
 				if !isOnMyFoot {
+					// this line begins elsewhere, the player surely (?!) noticed they didn't play on the foot.
+					continue
+				}
+				if lt.CoordA() == op.ChickenFootCoord && lt.Tile.PipsA != line[0].NextPips {
+					cerr(ErrMustMatchPips)
+					continue
+				}
+				if lt.CoordB() == op.ChickenFootCoord && lt.Tile.PipsB == line[0].NextPips {
+					cerr(ErrMustMatchPips)
 					continue
 				}
 			}
 			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
+				if op.Dead {
+					cerr(ErrPlayerAlreadyDead)
+					continue
+				}
+				if !op.ChickenFoot {
+					cerr(ErrLineIsNotFooted)
+					continue
+				}
+				if player.ChickenFoot && !player.Dead {
+					cerr(ErrYouAreFooted)
+					continue
+				}
 				playedALine = true
 				if !dryRun {
 					lt.PlayerName = oname
@@ -1294,23 +1319,24 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 						op.ChickenFootCoord = lt.CoordA()
 					}
 				}
+				break
 			} else {
 				cerr(err)
 			}
 		}
-		for i, line := range r.FreeLines {
-			if playedALine {
-				continue
-			}
-			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
-				playedALine = true
-				if !dryRun {
-					lt.PlayerName = ""
-					r.FreeLines[i] = append(line, lt)
-					lt.NextPips = nextPips
+		if !playedALine && !player.ChickenFoot {
+			for i, line := range r.FreeLines {
+				if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
+					playedALine = true
+					if !dryRun {
+						lt.PlayerName = ""
+						r.FreeLines[i] = append(line, lt)
+						lt.NextPips = nextPips
+					}
+					break
+				} else {
+					cerr(err)
 				}
-			} else {
-				cerr(err)
 			}
 		}
 	}
@@ -1329,6 +1355,10 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 			canBeFree := r.Spacer.B.Adj(lt.CoordA()) || r.Spacer.B.Adj(lt.CoordB())
 			if inSpacer(lt.CoordA()) || inSpacer(lt.CoordB()) {
 				canBeFree = false
+			}
+
+			if !canBeFree {
+				cerr(ErrFreeFromSpacer)
 			}
 
 			if canBeFree {

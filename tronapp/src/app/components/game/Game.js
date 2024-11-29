@@ -463,7 +463,7 @@ function Game({ code }) {
 			return;
 		}
 		const round = game?.rounds?.[game?.rounds?.length - 1];
-		if (round.laid_tiles?.length === 1 && round.history?.length === 1) {
+		if (round?.laid_tiles?.length === 1 && round?.history?.length === 1) {
 			dealAudio.play().catch(error => {
 				console.log('Audio playback failed:', error);
 			});
