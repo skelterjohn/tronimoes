@@ -1337,7 +1337,133 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	// Add the new tile to the occlusion grid.
 	squarePips[lt.CoordA()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsA}
 	squarePips[lt.CoordB()] = SquarePips{LaidTile: lt, Pips: lt.Tile.PipsB}
-	isOpenFrom := func(src Coord) bool {
+
+	// we identify dead tiles because the laid tiles are all copied when
+	// serialized.
+	deadTileKeys := map[string]bool{}
+
+	if !dryRun {
+		if canPlayOtherLines {
+			killKeys := r.findOuroboros(ctx, g, player, squarePips, lt)
+			for k, v := range killKeys {
+				deadTileKeys[k] = v
+			}
+		}
+
+		killKeys := r.killDeadLines(ctx, g, player, squarePips)
+		for k, v := range killKeys {
+			deadTileKeys[k] = v
+		}
+		r.LaidTiles = append(r.LaidTiles, lt)
+	}
+
+	for _, lt := range r.LaidTiles {
+		if deadTileKeys[lt.Tile.String()] {
+			lt.Dead = true
+		}
+	}
+
+	return nil
+}
+
+func (r *Round) findOuroboros(ctx context.Context, g *Game, player *Player, squarePips map[Coord]SquarePips, lt *LaidTile) map[string]bool {
+	deadTileKeys := map[string]bool{}
+	consumed := []string{}
+
+	canConsume := func(head *LaidTile) bool {
+		if lt.NextPips != head.NextPips {
+			return false
+		}
+		checkLTCoord := func(src Coord) bool {
+			if head.Tile.PipsA == head.NextPips {
+				if src.Adj(head.CoordA()) {
+					return true
+				}
+			}
+			if head.Tile.PipsB == head.NextPips {
+				if src.Adj(head.CoordB()) {
+					return true
+				}
+			}
+			return false
+		}
+		if lt.Tile.PipsA == lt.NextPips {
+			if checkLTCoord(lt.CoordA()) {
+				return true
+			}
+		}
+		if lt.Tile.PipsB == lt.NextPips {
+			if checkLTCoord(lt.CoordB()) {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, op := range g.Players {
+		if !op.ChickenFoot && op.Name != player.Name {
+			continue
+		}
+		if op.Dead {
+			continue
+		}
+		playerLine := r.PlayerLines[op.Name]
+		head := playerLine[len(playerLine)-1]
+		if lt == head {
+			continue
+		}
+
+		if canConsume(head) {
+			consumed = append(consumed, op.Name)
+		}
+	}
+
+	freeLines := 0
+	newFreeLines := [][]*LaidTile{}
+	for _, fl := range r.FreeLines {
+		head := fl[len(fl)-1]
+		if head != lt && canConsume(head) {
+			freeLines += 1
+			for _, lt := range fl {
+				lt.Dead = true
+				deadTileKeys[lt.Tile.String()] = true
+			}
+		} else {
+			newFreeLines = append(newFreeLines, fl)
+		}
+	}
+	r.FreeLines = newFreeLines
+
+	if len(consumed) > 0 {
+		if lt.PlayerName != "" {
+			consumed = append(consumed, fmt.Sprintf("%s-1", lt.PlayerName))
+		}
+		freeLineNote := ""
+		if freeLines > 0 {
+			freeLineNote = fmt.Sprintf("%d free line(s)", freeLines)
+		}
+		g.Note(ctx, fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", player.Name, len(consumed), strings.Join(append(consumed, freeLineNote), ", ")))
+		for _, n := range consumed {
+			op := g.GetPlayer(ctx, n)
+			op.Dead = true
+			op.ChickenFoot = false
+			for _, lt := range r.PlayerLines[op.Name][1:] {
+				lt.Dead = true
+				deadTileKeys[lt.Tile.String()] = true
+			}
+			op.Score -= 1
+			player.Score += 1
+			player.Kills = append(player.Kills, op.Name)
+		}
+	}
+
+	return deadTileKeys
+}
+
+func (r *Round) killDeadLines(ctx context.Context, g *Game, player *Player, squarePips map[Coord]SquarePips) map[string]bool {
+	deadTileKeys := map[string]bool{}
+
+	isOpenFrom := func(squarePips map[Coord]SquarePips, src Coord) bool {
 		for _, na := range src.Neighbors() {
 			if !g.InBounds(ctx, na) {
 				continue
@@ -1357,167 +1483,62 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		}
 		return false
 	}
-	isCutOff := func(line []*LaidTile) bool {
+	isCutOff := func(squarePips map[Coord]SquarePips, line []*LaidTile) bool {
 		last := line[len(line)-1]
-		if last.NextPips == last.Tile.PipsA && isOpenFrom(last.CoordA()) {
+		if last.NextPips == last.Tile.PipsA && isOpenFrom(squarePips, last.CoordA()) {
 			return false
 		}
-		if last.NextPips == last.Tile.PipsB && isOpenFrom(last.CoordB()) {
+		if last.NextPips == last.Tile.PipsB && isOpenFrom(squarePips, last.CoordB()) {
 			return false
 		}
 		return true
 	}
-
-	deadTileKeys := map[string]bool{}
-
-	if !dryRun {
-		// Kill lines as needed
-		newFreeLines := [][]*LaidTile{}
-		for _, line := range r.FreeLines {
-			if isCutOff(line) {
-				g.Note(ctx, fmt.Sprintf("what kind of reprobate cuts off a free line? (%s+0)", name))
-				tilesInFreeLine := map[string]bool{}
-				for _, lt := range line {
-					tilesInFreeLine[lt.Tile.String()] = true
-				}
-				for _, lt := range r.LaidTiles {
-					if tilesInFreeLine[lt.Tile.String()] {
-						lt.Dead = true
-					}
-				}
-				lt.Dead = true
-				continue
+	// Kill lines as needed
+	newFreeLines := [][]*LaidTile{}
+	for _, line := range r.FreeLines {
+		if isCutOff(squarePips, line) {
+			g.Note(ctx, fmt.Sprintf("what kind of reprobate cuts off a free line? (%s+0)", player.Name))
+			tilesInFreeLine := map[string]bool{}
+			for _, lt := range line {
+				tilesInFreeLine[lt.Tile.String()] = true
 			}
-			newFreeLines = append(newFreeLines, line)
-		}
-		r.FreeLines = newFreeLines
-
-		for _, p := range g.Players {
-			if p.Dead {
-				continue
-			}
-			if !isCutOff(r.PlayerLines[p.Name]) {
-				continue
-			}
-			if p.Name == player.Name {
-				g.Note(ctx, fmt.Sprintf("%s+1 ducked out of that situation", player.Name))
-			} else {
-				g.Note(ctx, fmt.Sprintf("%s+1 cut-off %s's-1 line", player.Name, p.Name))
-			}
-			player.Score += 1
-			player.Kills = append(player.Kills, p.Name)
-			p.Score -= 1
-			p.Dead = true
-			p.ChickenFoot = false
-			for _, lt := range r.PlayerLines[p.Name][1:] {
-				lt.Dead = true
-				deadTileKeys[lt.Tile.String()] = true
-			}
-			p.ChickenFoot = false
-		}
-
-		r.LaidTiles = append(r.LaidTiles, lt)
-	}
-
-	// look for il ouroboros
-	if !dryRun && canPlayOtherLines {
-		consumed := []string{}
-
-		canConsume := func(head *LaidTile) bool {
-			if lt.NextPips != head.NextPips {
-				return false
-			}
-			checkLTCoord := func(src Coord) bool {
-				if head.Tile.PipsA == head.NextPips {
-					if src.Adj(head.CoordA()) {
-						return true
-					}
-				}
-				if head.Tile.PipsB == head.NextPips {
-					if src.Adj(head.CoordB()) {
-						return true
-					}
-				}
-				return false
-			}
-			if lt.Tile.PipsA == lt.NextPips {
-				if checkLTCoord(lt.CoordA()) {
-					return true
-				}
-			}
-			if lt.Tile.PipsB == lt.NextPips {
-				if checkLTCoord(lt.CoordB()) {
-					return true
-				}
-			}
-			return false
-		}
-
-		for _, op := range g.Players {
-			if !op.ChickenFoot && op.Name != name {
-				continue
-			}
-			if op.Dead {
-				continue
-			}
-			playerLine := r.PlayerLines[op.Name]
-			head := playerLine[len(playerLine)-1]
-			if lt == head {
-				continue
-			}
-
-			if canConsume(head) {
-				consumed = append(consumed, op.Name)
-			}
-		}
-
-		freeLines := 0
-		newFreeLines := [][]*LaidTile{}
-		for _, fl := range r.FreeLines {
-			head := fl[len(fl)-1]
-			if head != lt && canConsume(head) {
-				freeLines += 1
-				for _, lt := range fl {
+			for _, lt := range r.LaidTiles {
+				if tilesInFreeLine[lt.Tile.String()] {
 					lt.Dead = true
-					deadTileKeys[lt.Tile.String()] = true
 				}
-			} else {
-				newFreeLines = append(newFreeLines, fl)
 			}
+			// lt.Dead = true
+			continue
 		}
-		r.FreeLines = newFreeLines
-
-		if len(consumed) > 0 {
-			if lt.PlayerName != "" {
-				consumed = append(consumed, fmt.Sprintf("%s-1", lt.PlayerName))
-			}
-			freeLineNote := ""
-			if freeLines > 0 {
-				freeLineNote = fmt.Sprintf("%d free line(s)", freeLines)
-			}
-			g.Note(ctx, fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", name, len(consumed), strings.Join(append(consumed, freeLineNote), ", ")))
-			for _, n := range consumed {
-				op := g.GetPlayer(ctx, n)
-				op.Dead = true
-				op.ChickenFoot = false
-				for _, lt := range r.PlayerLines[op.Name][1:] {
-					lt.Dead = true
-					deadTileKeys[lt.Tile.String()] = true
-				}
-				op.Score -= 1
-				player.Score += 1
-				player.Kills = append(player.Kills, op.Name)
-			}
-		}
+		newFreeLines = append(newFreeLines, line)
 	}
+	r.FreeLines = newFreeLines
 
-	for _, lt := range r.LaidTiles {
-		if deadTileKeys[lt.Tile.String()] {
+	for _, p := range g.Players {
+		if p.Dead {
+			continue
+		}
+		if !isCutOff(squarePips, r.PlayerLines[p.Name]) {
+			continue
+		}
+		if p.Name == player.Name {
+			g.Note(ctx, fmt.Sprintf("%s+1 ducked out of that situation", player.Name))
+		} else {
+			g.Note(ctx, fmt.Sprintf("%s+1 cut-off %s's-1 line", player.Name, p.Name))
+		}
+		player.Score += 1
+		player.Kills = append(player.Kills, p.Name)
+		p.Score -= 1
+		p.Dead = true
+		p.ChickenFoot = false
+		for _, lt := range r.PlayerLines[p.Name][1:] {
 			lt.Dead = true
+			deadTileKeys[lt.Tile.String()] = true
 		}
+		p.ChickenFoot = false
 	}
 
-	return nil
+	return deadTileKeys
 }
 
 func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]SquarePips, ot *LaidTile, name string) bool {
