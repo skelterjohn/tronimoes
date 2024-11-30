@@ -297,6 +297,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 	for _, p := range g.Players {
 		p.Hand = g.Bag[:7]
 		g.Bag = g.Bag[7:]
+		log.Printf("%s has starting hand %v", p.Name, p.Hand)
 	}
 	g.Turn = 0
 
@@ -325,6 +326,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 			if len(g.Bag) == 0 {
 				return ErrEmptyBag
 			}
+			log.Printf("%s got %v from the bag", p.Name, g.Bag[0])
 			p.Hand = append(p.Hand, g.Bag[0])
 			g.Bag = g.Bag[1:]
 		}
