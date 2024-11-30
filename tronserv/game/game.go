@@ -46,24 +46,35 @@ func (g *Game) CheckForDupes(ctx context.Context, when string) {
 	}
 	seen := map[string]bool{}
 	anyDupes := false
-	visit := func(t *Tile, where string) {
+	visit := func(t *Tile, where string) bool {
 		if seen[t.String()] {
 			log.Printf("dupe tile: %s in %s", t.String(), where)
 			anyDupes = true
+			seen[t.String()] = true
+			return true
 		}
 		seen[t.String()] = true
-	}
-	for _, t := range g.Bag {
-		visit(t, "bag")
+		return false
 	}
 	for _, lt := range g.CurrentRound(ctx).LaidTiles {
 		visit(lt.Tile, "laid tiles")
 	}
 	for _, p := range g.Players {
+		newHand := []*Tile{}
 		for _, t := range p.Hand {
-			visit(t, p.Name)
+			if !visit(t, p.Name) {
+				newHand = append(newHand, t)
+			}
+		}
+		p.Hand = newHand
+	}
+	newBag := []*Tile{}
+	for _, t := range g.Bag {
+		if !visit(t, "bag") {
+			newBag = append(newBag, t)
 		}
 	}
+	g.Bag = newBag
 	if anyDupes {
 		data, _ := json.Marshal(g)
 		log.Printf("dupes during %s: %s", when, string(data))
