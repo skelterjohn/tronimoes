@@ -512,12 +512,12 @@ function Game({ code }) {
 	}, [tilesInBag]);
 
 	return (
-		<div className="h-full bg-black text-white flex flex-col" onClick={() => setPlayErrorMessage("")}>
+		<div className="h-full bg-black text-white flex flex-col min-h-[20vh]" onClick={() => setPlayErrorMessage("")}>
 			<div className="flex pl-3 pr-3 justify-end items-center">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
-				<span className="block md:hidden text-left  font-bold mr-auto">
+				<span className="block md:hidden text-left font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
@@ -556,7 +556,7 @@ function Game({ code }) {
 					</div>
 				))}
 			</div>
-			<div className="flex justify-center max-h-[75vh]">
+			<div className="flex justify-center max-h-[65vh]">
 				<div className="min-w-[15rem] flex justify-right hidden lg:block">
 					<History history={gameHistory} />
 				</div>
@@ -591,7 +591,7 @@ function Game({ code }) {
 				</div>
 			</div>
 			{player &&
-				<div className="flex justify-center items-center gap-4 flex-1 min-h-0">
+				<div className="flex justify-center items-center gap-4 flex-1 min-h-[15vh]">
 					<div className="overflow-x-auto overflow-y-auto w-full h-full">
 						<Hand
 							player={player}
