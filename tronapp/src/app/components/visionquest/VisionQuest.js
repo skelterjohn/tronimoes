@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 const TENOR_API_KEY = 'AIzaSyBPpZRb23wy2zTKQ2j5eJHS8YVPtjIvcGQ';
 const TENOR_CLIENT_KEY = 'tronimoes'; // Replace with your app name
 
-function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
+function VisionQuest({ title = "Vision Quest", placeholder = "enter your path", isOpen, onClose, setURL }) {
 	const [path, setPath] = useState("");
 	const [gifs, setGifs] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 		>
 			<Input
 				ref={inputRef}
-				placeholder="enter your path"
+				placeholder={placeholder}
 				value={path}
 				onChange={(e) => setPath(e.target.value)}
 				className="mb-4"

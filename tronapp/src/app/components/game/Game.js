@@ -671,7 +671,7 @@ function Game({ code }) {
 
 			{showVisionQuestModal && (
 				<VisionQuest
-					title="Vision Quest"
+					title="vision quest"
 					onClose={() => setShowVisionQuestModal(false)}
 					isOpen={showVisionQuestModal}
 					setURL={setChickenFootURL}
@@ -679,8 +679,9 @@ function Game({ code }) {
 			)}
 			{showReactModal && (
 				<VisionQuest
-					title="React"
+					title="react"
 					onClose={() => setShowReactModal(false)}
+					placeholder="tell me how you really feel"
 					isOpen={showReactModal}
 					setURL={setReactURL}
 				/>
