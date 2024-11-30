@@ -300,14 +300,14 @@ function Game({ code }) {
 		setHintedTiles(ht);
 	}, [game, player]);
 
-	function startRound() {
+	const startRound = useCallback(() => {
 		client.StartRound(code).then((resp) => {
 			console.log("started round", resp);
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 		});
-	}
+	}, [client, code]);
 
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
@@ -319,7 +319,7 @@ function Game({ code }) {
 
 	const [playA, setPlayA] = useState(undefined);
 
-	function playTile(tile) {
+	const playTile = useCallback((tile) => {
 		console.log("playTile", tile);
 		tile.color = player.color;
 		client.LayTile(code, {
@@ -344,7 +344,7 @@ function Game({ code }) {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 		});
-	}
+	}, [client, code, player, indicated, setSelectedTile, setIndicated, setHints, setPlayA, setPlayErrorMessage]);
 
 	function playSpacer(spacer) {
 		client.LaySpacer(code, spacer).then((resp) => {
@@ -411,7 +411,7 @@ function Game({ code }) {
 		client.SetChickenFoot(code, chickenFootURL);
 	}, [chickenFootURL, client, code]);
 
-	function passTurn() {
+	const passTurn = useCallback(() => {
 		setSelectedTile(undefined);
 		client.Pass(code, {
 			selected_x: playA !== undefined ? playA.x : -1,
@@ -427,23 +427,28 @@ function Game({ code }) {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 		});
-	}
+	}, [client, code, playA, setPlayA, setSelectedTile, setIndicated, setPlayErrorMessage, chickenFootURL, setShowVisionQuestModal]);
 
-	function leaveOrQuit() {
+	const leaveOrQuit = useCallback(() => {
 		client.LeaveOrQuit(code).catch((error) => {
 			console.error("error", error);
 			router.push("/");
 		}).finally(() => {
 			router.push("/");
 		});
-	}
+	}, [client, code, router]);
 
-	const playerTurn = players[turnIndex];
+	const [playerTurn, setPlayerTurn] = useState(undefined);
+	useEffect(() => {
+		setPlayerTurn(players[turnIndex]);
+	}, [players, turnIndex]);
 
-	let myTurn = false;
-	if (playerTurn !== undefined) {
-		myTurn = players.length > 0 && playerTurn.name === playerName;
-	}
+	const [myTurn, setMyTurn] = useState(false);
+	useEffect(() => {
+		if (playerTurn !== undefined) {
+			setMyTurn(players.length > 0 && playerTurn.name === playerName);
+		}
+	}, [players, playerTurn, playerName])
 
 	const [dragOrientation, setDragOrientation] = useState("down");
 	
