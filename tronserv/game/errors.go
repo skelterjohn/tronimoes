@@ -48,4 +48,5 @@ var (
 	ErrLineIsNotFooted          = errors.New("the player who owns that line is not footed")
 	ErrPlayerAlreadyDead        = errors.New("that line is already dead")
 	ErrFreeFromSpacer           = errors.New("free lines must begin off a spacer")
+	ErrPlayerNameTooLong        = errors.New("player name too long")
 )
