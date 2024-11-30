@@ -562,7 +562,7 @@ function Game({ code }) {
 				<div className="flex-1 min-w-[15rem] flex justify-right hidden lg:block">
 					<History history={gameHistory} />
 				</div>
-				<div className="flex justify-center items-center overflow-auto p-2">
+				<div className="flex justify-center items-center overflow-auto">
 					<div className="aspect-square h-auto" style={{ maxHeight: 'min(100%, 100vw)' }}>
 						<Board
 							width={boardWidth} height={boardHeight}
