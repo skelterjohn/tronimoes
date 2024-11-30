@@ -512,7 +512,7 @@ function Game({ code }) {
 	}, [tilesInBag]);
 
 	return (
-		<div className="h-full bg-black text-white flex flex-col min-h-[20vh]" onClick={() => setPlayErrorMessage("")}>
+		<div className="h-full bg-black text-white flex flex-col" onClick={() => setPlayErrorMessage("")}>
 			<div className="flex pl-3 pr-3 justify-end items-center">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
@@ -557,10 +557,10 @@ function Game({ code }) {
 				))}
 			</div>
 			<div className="flex justify-center max-h-[65vh]">
-				<div className="min-w-[15rem] flex justify-right hidden lg:block">
+				<div className="flex-1 min-w-[15rem] flex justify-right hidden lg:block">
 					<History history={gameHistory} />
 				</div>
-				<div className="flex-1 flex justify-center overflow-auto">
+				<div className="flex justify-center overflow-auto">
 					<Board
 						width={boardWidth} height={boardHeight}
 						tiles={laidTiles}
@@ -586,7 +586,7 @@ function Game({ code }) {
 					/>
 					<WhyNot message={playErrorMessage} />
 				</div>
-				<div className="w-[15rem] hidden lg:block">
+				<div className="flex-1 min-w-[15rem] hidden lg:block">
 					<History history={roundHistory} />
 				</div>
 			</div>
