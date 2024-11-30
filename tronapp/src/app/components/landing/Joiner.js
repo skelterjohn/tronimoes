@@ -53,6 +53,9 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				joinCode(code);
 			}).catch((error) => {
 				console.error('register error', error);
+				setPlayerName('');
+				setNameInput('');
+				setIsRegistered(false);
 				setErrorMessage(error.data.error);
 			});
 		} else {

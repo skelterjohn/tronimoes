@@ -58,6 +58,13 @@ func RandomString(n int) string {
 	return string(b)
 }
 
+func validatePlayerName(name string) error {
+	if len(name) > 32 {
+		return ErrPlayerNameTooLong
+	}
+	return nil
+}
+
 type GameServer struct {
 	store Store
 }
@@ -114,6 +121,9 @@ func (s *GameServer) getName(ctx context.Context, r *http.Request) (string, erro
 	_, err := s.store.GetPlayerByName(ctx, tempName)
 	if err == ErrNoRegisteredPlayer {
 		// anonymous play is ok with unregistered names.
+		if err := validatePlayerName(tempName); err != nil {
+			return "", err
+		}
 		return tempName, nil
 	}
 	if err == nil {
@@ -808,6 +818,12 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 		return
 	}
 	pi.Id = playerID
+
+	if err := validatePlayerName(pi.Name); err != nil {
+		log.Printf("Error validating player name %q: %v", pi.Name, err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
 
 	if rpi, err := s.store.GetPlayerByName(r.Context(), pi.Name); err == nil {
 		if rpi.Id != playerID {
