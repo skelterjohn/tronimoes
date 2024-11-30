@@ -446,6 +446,16 @@ function Game({ code }) {
 	}
 
 	const [dragOrientation, setDragOrientation] = useState("down");
+	
+	const toggleOrientation = useCallback(() => {
+		switch (dragOrientation) {
+			case "down": setDragOrientation("left"); break;
+			case "right": setDragOrientation("down"); break;
+			case "up": setDragOrientation("right"); break;
+			case "left": setDragOrientation("up"); break;
+		}
+	}, [dragOrientation, setDragOrientation]);
+
 	const dropCallback = useCallback((x, y) => {
 		playTile({
 			a: selectedTile.a, b: selectedTile.b,
@@ -619,6 +629,7 @@ function Game({ code }) {
                 mouseIsOver={mouseIsOver}
                 dragOrientation={dragOrientation}
                 setDragOrientation={setDragOrientation}
+                toggleOrientation={toggleOrientation}
                 setShowReactModal={setShowReactModal}
               />
 						</div>
@@ -645,6 +656,7 @@ function Game({ code }) {
                 mouseIsOver={mouseIsOver}
                 dragOrientation={dragOrientation}
                 setDragOrientation={setDragOrientation}
+                toggleOrientation={toggleOrientation}
                 setShowReactModal={setShowReactModal}
                 />
 						</div>

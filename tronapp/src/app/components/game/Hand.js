@@ -14,7 +14,7 @@ function Hand({
 		hintedTiles, hintedSpacer,
 		bagCount, turnIndex, playTile,
 		setHoveredSquares, mouseIsOver,
-		dragOrientation, setDragOrientation,
+		dragOrientation, setDragOrientation, toggleOrientation,
 		setShowReactModal
 	}) {
 	const [handOrder, setHandOrder] = useState([]);
@@ -24,15 +24,6 @@ function Hand({
 	const [spacerColor, setSpacerColor] = useState("white");
 	const [myTurn, setMyTurn] = useState(false);
 	const [handBackground, setHandBackground] = useState("bg-white");
-
-	function toggleOrientation() {
-		switch (dragOrientation) {
-			case "down": setDragOrientation("left"); break;
-			case "right": setDragOrientation("down"); break;
-			case "up": setDragOrientation("right"); break;
-			case "left": setDragOrientation("up"); break;
-		}
-	}
 
 	useEffect(() => {
 		const colorMap = {
@@ -77,7 +68,7 @@ function Hand({
 		setShowReaction(reactURL !== undefined);
 	}, [reactURL]);
 	
-	function moveTile(tile, toTile) {
+	const moveTile = useCallback((tile, toTile) => {
 		if (tile.a === toTile.a && tile.b === toTile.b) {
 			return;
 		}
@@ -101,7 +92,7 @@ function Hand({
 			newOrder.push(t);
 		});
 		setHandOrder(newOrder);
-	}
+	}, [handOrder, setHandOrder]);
 
 	useEffect(() => {
 		if (!player?.hand) {
@@ -130,26 +121,27 @@ function Hand({
 		setHandOrder(newHandOrder);
 	}, [player]);
 
-	function tileClicked(tile) {
+	const tileClicked = useCallback((tile) => {
 		if (hidden) {
 			return;
 		}
 		setHoveredSquares(new Set([]));
 		if (selectedTile === tile) {
+			console.log(toggleOrientation);
 			toggleOrientation();
 		} else {
 			setDragOrientation("down");
 		}
 		setSelectedTile(tile);
-	}
+	}, [toggleOrientation, setDragOrientation, selectedTile, setSelectedTile]);
 
-	function spacerClicked() {
+	const spacerClicked = useCallback(() => {
 		setHoveredSquares(new Set([]));
 		if (hidden) {
 			return;
 		}
 		setSelectedTile({ a: -1, b: -1 });
-	}
+	}, [setSelectedTile, setHoveredSquares, hidden]);
 
 	useEffect(() => {
 		if (setDragOrientation) {
@@ -207,7 +199,7 @@ function Hand({
 		});
 	}, [dragOrientation, hidden, selectedTile]);
 
-	function handleDrop(targetTile, e) {
+	const handleDrop = useCallback((targetTile, e) => {
 		setIsDragging(false);
 		setHoveredSquares(new Set([]));
 		if (hidden) return;
@@ -215,7 +207,7 @@ function Hand({
 		const sourceTile = JSON.parse(e.dataTransfer.getData('text/plain'));
 		// Here you can add logic to swap tiles in the hand
 		moveTile(sourceTile, targetTile);
-	}
+	}, [moveTile, hidden, setIsDragging, setHoveredSquares]);
 
 	useEffect(() => {
 		if (!isDragging || mouseIsOver === undefined || mouseIsOver[0] === -1 || mouseIsOver[1] === -1) {
@@ -264,7 +256,7 @@ function Hand({
 		
 	}
 
-	function handleTouchStart(tile, e) {
+	const handleTouchStart = useCallback((tile, e) => {
 		if (hidden) return;
 		
 		// Create ghost element
@@ -285,9 +277,9 @@ function Hand({
 		setSelectedTile(tile);
 		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
 		setDraggedTile(tile);
-	}
+	}, [dragOrientation, hidden, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile]);
 
-	function handleTouchEnd(targetTile, e) {
+	const handleTouchEnd = useCallback((targetTile, e) => {
 		setHoveredSquares(new Set([]));
 		if (!draggedTile || !touchStartPos) return;
 		
@@ -316,24 +308,9 @@ function Hand({
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
-	}
+	}, [setTouchStartPos, setDraggedTile]);
 
-	function handleTouchMove(e) {
-		if (!touchStartPos) return;
-		
-		// Move the ghost element
-		const ghost = document.getElementById('touch-ghost');
-		if (!ghost) {
-			return;
-		}
-		const touch = e.touches[0];
-		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
-
-		const element = document.elementFromPoint(touch.clientX, touch.clientY);
-		hoverTile(parseInt(element?.dataset?.tron_x), parseInt(element?.dataset?.tron_y));
-	}
-
-	function hoverTile(x, y) {
+	const hoverTile = useCallback((x, y) => {
 		if (!selectedTile) {
 			return;
 		}
@@ -356,7 +333,22 @@ function Hand({
 			break;
 		}
 		setHoveredSquares(hs);
-	}
+	}, [selectedTile, dragOrientation, setHoveredSquares]);
+
+	const handleTouchMove = useCallback((e) => {
+		if (!touchStartPos) return;
+		
+		// Move the ghost element
+		const ghost = document.getElementById('touch-ghost');
+		if (!ghost) {
+			return;
+		}
+		const touch = e.touches[0];
+		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
+
+		const element = document.elementFromPoint(touch.clientX, touch.clientY);
+		hoverTile(parseInt(element?.dataset?.tron_x), parseInt(element?.dataset?.tron_y));
+	}, [dragOrientation, hoverTile]);
 
 	const dropTile = useCallback((x, y) => {
 		if (!selectedTile || x === undefined || y === undefined) {
