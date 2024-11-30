@@ -512,12 +512,12 @@ function Game({ code }) {
 	}, [tilesInBag]);
 
 	return (
-		<div className="h-full bg-black text-white flex flex-col" onClick={() => setPlayErrorMessage("")}>
-			<div className="flex pl-3 pr-3 justify-end items-center">
+		<div className="h-full bg-black text-white flex flex-col">
+			<div className="flex p-3 justify-end items-center min-h-[50px]">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
-				<span className="block md:hidden text-left  font-bold mr-auto">
+				<span className="block md:hidden text-left font-bold mr-auto">
 					#{code} {game?.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
@@ -539,11 +539,12 @@ function Game({ code }) {
 				</div>
 			</div>
 
-			<div className="flex justify-center items-center gap-4 max-h-32">
+			<div className="flex justify-center items-center gap-4 h-[60px] w-screen md:w-auto">
 				{opponents.map((o, i) => (
 					<div key={i} className="flex-1 overflow-x-auto">
 						<Hand
 							player={o}
+							
 							players={players}
 							name={o.name}
 							score={o.score}
@@ -556,68 +557,101 @@ function Game({ code }) {
 					</div>
 				))}
 			</div>
-			<div className="flex justify-center max-h-[75vh]">
-				<div className="min-w-[15rem] flex justify-right hidden lg:block">
+
+			<div className="flex justify-center flex-1 min-h-0">
+				<div className="flex-1 min-w-[15rem] flex justify-right hidden lg:block">
 					<History history={gameHistory} />
 				</div>
-				<div className="flex-1 flex justify-center overflow-auto">
-					<Board
-						width={boardWidth} height={boardHeight}
-						tiles={laidTiles}
-						spacer={spacer}
-						lineHeads={lineHeads}
-						selectedTile={selectedTile}
-						playTile={playTile}
-						playSpacer={playSpacer}
-						clearSpacer={clearSpacer}
-						chickenFeet={chickenFeet}
-						chickenFeetURLs={chickenFeetURLs}
-						indicated={indicated}
-						setIndicated={setIndicated}
-						playerTurn={myTurn}
-						activePlayer={roundInProgress && players[turnIndex]}
-						hints={hints}
-						playA={playA}
-						setPlayA={setPlayA}
-						spacerHints={player?.spacer_hints}
-						hoveredSquares={hoveredSquares}
-						setMouseIsOver={setMouseIsOver}
-						dropCallback={dropCallback}
-					/>
-					<WhyNot message={playErrorMessage} />
+				<div className="flex justify-center items-center overflow-auto">
+					<div className="aspect-square h-auto" style={{ maxHeight: 'min(100%, 100vw)' }}>
+						<Board
+							width={boardWidth} height={boardHeight}
+							tiles={laidTiles}
+							spacer={spacer}
+							lineHeads={lineHeads}
+							selectedTile={selectedTile}
+							playTile={playTile}
+							playSpacer={playSpacer}
+							clearSpacer={clearSpacer}
+							chickenFeet={chickenFeet}
+							chickenFeetURLs={chickenFeetURLs}
+							indicated={indicated}
+							setIndicated={setIndicated}
+							playerTurn={myTurn}
+							activePlayer={roundInProgress && players[turnIndex]}
+							hints={hints}
+							playA={playA}
+							setPlayA={setPlayA}
+							spacerHints={player?.spacer_hints}
+							hoveredSquares={hoveredSquares}
+							setMouseIsOver={setMouseIsOver}
+							dropCallback={dropCallback}
+						/>
+						<WhyNot message={playErrorMessage} />
+					</div>
 				</div>
-				<div className="w-[15rem] hidden lg:block">
+				<div className="flex-1 min-w-[15rem] hidden lg:block">
 					<History history={roundHistory} />
 				</div>
 			</div>
+
 			{player &&
-				<div className="flex justify-center items-center gap-4 flex-1 min-h-0">
-					<div className="overflow-x-auto overflow-y-auto w-full h-full">
-						<Hand
-							player={player}
-							players={players}
-							name={playerName}
-							hidden={false}
-							selectedTile={selectedTile}
-							setSelectedTile={setSelectedTile}
-							playerTurn={myTurn}
-							drawTile={drawTile}
-							passTurn={passTurn}
-							roundInProgress={roundInProgress}
-							hintedTiles={hintedTiles}
-							hintedSpacer={player.spacer_hints}
-							bagCount={bagCount}
-							turnIndex={turnIndex}
-							playTile={playTile}
-							setHoveredSquares={setHoveredSquares}
-							mouseIsOver={mouseIsOver}
-							dragOrientation={dragOrientation}
-							setDragOrientation={setDragOrientation}
-							setShowReactModal={setShowReactModal}
-						/>
+				<>
+					<div className="hidden md:block h-[150px] w-screen md:w-auto">
+						<div className="w-full h-full overflow-x-auto overflow-y-auto">
+              <Hand
+                player={player}
+                players={players}
+                name={playerName}
+                hidden={false}
+                selectedTile={selectedTile}
+                setSelectedTile={setSelectedTile}
+                playerTurn={myTurn}
+                drawTile={drawTile}
+                passTurn={passTurn}
+                roundInProgress={roundInProgress}
+                hintedTiles={hintedTiles}
+                hintedSpacer={player.spacer_hints}
+                bagCount={bagCount}
+                turnIndex={turnIndex}
+                playTile={playTile}
+                setHoveredSquares={setHoveredSquares}
+                mouseIsOver={mouseIsOver}
+                dragOrientation={dragOrientation}
+                setDragOrientation={setDragOrientation}
+                setShowReactModal={setShowReactModal}
+              />
+						</div>
 					</div>
-				</div>
+					<div className="block md:hidden flex-1 h-[150px] w-screen md:w-auto">
+						<div className="w-full h-full overflow-x-auto overflow-y-auto">
+              <Hand
+                player={player}
+                players={players}
+                name={playerName}
+                hidden={false}
+                selectedTile={selectedTile}
+                setSelectedTile={setSelectedTile}
+                playerTurn={myTurn}
+                drawTile={drawTile}
+                passTurn={passTurn}
+                roundInProgress={roundInProgress}
+                hintedTiles={hintedTiles}
+                hintedSpacer={player.spacer_hints}
+                bagCount={bagCount}
+                turnIndex={turnIndex}
+                playTile={playTile}
+                setHoveredSquares={setHoveredSquares}
+                mouseIsOver={mouseIsOver}
+                dragOrientation={dragOrientation}
+                setDragOrientation={setDragOrientation}
+                setShowReactModal={setShowReactModal}
+                />
+						</div>
+					</div>
+				</>
 			}
+
 			{showVisionQuestModal && (
 				<VisionQuest
 					title="Vision Quest"
