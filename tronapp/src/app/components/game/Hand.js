@@ -27,10 +27,10 @@ function Hand({
 
 	function toggleOrientation() {
 		switch (dragOrientation) {
-			case "down": setDragOrientation("right"); break;
-			case "right": setDragOrientation("up"); break;
-			case "up": setDragOrientation("left"); break;
-			case "left": setDragOrientation("down"); break;
+			case "down": setDragOrientation("left"); break;
+			case "right": setDragOrientation("down"); break;
+			case "up": setDragOrientation("right"); break;
+			case "left": setDragOrientation("up"); break;
 		}
 	}
 
