@@ -601,18 +601,31 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		code = "PICKUP"
 	}
 
-	g, err := s.store.FindGameAlreadyPlaying(ctx, code, name)
+	prefix := code
+	if len(code) > 6 {
+		prefix = code[:6]
+	}
+
+	g, err := s.store.FindGameAlreadyPlaying(ctx, prefix, name)
 	if err != nil && err != ErrNoSuchGame {
-		log.Printf("Error reading game %q: %v", code, err)
+		log.Printf("Error reading game %q: %v", prefix, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	if g == nil {
-		g, err = s.store.FindOpenGame(ctx, code)
+		g, err = s.store.FindOpenGame(ctx, prefix)
 		if err != nil && err != ErrNoSuchGame {
-			log.Printf("Error reading game %q: %v", code, err)
+			log.Printf("Error reading game %q: %v", prefix, err)
 			writeErr(w, err, http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if g != nil {
+		if code != g.Code {
+			log.Printf("Player %q joined game %q but it already exists as %q", name, code, g.Code)
+			writeErr(w, ErrGameOver, http.StatusConflict)
 			return
 		}
 	}

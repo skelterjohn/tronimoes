@@ -300,14 +300,23 @@ function Game({ code }) {
 		setHintedTiles(ht);
 	}, [game, player]);
 
-	const startRound = useCallback(() => {
+	const readyToPlay = useCallback(() => {
+		if (player === undefined && playerName !== undefined) {
+			client.JoinGame(code, playerName).then((resp) => {
+				console.log("joined game", resp);
+			}).catch((error) => {
+				console.error("error", error);
+				setPlayErrorMessage(error.data.error);
+			});
+			return;
+		}
 		client.StartRound(code).then((resp) => {
 			console.log("started round", resp);
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 		});
-	}, [client, code]);
+	}, [client, code, player, playerName]);
 
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
@@ -512,11 +521,6 @@ function Game({ code }) {
 		}
 	}, [lastRoundHistoryItem]);
 
-	const [isFirstTurn, setIsFirstTurn] = useState(true);
-	useEffect(() => {
-		setIsFirstTurn(turnsTaken < 2);
-	}, [turnsTaken]);
-
 	useEffect(() => {
 		if (prevTilesInBag === tilesInBag+1) {
 		drawAudio.play().catch(error => {
@@ -540,9 +544,9 @@ function Game({ code }) {
 						<Button
 							className="w-20"
 							disabled={roundInProgress || game?.done || player?.ready}
-							onClick={() => startRound()}
+							onClick={() => readyToPlay()}
 						>
-							ready
+							{player === undefined && playerName !== undefined ? "join" : "ready"}
 						</Button>
 						<Button
 							className="w-20"
