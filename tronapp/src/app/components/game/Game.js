@@ -534,10 +534,10 @@ function Game({ code }) {
 		<div className="h-full bg-black text-white flex flex-col">
 			<div className="flex p-3 justify-end items-center min-h-[50px]">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
-					#{code} {game?.done && "(done)"}
+					#{code.substring(0, 6)} {game?.done && "(done)"}
 				</span>
 				<span className="block md:hidden text-left font-bold mr-auto">
-					#{code} {game?.done && "(done)"}
+					#{code.substring(0, 6)} {game?.done && "(done)"}
 				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
