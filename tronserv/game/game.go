@@ -16,6 +16,7 @@ type Game struct {
 	Created int64 `json:"created"`
 
 	Version int64 `json:"version"`
+	Pickup  bool  `json:"pickup"`
 	Done    bool  `json:"done"`
 
 	Code        string    `json:"code"`

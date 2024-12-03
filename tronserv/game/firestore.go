@@ -105,6 +105,31 @@ func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error
 	return g, nil
 }
 
+func (s *FireStore) FindPickupGame(ctx context.Context) (*Game, error) {
+	c := s.games(ctx)
+	iter := c.Where("open", "==", true).Where("done", "==", false).Where("pickup", "==", true).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("could not query: %v", err)
+	}
+	if len(docs) == 0 {
+		return nil, ErrNoSuchGame
+	}
+	doc := docs[0]
+	data := doc.Data()
+	gameData, ok := data["game_json"].(string)
+	if !ok {
+		return nil, fmt.Errorf("bad data type for game_json: %T", data["game_json"])
+	}
+
+	g := &Game{}
+	if err := json.Unmarshal([]byte(gameData), g); err != nil {
+		return nil, fmt.Errorf("could not unmarshal: %v", err)
+	}
+
+	return g, nil
+}
+
 func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	c := s.games(ctx)
 	doc, err := c.Doc(code).Get(ctx)
@@ -141,6 +166,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		"created":     game.Created,
 		"code_prefix": game.Code[:6],
 		"open":        open,
+		"pickup":      game.Pickup,
 		"done":        game.Done,
 		"game_json":   string(gameData),
 		"version":     game.Version,

@@ -16,6 +16,7 @@ type PlayerInfo struct {
 type Store interface {
 	FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error)
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
+	FindPickupGame(ctx context.Context) (*Game, error)
 	ReadGame(ctx context.Context, code string) (*Game, error)
 	WriteGame(ctx context.Context, game *Game) error
 	DeleteGame(ctx context.Context, code string) error
@@ -73,6 +74,7 @@ func (s *MemoryStore) FindOpenGame(ctx context.Context, code string) (*Game, err
 
 	return s.ReadGame(ctx, fullCode)
 }
+
 func (s *MemoryStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
 	s.gamesMu.Lock()
 	fullCode := ""
@@ -103,6 +105,27 @@ func (s *MemoryStore) FindGameAlreadyPlaying(ctx context.Context, code, name str
 	}
 
 	return s.ReadGame(ctx, fullCode)
+}
+
+func (s *MemoryStore) FindPickupGame(ctx context.Context) (*Game, error) {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+	for _, g := range s.games {
+		if g.Done {
+			continue
+		}
+		if len(g.Rounds) > 0 {
+			continue
+		}
+		if len(g.Players) == 6 {
+			continue
+		}
+		if !g.Pickup {
+			continue
+		}
+		return g, nil
+	}
+	return nil, ErrNoSuchGame
 }
 
 func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) {

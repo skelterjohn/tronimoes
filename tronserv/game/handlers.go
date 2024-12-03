@@ -50,7 +50,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 }
 
 func RandomString(n int) string {
-	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
@@ -597,42 +597,54 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if code == "<>" {
-		code = "PICKUP"
-	}
+	var g *Game
 
-	prefix := code
-	if len(code) > 6 {
-		prefix = code[:6]
-	}
+	pickup := code == "PICKUP"
+	if pickup {
+		g, err = s.store.FindPickupGame(ctx)
+		if err != nil && err != ErrNoSuchGame {
+			log.Printf("Error finding pickup game: %v", err)
+			writeErr(w, err, http.StatusInternalServerError)
+			return
+		}
+	} else {
+		prefix := code
+		if len(code) > 6 {
+			prefix = code[:6]
+		}
 
-	g, err := s.store.FindGameAlreadyPlaying(ctx, prefix, name)
-	if err != nil && err != ErrNoSuchGame {
-		log.Printf("Error reading game %q: %v", prefix, err)
-		writeErr(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	if g == nil {
-		g, err = s.store.FindOpenGame(ctx, prefix)
+		g, err = s.store.FindGameAlreadyPlaying(ctx, prefix, name)
 		if err != nil && err != ErrNoSuchGame {
 			log.Printf("Error reading game %q: %v", prefix, err)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
-	}
 
-	if g != nil {
-		if code != g.Code {
-			log.Printf("Player %q joined game %q but it already exists as %q", name, code, g.Code)
-			writeErr(w, ErrGameOver, http.StatusConflict)
-			return
+		if g == nil {
+			g, err = s.store.FindOpenGame(ctx, prefix)
+			if err != nil && err != ErrNoSuchGame {
+				log.Printf("Error reading game %q: %v", prefix, err)
+				writeErr(w, err, http.StatusInternalServerError)
+				return
+			}
+		}
+
+		if g != nil {
+			if len(code) > 6 && code != g.Code {
+				log.Printf("Player %q joined game %q but it already exists as %q", name, code, g.Code)
+				writeErr(w, ErrGameOver, http.StatusConflict)
+				return
+			}
 		}
 	}
-
 	if g == nil {
-		code = fmt.Sprintf("%s-%s", code, RandomString(6))
+		if pickup {
+			code = fmt.Sprintf("%s-%s", RandomString(6), RandomString(6))
+		} else {
+			code = fmt.Sprintf("%s-%s", code, RandomString(6))
+		}
 		g = NewGame(ctx, code)
+		g.Pickup = pickup
 	}
 
 	inGame := false
