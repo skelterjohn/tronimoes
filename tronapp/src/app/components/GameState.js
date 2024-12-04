@@ -15,6 +15,7 @@ export function GameProvider({ children }) {
 	const [client, setClient] = useState(undefined);
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
+	const [tutorial, setTutorial] = useState(false);
 	
 	useEffect(() => {
 		if (!client?.key || !client?.userid) {
@@ -75,6 +76,7 @@ export function GameProvider({ children }) {
 			client, setClient,
 			userInfo, setUserInfo,
 			persistentUser, loading, error,
+			tutorial, setTutorial,
 		}}>
 			{children}
 		</GameContext.Provider>

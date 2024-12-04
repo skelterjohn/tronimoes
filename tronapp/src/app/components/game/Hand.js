@@ -127,7 +127,6 @@ function Hand({
 		}
 		setHoveredSquares(new Set([]));
 		if (selectedTile === tile) {
-			console.log(toggleOrientation);
 			toggleOrientation();
 		} else {
 			setDragOrientation("down");

@@ -6,7 +6,7 @@ import { useGameState } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
 import History from './History';
-import { Button, Modal } from 'antd';
+import { Button, Checkbox } from 'antd';
 import WhyNot from './WhyNot';
 import VisionQuest from '../visionquest/VisionQuest';
 
@@ -26,7 +26,7 @@ const footedAudio = new Audio('/sfx/footed.mp3');
 
 function Game({ code }) {
 	const router = useRouter();
-	const { playerName, client } = useGameState();
+	const { playerName, client, tutorial, setTutorial } = useGameState();
 
 	// These states come from the server
 	const [version, setVersion] = useState(-1);
@@ -538,6 +538,10 @@ function Game({ code }) {
 				</span>
 				<span className="block md:hidden text-left font-bold mr-auto">
 					#{code.substring(0, 6)} {game?.done && "(done)"}
+				</span>
+				<span className="text-sm pr-5">
+					<Checkbox checked={tutorial} onChange={() => setTutorial(!tutorial)} />
+					tutorial
 				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">

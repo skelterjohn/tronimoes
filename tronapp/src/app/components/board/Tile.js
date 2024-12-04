@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Pips from "./Pips";
+import Tip, { makeTipBundle } from "@/app/components/tutorial/Tip";
 
 const TileHalf = ({ pips, back, orientation }) => {
 	var outercnm = "w-full aspect-square";
@@ -134,8 +135,14 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		setIndicated({ a: pipsa, b: pipsb });
 	}
 
+	const playATileBundle = makeTipBundle("This tile is raised, which means it is currently playable.");
+	useEffect(() => {
+		playATileBundle.setShow(hinted);
+	}, [hinted]);
+
 	return (
-		<div className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
+		<div ref={playATileBundle.parentRef} className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
+			<Tip bundle={playATileBundle} />
 			<div className={height + " w-[100%]"}>
 				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
 					<table className="w-full h-full table-fixed">
