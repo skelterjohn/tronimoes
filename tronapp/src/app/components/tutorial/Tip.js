@@ -17,16 +17,19 @@ export function TipProvider({ children }) {
 }
 
 export default function Tip({ bundle }) {
-
 	const { tutorial } = useGameState();
-
 	const { messageRefs } = useContext(TipContext);
 
 	const tipRef = useRef(null);
 
 	const [parentBounds, setParentBounds] = useState(null);
 
+
 	useEffect(() => {
+		if (!tutorial) {
+			return;
+		}
+
 		// First parent to show this message wins.
 		if (!tipRef?.current) {
 			return;
@@ -35,8 +38,8 @@ export default function Tip({ bundle }) {
 			messageRefs.set(bundle.message, tipRef);
 		}
 		setParentBounds(tipRef.current?.parentElement?.getBoundingClientRect());
-	}, [bundle, tipRef, messageRefs]);
-
+	}, [bundle, tipRef, messageRefs, tutorial]);
+	
 	if (!tutorial) {
 		return null;
 	}
@@ -56,7 +59,7 @@ export default function Tip({ bundle }) {
 					onClick={() => {
 						bundle.setDone(true);
 					}}
-					className="absolute bg-white rounded-lg p-2 shadow-lg z-50 text-black"
+					className="absolute border border-black bg-white rounded-lg p-2 shadow-lg z-50 text-black"
 					style={{
 						position: 'fixed',
 						left: parentBounds?.left + (parentBounds?.width / 2) || -1000,

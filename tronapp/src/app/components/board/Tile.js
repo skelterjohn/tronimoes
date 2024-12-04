@@ -23,10 +23,7 @@ const TileHalf = ({ pips, back, orientation }) => {
 	);
 }
 
-export default function Tile({ pipsa, pipsb, orientation, back = false, color = "white", dead = false, selected = false, lineHeads, indicated, setIndicated, hintedTiles }) {
-
-
-
+export default function Tile({ pipsa, pipsb, orientation, back = false, color = "white", dead = false, selected = false, lineHeads, indicated, setIndicated, hintedTiles, roundLeader = undefined, freeLeaders = undefined }) {
 	var squareBar = <div className="absolute bottom-[-2px] left-[15%] w-[70%] h-[4px] bg-gray-300" />;
 	var bar = <div className="absolute left-[15%] w-[70%] h-[4px] bg-gray-300" />;
 
@@ -156,11 +153,33 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		}
 	}, [selected, orientation, rotateBundle.done]);
 
+	const roundLeaderBundle = makeTipBundle("This tile is the round leader. Your own line must start adjacent to this tile.");
+	useEffect(() => {
+		if (roundLeader && roundLeader.pips_a === pipsa && roundLeader.pips_b === pipsb) {
+			roundLeaderBundle.setShow(true);
+		}
+	}, [roundLeader, pipsa, pipsb]);
+
+	const freeLeaderBundle = makeTipBundle("This tile is a free line leader. One free line starts here, and anyone may play on it.");
+	useEffect(() => {
+		if (!freeLeaders) {
+			return;
+		}
+		freeLeaders.forEach((fl) => {
+			if (fl.pips_a === pipsa && fl.pips_b === pipsb) {
+				freeLeaderBundle.setShow(true);
+			}
+		});
+	}, [freeLeaders, pipsa, pipsb]);
+
+
 	return (
 		<div className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
 			<Tip bundle={playATileBundle} />
 			<Tip bundle={dragBundle} />
 			<Tip bundle={rotateBundle} />
+			<Tip bundle={roundLeaderBundle} />
+			<Tip bundle={freeLeaderBundle} />
 			<div className={height + " w-[100%]"}>
 				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
 					<table className="w-full h-full table-fixed">

@@ -37,6 +37,8 @@ function Game({ code }) {
 	const [turnIndex, setTurnIndex] = useState(0);
 	const [laidTiles, setLaidTiles] = useState({});
 	const [lineHeads, setLineHeads] = useState({});
+	const [roundLeader, setRoundLeader] = useState(undefined);
+	const [freeLeaders, setFreeLeaders] = useState(new Set([]));
 	const [spacer, setSpacer] = useState(undefined);
 
 	const [roundHistory, setRoundHistory] = useState([]);
@@ -173,6 +175,8 @@ function Game({ code }) {
 		let allLaidTiles = {}
 		if (game.rounds?.length > 0) {
 			const lastRound = game.rounds[game.rounds.length - 1]
+			setRoundLeader(lastRound?.laid_tiles?.[0]?.tile);
+			setFreeLeaders(new Set(lastRound?.free_lines?.map((fl) => fl[0]?.tile)));
 			lastRound?.laid_tiles?.forEach((lt) => {
 				allLaidTiles[`${lt.coord.x},${lt.coord.y}`] = {
 					a: lt.tile.pips_a,
@@ -592,6 +596,8 @@ function Game({ code }) {
 							tiles={laidTiles}
 							spacer={spacer}
 							lineHeads={lineHeads}
+							roundLeader={roundLeader}
+							freeLeaders={freeLeaders}
 							selectedTile={selectedTile}
 							playTile={playTile}
 							playSpacer={playSpacer}

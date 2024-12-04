@@ -21,7 +21,9 @@ const bgColorMap = {
 export default function Board({ 
 		width = 10, height = 11,
 		tiles, spacer,
-		lineHeads, selectedTile,
+		lineHeads,
+		roundLeader, freeLeaders,
+		selectedTile,
 		playTile, playSpacer,
 		chickenFeet, chickenFeetURLs,
 		indicated, setIndicated,
@@ -166,6 +168,8 @@ export default function Board({
 															color={tiles[`${x},${y}`].color}
 															dead={tiles[`${x},${y}`].dead}
 															lineHeads={lineHeads}
+															roundLeader={roundLeader}
+															freeLeaders={freeLeaders}
 															indicated={indicated}
 															setIndicated={setIndicated} />
 													</div>
