@@ -6,9 +6,18 @@ import { useGameState } from "@/app/components/GameState";
 
 // Track which tips have already been given.
 const messageRefs = new Map();
+// Add a variable to track the currently active tip
+let activeMessage = undefined;
 
 export default function Tip({ bundle }) {
 	const { tutorial } = useGameState();
+
+	if (activeMessage === undefined) {
+		activeMessage = bundle.message;
+	}
+	if (activeMessage !== bundle.message) {
+		return null;
+	}
 
 	if (bundle.done || !tutorial || !bundle.show || !bundle.parentRef?.current) {
 		return null;
@@ -28,6 +37,7 @@ export default function Tip({ bundle }) {
 		<div
 			onClick={() => {
 				bundle.setDone(true)
+				activeMessage = undefined;
 			}}
 			className="absolute bg-white rounded-lg p-2 shadow-lg z-50 text-black"
 			style={{
