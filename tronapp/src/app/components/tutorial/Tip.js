@@ -8,9 +8,10 @@ const TipContext = createContext();
 
 export function TipProvider({ children }) {
 	const [messageRefs] = useState(new Map());
+	const [activeTip, setActiveTip] = useState(null);
 
 	return (
-		<TipContext.Provider value={{ messageRefs }}>
+		<TipContext.Provider value={{ messageRefs, activeTip, setActiveTip }}>
 			{children}
 		</TipContext.Provider>
 	);
@@ -18,12 +19,26 @@ export function TipProvider({ children }) {
 
 export default function Tip({ bundle }) {
 	const { tutorial } = useGameState();
-	const { messageRefs } = useContext(TipContext);
+	const { messageRefs, activeTip, setActiveTip } = useContext(TipContext);
 
 	const tipRef = useRef(null);
 
 	const [parentBounds, setParentBounds] = useState(null);
 
+
+	useEffect(() => {
+		if (!tutorial || !bundle.show) {
+			return;
+		}
+		
+		if (bundle.done && activeTip === bundle.message) {
+			setActiveTip((prev) => prev === bundle.message ? null : prev);
+		}
+
+		if (!bundle.done && !activeTip) {
+			setActiveTip((prev) => prev || bundle.message);
+		}
+	}, [tutorial, bundle.show, bundle.done, bundle.message, activeTip, setActiveTip]);
 
 	useEffect(() => {
 		if (!tutorial) {
@@ -48,6 +63,10 @@ export default function Tip({ bundle }) {
 		return null;
 	}
 
+	if (activeTip && activeTip !== bundle.message) {
+		return null;
+	}
+
 	if (tipRef?.current && messageRefs.get(bundle.message) !== tipRef) {
 		return null;
 	}
@@ -58,6 +77,7 @@ export default function Tip({ bundle }) {
 				<div
 					onClick={() => {
 						bundle.setDone(true);
+						setActiveTip(null);
 					}}
 					className="absolute border border-black bg-white rounded-lg p-2 shadow-lg z-50 text-black"
 					style={{
