@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Pips from "./Pips";
 import Tip, { makeTipBundle } from "@/app/components/tutorial/Tip";
 
@@ -137,12 +137,30 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 
 	const playATileBundle = makeTipBundle("This tile is raised, which means it is currently playable.");
 	useEffect(() => {
-		playATileBundle.setShow(hinted);
+		if (hinted) {
+			playATileBundle.setShow(true);
+		}
 	}, [hinted]);
 
+	const rotateBundle = makeTipBundle("You can rotate the tile by clicking or tapping on it.");
+	useEffect(() => {
+		if (selected) {
+			rotateBundle.setShow(true);
+		}
+	}, [selected]);
+
+	const dragBundle = makeTipBundle("Once it's oriented, you can drag it to the board.");
+	useEffect(() => {
+		if (rotateBundle.done && selected && orientation !== "down") {
+			dragBundle.setShow(true);
+		}
+	}, [selected, orientation, rotateBundle.done]);
+
 	return (
-		<div ref={playATileBundle.parentRef} className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
+		<div className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
 			<Tip bundle={playATileBundle} />
+			<Tip bundle={dragBundle} />
+			<Tip bundle={rotateBundle} />
 			<div className={height + " w-[100%]"}>
 				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
 					<table className="w-full h-full table-fixed">

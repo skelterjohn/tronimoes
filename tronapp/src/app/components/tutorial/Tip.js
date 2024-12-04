@@ -1,62 +1,80 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { createPortal } from "react-dom";
 import { useGameState } from "@/app/components/GameState";
 
-// Track which tips have already been given.
-const messageRefs = new Map();
-// Add a variable to track the currently active tip
-let activeMessage = undefined;
+const TipContext = createContext();
+
+export function TipProvider({ children }) {
+	const [messageRefs] = useState(new Map());
+
+	return (
+		<TipContext.Provider value={{ messageRefs }}>
+			{children}
+		</TipContext.Provider>
+	);
+}
 
 export default function Tip({ bundle }) {
+
 	const { tutorial } = useGameState();
 
-	if (activeMessage === undefined) {
-		activeMessage = bundle.message;
-	}
-	if (activeMessage !== bundle.message) {
-		return null;
-	}
-
-	if (bundle.done || !tutorial || !bundle.show || !bundle.parentRef?.current) {
-		return null;
-	}
+	const { messageRefs } = useContext(TipContext);
 
 	const tipRef = useRef(null);
-	// First parent to show this message wins.
-	if (!messageRefs.has(bundle.message)) {
-		messageRefs.set(bundle.message, tipRef);
-	}
-	if (messageRefs.get(bundle.message) !== tipRef) {
+
+	const [parentBounds, setParentBounds] = useState(null);
+
+	useEffect(() => {
+		// First parent to show this message wins.
+		if (!tipRef?.current) {
+			return;
+		}
+		if (!messageRefs.has(bundle.message)) {
+			messageRefs.set(bundle.message, tipRef);
+		}
+		setParentBounds(tipRef.current?.parentElement?.getBoundingClientRect());
+	}, [bundle, tipRef, messageRefs]);
+
+	if (!tutorial) {
 		return null;
 	}
-	const parentBounds = bundle.parentRef.current.getBoundingClientRect();
+
+	if (!bundle.show || bundle.done) {
+		return null;
+	}
+
+	if (tipRef?.current && messageRefs.get(bundle.message) !== tipRef) {
+		return null;
+	}
 	
-	return createPortal(
-		<div
-			onClick={() => {
-				bundle.setDone(true)
-				activeMessage = undefined;
-			}}
-			className="absolute bg-white rounded-lg p-2 shadow-lg z-50 text-black"
-			style={{
-				position: 'fixed',
-				left: parentBounds.left + (parentBounds.width / 2),
-				top: parentBounds.top + (parentBounds.height / 2),
-				transform: 'translate(-50%, -50%)'
-			}}
-		>
-			{bundle.message}
-		</div>,
-		document.body
+	return (
+		<div ref={tipRef}>
+			{parentBounds && createPortal(
+				<div
+					onClick={() => {
+						bundle.setDone(true);
+					}}
+					className="absolute bg-white rounded-lg p-2 shadow-lg z-50 text-black"
+					style={{
+						position: 'fixed',
+						left: parentBounds?.left + (parentBounds?.width / 2) || -1000,
+						top: parentBounds?.top + (parentBounds?.height / 2) || -1000,
+						transform: 'translate(-50%, -50%)'
+					}}
+				>
+					{bundle.message}
+				</div>,
+				document.body
+			)}
+		</div>
 	);
 }
 
 export function makeTipBundle(message) {
 	const [done, setDone] = useState(false);
 	const [show, setShow] = useState(false);
-	const parentRef = useRef(null);
 	
-	return { done, setDone, show, setShow, message, parentRef };
+	return { done, setDone, show, setShow, message };
 }
