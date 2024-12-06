@@ -1,4 +1,3 @@
-
 import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 import { useEffect } from "react";
 
@@ -12,7 +11,7 @@ export default function Hint() {
 		if (hintBundle.done()) {
 			clickBundle.setShow(true);
 		}
-	}, [hintBundle.done]);
+	}, [hintBundle.done()]);
 
 	return (
         <div className="w-full h-full flex items-center justify-center">

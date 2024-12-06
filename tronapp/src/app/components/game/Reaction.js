@@ -1,20 +1,13 @@
 import { useEffect } from "react";
 
-export default function React({
-	show, setShow, url
+export default function Reaction({
+	setShow, url
 }) {
-	if (!show) {
-		return null;
-	}
-
 	useEffect(() => {
-		if (!show) {
-			return;
-		}
 		setTimeout(() => {
 			setShow(false);
 		}, 10000);
-	}, [show]);
+	}, [setShow]);
 
 	return <div
 		onClick={() => setShow(false)}

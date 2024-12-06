@@ -151,7 +151,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		if (rotateBundle.done() && selected && orientation !== "down") {
 			dragBundle.setShow(true);
 		}
-	}, [selected, orientation, rotateBundle.done]);
+	}, [selected, orientation, rotateBundle.done()]);
 
 	const roundLeaderBundle = useTipBundle("This tile is the round leader. Your own line must start adjacent to this tile.");
 	useEffect(() => {

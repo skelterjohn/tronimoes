@@ -3,7 +3,7 @@ import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 import Image from "next/image";
-import React from "./React";
+import Reaction from "./Reaction";
 import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 
 function Hand({
@@ -404,11 +404,12 @@ function Hand({
 						{player?.chickenFoot && " (footed)"}
 						{player?.ready && " (ready)"}
 					</span>
-					<React 
-						show={showReaction}
-						setShow={setShowReaction}
-						url={reactURL}
-					/>
+					{showReaction && (
+						<Reaction 
+							url={reactURL}
+							setShow={setShowReaction}
+						/>
+					)}
 					{!player?.chickenFoot && !player?.dead &&
 						<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
 							<div className="absolute inset-0">
