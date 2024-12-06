@@ -160,6 +160,13 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		}
 	}, [roundLeader, pipsa, pipsb]);
 
+	const deadBundle = useTipBundle("This tile and its whole line are dead. If this was a player's line, they can still play on free lines or chicken-footed lines.");
+	useEffect(() => {
+		if (dead) {
+			deadBundle.setShow(true);
+		}
+	}, [dead]);
+
 	const freeLeaderBundle = useTipBundle("This tile is a free line leader. One free line starts here, and anyone may play on it.");
 	useEffect(() => {
 		if (!freeLeaders) {
@@ -180,6 +187,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 			<Tip bundle={rotateBundle} />
 			<Tip bundle={roundLeaderBundle} />
 			<Tip bundle={freeLeaderBundle} />
+			<Tip bundle={deadBundle} />
 			<div className={height + " w-[100%]"}>
 				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
 					<table className="w-full h-full table-fixed">

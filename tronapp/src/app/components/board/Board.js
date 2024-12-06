@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 
 import Spacer from "./Spacer";
 import Square from "./Square";
@@ -131,6 +132,20 @@ export default function Board({
 		setSpacerA(`${spacer?.a.x},${spacer?.a.y}`);
 	}, [spacer]);
 
+	const chickenFootBundle = useTipBundle("This is a chicken foot. The player whose foot this is can only play on their own line until the foot is gone. Other players who are not footed can also play on this line.");
+	useEffect(() => {
+		if (Object.keys(chickenFeet).length > 0) {
+		chickenFootBundle.setShow(true);
+		}
+	}, [chickenFeet]);
+
+	const lineBundle = useTipBundle("This is a line. Build your line, matching pips, to wall-in your opponents can come out on top.");
+	useEffect(() => {
+		if (Object.keys(tiles).length > 1) {
+			lineBundle.setShow(true);
+		}
+	}, [tiles]);
+
 	return (
 		<div onContextMenu={rightClick} className={`aspect-square h-full border-8 border-gray-500 flex items-center justify-center ${gutterColor}`}>
 			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
@@ -161,6 +176,7 @@ export default function Board({
 												)}
 												{tiles[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute">
+														{tiles[`${x},${y}`].color != "white" && <Tip bundle={lineBundle} /> }
 														<Tile
 															pipsa={tiles[`${x},${y}`].a}
 															pipsb={tiles[`${x},${y}`].b}
@@ -176,6 +192,7 @@ export default function Board({
 												)}
 												{chickenFeet[`${x},${y}`] && (
 													<div className="w-full h-full z-30 absolute pointer-events-none">
+														<Tip bundle={chickenFootBundle} />
 														<ChickenFoot
 															url={chickenFeetURLs[`${x},${y}`]}
 															color={chickenFeet[`${x},${y}`]} />

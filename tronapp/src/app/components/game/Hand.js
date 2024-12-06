@@ -380,24 +380,10 @@ function Hand({
 	useEffect(() => {
 		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
 	}, [player, players]);
-
-	const drawBundle = useTipBundle("You can't play any tiles, so you have to draw.");
-	useEffect(() => {
-		if (hintedTiles.length == 0 && hintedSpacer.length == 0) {
-			drawBundle.setShow(true);
-		}
-	}, [hintedTiles, hintedSpacer]);
-	
-	const passBundle = useTipBundle("You've drawn a tile. You can play it or pass.");
-	useEffect(() => {
-		if (player?.just_drew || bagCount == 0) {
-			passBundle.setShow(true);
-		}
-	}, [player, bagCount]);
 	
 	const spacerBundle = useTipBundle("You've got a double that can be used to start a free line. Select it, then choose a square next to a playable line, and choose another square 5 spaces away.");
 	useEffect(() => {
-		if (hintedSpacer.length > 0) {
+		if (hintedSpacer !== null && hintedSpacer.length > 0) {
 			spacerBundle.setShow(true);
 		}
 	}, [hintedSpacer]);
@@ -432,8 +418,6 @@ function Hand({
 					}
 					{!hidden && <div className=" flex items-center gap-2">
 						<div className="flex flex-row gap-1 justify-center">
-							<Tip bundle={drawBundle} />
-							<Tip bundle={passBundle} />
 							<Button
 								size="small"
 								className="w-14"
