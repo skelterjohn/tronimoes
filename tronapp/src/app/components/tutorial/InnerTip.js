@@ -26,12 +26,7 @@ export default function InnerTip({ bundle }) {
 		const bundleDone = messageDones.get(bundle.message);
 
 		if (bundleDone) {
-			setActiveRef((prev) => {
-				if (prev === tipRef?.current) {
-					return null;
-				}
-				return prev;
-			});
+			setActiveRef((prev) => prev === tipRef?.current ? null : prev);
 			return;
 		}
 
