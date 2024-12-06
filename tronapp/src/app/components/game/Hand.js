@@ -4,6 +4,8 @@ import ChickenFoot from '../board/ChickenFoot';
 import { Button } from "antd";
 import Image from "next/image";
 import React from "./React";
+import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
+
 function Hand({
 		player, players,
 		hidden = false, dead = false,
@@ -379,26 +381,19 @@ function Hand({
 		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
 	}, [player, players]);
 
-	function DrawPassButtons() {
-		return <div className="flex flex-row gap-1 justify-center">
-			<Button
-				size="small"
-				className="w-14"
-				disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
-				onClick={drawTile}
-			>
-				draw
-			</Button>
-			<Button
-				size="small"
-				className="w-14"
-				disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
-				onClick={passTurn}
-			>
-				pass
-			</Button>
-		</div>;
-	}
+	const drawBundle = useTipBundle("You can't play any tiles, so you have to draw.");
+	useEffect(() => {
+		if (hintedTiles.length == 0 && hintedSpacer.length == 0) {
+			drawBundle.setShow(true);
+		}
+	}, [hintedTiles, hintedSpacer]);
+	
+	const passBundle = useTipBundle("You've drawn a tile. You can play it or pass.");
+	useEffect(() => {
+		if (player?.just_drew || bagCount == 0) {
+			passBundle.setShow(true);
+		}
+	}, [player, bagCount]);
 
 	return (
 		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
@@ -429,7 +424,26 @@ function Hand({
 						</div>
 					}
 					{!hidden && <div className=" flex items-center gap-2">
-						<DrawPassButtons/>
+						<div className="flex flex-row gap-1 justify-center">
+							<Tip bundle={drawBundle} />
+							<Tip bundle={passBundle} />
+							<Button
+								size="small"
+								className="w-14"
+								disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
+								onClick={drawTile}
+							>
+								draw
+							</Button>
+							<Button
+								size="small"
+								className="w-14"
+								disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
+								onClick={passTurn}
+							>
+								pass
+							</Button>
+						</div>;
 						<div className="flex flex-row items-center ">
 							<Image 
 								src="/bag.png" 
