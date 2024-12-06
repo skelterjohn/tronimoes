@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import InnerTip from "./InnerTip";
+import { useState, useContext, useCallback } from "react";
+import InnerTip, { TipContext } from "./InnerTip";
 import { useGameState } from "@/app/components/GameState";
 
 export default function Tip({ bundle }) {
@@ -17,7 +17,14 @@ export default function Tip({ bundle }) {
 }
 
 export function useTipBundle(message) {
+
+	const { messageDones } = useContext(TipContext);
+
 	const [show, setShow] = useState(false);
 	
-	return { show, setShow, message };
+	const done = useCallback(() => {
+		return messageDones.get(message);
+	}, [messageDones, message]);
+
+	return { show, setShow, message, done };
 }
