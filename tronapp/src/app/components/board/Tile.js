@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Pips from "./Pips";
-import Tip, { makeTipBundle } from "@/app/components/tutorial/Tip";
+import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 
 const TileHalf = ({ pips, back, orientation }) => {
 	var outercnm = "w-full aspect-square";
@@ -132,35 +132,35 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		setIndicated({ a: pipsa, b: pipsb });
 	}
 
-	const playATileBundle = makeTipBundle("This tile is raised, which means it is currently playable.");
+	const playATileBundle = useTipBundle("This tile is raised, which means it is currently playable.");
 	useEffect(() => {
 		if (hinted) {
 			playATileBundle.setShow(true);
 		}
 	}, [hinted]);
 
-	const rotateBundle = makeTipBundle("You can rotate the tile by clicking or tapping on it.");
+	const rotateBundle = useTipBundle("You can rotate the tile by clicking or tapping on it.");
 	useEffect(() => {
 		if (selected) {
 			rotateBundle.setShow(true);
 		}
 	}, [selected]);
 
-	const dragBundle = makeTipBundle("Once it's oriented, you can drag it to the board.");
+	const dragBundle = useTipBundle("Once it's oriented, you can drag it to the board.");
 	useEffect(() => {
 		if (rotateBundle.done && selected && orientation !== "down") {
 			dragBundle.setShow(true);
 		}
 	}, [selected, orientation, rotateBundle.done]);
 
-	const roundLeaderBundle = makeTipBundle("This tile is the round leader. Your own line must start adjacent to this tile.");
+	const roundLeaderBundle = useTipBundle("This tile is the round leader. Your own line must start adjacent to this tile.");
 	useEffect(() => {
 		if (roundLeader && roundLeader.pips_a === pipsa && roundLeader.pips_b === pipsb) {
 			roundLeaderBundle.setShow(true);
 		}
 	}, [roundLeader, pipsa, pipsb]);
 
-	const freeLeaderBundle = makeTipBundle("This tile is a free line leader. One free line starts here, and anyone may play on it.");
+	const freeLeaderBundle = useTipBundle("This tile is a free line leader. One free line starts here, and anyone may play on it.");
 	useEffect(() => {
 		if (!freeLeaders) {
 			return;

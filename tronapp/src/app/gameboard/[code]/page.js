@@ -1,5 +1,5 @@
 import Game from "@/app/components/game/Game";
-import { TipProvider } from "@/app/components/tutorial/Tip";
+import { TipProvider } from "@/app/components/tutorial/InnerTip";
 export default function Gameboard({params}) {
   return (
     <div className="h-screen flex justify-center">

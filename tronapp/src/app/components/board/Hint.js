@@ -1,13 +1,13 @@
 
-import Tip, { makeTipBundle } from "@/app/components/tutorial/Tip";
+import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 import { useEffect } from "react";
 
 export default function Hint() {
-	const hintBundle = makeTipBundle("This white square indicates the tile you have selected can be played here.");
+	const hintBundle = useTipBundle("This white square indicates the tile you have selected can be played here.");
 	useEffect(() => {
 		hintBundle.setShow(true);
 	}, []);
-	const clickBundle = makeTipBundle("You can also click the squares. First click where the top of the tile goes, then the bottom.");
+	const clickBundle = useTipBundle("You can also click the squares. First click where the top of the tile goes, then the bottom.");
 	useEffect(() => {
 		if (hintBundle.done) {
 			clickBundle.setShow(true);
