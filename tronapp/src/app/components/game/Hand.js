@@ -394,6 +394,13 @@ function Hand({
 			passBundle.setShow(true);
 		}
 	}, [player, bagCount]);
+	
+	const spacerBundle = useTipBundle("You've got a double that can be used to start a free line. Select it, then choose a square next to a playable line, and choose another square 5 spaces away.");
+	useEffect(() => {
+		if (hintedSpacer.length > 0) {
+			spacerBundle.setShow(true);
+		}
+	}, [hintedSpacer]);
 
 	return (
 		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
@@ -486,6 +493,7 @@ function Hand({
 							<div className="w-fit flex flex-wrap content-start justify-start">
 								{!hidden && (
 									<div className="max-h-[120px] aspect-[1/2] p-1">
+										<Tip bundle={spacerBundle} />
 										<div
 											className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
 											onClick={spacerClicked}
