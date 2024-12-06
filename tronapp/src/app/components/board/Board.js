@@ -176,7 +176,7 @@ export default function Board({
 												)}
 												{tiles[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute">
-														{tiles[`${x},${y}`].color != "white" && <Tip bundle={lineBundle} /> }
+														{tiles[`${x},${y}`].color !== "white" && <Tip bundle={lineBundle} /> }
 														<Tile
 															pipsa={tiles[`${x},${y}`].a}
 															pipsb={tiles[`${x},${y}`].b}

@@ -148,7 +148,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 
 	const dragBundle = useTipBundle("Once it's oriented, you can drag it to the board.");
 	useEffect(() => {
-		if (rotateBundle.done && selected && orientation !== "down") {
+		if (rotateBundle.done() && selected && orientation !== "down") {
 			dragBundle.setShow(true);
 		}
 	}, [selected, orientation, rotateBundle.done]);

@@ -9,7 +9,7 @@ export default function Hint() {
 	}, []);
 	const clickBundle = useTipBundle("You can also click the squares. First click where the top of the tile goes, then the bottom.");
 	useEffect(() => {
-		if (hintBundle.done) {
+		if (hintBundle.done()) {
 			clickBundle.setShow(true);
 		}
 	}, [hintBundle.done]);
