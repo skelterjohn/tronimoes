@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+@import '@fortawesome/fontawesome-free/css/all.css';
 
 :root {
   --background: #ffffff;
