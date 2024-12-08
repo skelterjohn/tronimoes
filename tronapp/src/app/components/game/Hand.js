@@ -281,14 +281,11 @@ function Hand({
 	}, [dragOrientation, hidden, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile]);
 
 	const handleTouchEnd = useCallback((targetTile, e) => {
+		// Remove the ghost element and ensure cleanup
+		cleanupGhostElement();
+
 		setHoveredSquares(new Set([]));
 		if (!draggedTile || !touchStartPos) return;
-		
-		// Remove the ghost element
-		const ghost = document.getElementById('touch-ghost');
-		if (ghost) {
-			ghost.parentElement.removeChild(ghost);
-		}
 		
 		// Get the element under the touch point
 		const touch = e.changedTouches[0];
@@ -310,6 +307,37 @@ function Hand({
 		setTouchStartPos(null);
 		setDraggedTile(null);
 	}, [setTouchStartPos, setDraggedTile]);
+
+	// Update cleanup function to be more aggressive
+	const cleanupGhostElement = () => {
+		// Find all elements with id starting with 'touch-ghost'
+		const ghosts = document.querySelectorAll('[id^="touch-ghost"]');
+		ghosts.forEach(ghost => {
+			try {
+				ghost.remove();
+			} catch (e) {
+				// If direct removal fails, try removing via parent
+				if (ghost.parentElement) {
+					ghost.parentElement.removeChild(ghost);
+				}
+			}
+		});
+	};
+
+	// Add cleanup to component unmount
+	useEffect(() => {
+		return () => {
+			cleanupGhostElement();
+		};
+	}, []);
+
+	// Add new touch cancel handler
+	const handleTouchCancel = useCallback(() => {
+		setHoveredSquares(new Set([]));
+		cleanupGhostElement();
+		setTouchStartPos(null);
+		setDraggedTile(null);
+	}, []);
 
 	const hoverTile = useCallback((x, y) => {
 		if (!selectedTile) {
@@ -337,11 +365,14 @@ function Hand({
 	}, [selectedTile, dragOrientation, setHoveredSquares]);
 
 	const handleTouchMove = useCallback((e) => {
-		if (!touchStartPos) return;
+		if (!touchStartPos) {
+			cleanupGhostElement();
+			return;
+		}
 		
-		// Move the ghost element
 		const ghost = document.getElementById('touch-ghost');
 		if (!ghost) {
+			cleanupGhostElement();
 			return;
 		}
 		const touch = e.touches[0];
@@ -501,6 +532,7 @@ function Hand({
 											onTouchStart={(e) => handleTouchStart(t, e)}
 											onTouchMove={(e) => handleTouchMove(e)}
 											onTouchEnd={(e) => handleTouchEnd(t, e)}
+											onTouchCancel={handleTouchCancel}
 										>
 											<div
 												className={`max-h-[120px] aspect-[1/2] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
