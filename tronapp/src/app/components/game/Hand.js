@@ -383,7 +383,7 @@ function Hand({
 	
 	const spacerBundle = useTipBundle("You've got a double that can be used to start a free line. Select it, then choose a square next to a playable line, and choose another square 5 spaces away.");
 	useEffect(() => {
-		if (hintedSpacer !== null && hintedSpacer.length > 0) {
+		if (hintedSpacer && hintedSpacer.length > 0) {
 			spacerBundle.setShow(true);
 		}
 	}, [hintedSpacer]);

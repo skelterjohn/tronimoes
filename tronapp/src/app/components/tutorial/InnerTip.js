@@ -33,23 +33,37 @@ export default function InnerTip({ bundle }) {
 		}
 
 		setActiveRef((prev) => prev === null ? tipRef?.current : prev);
-		setParentBounds(tipRef.current?.parentElement?.getBoundingClientRect());
+		
+		// Add retry logic for getting parent bounds
+		const getBounds = (retry = false) => {
+			const bounds = tipRef.current?.parentElement?.getBoundingClientRect();
+			if (bounds && (bounds.width === 0 && bounds.height === 0)) {
+				// Retry after a short delay if bounds are invalid
+				if (retry) {
+					setTimeout(getBounds, 100);
+				}
+			} else {
+				setParentBounds(bounds);
+			}
+		};
+		
+		getBounds(true);
 	}, [messageDones, tipRef?.current, setActiveRef]);
 
 	useEffect(() => {
 		if (tipRef.current && tooltipRef.current && parentBounds) {
 			const tooltipRect = tooltipRef.current.getBoundingClientRect();
 			const viewportWidth = window.innerWidth;
-			const viewportHeight = window.innerHeight;
+			const viewportHeight = document.documentElement.clientHeight;
 
+			// Center horizontally
 			let left = parentBounds.left + (parentBounds.width / 2);
-			let top = parentBounds.top + (parentBounds.height / 2);
+			left = Math.min(left, viewportWidth - tooltipRect.width - 10);
+			left = Math.max(left, 10);
 
-			left = Math.min(left, viewportWidth - (tooltipRect.width / 2) - 10);
-			top = Math.min(top, viewportHeight - (tooltipRect.height / 2) - 10);
-
-			left = Math.max(left, tooltipRect.width / 2 + 10);
-			top = Math.max(top, tooltipRect.height / 2 + 10);
+			// Always position at bottom of viewport
+			const mobileBottomPadding = window.innerWidth < 768 ? 60 : 10;
+			const top = viewportHeight - tooltipRect.height - mobileBottomPadding;
 
 			setPosition({ left, top });
 		}
@@ -63,31 +77,68 @@ export default function InnerTip({ bundle }) {
 		return null;
 	}
 
+	console.log(parentBounds);
 	return (
 		<div ref={tipRef}>
-			{createPortal(
-				<div
-					ref={tooltipRef}
-					onClick={(event) => {
-						event.stopPropagation();
-						setMessageDones((prev) => {
-							const newMap = new Map(prev);
-							newMap.set(bundle.message, true);
-							return newMap;
-						});
-						setActiveRef(null);
-					}}
-					className="absolute z-50 border border-black bg-white rounded-lg shadow-lg"
-					style={{
-						position: 'fixed',
-						left: position.left,
-						top: position.top,
-						//transform: 'translate(-50%, -50%)'
-					}}
-				>	
-					<i className="rotate-45 fas fa-arrow-left"></i>
-					<div className="p-2 text-black">{bundle.message}</div>
-				</div>,
+			{parentBounds && parentBounds?.width > 0 && createPortal(
+				<>
+					<svg 
+						style={{
+							position: 'fixed',
+							top: 0,
+							left: 0,
+							width: '100%',
+							height: '100%',
+							pointerEvents: 'none',
+							zIndex: 49
+						}}
+					>
+						<line
+							x1={parentBounds.left + (parentBounds.width / 2)}
+							y1={parentBounds.top + (parentBounds.height / 2)}
+							x2={position.left + (tooltipRef.current?.offsetWidth || 0) / 2}
+							y2={position.top}
+							stroke="black"
+							strokeWidth="6"
+						/>
+						<line
+							x1={parentBounds.left + (parentBounds.width / 2)}
+							y1={parentBounds.top + (parentBounds.height / 2)}
+							x2={position.left + (tooltipRef.current?.offsetWidth || 0) / 2}
+							y2={position.top}
+							stroke="white"
+							strokeWidth="4"
+						/>
+						<circle 
+							cx={parentBounds.left + (parentBounds.width / 2)}
+							cy={parentBounds.top + (parentBounds.height / 2)}
+							r="8"
+							fill="white"
+							stroke="black"
+							strokeWidth="2"
+						/>
+					</svg>
+					<div
+						ref={tooltipRef}
+						onClick={(event) => {
+							event.stopPropagation();
+							setMessageDones((prev) => {
+								const newMap = new Map(prev);
+								newMap.set(bundle.message, true);
+								return newMap;
+							});
+							setActiveRef(null);
+						}}
+						className="absolute z-50 border border-black bg-white rounded-lg shadow-lg"
+						style={{
+							position: 'fixed',
+							left: position.left,
+							top: position.top,
+						}}
+					>	
+						<div className="p-2 text-black">{bundle.message}</div>
+					</div>
+				</>,
 				document.body
 			)}
 		</div>
