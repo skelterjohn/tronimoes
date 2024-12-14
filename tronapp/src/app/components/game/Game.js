@@ -19,10 +19,17 @@ const availableColors = [
 	"fuchsia",
 ]
 
-const dealAudio = new Audio('/sfx/deal.mp3');
-const layAudio = new Audio('/sfx/lay.mp3');
-const drawAudio = new Audio('/sfx/draw.mp3');
-const footedAudio = new Audio('/sfx/footed.mp3');
+function loadAudio(url) {
+	if (typeof window !== 'undefined') {
+		return new Audio(url);
+	}
+	return null;
+}
+
+const dealAudio = loadAudio('/sfx/deal.mp3');
+const layAudio = loadAudio('/sfx/lay.mp3');
+const drawAudio = loadAudio('/sfx/draw.mp3');
+const footedAudio = loadAudio('/sfx/footed.mp3');
 
 function Game({ code }) {
 	const router = useRouter();

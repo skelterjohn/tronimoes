@@ -17,9 +17,6 @@ const geistMono = localFont({
 export const metadata = {
 	title: "tronimoes",
 	description: "tronimoes",
-	viewport: 'width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no',
-	'apple-mobile-web-app-capable': 'yes',
-	'mobile-web-app-capable': 'yes',
 };
 
 export default function RootLayout({ children }) {
