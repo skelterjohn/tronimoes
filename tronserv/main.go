@@ -15,9 +15,10 @@ import (
 )
 
 var (
-	addr = flag.String("addr", "0.0.0.0", "address to listen on")
-	port = flag.Int("port", 8080, "port to listen on")
-	env  = flag.String("env", "", "firestore env (unset to use MemoryStore)")
+	addr   = flag.String("addr", "0.0.0.0", "address to listen on")
+	port   = flag.Int("port", 8080, "port to listen on")
+	env    = flag.String("env", "", "firestore env (unset to use MemoryStore)")
+	noCors = flag.Bool("no-cors", false, "disable cors")
 )
 
 func main() {
@@ -26,8 +27,12 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+	allowedOrigins := []string{"http://localhost:3000", "http://localhost:*", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"}
+	if *noCors {
+		allowedOrigins = []string{"*"}
+	}
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000", "http://localhost:*", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"},
+		AllowedOrigins: allowedOrigins,
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{
 			"Accept", "Authorization", "Content-Type", "X-CSRF-Token",

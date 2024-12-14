@@ -105,5 +105,7 @@ class Client {
 
 
 export default function clientFor(name, id, key) {
-    return new Client(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080', name, id, key);
+	const baseURL = process.env.NEXT_PUBLIC_API_URL || 
+                   `${window.location.protocol}//${window.location.hostname}:8080`;
+    return new Client(baseURL, name, id, key);
 }
