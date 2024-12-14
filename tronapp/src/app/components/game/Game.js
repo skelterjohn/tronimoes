@@ -594,8 +594,13 @@ function Game({ code }) {
 			</div>
 
 			<div className="flex justify-center flex-1 min-h-0">
-				<div className="flex-1 min-w-[15rem] flex justify-right hidden lg:block">
-					<History history={gameHistory} />
+				<div className="h-full min-w-[15rem] flex justify-right hidden lg:block">
+					<div className="h-[50%]">
+				        <History history={gameHistory} />
+				    </div>
+				    <div className="h-[50%]">
+				        <History history={roundHistory} />
+				    </div>
 				</div>
 				<div className="flex justify-center items-center overflow-auto">
 					<div className="aspect-square h-auto" style={{ maxHeight: 'min(100%, 100vw)' }}>
@@ -626,9 +631,6 @@ function Game({ code }) {
 						/>
 						<WhyNot message={playErrorMessage} />
 					</div>
-				</div>
-				<div className="flex-1 min-w-[15rem] hidden lg:block">
-					<History history={roundHistory} />
 				</div>
 			</div>
 
