@@ -147,9 +147,9 @@ export default function Board({
 	}, [tiles]);
 
 	return (
-		<div onContextMenu={rightClick} className={`aspect-square h-full border-8 border-gray-500 flex items-center justify-center ${gutterColor}`}>
-			<div className="aspect-square pb-[100%] min-w-0 min-h-0" style={{ maxHeight: '100%', maxWidth: '100%' }}>
-				<div className="aspect-square">
+		<div onContextMenu={rightClick} className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center ${gutterColor}`}>
+			<div className="aspect-square w-full h-full" style={{ maxHeight: '100%', maxWidth: '100%' }}>
+				<div className="aspect-square w-full h-full">
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							{Array.from({ length: height }, (_, y) => (
