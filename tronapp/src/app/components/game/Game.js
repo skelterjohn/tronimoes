@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useGameState } from '../GameState';
 import Board from '../board/Board';
 import Hand from './Hand';
+import Opponent from './Opponent';
 import History from './History';
 import { Button, Checkbox } from 'antd';
 import WhyNot from './WhyNot';
@@ -576,7 +577,7 @@ function Game({ code }) {
 			<div className="flex justify-center items-center gap-4 h-[60px] w-screen md:w-auto">
 				{opponents.map((o, i) => (
 					<div key={i} className="flex-1 overflow-x-auto">
-						<Hand
+						<Opponent
 							player={o}
 							
 							players={players}
