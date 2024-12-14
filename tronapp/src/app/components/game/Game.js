@@ -603,7 +603,7 @@ function Game({ code }) {
 					</div>
 				</div>
 				<div className="flex flex-col justify-start items-center overflow-auto">
-					<div className="aspect-square h-auto" style={{ maxHeight: 'min(100%, 100vw)' }}>
+					<div className="aspect-square h-auto" style={{ maxHeight: 'min(75%, 100vw)' }}>
 						<Board
 							width={boardWidth} height={boardHeight}
 							tiles={laidTiles}
