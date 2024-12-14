@@ -8,7 +8,7 @@ import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 
 function Hand({
 		player, players,
-		hidden = false, dead = false,
+		dead = false,
 		selectedTile, setSelectedTile,
 		playerTurn,
 		drawTile, passTurn,
@@ -124,9 +124,6 @@ function Hand({
 	}, [player]);
 
 	const tileClicked = useCallback((tile) => {
-		if (hidden) {
-			return;
-		}
 		setHoveredSquares(new Set([]));
 		if (selectedTile === tile) {
 			toggleOrientation();
@@ -138,11 +135,8 @@ function Hand({
 
 	const spacerClicked = useCallback(() => {
 		setHoveredSquares(new Set([]));
-		if (hidden) {
-			return;
-		}
 		setSelectedTile({ a: -1, b: -1 });
-	}, [setSelectedTile, setHoveredSquares, hidden]);
+	}, [setSelectedTile, setHoveredSquares]);
 
 	useEffect(() => {
 		if (setDragOrientation) {
@@ -153,7 +147,7 @@ function Hand({
 	const [isDragging, setIsDragging] = useState(false);
 
 	const handleDragStart = useCallback((tile, e) => {
-		if (hidden || e.target !== e.currentTarget) return;
+		if (e.target !== e.currentTarget) return;
 		
 		// Create a clone of the entire tile container including its children
 		const ghost = e.currentTarget.cloneNode(true);
@@ -198,17 +192,16 @@ function Hand({
 		requestAnimationFrame(() => {
 			document.body.removeChild(ghost);
 		});
-	}, [dragOrientation, hidden, selectedTile]);
+	}, [dragOrientation, selectedTile]);
 
 	const handleDrop = useCallback((targetTile, e) => {
 		setIsDragging(false);
 		setHoveredSquares(new Set([]));
-		if (hidden) return;
 		e.preventDefault();
 		const sourceTile = JSON.parse(e.dataTransfer.getData('text/plain'));
 		// Here you can add logic to swap tiles in the hand
 		moveTile(sourceTile, targetTile);
-	}, [moveTile, hidden, setIsDragging, setHoveredSquares]);
+	}, [moveTile, setIsDragging, setHoveredSquares]);
 
 	useEffect(() => {
 		if (!isDragging || mouseIsOver === undefined || mouseIsOver[0] === -1 || mouseIsOver[1] === -1) {
@@ -258,8 +251,6 @@ function Hand({
 	}
 
 	const handleTouchStart = useCallback((tile, e) => {
-		if (hidden) return;
-		
 		// Create ghost element
 		const ghost = e.target.cloneNode(true);
 		ghost.id = 'touch-ghost';
@@ -278,7 +269,7 @@ function Hand({
 		setSelectedTile(tile);
 		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
 		setDraggedTile(tile);
-	}, [dragOrientation, hidden, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile]);
+	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile]);
 
 	const handleTouchEnd = useCallback((targetTile, e) => {
 		// Remove the ghost element and ensure cleanup
@@ -448,7 +439,7 @@ function Hand({
 							</div>
 						</div>
 					}
-					{!hidden && <div className=" flex items-center gap-2">
+					<div className=" flex items-center gap-2">
 						<div className="flex flex-row gap-1 justify-center">
 							<Button
 								size="small"
@@ -485,81 +476,63 @@ function Hand({
 							onClick={() => setShowReactModal(true)}>
 							react
 						</Button>
-					</div>}
+					</div>
 				</div>
 			</div>
-			{hidden && (
-				<div className="flex flex-row items-center gap-1">
-					<div className="w-[1rem]">
-						<Tile
-							color={player?.color}
-							pipsa={0}
-							pipsb={0}
-							back={true}
-							dead={dead}
-						/>
-					</div>
-					<div>x{player?.hand?.length}</div>
-				</div>
-			)}
-			{!hidden && (
-				<div className="w-full flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
-					<div className="w-full min-h-[10rem] flex flex-col flex-1">
-						<div className="w-full flex flex-row justify-center">
-							<div className="w-fit flex flex-wrap content-start justify-start">
-								{!hidden && (
-									<div className="max-h-[120px] aspect-[1/2] p-1">
-										<Tip bundle={spacerBundle} />
+			<div className="w-full flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
+				<div className="w-full min-h-[10rem] flex flex-col flex-1">
+					<div className="w-full flex flex-row justify-center">
+						<div className="w-fit flex flex-wrap content-start justify-start">
+							<div className="max-h-[120px] aspect-[1/2] p-1">
+								<Tip bundle={spacerBundle} />
+								<div
+									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
+									onClick={spacerClicked}
+								>
+									FREE LINE
+								</div>
+							</div>
+							{handOrder.map((t, i) => {
+								const isSelected = playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b;
+								return (
+									<div
+										key={i}
+										draggable={true}
+										data-tile={JSON.stringify(t)}
+										onClick={() => tileClicked(t)}
+										onDragStart={(e) => handleDragStart(t, e)}
+										onDrop={(e) => handleDrop(t, e)}
+										onDragOver={handleDragOver}
+										onTouchStart={(e) => handleTouchStart(t, e)}
+										onTouchMove={(e) => handleTouchMove(e)}
+										onTouchEnd={(e) => handleTouchEnd(t, e)}
+										onTouchCancel={handleTouchCancel}
+									>
 										<div
-											className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
-											onClick={spacerClicked}
-										>
-											FREE LINE
-										</div>
-									</div>
-								)}
-								{!hidden && handOrder.map((t, i) => {
-									const isSelected = playerTurn && selectedTile !== undefined && t.a === selectedTile.a && t.b === selectedTile.b;
-									return (
-										<div
-											key={i}
-											draggable={true}
-											data-tile={JSON.stringify(t)}
-											onClick={() => tileClicked(t)}
-											onDragStart={(e) => handleDragStart(t, e)}
-											onDrop={(e) => handleDrop(t, e)}
-											onDragOver={handleDragOver}
-											onTouchStart={(e) => handleTouchStart(t, e)}
-											onTouchMove={(e) => handleTouchMove(e)}
-											onTouchEnd={(e) => handleTouchEnd(t, e)}
-											onTouchCancel={handleTouchCancel}
-										>
-											<div
-												className={`max-h-[120px] aspect-[1/2] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
-												>
-												<div className="pointer-events-none">
-													<Tile
-														draggable={false}
-														color={player?.color}
-														pipsa={t.a}
-														pipsb={t.b}
-														back={false}
-														dead={dead}
-														hintedTiles={hintedTiles}
-														selected={isSelected}
-													/>
-												</div>
+											className={`max-h-[120px] aspect-[1/2] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
+											>
+											<div className="pointer-events-none">
+												<Tile
+													draggable={false}
+													color={player?.color}
+													pipsa={t.a}
+													pipsb={t.b}
+													back={false}
+													dead={dead}
+													hintedTiles={hintedTiles}
+													selected={isSelected}
+												/>
 											</div>
 										</div>
-									);
-								})}
-							</div>
-							{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
-							{!hidden && <div className="w-[1rem]"></div>}
+									</div>
+								);
+							})}
 						</div>
+						{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
+						<div className="w-[1rem]"></div>
 					</div>
 				</div>
-			)}
+			</div>
 		</div>
 	);
 }
