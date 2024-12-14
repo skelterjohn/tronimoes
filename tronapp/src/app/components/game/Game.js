@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameState } from '../GameState';
 import Board from '../board/Board';
@@ -542,6 +542,33 @@ function Game({ code }) {
 		setPrevTilesInBag(tilesInBag);
 	}, [tilesInBag]);
 
+	const rightGutterDiv = useRef(null);
+	const [rightGutterWidth, setRightGutterWidth] = useState(0);
+	useEffect(() => { 
+		const updateWidth = () => {
+			if (rightGutterDiv.current) {
+				setRightGutterWidth(rightGutterDiv.current.offsetWidth);
+			}
+		};
+	
+		// Initial measurement
+		updateWidth();
+
+		const resizeObserver = new ResizeObserver(updateWidth);
+		if (rightGutterDiv.current) {
+			resizeObserver.observe(rightGutterDiv.current);
+		}
+
+		// Add resize listener
+		window.addEventListener('resize', updateWidth);
+	
+		// Cleanup
+		return () => {
+			window.removeEventListener('resize', updateWidth);
+			resizeObserver.disconnect();
+		}
+	}, [rightGutterDiv, setRightGutterWidth]);
+
 	return (
 		<div className="h-full bg-black text-white flex flex-col">
 			<div className="flex p-3 justify-end items-center min-h-[50px]">
@@ -689,6 +716,7 @@ function Game({ code }) {
 						</div>
 					</>}
 				</div>
+				<div ref={rightGutterDiv} className="flex-1">extra</div>
 			</div>
 
 
