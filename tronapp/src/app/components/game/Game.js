@@ -596,13 +596,13 @@ function Game({ code }) {
 			<div className="flex justify-center flex-1 min-h-0">
 				<div className="h-full min-w-[15rem] flex justify-right hidden lg:block">
 					<div className="h-[50%]">
-				        <History history={gameHistory} />
-				    </div>
-				    <div className="h-[50%]">
-				        <History history={roundHistory} />
-				    </div>
+						<History history={gameHistory} />
+					</div>
+					<div className="h-[50%]">
+						<History history={roundHistory} />
+					</div>
 				</div>
-				<div className="flex flex-col justify-center items-center overflow-auto">
+				<div className="flex flex-col justify-start items-center overflow-auto">
 					<div className="aspect-square h-auto" style={{ maxHeight: 'min(100%, 100vw)' }}>
 						<Board
 							width={boardWidth} height={boardHeight}
@@ -632,64 +632,62 @@ function Game({ code }) {
 						<WhyNot message={playErrorMessage} />
 					</div>
 					
-					{player &&
-						<>
-							<div className="hidden md:block h-[150px] w-screen md:w-auto">
-								<div className="w-full h-full overflow-x-auto overflow-y-auto">
-		              <Hand
-		                player={player}
-		                players={players}
-		                name={playerName}
-		                hidden={false}
-		                selectedTile={selectedTile}
-		                setSelectedTile={setSelectedTile}
-		                playerTurn={myTurn}
-		                drawTile={drawTile}
-		                passTurn={passTurn}
-		                roundInProgress={roundInProgress}
-		                hintedTiles={hintedTiles}
-		                hintedSpacer={player.spacer_hints}
-		                bagCount={bagCount}
-		                turnIndex={turnIndex}
-		                playTile={playTile}
-		                setHoveredSquares={setHoveredSquares}
-		                mouseIsOver={mouseIsOver}
-		                dragOrientation={dragOrientation}
-		                setDragOrientation={setDragOrientation}
-		                toggleOrientation={toggleOrientation}
-		                setShowReactModal={setShowReactModal}
-		              />
-								</div>
+					{player && <>
+						<div className="hidden md:block h-full w-full min-h-[150px]">
+							<div className="w-full h-full overflow-x-auto overflow-y-auto">
+								<Hand
+									player={player}
+									players={players}
+									name={playerName}
+									hidden={false}
+									selectedTile={selectedTile}
+									setSelectedTile={setSelectedTile}
+									playerTurn={myTurn}
+									drawTile={drawTile}
+									passTurn={passTurn}
+									roundInProgress={roundInProgress}
+									hintedTiles={hintedTiles}
+									hintedSpacer={player.spacer_hints}
+									bagCount={bagCount}
+									turnIndex={turnIndex}
+									playTile={playTile}
+									setHoveredSquares={setHoveredSquares}
+									mouseIsOver={mouseIsOver}
+									dragOrientation={dragOrientation}
+									setDragOrientation={setDragOrientation}
+									toggleOrientation={toggleOrientation}
+									setShowReactModal={setShowReactModal}
+								/>
 							</div>
-							<div className="block md:hidden flex-1 h-[150px] w-screen md:w-auto">
-								<div className="w-full h-full overflow-x-auto overflow-y-auto">
-		              <Hand
-		                player={player}
-		                players={players}
-		                name={playerName}
-		                hidden={false}
-		                selectedTile={selectedTile}
-		                setSelectedTile={setSelectedTile}
-		                playerTurn={myTurn}
-		                drawTile={drawTile}
-		                passTurn={passTurn}
-		                roundInProgress={roundInProgress}
-		                hintedTiles={hintedTiles}
-		                hintedSpacer={player.spacer_hints}
-		                bagCount={bagCount}
-		                turnIndex={turnIndex}
-		                playTile={playTile}
-		                setHoveredSquares={setHoveredSquares}
-		                mouseIsOver={mouseIsOver}
-		                dragOrientation={dragOrientation}
-		                setDragOrientation={setDragOrientation}
-		                toggleOrientation={toggleOrientation}
-		                setShowReactModal={setShowReactModal}
-		                />
-								</div>
+						</div>
+						<div className="block md:hidden flex-1 h-[150px] w-screen md:w-auto">
+							<div className="w-full h-full overflow-x-auto overflow-y-auto">
+								<Hand
+									player={player}
+									players={players}
+									name={playerName}
+									hidden={false}
+									selectedTile={selectedTile}
+									setSelectedTile={setSelectedTile}
+									playerTurn={myTurn}
+									drawTile={drawTile}
+									passTurn={passTurn}
+									roundInProgress={roundInProgress}
+									hintedTiles={hintedTiles}
+									hintedSpacer={player.spacer_hints}
+									bagCount={bagCount}
+									turnIndex={turnIndex}
+									playTile={playTile}
+									setHoveredSquares={setHoveredSquares}
+									mouseIsOver={mouseIsOver}
+									dragOrientation={dragOrientation}
+									setDragOrientation={setDragOrientation}
+									toggleOrientation={toggleOrientation}
+									setShowReactModal={setShowReactModal}
+								/>
 							</div>
-						</>
-					}
+						</div>
+					</>}
 				</div>
 			</div>
 
