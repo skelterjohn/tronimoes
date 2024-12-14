@@ -26,13 +26,14 @@ export default function InnerTip({ bundle }) {
 
 	useEffect(() => {
 		const bundleDone = messageDones.get(bundle.message);
+		const currentTipRef = tipRef.current;
 
 		if (bundleDone) {
-			setActiveRef((prev) => prev === tipRef?.current ? null : prev);
+			setActiveRef((prev) => prev === currentTipRef ? null : prev);
 			return;
 		}
 
-		setActiveRef((prev) => prev === null ? tipRef?.current : prev);
+		setActiveRef((prev) => prev === null ? currentTipRef : prev);
 		
 		// Add retry logic for getting parent bounds
 		const getBounds = (retry = false) => {
@@ -48,7 +49,7 @@ export default function InnerTip({ bundle }) {
 		};
 		
 		getBounds(true);
-	}, [messageDones, tipRef?.current, setActiveRef]);
+	}, [messageDones, bundle.message, setActiveRef]);
 
 	useEffect(() => {
 		if (tipRef.current && tooltipRef.current && parentBounds) {

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Input } from "antd";
+import { Input } from "antd";
+import Button from '@/app/components/Button';
 import { useRouter } from "next/navigation";
 
 import { useGameState } from '../../components/GameState';
@@ -18,9 +19,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		if (!isRegistered) {
 			// Add a small delay to ensure DOM is ready and other focus events have completed
 			const timer = setTimeout(() => {
-				if (inputRef.current && document.activeElement !== inputRef.current) {
-					inputRef.current.focus();
-				}
+				inputRef.current?.focus?.();
 			}, 100);
 			
 			return () => clearTimeout(timer);
@@ -99,7 +98,6 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 			</div>
 		) : (
 			<Input
-				ref={inputRef}
 				placeholder="enter your designation"
 				size="large"
 				className="text-lg"

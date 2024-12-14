@@ -60,7 +60,7 @@ function VisionQuest({ title = "Vision Quest", placeholder = "enter your path", 
 			className="vision-quest-modal"
 		>
 			<Input
-				ref={inputRef}
+				inputRef={inputRef}
 				placeholder={placeholder}
 				value={path}
 				onChange={(e) => setPath(e.target.value)}

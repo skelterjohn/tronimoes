@@ -1,8 +1,7 @@
 import { Modal } from "antd";
-import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, fetchSignInMethodsForEmail, signInWithCredential, linkWithCredential } from "firebase/auth";
+import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, linkWithCredential } from "firebase/auth";
 import { Button } from "antd";
 import { auth } from "@/config";
-import { useEffect } from "react";
 
 export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) {
 	const signInAsGuest = async () => {

@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import Joiner from './components/landing/Joiner';
 import SignIn from './components/landing/SignIn';
 import { auth } from "@/config";
@@ -13,7 +12,7 @@ import { useGameState } from './components/GameState';
 export default function Home() {
 	const [errorMessage, setErrorMessage] = useState(null);
 	const [showSignIn, setShowSignIn] = useState(false);
-	const { userInfo, setUserInfo, persistentUser, loading, error } = useGameState();
+	const { userInfo, setUserInfo, loading, error } = useGameState();
 
 	useEffect(()=> {
 		setErrorMessage(error?.message);
