@@ -1,6 +1,6 @@
 import { Modal } from "antd";
 import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, linkWithCredential } from "firebase/auth";
-import { Button } from "antd";
+import Button from "@/app/components/Button";
 import { auth } from "@/config";
 
 export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) {

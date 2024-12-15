@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
-import { Button } from "antd";
+import Button from "@/app/components/Button";
 import Image from "next/image";
 import Reaction from "./Reaction";
 import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";

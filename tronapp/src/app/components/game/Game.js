@@ -7,7 +7,8 @@ import Board from '../board/Board';
 import Hand from './Hand';
 import Opponent from './Opponent';
 import History from './History';
-import { Button, Checkbox } from 'antd';
+import { Checkbox } from 'antd';
+import Button from "@/app/components/Button";
 import WhyNot from './WhyNot';
 import VisionQuest from '../visionquest/VisionQuest';
 
