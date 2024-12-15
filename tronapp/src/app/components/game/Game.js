@@ -555,20 +555,77 @@ function Game({ code }) {
 		// Initial measurement
 		updateWidth();
 
-		const resizeObserver = new ResizeObserver(updateWidth);
+		const widthObserver = new ResizeObserver(updateWidth);
 		if (rightGutterDiv.current) {
-			resizeObserver.observe(rightGutterDiv.current);
+			widthObserver.observe(rightGutterDiv.current);
 		}
-
-		// Add resize listener
-		window.addEventListener('resize', updateWidth);
 	
 		// Cleanup
 		return () => {
 			window.removeEventListener('resize', updateWidth);
-			resizeObserver.disconnect();
+			widthObserver.disconnect();
 		}
 	}, [rightGutterDiv, setRightGutterWidth]);
+
+	const [handOnRight, setHandOnRight] = useState(false);
+	useEffect(() => {
+		if (rightGutterWidth < 400) {
+			setHandOnRight(false);
+			return;
+		}
+		if (rightGutterWidth >= 200) {
+			setHandOnRight(true);
+			return;
+		}
+	}, [rightGutterWidth, setHandOnRight]);
+
+	const renderHand = useCallback(() => {
+		return (
+			<Hand
+				player={player}
+				players={players}
+				name={playerName}
+				hidden={false}
+				selectedTile={selectedTile}
+				setSelectedTile={setSelectedTile}
+				playerTurn={myTurn}
+				drawTile={drawTile}
+				passTurn={passTurn}
+				roundInProgress={roundInProgress}
+				hintedTiles={hintedTiles}
+				hintedSpacer={player?.spacer_hints}
+				bagCount={bagCount}
+				turnIndex={turnIndex}
+				playTile={playTile}
+				setHoveredSquares={setHoveredSquares}
+				mouseIsOver={mouseIsOver}
+				dragOrientation={dragOrientation}
+				setDragOrientation={setDragOrientation}
+				toggleOrientation={toggleOrientation}
+				setShowReactModal={setShowReactModal}
+			/>
+		);
+	}, [
+		player,
+		players,
+		playerName,
+		selectedTile,
+		setSelectedTile,
+		myTurn,
+		drawTile,
+		passTurn,
+		roundInProgress,
+		hintedTiles,
+		bagCount,
+		turnIndex,
+		playTile,
+		setHoveredSquares,
+		mouseIsOver,
+		dragOrientation,
+		setDragOrientation,
+		toggleOrientation,
+		setShowReactModal
+	]);
 
 	return (
 		<div className="h-full bg-black text-white flex flex-col">
@@ -660,64 +717,22 @@ function Game({ code }) {
 						<WhyNot message={playErrorMessage} />
 					</div>
 					
-					{player && <>
+					{!handOnRight && player && <div className="flex-1 w-full">
 						<div className="hidden md:block h-full w-full min-h-[150px]">
 							<div className="w-full h-full overflow-x-auto overflow-y-auto">
-								<Hand
-									player={player}
-									players={players}
-									name={playerName}
-									hidden={false}
-									selectedTile={selectedTile}
-									setSelectedTile={setSelectedTile}
-									playerTurn={myTurn}
-									drawTile={drawTile}
-									passTurn={passTurn}
-									roundInProgress={roundInProgress}
-									hintedTiles={hintedTiles}
-									hintedSpacer={player.spacer_hints}
-									bagCount={bagCount}
-									turnIndex={turnIndex}
-									playTile={playTile}
-									setHoveredSquares={setHoveredSquares}
-									mouseIsOver={mouseIsOver}
-									dragOrientation={dragOrientation}
-									setDragOrientation={setDragOrientation}
-									toggleOrientation={toggleOrientation}
-									setShowReactModal={setShowReactModal}
-								/>
+								{renderHand()}
 							</div>
 						</div>
 						<div className="block md:hidden flex-1 h-[150px] w-screen md:w-auto">
 							<div className="w-full h-full overflow-x-auto overflow-y-auto">
-								<Hand
-									player={player}
-									players={players}
-									name={playerName}
-									hidden={false}
-									selectedTile={selectedTile}
-									setSelectedTile={setSelectedTile}
-									playerTurn={myTurn}
-									drawTile={drawTile}
-									passTurn={passTurn}
-									roundInProgress={roundInProgress}
-									hintedTiles={hintedTiles}
-									hintedSpacer={player.spacer_hints}
-									bagCount={bagCount}
-									turnIndex={turnIndex}
-									playTile={playTile}
-									setHoveredSquares={setHoveredSquares}
-									mouseIsOver={mouseIsOver}
-									dragOrientation={dragOrientation}
-									setDragOrientation={setDragOrientation}
-									toggleOrientation={toggleOrientation}
-									setShowReactModal={setShowReactModal}
-								/>
+								{renderHand()}
 							</div>
 						</div>
-					</>}
+					</div>}
 				</div>
-				<div ref={rightGutterDiv} className="flex-1">extra</div>
+				<div ref={rightGutterDiv} className="flex-1">
+				{handOnRight && player && renderHand()}
+				</div>
 			</div>
 
 
