@@ -580,6 +580,9 @@ function Game({ code }) {
 	}, [rightGutterWidth, setHandOnRight]);
 
 	const renderHand = useCallback(() => {
+		if (player === undefined) {
+			return null;
+		}
 		return (
 			<Hand
 				player={player}
@@ -717,7 +720,8 @@ function Game({ code }) {
 						<WhyNot message={playErrorMessage} />
 					</div>
 					
-					{!handOnRight && player && <div className="flex-1 w-full min-h-0">
+					{!handOnRight && 
+					<div className="flex-1 w-full min-h-0">
 						<div className="h-full w-full">
 							<div className="w-full h-full overflow-x-auto overflow-y-auto">
 								{renderHand()}
@@ -726,7 +730,7 @@ function Game({ code }) {
 					</div>}
 				</div>
 				<div ref={rightGutterDiv} className="flex-1">
-				{handOnRight && player && renderHand()}
+					{handOnRight && renderHand()}
 				</div>
 			</div>
 
