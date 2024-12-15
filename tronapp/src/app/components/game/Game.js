@@ -717,13 +717,8 @@ function Game({ code }) {
 						<WhyNot message={playErrorMessage} />
 					</div>
 					
-					{!handOnRight && player && <div className="flex-1 w-full">
-						<div className="hidden md:block h-full w-full min-h-[150px]">
-							<div className="w-full h-full overflow-x-auto overflow-y-auto">
-								{renderHand()}
-							</div>
-						</div>
-						<div className="block md:hidden flex-1 h-[150px] w-screen md:w-auto">
+					{!handOnRight && player && <div className="flex-1 w-full min-h-0">
+						<div className="h-full w-full">
 							<div className="w-full h-full overflow-x-auto overflow-y-auto">
 								{renderHand()}
 							</div>
