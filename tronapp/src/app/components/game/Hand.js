@@ -394,6 +394,19 @@ function Hand({
 		hoverTile(parseInt(elementUnderTouch?.dataset?.tron_x), parseInt(elementUnderTouch?.dataset?.tron_y));
 	}, [dragOrientation, hoverTile, touchOverBoard, setTouchOverBoard, boardRef]);
 
+	useEffect(() => {
+		if (draggedTile) {
+			const preventDefault = (e) => e.preventDefault();
+			document.body.style.overflow = 'hidden';
+			document.addEventListener('touchmove', preventDefault, { passive: false });
+			
+			return () => {
+				document.body.style.overflow = '';
+				document.removeEventListener('touchmove', preventDefault);
+			};
+		}
+	}, [draggedTile]);
+
 	const dropTile = useCallback((x, y) => {
 		if (!selectedTile || x === undefined || y === undefined) {
 			return;
