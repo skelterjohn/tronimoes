@@ -721,7 +721,7 @@ function Game({ code }) {
 							setMouseIsOver={setMouseIsOver}
 							dropCallback={dropCallback}
 						/>
-						<WhyNot message={playErrorMessage} />
+						<WhyNot message={playErrorMessage} setMessage={setPlayErrorMessage} />
 					</div>
 					
 					{!handOnRight && 

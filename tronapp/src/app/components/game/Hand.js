@@ -126,6 +126,7 @@ function Hand({
 
 	const tileClicked = useCallback((tile) => {
 		setHoveredSquares(new Set([]));
+		setTouchOverBoard(false);
 		if (selectedTile === tile) {
 			toggleOrientation();
 		} else {
@@ -307,7 +308,7 @@ function Hand({
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
-		setTouchOverBoard(false);	
+		setTouchOverBoard(false);
 	}, [setTouchStartPos, setDraggedTile, touchOverBoard, setTouchOverBoard]);
 
 	// Update cleanup function to be more aggressive
