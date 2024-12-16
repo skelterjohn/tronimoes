@@ -17,7 +17,8 @@ function Hand({
 		bagCount, turnIndex, playTile,
 		setHoveredSquares, mouseIsOver,
 		dragOrientation, setDragOrientation, toggleOrientation,
-		setShowReactModal
+		setShowReactModal,
+		boardRef
 	}) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
@@ -250,6 +251,8 @@ function Hand({
 		
 	}
 
+	const [touchOverBoard, setTouchOverBoard] = useState(false);
+
 	const handleTouchStart = useCallback((tile, e) => {
 		// Create ghost element
 		const ghost = e.target.cloneNode(true);
@@ -269,7 +272,9 @@ function Hand({
 		setSelectedTile(tile);
 		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
 		setDraggedTile(tile);
-	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile]);
+		setTouchOverBoard(false);
+	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard]);
+
 
 	const handleTouchEnd = useCallback((targetTile, e) => {
 		// Remove the ghost element and ensure cleanup
@@ -280,7 +285,12 @@ function Hand({
 		
 		// Get the element under the touch point
 		const touch = e.changedTouches[0];
-		const element = document.elementFromPoint(touch.clientX, touch.clientY);
+		let [x, y] = [touch.clientX, touch.clientY];
+
+		if (touchOverBoard) {
+			y -= 100;
+		}
+		const element = document.elementFromPoint(x, y);
 		
 		if (element?.dataset?.tron_x && element?.dataset?.tron_y) {
 			dropTile(element.dataset.tron_x, element.dataset.tron_y);
@@ -297,7 +307,7 @@ function Hand({
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
-	}, [setTouchStartPos, setDraggedTile]);
+	}, [setTouchStartPos, setDraggedTile, touchOverBoard]);
 
 	// Update cleanup function to be more aggressive
 	const cleanupGhostElement = () => {
@@ -360,18 +370,29 @@ function Hand({
 			cleanupGhostElement();
 			return;
 		}
+
+		const touch = e.touches[0];
+		let [x, y] = [touch.clientX, touch.clientY];
+
+		if (touchOverBoard) {
+			y -= 100;
+		}
+
+		const elementUnderTouch = document.elementFromPoint(x, y);
 		
+		// Check if the element under touch is within the board
+		if (!touchOverBoard && boardRef.current?.contains(elementUnderTouch)) {
+			setTouchOverBoard(true);
+		}
 		const ghost = document.getElementById('touch-ghost');
 		if (!ghost) {
 			cleanupGhostElement();
 			return;
 		}
-		const touch = e.touches[0];
-		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
+		orientGhost(ghost, x, y, dragOrientation);
 
-		const element = document.elementFromPoint(touch.clientX, touch.clientY);
-		hoverTile(parseInt(element?.dataset?.tron_x), parseInt(element?.dataset?.tron_y));
-	}, [dragOrientation, hoverTile]);
+		hoverTile(parseInt(elementUnderTouch?.dataset?.tron_x), parseInt(elementUnderTouch?.dataset?.tron_y));
+	}, [dragOrientation, hoverTile, touchOverBoard, setTouchOverBoard, boardRef]);
 
 	const dropTile = useCallback((x, y) => {
 		if (!selectedTile || x === undefined || y === undefined) {
