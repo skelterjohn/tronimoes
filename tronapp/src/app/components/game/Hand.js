@@ -307,7 +307,8 @@ function Hand({
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
-	}, [setTouchStartPos, setDraggedTile, touchOverBoard]);
+		setTouchOverBoard(false);	
+	}, [setTouchStartPos, setDraggedTile, touchOverBoard, setTouchOverBoard]);
 
 	// Update cleanup function to be more aggressive
 	const cleanupGhostElement = () => {
