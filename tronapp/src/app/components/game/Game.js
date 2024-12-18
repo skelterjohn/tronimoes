@@ -418,6 +418,7 @@ function Game({ code }) {
 		client.React(code, reactURL).then((resp) => {
 			console.log("reacted", resp);
 		}).catch((error) => {
+			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 		});
 	}, [reactURL, client, code]);
@@ -580,6 +581,7 @@ function Game({ code }) {
 	}, [rightGutterWidth, setHandOnRight]);
 
 	const boardRef = useRef(null);
+	const [squareSpan, setSquareSpan] = useState(0);
 
 	const renderHand = useCallback(() => {
 		if (player === undefined) {
@@ -609,6 +611,7 @@ function Game({ code }) {
 				toggleOrientation={toggleOrientation}
 				setShowReactModal={setShowReactModal}
 				boardRef={boardRef}
+				squareSpan={squareSpan}
 			/>
 		);
 	}, [
@@ -631,7 +634,7 @@ function Game({ code }) {
 		setDragOrientation,
 		toggleOrientation,
 		setShowReactModal,
-		boardRef
+		boardRef, squareSpan
 	]);
 
 	return (
@@ -720,6 +723,7 @@ function Game({ code }) {
 							hoveredSquares={hoveredSquares}
 							setMouseIsOver={setMouseIsOver}
 							dropCallback={dropCallback}
+							setSquareSpan={setSquareSpan}
 						/>
 						<WhyNot message={playErrorMessage} setMessage={setPlayErrorMessage} />
 					</div>

@@ -18,7 +18,7 @@ function Hand({
 		setHoveredSquares, mouseIsOver,
 		dragOrientation, setDragOrientation, toggleOrientation,
 		setShowReactModal,
-		boardRef
+		boardRef, squareSpan
 	}) {
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
@@ -148,15 +148,32 @@ function Hand({
 
 	const [isDragging, setIsDragging] = useState(false);
 
+
 	const handleDragStart = useCallback((tile, e) => {
 		if (e.target !== e.currentTarget) return;
 		
 		// Create a clone of the entire tile container including its children
 		const ghost = e.currentTarget.cloneNode(true);
+		
+		// Reset any existing size-related styles and classes
 		ghost.style.position = 'absolute';
 		ghost.style.top = '-1000px';
-		ghost.style.width = '4rem';
-		ghost.style.height = '8rem';
+		ghost.style.width = `${squareSpan}px`;
+		
+		ghost.style.height = `${squareSpan * 2}px`;
+		ghost.style.maxHeight = `${squareSpan * 2}px`; // Force max height
+		ghost.style.minHeight = `${squareSpan * 2}px`; // Force min height
+		ghost.style.aspectRatio = '1/2';
+		ghost.style.padding = '0'; // Remove any padding
+		ghost.style.margin = '0'; // Remove any margin
+		
+		// Force the inner tile to match the container size
+		const innerTile = ghost.querySelector('div');
+		if (innerTile) {
+			innerTile.style.width = '100%';
+			innerTile.style.height = '100%';
+			innerTile.style.maxHeight = '100%';
+		}
 		
 		let x_offset = 32;
 		let y_offset = 32;
@@ -194,7 +211,7 @@ function Hand({
 		requestAnimationFrame(() => {
 			document.body.removeChild(ghost);
 		});
-	}, [dragOrientation, selectedTile]);
+	}, [dragOrientation, selectedTile, squareSpan]);
 
 	const handleDrop = useCallback((targetTile, e) => {
 		setIsDragging(false);
@@ -259,8 +276,13 @@ function Hand({
 		const ghost = e.target.cloneNode(true);
 		ghost.id = 'touch-ghost';
 		ghost.style.position = 'fixed';
-		ghost.style.width = '4rem';
-		ghost.style.height = '6rem';
+		ghost.style.width = `${squareSpan}px`;
+		ghost.style.height = `${squareSpan * 2}px`;
+		ghost.style.maxHeight = `${squareSpan * 2}px`;
+		ghost.style.minHeight = `${squareSpan * 2}px`;
+		ghost.style.aspectRatio = '1/2';
+		ghost.style.padding = '0';
+		ghost.style.margin = '0';
 		ghost.style.transform = 'scale(1)';
 		ghost.style.opacity = '0.8';
 		ghost.style.pointerEvents = 'none';
@@ -274,7 +296,7 @@ function Hand({
 		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
 		setDraggedTile(tile);
 		setTouchOverBoard(false);
-	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard]);
+	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard, squareSpan]);
 
 
 	const handleTouchEnd = useCallback((targetTile, e) => {

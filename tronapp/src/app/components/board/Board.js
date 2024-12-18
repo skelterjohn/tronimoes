@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 
 import Spacer from "./Spacer";
@@ -32,7 +32,8 @@ export default function Board({
 		playA, setPlayA,
 		spacerHints, clearSpacer,
 		hoveredSquares, setMouseIsOver,
-		dropCallback
+		dropCallback,
+		setSquareSpan
 	}) {
 	function rightClick(evt) {
 		evt.preventDefault();
@@ -146,11 +147,33 @@ export default function Board({
 		}
 	}, [tiles]);
 
+	const playableBoardRef = useRef(null);
+	useEffect(() => {
+		const updateSpan = () => {
+			if (playableBoardRef.current) {
+				setSquareSpan(playableBoardRef.current.clientHeight / height);
+			}
+		};
+	
+		// Initial measurement
+		updateSpan();
+
+		const spanObserver = new ResizeObserver(updateSpan);
+		if (playableBoardRef.current) {
+			spanObserver.observe(playableBoardRef.current);
+		}
+	
+		// Cleanup
+		return () => {
+			spanObserver.disconnect();
+		}
+	}, [playableBoardRef, setSquareSpan, height]);
+
 	return (
 		<div onContextMenu={rightClick} className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center ${gutterColor}`}>
 			<div className="aspect-square w-full h-full" style={{ maxHeight: '100%', maxWidth: '100%' }}>
 				<div className="aspect-square w-full h-full">
-					<table className="w-full h-full table-fixed">
+					<table className="w-full h-full table-fixed" ref={playableBoardRef}>
 						<tbody>
 							{Array.from({ length: height }, (_, y) => (
 								<tr key={y}>
