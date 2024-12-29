@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 
 export default function WhyNot({message, setMessage}) {
-	if (!message) return null;
-
 	const clickMessage = useCallback(() => {
 		setMessage("");
 	}, [setMessage]);
+	
+	if (!message) return null;
 
 	return (
 		<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
