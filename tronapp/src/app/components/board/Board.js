@@ -253,7 +253,8 @@ export default function Board({
 		}
 	}
 
-	function handleTouchEnd() {
+	function handleTouchEnd(evt) {
+		evt.preventDefault();
 		setTouchStartDistance(null);
 	}
 
@@ -265,6 +266,9 @@ export default function Board({
 			onTouchStart={handleTouchStart}
 			onTouchMove={handleTouchMove}
 			onTouchEnd={handleTouchEnd}
+			style={{
+				touchAction: 'none'
+			}}
 			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor}`}
 		>
 			<div 
