@@ -38,6 +38,8 @@ export default function Board({
 	const [zoom, setZoom] = useState(1);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const boardContainerRef = useRef(null);
+	const [touchStartDistance, setTouchStartDistance] = useState(null);
+	const [touchStartZoom, setTouchStartZoom] = useState(1);
 
 	function handleWheel(evt) {
 		// evt.preventDefault();
@@ -203,11 +205,66 @@ export default function Board({
 		}
 	}, [playableBoardRef, setSquareSpan, height]);
 
+	function getDistance(touch1, touch2) {
+		return Math.hypot(
+			touch1.clientX - touch2.clientX,
+			touch1.clientY - touch2.clientY
+		);
+	}
+
+	function handleTouchStart(evt) {
+		if (evt.touches.length === 2) {
+			evt.preventDefault();
+			const distance = getDistance(evt.touches[0], evt.touches[1]);
+			setTouchStartDistance(distance);
+			setTouchStartZoom(zoom);
+		}
+	}
+
+	function handleTouchMove(evt) {
+		if (evt.touches.length === 2) {
+			evt.preventDefault();
+			const container = boardContainerRef.current;
+			if (!container || !touchStartDistance) return;
+
+			const rect = container.getBoundingClientRect();
+			const touch1 = evt.touches[0];
+			const touch2 = evt.touches[1];
+			
+			// Calculate center point of the two touches
+			const centerX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+			const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+			
+			const centerXPercent = 100 * centerX / rect.width;
+			const centerYPercent = 100 * centerY / rect.height;
+
+			const currentDistance = getDistance(touch1, touch2);
+			const scale = currentDistance / touchStartDistance;
+			const newZoom = Math.min(Math.max(touchStartZoom * scale, 1), 3);
+
+			// Calculate new position to keep pinch center point fixed
+			const newPosition = {
+				x: centerXPercent - (centerXPercent - position.x) * (newZoom / zoom),
+				y: centerYPercent - (centerYPercent - position.y) * (newZoom / zoom)
+			};
+
+			setZoom(newZoom);
+			setPosition(newZoom === 1 ? {x: 0, y: 0} : newPosition);
+		}
+	}
+
+	function handleTouchEnd() {
+		setTouchStartDistance(null);
+	}
+
 	return (
 		<div 
 			ref={boardContainerRef}
 			onWheel={handleWheel}
 			onContextMenu={rightClick}
+			onTouchStart={handleTouchStart}
+			onTouchMove={handleTouchMove}
+			onTouchEnd={handleTouchEnd}
 			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor}`}
 		>
 			<div 
