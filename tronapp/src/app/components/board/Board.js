@@ -35,10 +35,44 @@ export default function Board({
 		dropCallback,
 		setSquareSpan
 	}) {
+	const [zoom, setZoom] = useState(1);
+	const [position, setPosition] = useState({ x: 0, y: 0 });
+	const boardContainerRef = useRef(null);
+
+	function handleWheel(evt) {
+		// evt.preventDefault();
+		
+		const container = boardContainerRef.current;
+		if (!container) return;
+
+		const rect = container.getBoundingClientRect();
+		const mouseX = evt.clientX - rect.left;
+		const mouseY = evt.clientY - rect.top;
+
+		const mouseXPercent = 100 * mouseX / rect.width;
+		const mouseYPercent = 100 * mouseY / rect.height;
+
+		const boardX = mouseXPercent - position.x;
+
+		const delta = evt.deltaY * -0.001;
+		const newZoom = Math.min(Math.max(zoom * (1 + delta), 1), 3);
+		
+		// Calculate new position to keep mouse point fixed
+		const newPosition = {
+			x: mouseXPercent - (mouseXPercent - position.x) * (newZoom / zoom),
+			y: mouseYPercent - (mouseYPercent - position.y) * (newZoom / zoom)
+		};
+
+
+		setZoom(newZoom);
+		setPosition(newZoom === 1 ? {x: 0, y: 0} : newPosition);
+	}
+
 	function rightClick(evt) {
 		evt.preventDefault();
 		setPlayA(undefined);
 		setIndicated(undefined);
+		
 		clearSpacer();
 	}
 
@@ -170,8 +204,22 @@ export default function Board({
 	}, [playableBoardRef, setSquareSpan, height]);
 
 	return (
-		<div onContextMenu={rightClick} className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center ${gutterColor}`}>
-			<div className="aspect-square w-full h-full" style={{ maxHeight: '100%', maxWidth: '100%' }}>
+		<div 
+			ref={boardContainerRef}
+			onWheel={handleWheel}
+			onContextMenu={rightClick}
+			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor}`}
+		>
+			<div 
+				className="aspect-square"
+				style={{ 
+					transform: `translate(${position.x}%, ${position.y}%) scale(${zoom})`,
+					transformOrigin: '0 0',
+					transition: 'none',
+					width: '100%',
+					height: '100%'
+				}}
+			>
 				<div className="aspect-square w-full h-full">
 					<table className="w-full h-full table-fixed" ref={playableBoardRef}>
 						<tbody>
