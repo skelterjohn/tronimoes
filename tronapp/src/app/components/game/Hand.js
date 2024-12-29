@@ -144,6 +144,7 @@ function Hand({
 		if (setDragOrientation) {
 			setDragOrientation("down");
 		}
+		setHoveredSquares(new Set([]));
 	}, [selectedTile, setDragOrientation]);
 
 	const [isDragging, setIsDragging] = useState(false);
