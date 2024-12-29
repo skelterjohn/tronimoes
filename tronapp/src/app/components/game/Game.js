@@ -365,6 +365,7 @@ function Game({ code }) {
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
+			setHoveredSquares(new Set([]));
 		});
 	}, [client, code, player, indicated, setSelectedTile, setIndicated, setHints, setPlayA, setPlayErrorMessage]);
 
