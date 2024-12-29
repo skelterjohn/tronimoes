@@ -40,6 +40,8 @@ export default function Board({
 	const boardContainerRef = useRef(null);
 	const [touchStartDistance, setTouchStartDistance] = useState(null);
 	const [touchStartZoom, setTouchStartZoom] = useState(1);
+	const [touchStartPosition, setTouchStartPosition] = useState(null);
+	const [lastTouchPosition, setLastTouchPosition] = useState(null);
 
 	function handleWheel(evt) {
 		// evt.preventDefault();
@@ -218,6 +220,21 @@ export default function Board({
 			const distance = getDistance(evt.touches[0], evt.touches[1]);
 			setTouchStartDistance(distance);
 			setTouchStartZoom(zoom);
+		} else if (evt.touches.length === 1 && zoom > 1) {
+			evt.preventDefault();
+			const touch = evt.touches[0];
+			const container = boardContainerRef.current;
+			if (!container) return;
+
+			const rect = container.getBoundingClientRect();
+			setTouchStartPosition({
+				x: touch.clientX - rect.left,
+				y: touch.clientY - rect.top
+			});
+			setLastTouchPosition({
+				x: touch.clientX - rect.left,
+				y: touch.clientY - rect.top
+			});
 		}
 	}
 
@@ -250,12 +267,36 @@ export default function Board({
 
 			setZoom(newZoom);
 			setPosition(newZoom === 1 ? {x: 0, y: 0} : newPosition);
+		} else if (evt.touches.length === 1 && zoom > 1 && touchStartPosition) {
+			evt.preventDefault();
+			const touch = evt.touches[0];
+			const container = boardContainerRef.current;
+			if (!container) return;
+
+			const rect = container.getBoundingClientRect();
+			const currentTouch = {
+				x: touch.clientX - rect.left,
+				y: touch.clientY - rect.top
+			};
+
+			// Calculate the movement as a percentage of container size
+			const deltaX = (currentTouch.x - lastTouchPosition.x) / rect.width * 100;
+			const deltaY = (currentTouch.y - lastTouchPosition.y) / rect.height * 100;
+
+			setPosition({
+				x: position.x + deltaX,
+				y: position.y + deltaY
+			});
+
+			setLastTouchPosition(currentTouch);
 		}
 	}
 
 	function handleTouchEnd(evt) {
 		evt.preventDefault();
 		setTouchStartDistance(null);
+		setTouchStartPosition(null);
+		setLastTouchPosition(null);
 	}
 
 	return (
