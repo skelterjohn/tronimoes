@@ -42,6 +42,8 @@ export default function Board({
 	const [touchStartZoom, setTouchStartZoom] = useState(1);
 	const [touchStartPosition, setTouchStartPosition] = useState(null);
 	const [lastTouchPosition, setLastTouchPosition] = useState(null);
+	const [isDragging, setIsDragging] = useState(false);
+	const [dragStart, setDragStart] = useState(null);
 
 	function handleWheel(evt) {
 		// evt.preventDefault();
@@ -74,10 +76,56 @@ export default function Board({
 
 	function rightClick(evt) {
 		evt.preventDefault();
-		setPlayA(undefined);
-		setIndicated(undefined);
-		
-		clearSpacer();
+		if (!isDragging) {
+			setPlayA(undefined);
+			setIndicated(undefined);
+			clearSpacer();
+		}
+	}
+
+	function handleMouseDown(evt) {
+		if (evt.button === 2 && zoom > 1) { // Right click
+			evt.preventDefault();
+			const container = boardContainerRef.current;
+			if (!container) return;
+
+			const rect = container.getBoundingClientRect();
+			setIsDragging(true);
+			setDragStart({
+				x: evt.clientX - rect.left,
+				y: evt.clientY - rect.top
+			});
+		}
+	}
+
+	function handleMouseMove(evt) {
+		if (isDragging) {
+			evt.preventDefault();
+			const container = boardContainerRef.current;
+			if (!container) return;
+
+			const rect = container.getBoundingClientRect();
+			const currentPos = {
+				x: evt.clientX - rect.left,
+				y: evt.clientY - rect.top
+			};
+
+			// Calculate the movement as a percentage of container size
+			const deltaX = (currentPos.x - dragStart.x) / rect.width * 100;
+			const deltaY = (currentPos.y - dragStart.y) / rect.height * 100;
+
+			setPosition({
+				x: position.x + deltaX,
+				y: position.y + deltaY
+			});
+
+			setDragStart(currentPos);
+		}
+	}
+
+	function handleMouseUp() {
+		setIsDragging(false);
+		setDragStart(null);
 	}
 
 	useEffect(() => {
@@ -304,14 +352,19 @@ export default function Board({
 			ref={boardContainerRef}
 			onWheel={handleWheel}
 			onContextMenu={rightClick}
+			onMouseDown={handleMouseDown}
+			onMouseMove={handleMouseMove}
+			onMouseUp={handleMouseUp}
+			onMouseLeave={handleMouseUp}
 			onTouchStart={handleTouchStart}
 			onTouchMove={handleTouchMove}
 			onTouchEnd={handleTouchEnd}
 			style={{
-				touchAction: 'none'
+				touchAction: 'none',
+				cursor: isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'default')
 			}}
 			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor}`}
-		>
+			>
 			<div 
 				className="aspect-square"
 				style={{ 
