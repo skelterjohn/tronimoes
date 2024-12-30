@@ -41,9 +41,9 @@ func NewGame(ctx context.Context, code string) *Game {
 	}
 }
 
-func (g *Game) CheckForDupes(ctx context.Context, when string) {
+func (g *Game) CheckForDupes(ctx context.Context, when string) bool {
 	if g.CurrentRound(ctx) == nil {
-		return
+		return false
 	}
 	seen := map[string]bool{}
 	anyDupes := false
@@ -80,6 +80,7 @@ func (g *Game) CheckForDupes(ctx context.Context, when string) {
 		data, _ := json.Marshal(g)
 		log.Printf("dupes during %s: %s", when, string(data))
 	}
+	return anyDupes
 }
 
 func (g *Game) LeaveOrQuit(ctx context.Context, name string) bool {
@@ -296,9 +297,8 @@ func (g *Game) Start(ctx context.Context, name string) error {
 
 	// Give each player 7 tiles.
 	for _, p := range g.Players {
-		p.Hand = g.Bag[:7]
+		p.Hand = append(p.Hand, g.Bag[:7]...)
 		g.Bag = g.Bag[7:]
-		log.Printf("%s has starting hand %v", p.Name, p.Hand)
 	}
 	g.Turn = 0
 
