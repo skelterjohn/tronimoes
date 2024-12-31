@@ -304,6 +304,7 @@ function Hand({
 	const handleTouchEnd = useCallback((targetTile, e) => {
 		// Remove the ghost element and ensure cleanup
 		cleanupGhostElement();
+		document.body.style.overflow = ''; // Explicitly restore scrolling
 
 		setHoveredSquares(new Set([]));
 		if (!draggedTile || !touchStartPos) return;
@@ -430,6 +431,9 @@ function Hand({
 				document.body.style.overflow = '';
 				document.removeEventListener('touchmove', preventDefault);
 			};
+		} else {
+			// Ensure we restore scrolling when not dragging
+			document.body.style.overflow = '';
 		}
 	}, [draggedTile]);
 
@@ -471,12 +475,14 @@ function Hand({
 	}, [hintedSpacer]);
 
 	const scrollToTop = useCallback(() => {
+		setSelectedTile(undefined);
 		scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 	}, []);
 	
 	const scrollToBottom = useCallback(() => {
+		setSelectedTile(undefined);
 		const container = scrollContainerRef.current;
-		container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+		container?.scrollTo({ top: container?.scrollHeight, behavior: 'smooth' });
 	}, []);
 	
 	return (
@@ -526,7 +532,7 @@ function Hand({
 							>
 								pass
 							</Button>
-						</div>;
+						</div>
 						<div className="flex flex-row items-center ">
 							<Image 
 								src="/bag.png" 
@@ -545,6 +551,14 @@ function Hand({
 							onClick={() => setShowReactModal(true)}>
 							react
 						</Button>
+					</div>
+					<div className="flex flex-row gap-1">
+						<a onClick={scrollToTop} className="cursor-pointer">
+							<i className="w-6 aspect-square text-black fa-solid fa-arrow-up"></i>
+						</a>
+						<a onClick={scrollToBottom} className="cursor-pointer">
+							<i className="w-6 aspect-square text-black fa-solid fa-arrow-down"></i>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -596,16 +610,6 @@ function Hand({
 									</div>
 								);
 							})}
-						</div>
-						{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
-						<div className="w-[1rem] h-full flex flex-col">
-							<a onClick={scrollToBottom}>
-								<i className="w-full aspect-square text-black fa-solid fa-arrow-down"></i>
-							</a>
-							<div className="flex-grow"></div>
-							<a onClick={scrollToTop}>
-								<i className="w-full aspect-square text-black fa-solid fa-arrow-up"></i>
-							</a>
 						</div>
 					</div>
 				</div>
