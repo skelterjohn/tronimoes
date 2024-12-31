@@ -269,6 +269,7 @@ export default function Board({
 			setTouchStartDistance(distance);
 			setTouchStartZoom(zoom);
 		} else if (evt.touches.length === 1 && zoom > 1) {
+			// Only prevent default for panning when zoomed in
 			evt.preventDefault();
 			const touch = evt.touches[0];
 			const container = boardContainerRef.current;
@@ -284,6 +285,7 @@ export default function Board({
 				y: touch.clientY - rect.top
 			});
 		}
+		// Single taps when not zoomed will propagate normally
 	}
 
 	function handleTouchMove(evt) {
@@ -341,7 +343,9 @@ export default function Board({
 	}
 
 	function handleTouchEnd(evt) {
-		evt.preventDefault();
+		if (evt.touches.length !== 0) {
+			evt.preventDefault(); // Only prevent default for multi-touch gestures
+		}
 		setTouchStartDistance(null);
 		setTouchStartPosition(null);
 		setLastTouchPosition(null);
