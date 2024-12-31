@@ -331,6 +331,7 @@ function Game({ code }) {
 		});
 	}, [client, code, player, playerName]);
 
+	const [inFlight, setInFlight] = useState(undefined);
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
 	useEffect(() => {
@@ -344,6 +345,7 @@ function Game({ code }) {
 	const playTile = useCallback((tile) => {
 		console.log("playTile", tile);
 		tile.color = player.color;
+		setInFlight("laying tile");
 		client.LayTile(code, {
 			tile: {
 				pips_a: tile.a,
@@ -366,10 +368,13 @@ function Game({ code }) {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 			setHoveredSquares(new Set([]));
+		}).finally(() => {
+			setInFlight(undefined);
 		});
 	}, [client, code, player, indicated, setSelectedTile, setIndicated, setHints, setPlayA, setPlayErrorMessage]);
 
 	function playSpacer(spacer) {
+		setInFlight("laying spacer");
 		client.LaySpacer(code, spacer).then((resp) => {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
@@ -379,10 +384,13 @@ function Game({ code }) {
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
+		}).finally(() => {
+			setInFlight(undefined);
 		});
 	}
 
 	function clearSpacer() {
+		setInFlight("clearing spacer");
 		client.LaySpacer(code, {}).then((resp) => {
 			setSelectedTile(undefined);
 			setIndicated(undefined);
@@ -392,17 +400,22 @@ function Game({ code }) {
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
+		}).finally(() => {
+			setInFlight(undefined);
 		});
 	}
 
 	function drawTile() {
 		setSelectedTile(undefined);
+		setInFlight("drawing tile");
 		client.DrawTile(code).then((resp) => {
 			console.log("drew tile", resp);
 			setPlayA(undefined);
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
+		}).finally(() => {
+			setInFlight(undefined);
 		});
 	}
 
@@ -437,6 +450,7 @@ function Game({ code }) {
 
 	const passTurn = useCallback(() => {
 		setSelectedTile(undefined);
+		setInFlight("passing");
 		client.Pass(code, {
 			selected_x: playA !== undefined ? playA.x : -1,
 			selected_y: playA !== undefined ? playA.y : -1,
@@ -450,6 +464,8 @@ function Game({ code }) {
 		}).catch((error) => {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
+		}).finally(() => {
+			setInFlight(undefined);
 		});
 	}, [client, code, playA, setPlayA, setSelectedTile, setIndicated, setPlayErrorMessage, chickenFootURL, setShowVisionQuestModal]);
 
@@ -726,7 +742,7 @@ function Game({ code }) {
 							dropCallback={dropCallback}
 							setSquareSpan={setSquareSpan}
 						/>
-						<WhyNot message={playErrorMessage} setMessage={setPlayErrorMessage} />
+						<WhyNot message={playErrorMessage} setMessage={setPlayErrorMessage} inFlight={inFlight} />
 					</div>
 					
 					{!handOnRight && 
