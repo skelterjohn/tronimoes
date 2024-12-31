@@ -715,13 +715,9 @@ function Game({ code }) {
 					</div>
 				</div>
 				<div className="flex flex-col justify-start items-center overflow-auto">
-					<div className="w-full" style={{ 
-						maxWidth: 'min(75vh, 100vw)',
-						aspectRatio: '1/1'
-					}} ref={boardRef}>
+					<div className="aspect-square h-auto" style={{ maxHeight: 'min(75%, 100vw)' }} ref={boardRef}>
 						<Board
-							width={boardWidth}
-							height={boardHeight}
+							width={boardWidth} height={boardHeight}
 							tiles={laidTiles}
 							spacer={spacer}
 							lineHeads={lineHeads}
