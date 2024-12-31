@@ -551,7 +551,7 @@ function Hand({
 			<div ref={scrollContainerRef} className="w-full flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
 				<div className="w-full min-h-[10rem] flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
-						<div className="w-fit flex flex-wrap content-start justify-start">
+						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">
 							<div className="max-h-[120px] aspect-[1/2] p-1">
 								<Tip bundle={spacerBundle} />
 								<div
