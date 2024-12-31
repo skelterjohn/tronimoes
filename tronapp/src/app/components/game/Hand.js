@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import Button from "@/app/components/Button";
@@ -27,6 +27,7 @@ function Hand({
 	const [spacerColor, setSpacerColor] = useState("white");
 	const [myTurn, setMyTurn] = useState(false);
 	const [handBackground, setHandBackground] = useState("bg-white");
+	const scrollContainerRef = useRef(null);
 
 	useEffect(() => {
 		const colorMap = {
@@ -469,6 +470,15 @@ function Hand({
 		}
 	}, [hintedSpacer]);
 
+	const scrollToTop = useCallback(() => {
+		scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+	}, []);
+	
+	const scrollToBottom = useCallback(() => {
+		const container = scrollContainerRef.current;
+		container?.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+	}, []);
+	
 	return (
 		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
 			<div className="w-full text-center font-bold ">
@@ -538,7 +548,7 @@ function Hand({
 					</div>
 				</div>
 			</div>
-			<div className="w-full flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
+			<div ref={scrollContainerRef} className="w-full flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
 				<div className="w-full min-h-[10rem] flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-fit flex flex-wrap content-start justify-start">
@@ -588,7 +598,15 @@ function Hand({
 							})}
 						</div>
 						{/* This gutter ensures that a touch can land somewhere to scroll without grabbing a tile. */}
-						<div className="w-[1rem]"></div>
+						<div className="w-[1rem] h-full flex flex-col">
+							<a onClick={scrollToBottom}>
+								<i className="w-full aspect-square text-black fa-solid fa-arrow-down"></i>
+							</a>
+							<div className="flex-grow"></div>
+							<a onClick={scrollToTop}>
+								<i className="w-full aspect-square text-black fa-solid fa-arrow-up"></i>
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
