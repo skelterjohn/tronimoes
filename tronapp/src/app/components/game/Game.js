@@ -390,6 +390,9 @@ function Game({ code }) {
 	}
 
 	function clearSpacer() {
+		if (!spacer) {
+			return;
+		}
 		setInFlight("clearing spacer");
 		client.LaySpacer(code, {}).then((resp) => {
 			setSelectedTile(undefined);
