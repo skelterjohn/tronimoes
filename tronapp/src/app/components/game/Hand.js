@@ -300,6 +300,20 @@ function Hand({
 		setTouchOverBoard(false);
 	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard, squareSpan]);
 
+	const dropTile = useCallback((x, y) => {
+		if (!selectedTile || x === undefined || y === undefined) {
+			return;
+		}
+		playTile({
+			a: selectedTile.a, b: selectedTile.b,
+			coord: {
+				x: parseInt(x),
+				y: parseInt(y),
+			},
+			orientation: dragOrientation,
+			dead: false,
+		});
+	}, [selectedTile, dragOrientation]);
 
 	const handleTouchEnd = useCallback((targetTile, e) => {
 		// Remove the ghost element and ensure cleanup
@@ -320,21 +334,21 @@ function Hand({
 		
 		if (element?.dataset?.tron_x && element?.dataset?.tron_y) {
 			dropTile(element.dataset.tron_x, element.dataset.tron_y);
-		}
-
-		// Find the tile container element
-		const tileContainer = element?.closest('[draggable="true"]');
-		if (tileContainer) {
-			const endTile = JSON.parse(tileContainer.dataset.tile);
-			if (draggedTile !== endTile) {
-				moveTile(draggedTile, endTile);
+		} else {
+			// Find the closest draggable tile container
+			const tileContainer = element?.closest('[data-tile]');
+			if (tileContainer) {
+				const endTile = JSON.parse(tileContainer.dataset.tile);
+				if (draggedTile !== endTile) {
+					moveTile(draggedTile, endTile);
+				}
 			}
 		}
 		
 		setTouchStartPos(null);
 		setDraggedTile(null);
 		setTouchOverBoard(false);
-	}, [setTouchStartPos, setDraggedTile, touchOverBoard, setTouchOverBoard]);
+	}, [setTouchStartPos, setDraggedTile, touchOverBoard, setTouchOverBoard, draggedTile, touchStartPos, moveTile, dropTile]);
 
 	// Update cleanup function to be more aggressive
 	const cleanupGhostElement = () => {
@@ -436,21 +450,6 @@ function Hand({
 			document.body.style.overflow = '';
 		}
 	}, [draggedTile]);
-
-	const dropTile = useCallback((x, y) => {
-		if (!selectedTile || x === undefined || y === undefined) {
-			return;
-		}
-		playTile({
-			a: selectedTile.a, b: selectedTile.b,
-			coord: {
-				x: parseInt(x),
-				y: parseInt(y),
-			},
-			orientation: dragOrientation,
-			dead: false,
-		});
-	}, [selectedTile, dragOrientation]);
 
 	const [selectedTileRotation, setSelectedTileRotation] = useState("rotate-0");
 	useEffect(() => {
