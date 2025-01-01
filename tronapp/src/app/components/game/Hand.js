@@ -562,7 +562,7 @@ function Hand({
 					</div>
 				</div>
 			</div>
-			<div ref={scrollContainerRef} className="w-full flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
+			<div ref={scrollContainerRef} className="w-full min-h-[20vh] flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
 				<div className="w-full min-h-[10rem] flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">

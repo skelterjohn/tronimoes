@@ -753,7 +753,7 @@ function Game({ code }) {
 					{!handOnRight && 
 					<div className="flex-1 w-full min-h-0">
 						<div className="h-full w-full">
-							<div className="w-full min-h-[20vh] h-full overflow-x-auto overflow-y-auto">
+							<div className="w-full h-full overflow-x-auto overflow-y-auto">
 								{renderHand()}
 							</div>
 						</div>
