@@ -566,7 +566,7 @@ function Hand({
 				<div className="w-full min-h-[10rem] flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">
-							<div className="max-h-[120px] aspect-[1/2] p-1">
+							<div className="max-h-[15vh] aspect-[1/2] p-1">
 								<Tip bundle={spacerBundle} />
 								<div
 									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
@@ -592,7 +592,7 @@ function Hand({
 										onTouchCancel={handleTouchCancel}
 									>
 										<div
-											className={`max-h-[120px] aspect-[1/2] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
+											className={`max-h-[15vh] aspect-[1/2] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
 											>
 											<div className="pointer-events-none">
 												<Tile
