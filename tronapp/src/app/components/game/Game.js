@@ -671,7 +671,7 @@ function Game({ code }) {
 					<div className="flex gap-2">
 						<Button
 							className="w-20"
-							disabled={roundInProgress || game?.done || player?.ready}
+							disabled={!playerName || roundInProgress || game?.done || player?.ready}
 							onClick={() => readyToPlay()}
 						>
 							{player === undefined && playerName !== undefined ? "join" : "ready"}
