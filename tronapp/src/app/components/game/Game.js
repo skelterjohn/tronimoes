@@ -32,6 +32,8 @@ const dealAudio = loadAudio('/sfx/deal.mp3');
 const layAudio = loadAudio('/sfx/lay.mp3');
 const drawAudio = loadAudio('/sfx/draw.mp3');
 const footedAudio = loadAudio('/sfx/footed.mp3');
+const chimeDownAudio = loadAudio('/sfx/chime_down.mp3');
+const chimeUpAudio = loadAudio('/sfx/chime_up.mp3');
 
 function Game({ code }) {
 	const router = useRouter();
@@ -531,12 +533,10 @@ function Game({ code }) {
 	const [tilesInBag, setTilesInBag] = useState(0);
 	const [prevTilesInBag, setPrevTilesInBag] = useState(0);
 	const [lastRoundHistoryItem, setLastRoundHistoryItem] = useState(undefined);
-	const [turnsTaken, setTurnsTaken] = useState(0);
 	useEffect(() => {
 		const round = game?.rounds?.[game?.rounds?.length - 1];
 		setTilesInBag(game?.bag?.length || 0);
 		setLastRoundHistoryItem(round?.history?.[round?.history?.length - 1]);
-		setTurnsTaken(round?.history?.length || 0);
 	}, [game]);
 
 	useEffect(() => {
@@ -563,6 +563,22 @@ function Game({ code }) {
 		}
 		setPrevTilesInBag(tilesInBag);
 	}, [tilesInBag]);
+
+	const [lastPlayerCount, setLastPlayerCount] = useState(0);
+	useEffect(() => {
+		const numPlayers = players.length;
+		if (numPlayers > lastPlayerCount) {
+			chimeUpAudio.play().catch(error => {
+				console.log('Audio playback failed:', error);
+			});
+		}
+		if (numPlayers < lastPlayerCount) {
+			chimeDownAudio.play().catch(error => {
+				console.log('Audio playback failed:', error);
+			});
+		}
+		setLastPlayerCount(numPlayers);
+	}, [players, lastPlayerCount]);
 
 	const rightGutterDiv = useRef(null);
 	const [rightGutterWidth, setRightGutterWidth] = useState(0);
