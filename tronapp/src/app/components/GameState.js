@@ -37,8 +37,7 @@ export function GameProvider({ children }) {
 	useEffect(() => {
 		const refreshInterval = setInterval(async () => {
 			try {
-				const newToken = await userInfo.stsTokenManager.getToken(auth);
-				console.log("refreshed token");
+				const newToken = await persistentUser.getIdToken(true);
 				setUserInfo(prevState => ({
 					...prevState,
 					accessToken: newToken,
@@ -50,7 +49,7 @@ export function GameProvider({ children }) {
 	
 		// Cleanup interval on component unmount
 		return () => clearInterval(refreshInterval);
-	}, [userInfo]);
+	}, [persistentUser]);
 
 	useEffect(()=> {
 		if (error !== undefined) {
