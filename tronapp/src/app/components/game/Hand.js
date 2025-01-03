@@ -295,7 +295,8 @@ function Hand({
 		
 		document.body.appendChild(ghost);
 		setSelectedTile(tile);
-		setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+		const sp = { x: touch.clientX, y: touch.clientY };
+		setTouchStartPos(sp);
 		setDraggedTile(tile);
 		setTouchOverBoard(false);
 	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard, squareSpan]);
@@ -345,7 +346,6 @@ function Hand({
 			}
 		}
 		
-		setTouchStartPos(null);
 		setDraggedTile(null);
 		setTouchOverBoard(false);
 	}, [setTouchStartPos, setDraggedTile, touchOverBoard, setTouchOverBoard, draggedTile, touchStartPos, moveTile, dropTile]);
@@ -377,9 +377,8 @@ function Hand({
 	const handleTouchCancel = useCallback(() => {
 		setHoveredSquares(new Set([]));
 		cleanupGhostElement();
-		setTouchStartPos(null);
 		setDraggedTile(null);
-	}, []);
+	}, [setHoveredSquares, setTouchStartPos, setDraggedTile]);
 
 	const hoverTile = useCallback((x, y) => {
 		if (!selectedTile) {
