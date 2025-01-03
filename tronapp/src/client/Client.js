@@ -1,8 +1,7 @@
 class Client {
-    constructor(baseURL, name, userid, userInfo) {
+    constructor(baseURL, name, userInfo) {
         this.baseURL = baseURL;
         this.name = name;
-        this.userid = userid;
         this.userInfo = userInfo;
     }
 
@@ -79,9 +78,7 @@ class Client {
 		}
 		if (this.userInfo) {
 			headers['Authorization'] = `Bearer ${await this.userInfo.getIdToken(false)}`;
-		}
-		if (this.userid !== undefined) {
-			headers['X-Player-Id'] = this.userid;
+			headers['X-Player-Id'] = this.userInfo?.uid;
 		}
         const response = await fetch(`${this.baseURL}${path}`, {
             method,
@@ -104,8 +101,8 @@ class Client {
 }
 
 
-export default function clientFor(name, id, userInfo) {
+export default function clientFor(name, userInfo) {
 	const baseURL = process.env.NEXT_PUBLIC_API_URL || 
                    `${window.location.protocol}//${window.location.hostname}:8080`;
-    return new Client(baseURL, name, id, userInfo);
+    return new Client(baseURL, name, userInfo);
 }

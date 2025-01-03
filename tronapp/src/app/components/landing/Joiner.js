@@ -8,7 +8,7 @@ import { useGameState } from '../../components/GameState';
 export default function Joiner({userInfo, loading, setErrorMessage}) {
 	const router = useRouter();
 
-	const { setGameCode, playerName, setPlayerName, setPlayerKey, setPlayerID, client } = useGameState();
+	const { setGameCode, playerName, setPlayerName, setPlayerKey, client } = useGameState();
 	const [isRegistered, setIsRegistered] = useState(false);
 
 	const [nameInput, setNameInput] = useState('');

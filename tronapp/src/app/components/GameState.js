@@ -10,14 +10,13 @@ const GameContext = createContext();
 export function GameProvider({ children }) {
 	const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("");
-	const [playerID, setPlayerID] = useState("");
 	const [client, setClient] = useState(undefined);
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
 	const [tutorial, setTutorial] = useState(false);
 	
 	useEffect(() => {
-		if (!client?.userInfo || !client?.userid) {
+		if (!client?.userInfo) {
 			return;
 		}
 		client?.GetPlayerName().then((resp) => {
@@ -27,10 +26,6 @@ export function GameProvider({ children }) {
 			console.error('get player name error', error);
 		});
 	}, [client, setPlayerName]);
-
-	useEffect(() => {
-		setPlayerID(userInfo?.uid);
-	}, [userInfo, setPlayerID]);
 
 	useEffect(()=> {
 		if (error !== undefined) {
@@ -44,14 +39,13 @@ export function GameProvider({ children }) {
 	}, [persistentUser, loading, error]);
 
 	useEffect(() => {
-		setClient(clientFor(playerName, playerID, userInfo));
-	}, [playerName, playerID, userInfo]);
+		setClient(clientFor(playerName, userInfo));
+	}, [playerName, userInfo]);
 
 	return (
 		<GameContext.Provider value={{
 			gameCode, setGameCode,
 			playerName, setPlayerName,
-			playerID, setPlayerID,
 			client, setClient,
 			userInfo, setUserInfo,
 			persistentUser, loading, error,
