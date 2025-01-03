@@ -1,9 +1,9 @@
 class Client {
-    constructor(baseURL, name, userid, key) {
+    constructor(baseURL, name, userid, userInfo) {
         this.baseURL = baseURL;
         this.name = name;
         this.userid = userid;
-        this.key = key;
+        this.userInfo = userInfo;
     }
 
 
@@ -77,8 +77,8 @@ class Client {
 			'Accept': 'application/json',
 			'X-Player-Name': this.name,
 		}
-		if (this.key !== undefined) {
-			headers['Authorization'] = `Bearer ${this.key}`;
+		if (this.userInfo) {
+			headers['Authorization'] = `Bearer ${await this.userInfo.getIdToken(false)}`;
 		}
 		if (this.userid !== undefined) {
 			headers['X-Player-Id'] = this.userid;
@@ -104,8 +104,8 @@ class Client {
 }
 
 
-export default function clientFor(name, id, key) {
+export default function clientFor(name, id, userInfo) {
 	const baseURL = process.env.NEXT_PUBLIC_API_URL || 
                    `${window.location.protocol}//${window.location.hostname}:8080`;
-    return new Client(baseURL, name, id, key);
+    return new Client(baseURL, name, id, userInfo);
 }
