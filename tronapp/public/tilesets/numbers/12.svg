@@ -36,27 +36,6 @@
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      inkscape:export-bgcolor="#ffffff00" />
-  <defs
-     id="defs1">
-    <rect
-       x="24.68672"
-       y="17.42592"
-       width="203.3024"
-       height="203.3024"
-       id="rect4" />
-    <rect
-       x="55.18208"
-       y="31.94752"
-       width="151.02464"
-       height="165.54624"
-       id="rect3" />
-    <rect
-       x="81.32096"
-       y="120.52928"
-       width="95.84256"
-       height="72.608"
-       id="rect2" />
-  </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -67,20 +46,12 @@
        x="-2.9945931"
        y="54.923519"
        id="text5"
+	   stroke="black"
        transform="scale(0.99414053,1.005894)"><tspan
          sodipodi:role="line"
          id="tspan5"
          style="fill:#ff6600;stroke-width:0.748268"
          x="-2.9945931"
          y="54.923519">12</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:19.7556px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#0000ff;stroke-width:0.264583"
-       x="187.11383"
-       y="48.411381"
-       id="text1"><tspan
-         sodipodi:role="line"
-         id="tspan1"
-         style="stroke-width:0.264583"></tspan></text>
   </g>
 </svg>
