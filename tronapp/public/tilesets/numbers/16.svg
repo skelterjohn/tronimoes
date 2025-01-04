@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 67.733334 67.733334"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="16.svg"
+   inkscape:export-filename="0.png"
+   inkscape:export-xdpi="47.393879"
+   inkscape:export-ydpi="47.393879"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.68862935"
+     inkscape:cx="411.68736"
+     inkscape:cy="506.80384"
+     inkscape:window-width="1718"
+     inkscape:window-height="1368"
+     inkscape:window-x="1682"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     inkscape:export-bgcolor="#ffffff00" />
+  <defs
+     id="defs1">
+    <rect
+       x="24.68672"
+       y="17.42592"
+       width="203.3024"
+       height="203.3024"
+       id="rect4" />
+    <rect
+       x="55.18208"
+       y="31.94752"
+       width="151.02464"
+       height="165.54624"
+       id="rect3" />
+    <rect
+       x="81.32096"
+       y="120.52928"
+       width="95.84256"
+       height="72.608"
+       id="rect2" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:55.8708px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#0000ff;stroke-width:0.748268"
+       x="-3.5268788"
+       y="54.923519"
+       id="text5"
+       transform="scale(0.99414053,1.005894)"><tspan
+         sodipodi:role="line"
+         id="tspan5"
+         style="fill:#0000ff;stroke-width:0.748268"
+         x="-3.5268788"
+         y="54.923519">16</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:19.7556px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#0000ff;stroke-width:0.264583"
+       x="187.11383"
+       y="48.411381"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="stroke-width:0.264583"></tspan></text>
+  </g>
+</svg>
