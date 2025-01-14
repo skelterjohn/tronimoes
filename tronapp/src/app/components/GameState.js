@@ -14,18 +14,29 @@ export function GameProvider({ children }) {
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
 	const [tutorial, setTutorial] = useState(false);
+	const [config, setConfig] = useState(null);
 	
 	useEffect(() => {
 		if (!client?.userInfo) {
 			return;
 		}
-		client?.GetPlayerName().then((resp) => {
+		client?.GetPlayer().then((resp) => {
 			setPlayerName(resp.name);
-			// setIsRegistered(true);
+			setConfig(resp.config);
 		}).catch((error) => {
 			console.error('get player name error', error);
 		});
 	}, [client, setPlayerName]);
+
+	useEffect(() => {
+		if (!client?.userInfo) {
+			return;
+		}
+		const playerInfo = { ...config, name: playerName };
+		client?.UpdatePlayer(playerInfo).catch((error) => {
+			console.error('update player error', error);
+		});
+	}, [config, playerName]);
 
 	useEffect(()=> {
 		if (error !== undefined) {

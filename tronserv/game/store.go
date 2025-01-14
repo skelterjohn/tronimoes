@@ -8,9 +8,14 @@ import (
 	"sync"
 )
 
+type PlayerConfig struct {
+	Tileset string `json:"tileset"`
+}
+
 type PlayerInfo struct {
-	Name string `json:"name"`
-	Id   string `json:"id"`
+	Name   string       `json:"name"`
+	Id     string       `json:"id"`
+	Config PlayerConfig `json:"config"`
 }
 
 type Store interface {
@@ -26,6 +31,7 @@ type Store interface {
 	GetPlayerByName(ctx context.Context, playerName string) (PlayerInfo, error)
 	RecordPlayerActive(ctx context.Context, code, playerName string, lastActive int64) error
 	PlayerLastActive(ctx context.Context, code, playerName string) (int64, error)
+	UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error
 }
 
 type MemoryStore struct {
@@ -256,4 +262,13 @@ func (s *MemoryStore) PlayerLastActive(ctx context.Context, code, playerName str
 		return 0, ErrNoSuchPlayer
 	}
 	return pa, nil
+}
+
+func (s *MemoryStore) UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error {
+	s.playersMu.Lock()
+	defer s.playersMu.Unlock()
+	p := s.players[playerID]
+	p.Config = config
+	s.players[playerID] = p
+	return nil
 }

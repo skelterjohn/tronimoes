@@ -46,7 +46,8 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/game/{code}/foot", gs.HandleChickenFoot)
 	r.Post("/game/{code}/react", gs.HandleReact)
 	r.Post("/players", gs.HandleRegisterPlayerName)
-	r.Get("/players", gs.HandleGetPlayerName)
+	r.Get("/players/{playerID}", gs.HandleGetPlayer)
+	r.Put("/players/{playerID}", gs.HandleUpdatePlayer)
 }
 
 func RandomString(n int) string {
@@ -100,6 +101,20 @@ func (s *GameServer) validateToken(ctx context.Context, r *http.Request) error {
 		return ErrInvalidToken
 	}
 
+	return nil
+}
+
+func (s *GameServer) validatePlayerID(ctx context.Context, playerID string, r *http.Request) error {
+	userID := r.Header.Get("X-Player-Id")
+	if userID == "" {
+		return ErrMissingUserID
+	}
+	if userID != playerID {
+		return ErrNotYourPlayer
+	}
+	if err := s.validateToken(ctx, r); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -872,7 +887,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(pi)
 }
 
-func (s *GameServer) HandleGetPlayerName(w http.ResponseWriter, r *http.Request) {
+func (s *GameServer) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	pi, err := s.store.GetPlayer(ctx, r.Header.Get("X-Player-ID"))
@@ -887,4 +902,27 @@ func (s *GameServer) HandleGetPlayerName(w http.ResponseWriter, r *http.Request)
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(pi)
+}
+
+func (s *GameServer) HandleUpdatePlayer(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	playerID := chi.URLParam(r, "playerID")
+	if err := s.validatePlayerID(ctx, playerID, r); err != nil {
+		log.Printf("Error validating player ID: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	pi := &PlayerInfo{}
+	if err := json.NewDecoder(r.Body).Decode(pi); err != nil {
+		log.Printf("Error decoding player info: %v", err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := s.store.UpdatePlayerConfig(ctx, playerID, pi.Config); err != nil {
+		log.Printf("Error updating player config: %v", err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
 }

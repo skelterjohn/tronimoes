@@ -246,10 +246,15 @@ func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo,
 	if err != nil {
 		return PlayerInfo{}, fmt.Errorf("could not read: %v", err)
 	}
-	return PlayerInfo{
-		Name: doc.Data()["name"].(string),
-		Id:   doc.Data()["id"].(string),
-	}, nil
+	pi := PlayerInfo{}
+	if name, ok := doc.Data()["name"].(string); ok {
+		pi.Name = name
+	}
+	if id, ok := doc.Data()["id"].(string); ok {
+		pi.Id = id
+	}
+
+	return pi, nil
 }
 
 func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (PlayerInfo, error) {
@@ -261,10 +266,15 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 	if len(docs) == 0 {
 		return PlayerInfo{}, ErrNoRegisteredPlayer
 	}
-	return PlayerInfo{
-		Name: docs[0].Data()["name"].(string),
-		Id:   docs[0].Data()["id"].(string),
-	}, nil
+	pi := PlayerInfo{}
+	if name, ok := docs[0].Data()["name"].(string); ok {
+		pi.Name = name
+	}
+	if id, ok := docs[0].Data()["id"].(string); ok {
+		pi.Id = id
+	}
+
+	return pi, nil
 }
 
 func (s *FireStore) RecordPlayerActive(ctx context.Context, code, playerName string, lastActive int64) error {
@@ -279,5 +289,13 @@ func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerName strin
 	if err != nil {
 		return 0, fmt.Errorf("could not read: %v", err)
 	}
-	return doc.Data()["last_active"].(int64), nil
+	if lastActive, ok := doc.Data()["last_active"].(int64); ok {
+		return lastActive, nil
+	}
+	return 0, fmt.Errorf("bad data type for last_active: %T", doc.Data()["last_active"])
+}
+
+func (s *FireStore) UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error {
+	_, err := s.players(ctx).Doc(playerID).Set(ctx, map[string]any{"config": config})
+	return err
 }

@@ -3,6 +3,7 @@ class Client {
         this.baseURL = baseURL;
         this.name = name;
         this.userInfo = userInfo;
+		this.playerID = userInfo?.uid;
     }
 
 
@@ -47,9 +48,13 @@ class Client {
         return this.post(`/players`, { name: name });
     }
 
-    async GetPlayerName() {
-        return this.get(`/players`);
+    async GetPlayer() {
+        return this.get(`/players/${this.playerID}`);
     }
+
+	async UpdatePlayer(playerInfo) {
+		return this.put(`/players/${this.playerID}`, playerInfo);
+	}
 
 	async React(code, url) {
 		return this.post(`/game/${code}/react`, { url: url });
@@ -78,7 +83,7 @@ class Client {
 		}
 		if (this.userInfo) {
 			headers['Authorization'] = `Bearer ${await this.userInfo.getIdToken(false)}`;
-			headers['X-Player-Id'] = this.userInfo?.uid;
+			headers['X-Player-Id'] = this.playerID;
 		}
         const response = await fetch(`${this.baseURL}${path}`, {
             method,
