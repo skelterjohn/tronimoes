@@ -239,15 +239,20 @@ func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName
 }
 
 func playerConfigFromData(data map[string]any) (PlayerConfig, error) {
+	if data["config"] == nil {
+		return PlayerConfig{}, nil
+	}
 	m, ok := data["config"].(map[string]any)
 	if !ok {
 		return PlayerConfig{}, fmt.Errorf("bad data type for config: %T", data["config"])
 	}
 	cfg := PlayerConfig{}
-	if tileset, ok := m["tileset"].(string); ok {
-		cfg.Tileset = tileset
-	} else {
-		return PlayerConfig{}, fmt.Errorf("bad data type for tileset: %T", m["tileset"])
+	if _, ok := m["tileset"]; ok {
+		if tileset, ok := m["tileset"].(string); ok {
+			cfg.Tileset = tileset
+		} else {
+			return PlayerConfig{}, fmt.Errorf("bad data type for tileset: %T", m["tileset"])
+		}
 	}
 	return cfg, nil
 }
