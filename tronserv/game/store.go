@@ -9,7 +9,7 @@ import (
 )
 
 type PlayerConfig struct {
-	Tileset string `json:"tileset"`
+	Tileset string `json:"tileset" firestore:"tileset"`
 }
 
 type PlayerInfo struct {

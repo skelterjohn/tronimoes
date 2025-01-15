@@ -238,6 +238,20 @@ func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName
 	return err
 }
 
+func playerConfigFromData(data map[string]any) (PlayerConfig, error) {
+	m, ok := data["config"].(map[string]any)
+	if !ok {
+		return PlayerConfig{}, fmt.Errorf("bad data type for config: %T", data["config"])
+	}
+	cfg := PlayerConfig{}
+	if tileset, ok := m["tileset"].(string); ok {
+		cfg.Tileset = tileset
+	} else {
+		return PlayerConfig{}, fmt.Errorf("bad data type for tileset: %T", m["tileset"])
+	}
+	return cfg, nil
+}
+
 func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error) {
 	doc, err := s.players(ctx).Doc(playerID).Get(ctx)
 	if err != nil && status.Code(err) == codes.NotFound {
@@ -253,8 +267,10 @@ func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo,
 	if id, ok := doc.Data()["id"].(string); ok {
 		pi.Id = id
 	}
-	if cfg, ok := doc.Data()["config"].(PlayerConfig); ok {
+	if cfg, err := playerConfigFromData(doc.Data()); err == nil {
 		pi.Config = cfg
+	} else {
+		return PlayerInfo{}, fmt.Errorf("could not get config: %v", err)
 	}
 
 	return pi, nil
@@ -276,8 +292,10 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 	if id, ok := docs[0].Data()["id"].(string); ok {
 		pi.Id = id
 	}
-	if cfg, ok := docs[0].Data()["config"].(PlayerConfig); ok {
+	if cfg, err := playerConfigFromData(docs[0].Data()); err == nil {
 		pi.Config = cfg
+	} else {
+		return PlayerInfo{}, fmt.Errorf("could not get config: %v", err)
 	}
 
 	return pi, nil

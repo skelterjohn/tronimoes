@@ -22,6 +22,7 @@ export function GameProvider({ children }) {
 		}
 		client?.GetPlayer().then((resp) => {
 			setPlayerName(resp.name);
+			console.log("got player config", resp);
 			setConfig(resp.config);
 		}).catch((error) => {
 			console.error('get player name error', error);
@@ -32,6 +33,10 @@ export function GameProvider({ children }) {
 		if (!client?.userInfo) {
 			return;
 		}
+		if (!config) {
+			return;
+		}
+		console.log("updating player config", config);
 		client?.UpdatePlayerConfig(config).catch((error) => {
 			console.error('update player error', error);
 		});
