@@ -26,7 +26,7 @@ var (
 	ErrMustPickChickenFoot      = errors.New("must pick chicken foot next to round leader")
 	ErrMustDrawTile             = errors.New("must draw tile")
 	ErrNoSuchPlayer             = errors.New("no such player... who are you")
-	ErrNoBlockingFeet           = errors.New("you must let all players lay at least one tile on their own lines")
+	ErrNoBlockingFeet           = errors.New("you must let all players lay at least one tile on their own line")
 	ErrSpacerNotStraight        = errors.New("spacer not straight")
 	ErrWrongLengthSpacer        = errors.New("spacer must span 6 squares")
 	ErrSpacerNotStartedOnLine   = errors.New("spacer not started on a line")
