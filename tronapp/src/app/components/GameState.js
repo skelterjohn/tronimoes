@@ -32,8 +32,7 @@ export function GameProvider({ children }) {
 		if (!client?.userInfo) {
 			return;
 		}
-		const playerInfo = { ...config, name: playerName };
-		client?.UpdatePlayer(playerInfo).catch((error) => {
+		client?.UpdatePlayerConfig(config).catch((error) => {
 			console.error('update player error', error);
 		});
 	}, [config, playerName]);
@@ -61,6 +60,7 @@ export function GameProvider({ children }) {
 			userInfo, setUserInfo,
 			persistentUser, loading, error,
 			tutorial, setTutorial,
+			config, setConfig,
 		}}>
 			{children}
 		</GameContext.Provider>

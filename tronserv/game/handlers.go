@@ -47,7 +47,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	r.Post("/game/{code}/react", gs.HandleReact)
 	r.Post("/players", gs.HandleRegisterPlayerName)
 	r.Get("/players/{playerID}", gs.HandleGetPlayer)
-	r.Put("/players/{playerID}", gs.HandleUpdatePlayer)
+	r.Put("/players/{playerID}/config", gs.HandleUpdatePlayerConfig)
 }
 
 func RandomString(n int) string {
@@ -904,7 +904,7 @@ func (s *GameServer) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pi)
 }
 
-func (s *GameServer) HandleUpdatePlayer(w http.ResponseWriter, r *http.Request) {
+func (s *GameServer) HandleUpdatePlayerConfig(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	playerID := chi.URLParam(r, "playerID")
 	if err := s.validatePlayerID(ctx, playerID, r); err != nil {
@@ -913,16 +913,19 @@ func (s *GameServer) HandleUpdatePlayer(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	pi := &PlayerInfo{}
-	if err := json.NewDecoder(r.Body).Decode(pi); err != nil {
+	cfg := PlayerConfig{}
+	if err := json.NewDecoder(r.Body).Decode(&cfg); err != nil {
 		log.Printf("Error decoding player info: %v", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := s.store.UpdatePlayerConfig(ctx, playerID, pi.Config); err != nil {
+	if err := s.store.UpdatePlayerConfig(ctx, playerID, cfg); err != nil {
 		log.Printf("Error updating player config: %v", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cfg)
 }

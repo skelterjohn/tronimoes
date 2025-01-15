@@ -52,8 +52,8 @@ class Client {
         return this.get(`/players/${this.playerID}`);
     }
 
-	async UpdatePlayer(playerInfo) {
-		return this.put(`/players/${this.playerID}`, playerInfo);
+	async UpdatePlayerConfig(config) {
+		return this.put(`/players/${this.playerID}/config`, config);
 	}
 
 	async React(code, url) {
@@ -90,7 +90,6 @@ class Client {
             headers: headers,
             body: body ? JSON.stringify(body) : null,
         });
-
         const data = await response.json();
 
         if (!response.ok) {

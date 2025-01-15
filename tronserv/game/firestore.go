@@ -253,6 +253,9 @@ func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo,
 	if id, ok := doc.Data()["id"].(string); ok {
 		pi.Id = id
 	}
+	if cfg, ok := doc.Data()["config"].(PlayerConfig); ok {
+		pi.Config = cfg
+	}
 
 	return pi, nil
 }
@@ -272,6 +275,9 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 	}
 	if id, ok := docs[0].Data()["id"].(string); ok {
 		pi.Id = id
+	}
+	if cfg, ok := docs[0].Data()["config"].(PlayerConfig); ok {
+		pi.Config = cfg
 	}
 
 	return pi, nil
@@ -296,6 +302,10 @@ func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerName strin
 }
 
 func (s *FireStore) UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error {
-	_, err := s.players(ctx).Doc(playerID).Set(ctx, map[string]any{"config": config})
+	log.Printf("updating player config for %q: %+v", playerID, config)
+	_, err := s.players(ctx).Doc(playerID).Update(ctx, []firestore.Update{{
+		Path:  "config",
+		Value: config,
+	}})
 	return err
 }

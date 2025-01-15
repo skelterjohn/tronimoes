@@ -11,6 +11,9 @@ import { Checkbox } from 'antd';
 import Button from "@/app/components/Button";
 import WhyNot from './WhyNot';
 import VisionQuest from '../visionquest/VisionQuest';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
+import Settings from '../settings/Settings';
 
 const availableColors = [
 	"red",
@@ -619,6 +622,8 @@ function Game({ code }) {
 	const boardRef = useRef(null);
 	const [squareSpan, setSquareSpan] = useState(0);
 
+	const [showSettingsModal, setShowSettingsModal] = useState(false);
+
 	const renderHand = useCallback(() => {
 		if (player === undefined) {
 			return null;
@@ -701,6 +706,11 @@ function Game({ code }) {
 						>
 							{(gameInProgress && !game?.done) && (<div>quit</div>) || (<div>leave</div>)}
 						</Button>
+						<FontAwesomeIcon 
+							icon={faGear} 
+							className="text-xl hover:text-gray-300 cursor-pointer" 
+							onClick={() => setShowSettingsModal(true)}
+						/>
 					</div>
 				</div>
 			</div>
@@ -801,6 +811,10 @@ function Game({ code }) {
 					setURL={setReactURL}
 				/>
 			)}
+			<Settings
+				isOpen={showSettingsModal}
+				onClose={() => setShowSettingsModal(false)}
+			/>
 		</div>
 	);
 }
