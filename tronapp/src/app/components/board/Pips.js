@@ -25,8 +25,6 @@ export default function Pips({pips}) {
 		);
 	}
 
-	console.log("config", config);
-
 	return (
 		<div className="w-full flex justify-center items-center">
 			<Image 

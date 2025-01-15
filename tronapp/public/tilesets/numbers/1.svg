@@ -16,6 +16,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -32,7 +34,7 @@
      inkscape:window-width="1718"
      inkscape:window-height="1368"
      inkscape:window-x="1682"
-     inkscape:window-y="29"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      inkscape:export-bgcolor="#ffffff00" />
@@ -40,18 +42,11 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-size:72.1274px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ff0000;stroke-width:0.965989"
-       x="11.628126"
-       y="59.844341"
+    <path
+       d="M 49.804935,59.844341 H 21.418858 V 54.491136 H 32.33658 V 19.343114 H 21.418858 v -4.789711 q 2.218763,0 4.754492,-0.352184 2.535729,-0.387403 3.838812,-1.091772 1.620049,-0.880462 2.535729,-2.218763 0.950898,-1.3735201 1.091772,-3.6627199 h 5.458861 V 54.491136 h 10.706411 z"
        id="text5"
-	   stroke="black"
-       transform="scale(0.99414053,1.005894)"><tspan
-         sodipodi:role="line"
-         id="tspan5"
-         style="stroke-width:0.965989;fill:#ff0000"
-         x="11.628126"
-         y="59.844341">1</tspan></text>
+       style="font-size:72.1274px;fill:#ff0000;stroke:#000000;stroke-width:0.965989"
+       transform="scale(0.99414053,1.005894)"
+       aria-label="1" />
   </g>
 </svg>

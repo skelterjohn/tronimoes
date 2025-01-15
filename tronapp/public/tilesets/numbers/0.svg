@@ -16,6 +16,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -32,7 +34,7 @@
      inkscape:window-width="1718"
      inkscape:window-height="1368"
      inkscape:window-x="1682"
-     inkscape:window-y="29"
+     inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1"
      inkscape:export-bgcolor="#ffffff00" />
@@ -40,18 +42,11 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-size:72.1274px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke-width:0.965989"
-       x="11.628126"
-       y="59.844341"
+    <path
+       d="m 52.728067,33.60659 q 0,14.122602 -4.437525,20.743672 -4.402308,6.585851 -13.699981,6.585851 -9.438547,0 -13.805636,-6.691507 -4.33187,-6.691507 -4.33187,-20.567579 0,-13.981729 4.402307,-20.638017 4.402308,-6.6915074 13.735199,-6.6915074 9.438547,0 13.770417,6.7971624 4.367089,6.761944 4.367089,20.461925 z m -9.262454,15.98918 q 1.232646,-2.852695 1.655267,-6.691507 0.45784,-3.874031 0.45784,-9.297673 0,-5.353206 -0.45784,-9.297673 -0.422621,-3.944468 -1.690486,-6.691508 -1.232646,-2.711821 -3.380972,-4.085341 -2.113107,-1.37352 -5.458861,-1.37352 -3.310535,0 -5.494079,1.37352 -2.148326,1.37352 -3.416191,4.155778 -1.197427,2.606166 -1.655267,6.797163 -0.422622,4.190996 -0.422622,9.192018 0,5.494079 0.387403,9.192017 0.387403,3.697938 1.655268,6.62107 1.162209,2.74704 3.275316,4.190997 2.148326,1.443957 5.670172,1.443957 3.310535,0 5.49408,-1.37352 2.183544,-1.37352 3.380972,-4.155778 z"
        id="text5"
-	   stroke="black"
-       transform="scale(0.99414053,1.005894)"><tspan
-         sodipodi:role="line"
-         id="tspan5"
-         style="stroke-width:0.965989"
-         x="11.628126"
-         y="59.844341">0</tspan></text>
+       style="font-size:72.1274px;stroke:#000000;stroke-width:0.965989"
+       transform="scale(0.99414053,1.005894)"
+       aria-label="0" />
   </g>
 </svg>

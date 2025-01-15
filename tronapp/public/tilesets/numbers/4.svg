@@ -16,6 +16,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -40,18 +42,11 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-size:72.1274px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#00ff00;stroke-width:0.965989"
-       x="11.628126"
-       y="59.844341"
+    <path
+       style="font-size:72.1274px;fill:#ff00ff;stroke:#000000;stroke-width:0.965989"
+       d="M 53.995932,45.087807 H 46.212653 V 59.844341 H 39.450708 V 45.087807 H 14.339947 V 36.987562 L 39.732456,7.4040564 h 6.480197 V 39.452854 h 7.783279 z M 39.450708,39.452854 V 15.78605 l -20.32105,23.666804 z"
        id="text5"
-	   stroke="black"
-       transform="scale(0.99414053,1.005894)"><tspan
-         sodipodi:role="line"
-         id="tspan5"
-         style="fill:#ff00ff;stroke-width:0.965989"
-         x="11.628126"
-         y="59.844341">4</tspan></text>
+       transform="scale(0.99414053,1.005894)"
+       aria-label="4" />
   </g>
 </svg>

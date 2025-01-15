@@ -16,6 +16,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
@@ -40,18 +42,11 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       style="font-size:55.8708px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ff00ff;stroke-width:0.748268"
-       x="-1.3977363"
-       y="54.923519"
+    <path
+       d="M 28.174504,54.923519 H 6.1862883 V 50.776858 H 14.643294 V 23.550755 H 6.1862883 v -3.71017 q 1.7186818,0 3.6828897,-0.272807 1.964208,-0.300087 2.973592,-0.8457 1.254911,-0.682017 1.964208,-1.718682 0.736578,-1.063946 0.845701,-2.837189 h 4.228503 v 36.610651 h 8.293322 z m 35.519424,0 H 41.705713 v -4.146661 h 8.457006 V 23.550755 h -8.457006 v -3.71017 q 1.718682,0 3.682889,-0.272807 1.964208,-0.300087 2.973593,-0.8457 1.25491,-0.682017 1.964208,-1.718682 0.736578,-1.063946 0.8457,-2.837189 h 4.228503 v 36.610651 h 8.293322 z"
        id="text5"
-	   stroke="black"
-       transform="scale(0.99414053,1.005894)"><tspan
-         sodipodi:role="line"
-         id="tspan5"
-         style="fill:#ff00ff;stroke-width:0.748268"
-         x="-1.3977363"
-         y="54.923519">11</tspan></text>
+       style="font-size:55.8708px;fill:#ff00ff;stroke:#000000;stroke-width:0.748268"
+       transform="scale(0.99414053,1.005894)"
+       aria-label="11" />
   </g>
 </svg>
