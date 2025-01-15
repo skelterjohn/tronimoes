@@ -1,7 +1,10 @@
 import Image from 'next/image';
-
+import { useGameState } from '@/app/components/GameState';
 
 export default function Pips({pips}) {
+
+	const { config } = useGameState();
+
 	if (pips === -1) {
 		return (
 			<div className="w-full h-full flex justify-center items-center flex-col border border-black rounded-lg bg-white">
@@ -21,10 +24,13 @@ export default function Pips({pips}) {
 			</div>
 		);
 	}
+
+	console.log("config", config);
+
 	return (
 		<div className="w-full flex justify-center items-center">
 			<Image 
-				src={`/tilesets/beehive/${pips}.svg`}
+				src={`/tilesets/${config.tileset || 'beehive'}/${pips}.svg`}
 				width={0}
 				height={0}
 				sizes="100%"
