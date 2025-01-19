@@ -176,9 +176,9 @@ function Hand({
 			innerTile.style.height = '100%';
 			innerTile.style.maxHeight = '100%';
 		}
-		
-		let x_offset = 32;
-		let y_offset = 32;
+		const scale = squareSpan / 2;
+		let x_offset = scale;
+		let y_offset = scale;
 		// Ensure the rotation class is applied
 		if (tile.a === selectedTile?.a && tile.b === selectedTile?.b) {
 			switch (dragOrientation) {
@@ -187,17 +187,17 @@ function Hand({
 				break;
 			case "right": 
 				ghost.classList.add("-rotate-90");
-				x_offset = 32;
-				y_offset = 64;
+				x_offset = scale;
+				y_offset = 2*scale;
 				break;
 			case "up": 
 				ghost.classList.add("rotate-180");
-				y_offset = 96;
+				y_offset = 3*scale;
 				break;
 			case "left": 
 				ghost.classList.add("rotate-90");
-				x_offset = 96;
-				y_offset = 64;
+				x_offset = 3*scale;
+				y_offset = 2*scale;
 				break;
 			}
 		}
