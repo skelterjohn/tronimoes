@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -84,13 +85,12 @@ func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error
 	if err != nil {
 		return nil, fmt.Errorf("could not query: %v", err)
 	}
-
 	if len(docs) == 0 {
 		return nil, ErrNoSuchGame
 	}
 
-	// Return the first matching game
-	doc := docs[0]
+	// Randomly choose an open game.
+	doc := docs[rand.Intn(len(docs))]
 	data := doc.Data()
 	gameData, ok := data["game_json"].(string)
 	if !ok {
@@ -115,7 +115,9 @@ func (s *FireStore) FindPickupGame(ctx context.Context) (*Game, error) {
 	if len(docs) == 0 {
 		return nil, ErrNoSuchGame
 	}
-	doc := docs[0]
+
+	// Randomly choose an open game.
+	doc := docs[rand.Intn(len(docs))]
 	data := doc.Data()
 	gameData, ok := data["game_json"].(string)
 	if !ok {
