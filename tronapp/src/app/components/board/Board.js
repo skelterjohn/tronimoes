@@ -237,7 +237,7 @@ export default function Board({
 	useEffect(() => {
 		const updateSpan = () => {
 			if (playableBoardRef.current) {
-				setSquareSpan(playableBoardRef.current.clientHeight / height);
+				setSquareSpan(zoom * playableBoardRef.current.clientHeight / height);
 			}
 		};
 	
@@ -253,7 +253,7 @@ export default function Board({
 		return () => {
 			spanObserver.disconnect();
 		}
-	}, [playableBoardRef, setSquareSpan, height]);
+	}, [playableBoardRef.current, setSquareSpan, height, zoom]);
 
 	function getDistance(touch1, touch2) {
 		return Math.hypot(
