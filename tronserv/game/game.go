@@ -297,8 +297,8 @@ func (g *Game) Start(ctx context.Context, name string) error {
 
 	// Give each player 7 tiles.
 	for _, p := range g.Players {
-		p.Hand = append(p.Hand, g.Bag[:7]...)
-		g.Bag = g.Bag[7:]
+		p.Hand = append(p.Hand, g.Bag[:10]...)
+		g.Bag = g.Bag[10:]
 	}
 	g.Turn = 0
 
