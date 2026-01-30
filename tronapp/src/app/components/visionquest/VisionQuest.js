@@ -1,10 +1,10 @@
 import { Modal, Input, Spin } from 'antd';
 import { useState, useEffect, useRef } from 'react';
-// Replace with your actual Tenor API key
-const TENOR_API_KEY = 'AIzaSyBPpZRb23wy2zTKQ2j5eJHS8YVPtjIvcGQ';
-const TENOR_CLIENT_KEY = 'tronimoes'; // Replace with your app name
 
-function VisionQuest({ title = "Vision Quest", placeholder = "enter your path", isOpen, onClose, setURL }) {
+const KLIPY_API_KEY = 'lJodCdaswwEpTPg5Lhix66aIcaFsXBTrKKGlAzX1rPSQvagQHDNczRi42lNJ6x56';
+const KLIPY_CLIENT_KEY = 'tronimoes-js';
+
+function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 	const [path, setPath] = useState("");
 	const [gifs, setGifs] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ function VisionQuest({ title = "Vision Quest", placeholder = "enter your path", 
 		setLoading(true);
 		try {
 			const response = await fetch(
-				`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(searchTerm)}&key=${TENOR_API_KEY}&client_key=${TENOR_CLIENT_KEY}&limit=9&searchfilter=sticker`
+				`https://api.klipy.com/v2/search?q=${encodeURIComponent(searchTerm)}&key=${KLIPY_API_KEY}&client_key=${KLIPY_CLIENT_KEY}&limit=9&searchfilter=sticker`
 			);
 			const data = await response.json();
 			setGifs(data.results);
@@ -58,20 +58,39 @@ function VisionQuest({ title = "Vision Quest", placeholder = "enter your path", 
 			centered
 			width={800}
 			className="vision-quest-modal"
+			styles={{
+				header: {
+					backgroundColor: '#f5f5f5', // Or use your specific grey, e.g., '#f5f5f5'
+					marginBottom: 0,
+					paddingBottom: '16px'
+				},
+				content: {
+					backgroundColor: '#f5f5f5', // Ensures the body matches
+				}
+			}}
 		>
-			<Input
-				inputRef={inputRef}
-				placeholder={placeholder}
-				value={path}
-				onChange={(e) => setPath(e.target.value)}
-				className="mb-4"
-			/>
-			
-			{loading && (
-				<div className="flex justify-center my-4">
-					<Spin />
-				</div>
-			)}
+			<div className="flex items-center justify-between gap-2 mb-4">
+			    <Input
+			        inputRef={inputRef}
+			        placeholder="Search KLIPY"
+			        value={path}
+			        onChange={(e) => setPath(e.target.value)}
+			        className="w-4/5" // Keep your 80% width
+			    />
+			    <div className="flex flex-1 justify-end">
+			        <img 
+			            src="/klipy_powered.png"
+			            alt="Powered by KLIPY"
+			            className="max-h-10 w-auto object-contain" 
+			        />
+			    </div>
+			    
+			    {loading && (
+			        <div className="absolute right-0 flex items-center pr-2">
+			            <Spin />
+			        </div>
+			    )}
+			</div>
 
 			<div className="grid grid-cols-3 gap-4">
 				{gifs.map((gif) => (
