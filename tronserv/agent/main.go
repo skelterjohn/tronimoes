@@ -4,13 +4,12 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
-	"log"
-
 	"cloud.google.com/go/compute/metadata"
+
+	"github.com/skelterjohn/tronimoes/tronserv/client"
 )
 
 var (
@@ -39,9 +38,9 @@ func main() {
 	ctx := context.Background()
 	flag.Parse()
 
-	client := http.DefaultClient
+	c := http.DefaultClient
 	if *useGCEToken {
-		client = &http.Client{
+		c = &http.Client{
 			Transport: &AgentRoundTripper{
 				Next:     http.DefaultClient.Transport,
 				TokenURL: fmt.Sprintf("instance/service-accounts/default/identity?audience=%s", *tronserv_addr),
@@ -49,20 +48,10 @@ func main() {
 		}
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/players/jt", *tronserv_addr), http.NoBody)
-	if err != nil {
-		log.Printf("Could not create request: %s", err)
-		return
+	tc := client.TronimoesClient{
+		TronservAddr: *tronserv_addr,
+		Client:       c,
 	}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Printf("Could not create request: %s", err)
-		return
-	}
-
-	data, err := io.ReadAll(resp.Body)
-	resp.Body.Close()
-
-	fmt.Printf("%s\n", data)
+	tc.GetPlayer(ctx, "jt")
 }

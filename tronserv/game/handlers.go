@@ -65,6 +65,15 @@ var reservedInitials = map[string]bool{
 	"RL": true,
 }
 
+func isBotName(name string) bool {
+	tokens := strings.Split(name, " ")
+	var initials string
+	for _, t := range tokens {
+		initials += t
+	}
+
+	return reservedInitials[initials]
+}
 func validatePlayerName(name string) error {
 	if len(name) > 32 {
 		return ErrPlayerNameTooLong
@@ -879,6 +888,12 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 	if err := validatePlayerName(pi.Name); err != nil {
 		log.Printf("Error validating player name %q: %v", pi.Name, err)
 		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if isBotName(pi.Name) {
+		log.Printf("Error trying to register name with reserved initials %q", pi.Name)
+		writeErr(w, ErrPlayerInitialsReserved, http.StatusForbidden)
 		return
 	}
 
