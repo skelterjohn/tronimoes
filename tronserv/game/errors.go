@@ -49,4 +49,5 @@ var (
 	ErrPlayerAlreadyDead        = errors.New("that line is already dead")
 	ErrFreeFromSpacer           = errors.New("free lines must begin off a spacer")
 	ErrPlayerNameTooLong        = errors.New("player name too long")
+	ErrPlayerInitialsReserved   = errors.New("you cannot make a player with those initials")
 )

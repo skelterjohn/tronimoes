@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	firebase "firebase.google.com/go/v4"
@@ -59,10 +60,26 @@ func RandomString(n int) string {
 	return string(b)
 }
 
+var reservedInitials = map[string]bool{
+	"RC": true,
+	"RL": true,
+}
+
 func validatePlayerName(name string) error {
 	if len(name) > 32 {
 		return ErrPlayerNameTooLong
 	}
+
+	tokens := strings.Split(name, " ")
+	var initials string
+	for _, t := range tokens {
+		initials += t
+	}
+
+	if reservedInitials[initials] {
+		return ErrPlayerInitialsReserved
+	}
+
 	return nil
 }
 
