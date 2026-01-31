@@ -13,16 +13,25 @@ import (
 type TronimoesClient struct {
 	TronservAddr string
 	Client       *http.Client
+
+	Name string
 }
 
-func (c *TronimoesClient) GetPlayer(ctx context.Context, name string) (*game.PlayerInfo, error) {
+func (c *TronimoesClient) WriteHeaders(req *http.Request) {
+	req.Header.Set("X-Player-Name", c.Name)
+}
 
-	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/players/jt", c.TronservAddr), http.NoBody)
+func (c *TronimoesClient) Get(ctx context.Context, path string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/%s", c.TronservAddr, path), http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %s", err)
 	}
 
-	resp, err := c.Client.Do(req)
+	return c.Client.Do(req)
+}
+
+func (c *TronimoesClient) GetPlayer(ctx context.Context, name string) (*game.PlayerInfo, error) {
+	resp, err := c.Get(ctx, "players/jt")
 	if err != nil {
 		return nil, fmt.Errorf("could not do request: %s", err)
 	}
