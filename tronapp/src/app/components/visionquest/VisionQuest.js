@@ -11,17 +11,6 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 
 	const inputRef = useRef(null);
 
-	useEffect(() => {
-		// Add a small delay to ensure DOM is ready and other focus events have completed
-		const timer = setTimeout(() => {
-			if (inputRef.current && document.activeElement !== inputRef.current) {
-				inputRef.current.focus();
-			}
-		}, 100);
-		
-		return () => clearTimeout(timer);
-	}, []);
-
 	// Debounced search function
 	useEffect(() => {
 		const searchTimer = setTimeout(() => {
@@ -53,6 +42,11 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 			title={title}
 			
 			open={isOpen}
+			afterOpenChange={(open) => {
+				if (open) {
+					inputRef.current?.focus();
+				}
+			}}
 			onCancel={onClose}
 			footer={null}
 			centered
@@ -71,7 +65,7 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 		>
 			<div className="flex items-center justify-between gap-2 mb-4">
 			    <Input
-			        inputRef={inputRef}
+			        ref={inputRef}
 			        placeholder="Search KLIPY"
 			        value={path}
 			        onChange={(e) => setPath(e.target.value)}
