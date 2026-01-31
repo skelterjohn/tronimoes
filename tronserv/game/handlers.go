@@ -890,13 +890,20 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 func (s *GameServer) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	pi, err := s.store.GetPlayer(ctx, r.Header.Get("X-Player-ID"))
+	playerID := chi.URLParam(r, "playerID")
+	pi, err := s.store.GetPlayer(ctx, playerID)
+
+	if err == ErrNoRegisteredPlayer {
+		// If this isn't a valid player ID, try the player by name.
+		pi, err = s.store.GetPlayerByName(ctx, playerID)
+	}
+
 	if err != nil {
 		if err == ErrNoRegisteredPlayer {
 			writeErr(w, err, http.StatusNotFound)
 			return
 		}
-		log.Printf("Error getting player name for %q: %v", r.Header.Get("X-Player-ID"), err)
+		log.Printf("Error getting player name for %q: %v", playerID, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
