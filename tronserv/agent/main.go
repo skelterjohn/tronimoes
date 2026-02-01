@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -13,10 +14,10 @@ import (
 )
 
 var (
-	tronserv_addr = flag.String("tronserv", "http://localhost:8080", "host/port for the tronimoes game server")
+	tronserv_addr = flag.String("addr", "http://localhost:8080", "host/port for the tronimoes game server")
 	name          = flag.String("name", "", "name of the agent")
-	gamecode      = flag.String("gamecode", "", "code of the game to connect to")
-	useGCEToken   = flag.Bool("use_gce_token", false, "use the runner's service account to inject access tokens into requests")
+	gamecode      = flag.String("code", "", "code of the game to connect to")
+	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
 )
 
 type AgentRoundTripper struct {
@@ -51,7 +52,10 @@ func main() {
 	tc := client.TronimoesClient{
 		TronservAddr: *tronserv_addr,
 		Client:       c,
+		Name:         *name,
 	}
 
-	tc.GetPlayer(ctx, "jt")
+	if _, err := tc.JoinGame(ctx, *gamecode); err != nil {
+		log.Print(err)
+	}
 }

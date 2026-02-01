@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/skelterjohn/tronimoes/tronserv/game"
@@ -31,15 +32,27 @@ func (c *TronimoesClient) Do(ctx context.Context, method, path string, vin, vout
 		if err := json.NewEncoder(b).Encode(vin); err != nil {
 			return fmt.Errorf("could not encode request body: %v", err)
 		}
+		body = b
 	}
 	req, err := http.NewRequestWithContext(ctx, method, fmt.Sprintf("%s/%s", c.TronservAddr, path), body)
 	if err != nil {
 		return fmt.Errorf("could not create request: %s", err)
 	}
 
+	c.WriteHeaders(req)
+
 	resp, err := c.Client.Do(req)
 	if err != nil {
 		return fmt.Errorf("could not do request: %s", err)
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		d, _ := io.ReadAll(resp.Body)
+		log.Printf("Got an error with the request: %s", d)
+		if resp.StatusCode == http.StatusNotFound {
+			return game.ErrNoSuchGame
+		}
+		return fmt.Errorf("request had status code %d", resp.StatusCode)
 	}
 
 	if vout != nil {
@@ -59,4 +72,18 @@ func (c *TronimoesClient) GetPlayer(ctx context.Context, name string) (*game.Pla
 	fmt.Printf("%+v\n", pi)
 
 	return nil, nil
+}
+
+func (c *TronimoesClient) JoinGame(ctx context.Context, code string) (*game.Game, error) {
+	p := game.Player{
+		Name: c.Name,
+	}
+	var g game.Game
+
+	if err := c.Do(ctx, "PUT", fmt.Sprintf("game/%s", code), p, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+
+	return &g, nil
 }

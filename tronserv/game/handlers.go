@@ -648,6 +648,9 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
+		if g != nil {
+			log.Printf("Found a pickup game: %s", g.Code)
+		}
 	} else {
 		prefix := code
 		if len(code) > 6 {
@@ -668,6 +671,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 				writeErr(w, err, http.StatusInternalServerError)
 				return
 			}
+			log.Printf("Found open game with prefix %q", prefix)
 		}
 
 		if g != nil {
@@ -687,6 +691,8 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		g = NewGame(ctx, code)
 		g.Pickup = pickup
 	}
+
+	log.Printf("Attempting to add player %q to %q", name, code)
 
 	inGame := false
 	for _, p := range g.Players {
