@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -12,11 +13,14 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
+var ErrTimeout = errors.New("request timed out")
+
 type TronimoesClient struct {
 	TronservAddr string
 	Client       *http.Client
 
 	Name string
+	Code string
 }
 
 func (c *TronimoesClient) WriteHeaders(req *http.Request) {
@@ -52,6 +56,9 @@ func (c *TronimoesClient) Do(ctx context.Context, method, path string, vin, vout
 		if resp.StatusCode == http.StatusNotFound {
 			return game.ErrNoSuchGame
 		}
+		if resp.StatusCode == http.StatusRequestTimeout {
+			return ErrTimeout
+		}
 		return fmt.Errorf("request had status code %d", resp.StatusCode)
 	}
 
@@ -81,6 +88,57 @@ func (c *TronimoesClient) JoinGame(ctx context.Context, code string) (*game.Game
 	var g game.Game
 
 	if err := c.Do(ctx, "PUT", fmt.Sprintf("game/%s", code), p, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+
+	c.Code = g.Code
+
+	return &g, nil
+}
+
+func (c *TronimoesClient) GetGame(ctx context.Context, version int64) (*game.Game, error) {
+	var g game.Game
+
+	if err := c.Do(ctx, "GET", fmt.Sprintf("game/%s", c.Code), nil, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+
+	return &g, nil
+}
+
+func (c *TronimoesClient) Start(ctx context.Context) (*game.Game, error) {
+	var g game.Game
+
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/start", c.Code), nil, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+
+	return &g, nil
+}
+
+func (c *TronimoesClient) Draw(ctx context.Context) (*game.Game, error) {
+	var g game.Game
+
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/draw", c.Code), nil, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+
+	return &g, nil
+}
+
+func (c *TronimoesClient) Pass(ctx context.Context, x, y int) (*game.Game, error) {
+	var g game.Game
+
+	sel := map[string]int{
+		"selected_x": x,
+		"selected_y": y,
+	}
+
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/pass", c.Code), sel, &g); err != nil {
 		return nil, err
 	}
 	fmt.Printf("%+v\n", g)

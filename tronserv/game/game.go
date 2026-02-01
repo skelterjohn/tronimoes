@@ -214,7 +214,6 @@ func (g *Game) Start(ctx context.Context, name string) error {
 	}
 
 	g.Rounds = append(g.Rounds, &Round{
-		Turn:        0,
 		LaidTiles:   []*LaidTile{},
 		PlayerLines: playerLines,
 	})
@@ -803,7 +802,6 @@ func (lt *LaidTile) String() string {
 }
 
 type Round struct {
-	Turn          int                    `json:"turn"`
 	LaidTiles     []*LaidTile            `json:"laid_tiles"`
 	Spacer        *Spacer                `json:"spacer"`
 	Done          bool                   `json:"done"`
