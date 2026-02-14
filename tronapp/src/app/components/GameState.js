@@ -5,7 +5,7 @@ import clientFor from '../../client/Client';
 import { auth } from "@/config";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-const GameContext = createContext();
+export const GameContext = createContext();
 
 export function GameProvider({ children }) {
 	const [gameCode, setGameCode] = useState("");
