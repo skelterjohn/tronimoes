@@ -8,14 +8,27 @@ import Settings from "@/app/components/settings/Settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 
+function slugify(title) {
+	return title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+}
+
 function Section({ title, children }) {
+	const id = slugify(title);
 	return (
-		<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
+		<div id={id} className="mx-auto px-6 py-10 max-w-2xl space-y-10 scroll-mt-24">
 			<h2 className="text-xl font-semibold tracking-tight text-slate-200">{title}</h2>
 			{children}
 		</div>
 	);
 }
+
+const SECTION_TITLES = [
+	"Leaders and lines",
+	"A game of murder",
+	"A dead line",
+	"Drawing and passing",
+	"The dreaded chicken-foot",
+];
 
 export default function RulesPage() {
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
@@ -27,7 +40,7 @@ export default function RulesPage() {
 
 	return (
 		<GameContext.Provider value={stateWithConfig}>
-			<main className="min-h-screen w-full bg-slate-800 text-slate-100">
+			<main className="flex flex-col h-screen w-full bg-slate-800 text-slate-100 overflow-hidden">
 				<header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-slate-800 border-b border-slate-600">
 					<div className="flex items-baseline gap-4">
 						<h1 className="text-3xl font-bold tracking-tight">Tronimoes: the rules of play</h1>
@@ -47,6 +60,24 @@ export default function RulesPage() {
 						<FontAwesomeIcon icon={faGear} className="text-xl" />
 					</button>
 				</header>
+				<div className="flex flex-1 min-h-0">
+					<aside
+						aria-label="Table of contents"
+						className="w-52 flex-shrink-0 overflow-y-auto border-r border-slate-600 bg-slate-800 py-4"
+					>
+						<nav className="px-4 space-y-1">
+							{SECTION_TITLES.map((t) => (
+								<a
+									key={t}
+									href={`#${slugify(t)}`}
+									className="block py-1.5 text-sm text-slate-300 hover:text-slate-100 focus:text-slate-100 focus:outline-none underline-offset-2 hover:underline"
+								>
+									{t}
+								</a>
+							))}
+						</nav>
+					</aside>
+					<div className="flex-1 overflow-y-auto">
 				<Section title="Leaders and lines">
 					<p>
 						In tronimoes, players take turns laying tiles on the board. They start
@@ -161,6 +192,8 @@ export default function RulesPage() {
 						are no longer chicken-footed.
 					</p>
 				</Section>
+					</div>
+				</div>
 				<Settings
 					isOpen={showSettingsModal}
 					onClose={() => setShowSettingsModal(false)}
