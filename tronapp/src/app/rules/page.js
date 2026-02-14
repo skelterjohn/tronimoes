@@ -280,6 +280,45 @@ const SECTIONS = [
 		contentIsFunction: true,
 	},
 	{
+		title: "starting chicken-footed",
+		content: (openVisionQuest, chickenFoot) => (
+			<>
+				<p>
+					If you find yourself in the unfortunate position of being unable to
+					play off the round leader, you still become chicken-footed but must
+					choose a square, adjacent to the round leader, for your foot.
+				</p>
+				<p>
+					You choose this square by clicking on it before you pass.
+				</p>
+				<p>
+					When you are finally able to play, it must go through this chosen square.
+					If someone attempts to play on your line, it must go through this square.
+				</p>
+				<p>
+					It is illegal for another player to lay a tile in such a way that you can 
+					never play the first tile of your line. However, they may leave a box for you
+					which results in line-death immediately once the first tile is played.
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+					chickenFeet={{ "2,2": "red" }}
+					chickenFeetURLs={{ "2,2": chickenFoot }}
+				/>
+			</>
+		),
+		contentIsFunction: true,
+	},
+	{
 		title: "double tile, double turn",
 		content: (
 			<>
