@@ -45,18 +45,19 @@ export default function RulesPage() {
 	}, []);
 
 	return (
-		<main className="relative min-h-screen w-full bg-slate-800 text-slate-100">
-			<div className="absolute top-4 right-4 text-slate-300 hover:text-white cursor-pointer">
-				<FontAwesomeIcon
-					icon={faGear}
-					className="text-xl"
+		<main className="min-h-screen w-full bg-slate-800 text-slate-100">
+			<header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-slate-800 border-b border-slate-600">
+				<h1 className="text-3xl font-bold tracking-tight">game rules</h1>
+				<button
+					type="button"
 					onClick={() => setShowSettingsModal(true)}
-				/>
-			</div>
+					className="text-slate-300 hover:text-white cursor-pointer p-1"
+					aria-label="Settings"
+				>
+					<FontAwesomeIcon icon={faGear} className="text-xl" />
+				</button>
+			</header>
 			<div className="mx-auto px-6 py-10">
-				<header className="mb-8">
-					<h1 className="text-3xl font-bold tracking-tight">game rules</h1>
-				</header>
 
 				<div
 					ref={boardContainerRef}
