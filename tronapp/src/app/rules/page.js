@@ -8,6 +8,15 @@ import Settings from "@/app/components/settings/Settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
 
+function Section({ title, children }) {
+	return (
+		<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
+			<h2 className="text-xl font-semibold tracking-tight text-slate-200">{title}</h2>
+			{children}
+		</div>
+	);
+}
+
 export default function RulesPage() {
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
 	const gameState = useGameState();
@@ -38,10 +47,7 @@ export default function RulesPage() {
 						<FontAwesomeIcon icon={faGear} className="text-xl" />
 					</button>
 				</header>
-				<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
-					<h2 className="text-xl font-semibold tracking-tight text-slate-200">
-						Leaders and lines
-					</h2>
+				<Section title="Leaders and lines">
 					<p>
 						In tronimoes, players take turns laying tiles on the board. They start
 						from the central tile, known as the "round leader". Lines are built by
@@ -71,11 +77,8 @@ export default function RulesPage() {
 						]}
 						activePlayer={{ color: "red" }}
 					/>
-				</div>
-				<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
-					<h2 className="text-xl font-semibold tracking-tight text-slate-200">
-						A game of murder
-					</h2>
+				</Section>
+				<Section title="A game of murder">
 					<p>
 						If a player lays a tile that makes it impossible for another player to
 						continue their line, that player is "killed", and their line is "dead".
@@ -99,11 +102,8 @@ export default function RulesPage() {
 						]}
 						activePlayer={{ color: "blue" }}
 					/>
-				</div>
-				<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
-					<h2 className="text-xl font-semibold tracking-tight text-slate-200">
-						A dead line
-					</h2>
+				</Section>
+				<Section title="A dead line">
 					<p>
 						That's right (probably): blue can place their next tile blocking
 						red from continuing.
@@ -128,11 +128,8 @@ export default function RulesPage() {
 						]}
 						activePlayer={false}
 					/>
-				</div>
-				<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
-					<h2 className="text-xl font-semibold tracking-tight text-slate-200">
-						Drawing and passing
-					</h2>
+				</Section>
+				<Section title="Drawing and passing">
 					<p>
 						On your turn, you may opt to draw a tile, if you haven't already.
 					</p>
@@ -143,11 +140,8 @@ export default function RulesPage() {
 						You can do this draw/pass maneuver whether or not you have a tile
 						that could have been laid.
 					</p>
-				</div>
-				<div className="mx-auto px-6 py-10 max-w-2xl space-y-10">
-					<h2 className="text-xl font-semibold tracking-tight text-slate-200">
-						The dreaded chicken-foot
-					</h2>
+				</Section>
+				<Section title="The dreaded chicken-foot">
 					<p>
 						If you pass, and you weren't chicken-footed already, you become
 						chicken-footed.
@@ -166,7 +160,7 @@ export default function RulesPage() {
 						Once you are finally able to play a tile on your own line again, you
 						are no longer chicken-footed.
 					</p>
-				</div>
+				</Section>
 				<Settings
 					isOpen={showSettingsModal}
 					onClose={() => setShowSettingsModal(false)}
