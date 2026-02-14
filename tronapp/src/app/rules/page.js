@@ -161,6 +161,24 @@ const SECTIONS = [
 			</>
 		),
 	},
+	{
+		title: "A vision quest",
+		content: (
+			<>
+				<p>
+					The first time you become chicken-footed, you must complete a vision quest.
+				</p>
+				<p>
+					On tronimoes.com, that means doing a quick image search for something that
+					makes you feel like you're chicken-footed. The resulting image is your chicken-foot.
+				</p>
+				<p>
+					When you are chicken-footed, your chicken-foot is displayed on the end of your
+					line, making it clear to you and your opponents that you are chicken-footed.
+				</p>
+			</>
+		),
+	}
 ];
 
 export default function RulesPage() {
