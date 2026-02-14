@@ -15,8 +15,8 @@ function slugify(title) {
 function Section({ title, children }) {
 	const id = slugify(title);
 	return (
-		<div id={id} className="mx-auto px-6 py-10 max-w-2xl space-y-10 scroll-mt-24">
-			<h2 className="text-xl font-semibold tracking-tight text-slate-200">{title}</h2>
+		<div id={id} className="mx-auto px-6 py-5 max-w-2xl space-y-10 scroll-mt-24">
+			<h2 className="text-2xl font-bold tracking-tight text-white border-b border-slate-500 pb-2 mb-1">{title}</h2>
 			{children}
 		</div>
 	);
