@@ -24,7 +24,7 @@ function Section({ title, children }) {
 
 const SECTIONS = [
 	{
-		title: "Leaders and lines",
+		title: "leaders and lines",
 		content: (
 			<>
 				<p>
@@ -60,7 +60,7 @@ const SECTIONS = [
 		),
 	},
 	{
-		title: "A game of murder",
+		title: "a game of murder",
 		content: (
 			<>
 				<p>
@@ -89,7 +89,7 @@ const SECTIONS = [
 		),
 	},
 	{
-		title: "A dead line",
+		title: "a dead line",
 		content: (
 			<>
 				<p>
@@ -120,7 +120,7 @@ const SECTIONS = [
 		),
 	},
 	{
-		title: "Drawing and passing",
+		title: "drawing and passing",
 		content: (
 			<>
 				<p>
@@ -137,7 +137,7 @@ const SECTIONS = [
 		),
 	},
 	{
-		title: "The dreaded chicken-foot",
+		title: "the dreaded chicken-foot",
 		content: (
 			<>
 				<p>
@@ -162,7 +162,7 @@ const SECTIONS = [
 		),
 	},
 	{
-		title: "A vision quest",
+		title: "a vision quest",
 		content: (
 			<>
 				<p>
