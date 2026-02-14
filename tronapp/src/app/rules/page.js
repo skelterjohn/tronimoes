@@ -6,7 +6,7 @@ import { GameContext } from "@/app/components/GameState";
 import { useGameState } from "@/app/components/GameState";
 import Settings from "@/app/components/settings/Settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faList } from "@fortawesome/free-solid-svg-icons";
 import VisionQuest from "@/app/components/visionquest/VisionQuest";
 
 function slugify(title) {
@@ -491,6 +491,7 @@ export default function RulesPage() {
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFoot, setChickenFoot] = useState(null);
+	const [showToc, setShowToc] = useState(true);
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
 		() => ({ ...gameState, config: gameState?.config ?? { tileset: "beehive" } }),
@@ -520,23 +521,34 @@ export default function RulesPage() {
 					</button>
 				</header>
 				<div className="flex flex-1 min-h-0">
-					<aside
-						aria-label="Table of contents"
-						className="w-52 flex-shrink-0 overflow-y-auto border-r border-slate-600 bg-slate-800 py-4"
-					>
-						<nav className="px-4 space-y-1">
-							{SECTIONS.map((section) => (
-								<a
-									key={section.title}
-									href={`#${slugify(section.title)}`}
-									className="block py-1.5 text-sm text-slate-300 hover:text-slate-100 focus:text-slate-100 focus:outline-none underline-offset-2 hover:underline"
-								>
-									{section.title}
-								</a>
-							))}
-						</nav>
-					</aside>
-					<div className="flex-1 overflow-y-auto">
+					{showToc && (
+						<aside
+							aria-label="Table of contents"
+							className="w-52 flex-shrink-0 overflow-y-auto border-r border-slate-600 bg-slate-800 py-4"
+						>
+							<nav className="px-4 space-y-1">
+								{SECTIONS.map((section) => (
+									<a
+										key={section.title}
+										href={`#${slugify(section.title)}`}
+										className="block py-1.5 text-sm text-slate-300 hover:text-slate-100 focus:text-slate-100 focus:outline-none underline-offset-2 hover:underline"
+									>
+										{section.title}
+									</a>
+								))}
+							</nav>
+						</aside>
+					)}
+					<div className="relative flex-1 overflow-y-auto">
+						<button
+							type="button"
+							onClick={() => setShowToc((v) => !v)}
+							className={`sticky top-0 left-0 z-10 mt-2 ml-2 cursor-pointer rounded p-2 ${showToc ? "text-slate-100 bg-slate-700/90" : "text-slate-400 hover:text-slate-200 bg-slate-700/70 hover:bg-slate-600/90"}`}
+							aria-label={showToc ? "Hide table of contents" : "Show table of contents"}
+							title={showToc ? "Hide contents" : "Show contents"}
+						>
+							<FontAwesomeIcon icon={faList} className="text-xl" />
+						</button>
 						{SECTIONS.map((section) => (
 							<Section key={section.title} title={section.title}>
 								{section.contentIsFunction
