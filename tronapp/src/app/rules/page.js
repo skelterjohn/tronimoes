@@ -524,9 +524,18 @@ export default function RulesPage() {
 					{showToc && (
 						<aside
 							aria-label="Table of contents"
-							className="w-52 flex-shrink-0 overflow-y-auto border-r border-slate-600 bg-slate-800 py-4"
+							className="w-52 flex-shrink-0 flex flex-col overflow-hidden border-r border-slate-600 bg-slate-800"
 						>
-							<nav className="px-4 space-y-1">
+							<button
+								type="button"
+								onClick={() => setShowToc(false)}
+								className="flex-shrink-0 p-2 m-2 self-start cursor-pointer rounded text-slate-100 bg-slate-700/90 hover:bg-slate-600/90"
+								aria-label="Hide table of contents"
+								title="Hide contents"
+							>
+								<FontAwesomeIcon icon={faList} className="text-xl" />
+							</button>
+							<nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-1">
 								{SECTIONS.map((section) => (
 									<a
 										key={section.title}
@@ -540,15 +549,17 @@ export default function RulesPage() {
 						</aside>
 					)}
 					<div className="relative flex-1 overflow-y-auto">
-						<button
-							type="button"
-							onClick={() => setShowToc((v) => !v)}
-							className={`sticky top-0 left-0 z-10 mt-2 ml-2 cursor-pointer rounded p-2 ${showToc ? "text-slate-100 bg-slate-700/90" : "text-slate-400 hover:text-slate-200 bg-slate-700/70 hover:bg-slate-600/90"}`}
-							aria-label={showToc ? "Hide table of contents" : "Show table of contents"}
-							title={showToc ? "Hide contents" : "Show contents"}
-						>
-							<FontAwesomeIcon icon={faList} className="text-xl" />
-						</button>
+						{!showToc && (
+							<button
+								type="button"
+								onClick={() => setShowToc(true)}
+								className="sticky top-0 left-0 z-10 mt-2 ml-2 cursor-pointer rounded p-2 text-slate-400 hover:text-slate-200 bg-slate-700/70 hover:bg-slate-600/90"
+								aria-label="Show table of contents"
+								title="Show contents"
+							>
+								<FontAwesomeIcon icon={faList} className="text-xl" />
+							</button>
+						)}
 						{SECTIONS.map((section) => (
 							<Section key={section.title} title={section.title}>
 								{section.contentIsFunction
