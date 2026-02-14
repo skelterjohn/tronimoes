@@ -7,6 +7,7 @@ import { useGameState } from "@/app/components/GameState";
 import Settings from "@/app/components/settings/Settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear } from "@fortawesome/free-solid-svg-icons";
+import VisionQuest from "@/app/components/visionquest/VisionQuest";
 
 function slugify(title) {
 	return title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
@@ -163,7 +164,7 @@ const SECTIONS = [
 	},
 	{
 		title: "a vision quest",
-		content: (
+		content: (openVisionQuest, chickenFoot) => (
 			<>
 				<p>
 					The first time you become chicken-footed, you must complete a vision quest.
@@ -176,13 +177,30 @@ const SECTIONS = [
 					When you are chicken-footed, your chicken-foot is displayed on the end of your
 					line, making it clear to you and your opponents that you are chicken-footed.
 				</p>
+				<p>
+					<button
+						type="button"
+						onClick={openVisionQuest}
+						className="rounded bg-slate-600 px-4 py-2 text-slate-100 hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400"
+					>
+						Go on a vision quest
+					</button>
+				</p>
+				{chickenFoot && (
+					<p>
+						<img src={chickenFoot} alt="Your chicken-foot" className="max-h-32 w-auto rounded" />
+					</p>
+				)}
 			</>
 		),
+		contentIsFunction: true,
 	}
 ];
 
 export default function RulesPage() {
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
+	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
+	const [chickenFoot, setChickenFoot] = useState(null);
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
 		() => ({ ...gameState, config: gameState?.config ?? { tileset: "beehive" } }),
@@ -231,11 +249,21 @@ export default function RulesPage() {
 					<div className="flex-1 overflow-y-auto">
 						{SECTIONS.map((section) => (
 							<Section key={section.title} title={section.title}>
-								{section.content}
+								{section.contentIsFunction
+									? section.content(() => setShowVisionQuestModal(true), chickenFoot)
+									: section.content}
 							</Section>
 						))}
 					</div>
 				</div>
+				{showVisionQuestModal && (
+					<VisionQuest
+						title="Choose an image for your vision quest"
+						isOpen={showVisionQuestModal}
+						onClose={() => setShowVisionQuestModal(false)}
+						setURL={setChickenFoot}
+					/>
+				)}
 				<Settings
 					isOpen={showSettingsModal}
 					onClose={() => setShowSettingsModal(false)}
