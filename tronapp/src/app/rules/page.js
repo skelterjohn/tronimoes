@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import Board from "@/app/components/board/Board";
 import { TipProvider } from "@/app/components/tutorial/InnerTip";
 import { GameContext } from "@/app/components/GameState";
 import { useGameState } from "@/app/components/GameState";
+import Settings from "@/app/components/settings/Settings";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGear } from "@fortawesome/free-solid-svg-icons";
 
 const RULES_BOARD_HEIGHT = 7;
 const RULES_BOARD_WIDTH = RULES_BOARD_HEIGHT - 1;
@@ -22,20 +25,41 @@ const rulesLineHeads = [
 const noop = () => {};
 
 export default function RulesPage() {
+	const [showSettingsModal, setShowSettingsModal] = useState(false);
+	const boardContainerRef = useRef(null);
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
 		() => ({ ...gameState, config: gameState?.config ?? { tileset: "beehive" } }),
 		[gameState]
 	);
 
+	useEffect(() => {
+		const el = boardContainerRef.current;
+		if (!el) return;
+		const handleWheel = (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+		};
+		el.addEventListener("wheel", handleWheel, { passive: false, capture: true });
+		return () => el.removeEventListener("wheel", handleWheel, { capture: true });
+	}, []);
+
 	return (
-		<main className="min-h-screen w-full bg-slate-800 text-slate-100">
+		<main className="relative min-h-screen w-full bg-slate-800 text-slate-100">
+			<div className="absolute top-4 right-4 text-slate-300 hover:text-white cursor-pointer">
+				<FontAwesomeIcon
+					icon={faGear}
+					className="text-xl"
+					onClick={() => setShowSettingsModal(true)}
+				/>
+			</div>
 			<div className="mx-auto px-6 py-10">
 				<header className="mb-8">
 					<h1 className="text-3xl font-bold tracking-tight">game rules</h1>
 				</header>
 
 				<div
+					ref={boardContainerRef}
 					className="w-[75vw] mx-auto aspect-square"
 					style={{ maxHeight: "75vw" }}
 				>
@@ -71,6 +95,12 @@ export default function RulesPage() {
 					</GameContext.Provider>
 				</div>
 			</div>
+			<GameContext.Provider value={stateWithConfig}>
+				<Settings
+					isOpen={showSettingsModal}
+					onClose={() => setShowSettingsModal(false)}
+				/>
+			</GameContext.Provider>
 		</main>
 	);
 }
