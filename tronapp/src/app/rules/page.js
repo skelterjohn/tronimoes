@@ -278,7 +278,102 @@ const SECTIONS = [
 			</>
 		),
 		contentIsFunction: true,
-	}
+	},
+	{
+		title: "double tile, double turn",
+		content: (
+			<>
+				<p>
+					If you lay a double tile, you get to go again.
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+				/>
+				<p>If red has the double-5...</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "right", color: "red", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+				/>
+				<p>Red gets one more turn for the sniper-rifle kill.</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: true },
+						"3,1": { a: 5, b: 5, orientation: "right", color: "red", dead: false },
+						"5,1": { a: 5, b: 2, orientation: "down", color: "red", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={false}
+				/>
+			</>
+		),
+	},
+	{
+		title: "dangling doubles",
+		content: (
+			<>
+				<p>
+					When you play off a double, you can choose either side. Both of
+					these examples are legal plays (even though they missed the sniper-rifle kill).
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
+						"4,1": { a: 5, b: 2, orientation: "right", color: "red", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={false}
+				/>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
+						"4,0": { a: 5, b: 2, orientation: "right", color: "red", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={false}
+				/>
+			</>
+		),
+	},
 ];
 
 export default function RulesPage() {
