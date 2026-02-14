@@ -374,6 +374,78 @@ const SECTIONS = [
 			</>
 		),
 	},
+	{
+		title: "free lines",
+		content: (
+			<>
+				<p>
+					If you have a double that is higher than any leader on the board, you
+					can use it to start a "free line".
+				</p>
+				<p>
+					The free-line spacer is a special non-played tile that helps determine
+					where a new free line can be started. 
+				</p>
+				<p>
+					The spacer is six squares long, and can be placed beginning on the end of
+					any living line on the board. The leader is then placed off the other end of 
+					the spacer. Then the spacer is removed from the board and does not impact
+					future turns. 
+				</p>
+				<p>
+					Later free lines must have a leader whose pips are higher than the previous
+					free line leaders.
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+					spacer={{ a: { x: 1, y: 1 }, b: { x: 1, y: 6 } }}
+				/>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"2,6": { a: 6, b: 6, orientation: "right", color: "white", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+				/>
+				<p>
+					The double-6 is the leader of a new free line.
+				</p>
+				<p>
+					Any player who is not chicken-footed can play on the free line, but unlike
+					the round leader, only a single line is created.
+				</p>
+				<p>
+					Free lines can be used to kill player lines, and the player who used it to
+					do so is the one that gets credit.
+				</p>
+				<p>
+					Free lines can also be killed, but no one gets points (what kind of reprobate 
+					would do that?).
+				</p>
+				<p>
+					Upon starting a new free line, the player immediately goes again (since they
+					just played a double).
+				</p>
+			</>
+		),
+	},
 ];
 
 export default function RulesPage() {

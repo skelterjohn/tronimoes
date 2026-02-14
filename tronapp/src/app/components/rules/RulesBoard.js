@@ -15,9 +15,10 @@ const noop = () => {};
  * @param {{ color: string }} [activePlayer] - Optional; if set, gutter uses this player color (e.g. { color: "red" }). Omit for completed-round look (black gutter).
  * @param {Record<string, string>} [chickenFeet] - Optional; map of "x,y" to color for chicken-foot markers
  * @param {Record<string, string>} [chickenFeetURLs] - Optional; map of "x,y" to image URL for chicken-foot markers
+ * @param {{ a: { x: number, y: number }, b?: { x: number, y: number } }} [spacer] - Optional; spacer placement (Board shows Spacer at spacer.a)
  * @param {string} [className] - Optional extra classes for the board container
  */
-export default function RulesBoard({ height, tiles, roundLeader, lineHeads, activePlayer, chickenFeet = {}, chickenFeetURLs = {}, className = "" }) {
+export default function RulesBoard({ height, tiles, roundLeader, lineHeads, activePlayer, chickenFeet = {}, chickenFeetURLs = {}, spacer, className = "" }) {
 	const width = height - 1;
 	const containerRef = useRef(null);
 
@@ -42,7 +43,7 @@ export default function RulesBoard({ height, tiles, roundLeader, lineHeads, acti
 					width={width}
 					height={height}
 					tiles={tiles}
-					spacer={undefined}
+					spacer={spacer}
 					lineHeads={lineHeads}
 					roundLeader={roundLeader}
 					freeLeaders={new Set()}
