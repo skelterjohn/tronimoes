@@ -24,8 +24,7 @@ const TileHalf = ({ pips, back, orientation }) => {
 }
 
 export default function Tile({ pipsa, pipsb, orientation, back = false, color = "white", dead = false, selected = false, lineHeads, indicated, setIndicated, hintedTiles, roundLeader = undefined, freeLeaders = undefined }) {
-	var squareBar = <div className="absolute bottom-[-2px] left-[15%] w-[70%] h-[4px] bg-gray-300" />;
-	var bar = <div className="absolute left-[15%] w-[70%] h-[4px] bg-gray-300" />;
+	var bar = <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[4px] bg-gray-300" />;
 
 	var height = "";
 	var rotate = 'rotate-0'
@@ -33,22 +32,18 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 	if (orientation == "down") {
 		height = "h-[200%]";
 		rotate = 'rotate-0'
-		bar = squareBar;
 	}
 	if (orientation == "up") {
 		height = "h-[200%]";
 		rotate = 'rotate-180'
-		bar = squareBar;
 	}
 	if (orientation == "left") {
 		height = "h-[200%]";
 		rotate = 'rotate-90'
-		bar = squareBar;
 	}
 	if (orientation == "right") {
 		height = "h-[200%]";
 		rotate = '-rotate-90'
-		bar = squareBar;
 	}
 
 	const [isLineHead, setIsLineHead] = useState(false);
@@ -188,8 +183,8 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 			<Tip bundle={roundLeaderBundle} />
 			<Tip bundle={freeLeaderBundle} />
 			<Tip bundle={deadBundle} />
-			<div className={height + " w-[100%]"}>
-				<div className={`w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
+			<div className={height + " w-full"}>
+				<div className={`relative overflow-hidden w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={() => tileClicked()}>
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							<tr><td>

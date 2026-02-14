@@ -32,7 +32,7 @@ export default function Pips({pips}) {
 				width={0}
 				height={0}
 				sizes="100%"
-				className="w-[100%] h-[100%]"
+				className="w-full h-full"
 				alt="tile"
 			/>
 		</div>

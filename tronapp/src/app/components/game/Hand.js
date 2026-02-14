@@ -488,7 +488,7 @@ function Hand({
 			<div className="w-full text-center font-bold ">
 				<div className="flex flex-row items-center justify-center gap-2">
 					{killedPlayers?.map(kp => (
-						<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
+						<div key={kp.name} className="relative w-8 h-8 inline-block align-middle">
 							<div className="absolute inset-0">
 								<ChickenFoot url={kp.chickenFootURL} color={kp.color} />
 							</div>
@@ -506,7 +506,7 @@ function Hand({
 						/>
 					)}
 					{!player?.chickenFoot && !player?.dead &&
-						<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
+						<div className="relative w-8 h-8 inline-block align-middle">
 							<div className="absolute inset-0">
 								<ChickenFoot url={player.chickenFootURL} color={player.color} />
 							</div>
@@ -560,11 +560,11 @@ function Hand({
 					</div>
 				</div>
 			</div>
-			<div ref={scrollContainerRef} className="w-full min-h-[20vh] flex flex-col items-center flex-1 border-1 border-t border-black overflow-y-auto">
-				<div className="w-full min-h-[10rem] flex flex-col flex-1">
+			<div ref={scrollContainerRef} className="w-full min-h-[20vh] flex flex-col items-center flex-1 border border-t border-black overflow-y-auto">
+				<div className="w-full min-h-40 flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">
-							<div className="max-h-[15vh] aspect-[1/2] p-1">
+							<div className="max-h-[15vh] aspect-1/2 p-1">
 								<Tip bundle={spacerBundle} />
 								<div
 									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
@@ -590,7 +590,7 @@ function Hand({
 										onTouchCancel={handleTouchCancel}
 									>
 										<div
-											className={`max-h-[15vh] aspect-[1/2] pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
+											className={`max-h-[15vh] aspect-1/2 pr-1 pt-1 ${isSelected ? selectedTileRotation : ""}`}
 											>
 											<div className="pointer-events-none">
 												<Tile

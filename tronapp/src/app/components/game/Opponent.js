@@ -48,7 +48,7 @@ function Opponent({
 			<div className="w-full text-center font-bold ">
 				<div className="flex flex-row items-center justify-center gap-2">
 					{killedPlayers?.map(kp => (
-						<div key={kp.name} className="relative w-[2rem] h-[2rem] inline-block align-middle">
+						<div key={kp.name} className="relative w-8 h-8 inline-block align-middle">
 							<div className="absolute inset-0">
 								<ChickenFoot url={kp.chickenFootURL} color={kp.color} />
 							</div>
@@ -66,7 +66,7 @@ function Opponent({
 						/>
 					)}
 					{!player?.chickenFoot && !player?.dead &&
-						<div className="relative w-[2rem] h-[2rem] inline-block align-middle">
+						<div className="relative w-8 h-8 inline-block align-middle">
 							<div className="absolute inset-0">
 								<ChickenFoot url={player.chickenFootURL} color={player.color} />
 							</div>
@@ -75,7 +75,7 @@ function Opponent({
 				</div>
 			</div>
 			<div className="flex flex-row items-center gap-1">
-				<div className="w-[1rem]">
+				<div className="w-4">
 					<Tile
 						color={player?.color}
 						pipsa={0}

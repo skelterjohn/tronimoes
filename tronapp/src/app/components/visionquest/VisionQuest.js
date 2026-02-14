@@ -99,7 +99,7 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 						<img 
 							src={gif.media_formats.tinygif_transparent.url}
 							alt={gif.content_description}
-							className="w-full h-auto rounded"
+							className="w-full h-auto rounded-sm"
 						/>
 					</div>
 				))}

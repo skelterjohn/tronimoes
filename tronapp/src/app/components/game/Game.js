@@ -735,7 +735,7 @@ function Game({ code }) {
 			</div>
 
 			<div className="flex justify-left flex-1 min-h-0">
-				<div className="h-full w-[15rem] flex justify-right hidden lg:block">
+				<div className="h-full w-60 flex justify-right hidden lg:block">
 					<div className="h-[50%]">
 						<History history={gameHistory} />
 					</div>
