@@ -61,6 +61,51 @@ const SECTIONS = [
 		),
 	},
 	{
+		title: "leader election",
+		content: (
+			<>
+				<p>
+					The round leader is chosen and placed automatically.
+				</p>
+				<p>
+					It is the highest double available from a player's hand that
+					is lower than all previous round leaders.
+				</p>
+				<p>
+					If no one has such a double, every player draws a tile until
+					the double is found. This tile-drawing is why in some rounds, especially
+					later ones, players may begin the round with a higher-than-expected
+					number of tiles.
+				</p>
+				<p>
+					The last round is the one that is led by the double-zero.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "scoring and victory",
+		content: (
+			<>
+				<p>
+					The winner of a round gets 2 points.
+				</p>
+				<p>
+					If you kill another player (more on this soon), you get 1 point.
+				</p>
+				<p>
+					If you are killed, you lose 1 point.
+				</p>
+				<p>
+					(If you kill your own line, there is net-zero points)
+				</p>
+				<p>
+					After the last round is played, the player with the most points wins.
+				</p>
+			</>
+		),
+	},
+	{
 		title: "a game of murder",
 		content: (
 			<>
