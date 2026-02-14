@@ -8,6 +8,7 @@ import { auth } from "@/config";
 import { signOut } from "firebase/auth";
 import Error from './components/landing/Error';
 import { useGameState } from './components/GameState';
+import Link from 'next/link';
 
 export default function Home() {
 	const [errorMessage, setErrorMessage] = useState(null);
@@ -29,6 +30,11 @@ export default function Home() {
 			/>
 			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit space-y-4">
 				<Joiner userInfo={userInfo} loading={loading} setErrorMessage={setErrorMessage} />
+			</div>
+			<div className="absolute top-4 left-4 w-fit text-white">
+				<Link href="/rules" target="_blank" rel="noopener noreferrer" className="cursor-pointer underline underline-offset-2">
+					rules
+				</Link>
 			</div>
 			<div className="absolute top-4 right-4 w-fit text-white">
 				{!loading && userInfo === null && (

@@ -13,6 +13,7 @@ import WhyNot from './WhyNot';
 import VisionQuest from '../visionquest/VisionQuest';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 import Settings from '../settings/Settings';
 
 const availableColors = [
@@ -687,6 +688,9 @@ function Game({ code }) {
 				<span className="block md:hidden text-left font-bold mr-auto">
 					#{code.substring(0, 6)} {game?.done && "(done)"}
 				</span>
+				<Link href="/rules" target="_blank" rel="noopener noreferrer" className="text-sm underline underline-offset-2 hover:text-gray-300 pr-5">
+					rules
+				</Link>
 				<span className="text-sm pr-5">
 					<Checkbox checked={tutorial} onChange={() => setTutorial(!tutorial)} />
 					tutorial
