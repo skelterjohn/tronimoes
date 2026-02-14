@@ -9,26 +9,25 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.1",
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@fortawesome/react-fontawesome": "^0.2.6",
     "antd": "^5.22.4",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.8",
     "firebase": "^11.0.2",
     "next": "15.5.11",
-    "nvm": "^0.0.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-firebase-hooks": "^5.1.1",
-    "sharp": "^0.33.5",
-    "uuid": "^11.0.2"
+    "sharp": "^0.34.5",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "eslint": "^9",
     "eslint-config-next": "15.5.11",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.6",
     "source-map-loader": "^5.0.0",
     "tailwindcss": "^4.1.18"
   }
