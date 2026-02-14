@@ -186,11 +186,50 @@ const SECTIONS = [
 						Go on a vision quest
 					</button>
 				</p>
-				{chickenFoot && (
-					<p>
-						<img src={chickenFoot} alt="Your chicken-foot" className="max-h-32 w-auto rounded" />
-					</p>
-				)}
+				<p>You're red, and it's blue's turn. What do you think they might do?</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "blue" }}
+					chickenFeet={{ "2,2": "red" }}
+					chickenFeetURLs={{ "2,2": chickenFoot }}
+				/>
+			</>
+		),
+		contentIsFunction: true,
+	},
+	{
+		title: "your own worst enemy",
+		content: (openVisionQuest, chickenFoot) => (
+			<>
+				<p>
+					In this case, they turned you into a corner which killed your line
+					and ended the round.
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: true },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 1, orientation: "down", color: "red", dead: true },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={false}
+				/>
 			</>
 		),
 		contentIsFunction: true,
