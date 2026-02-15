@@ -33,7 +33,8 @@ export default function Board({
 		spacerHints, clearSpacer,
 		hoveredSquares, setMouseIsOver,
 		dropCallback,
-		setSquareSpan
+		setSquareSpan,
+		zoomEnabled = true
 	}) {
 	const [zoom, setZoom] = useState(1);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -354,7 +355,7 @@ export default function Board({
 	return (
 		<div 
 			ref={boardContainerRef}
-			onWheel={handleWheel}
+			onWheel={zoomEnabled ? handleWheel : undefined}
 			onContextMenu={rightClick}
 			onMouseDown={handleMouseDown}
 			onMouseMove={handleMouseMove}

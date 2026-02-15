@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import Board from "@/app/components/board/Board";
 import { TipProvider } from "@/app/components/tutorial/InnerTip";
 
@@ -20,22 +19,9 @@ const noop = () => {};
  */
 export default function RulesBoard({ height, tiles, roundLeader, lineHeads, activePlayer, chickenFeet = {}, chickenFeetURLs = {}, spacer, className = "" }) {
 	const width = height - 1;
-	const containerRef = useRef(null);
-
-	useEffect(() => {
-		const el = containerRef.current;
-		if (!el) return;
-		const handleWheel = (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-		};
-		el.addEventListener("wheel", handleWheel, { passive: false, capture: true });
-		return () => el.removeEventListener("wheel", handleWheel, { capture: true });
-	}, []);
 
 	return (
 		<div
-			ref={containerRef}
 			className={`w-full max-w-full mx-auto aspect-square ${className}`.trim()}
 		>
 			<TipProvider>
@@ -64,6 +50,7 @@ export default function RulesBoard({ height, tiles, roundLeader, lineHeads, acti
 					setMouseIsOver={noop}
 					dropCallback={noop}
 					setSquareSpan={noop}
+					zoomEnabled={false}
 				/>
 			</TipProvider>
 		</div>
