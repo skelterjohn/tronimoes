@@ -273,9 +273,15 @@ function Hand({
 
 	const [touchOverBoard, setTouchOverBoard] = useState(false);
 
+	function stripRotationClasses(el) {
+		el.classList.remove('rotate-0', '-rotate-90', 'rotate-90', 'rotate-180');
+		el.querySelectorAll('*').forEach(stripRotationClasses);
+	}
+
 	const handleTouchStart = useCallback((tile, e) => {
-		// Create ghost element
-		const ghost = e.target.cloneNode(true);
+		// Clone the same tile container as mouse drag (currentTarget), not the touch target
+		const ghost = e.currentTarget.cloneNode(true);
+		stripRotationClasses(ghost);
 		ghost.id = 'touch-ghost';
 		ghost.style.position = 'fixed';
 		ghost.style.width = `${squareSpan}px`;
@@ -285,10 +291,16 @@ function Hand({
 		ghost.style.aspectRatio = '1/2';
 		ghost.style.padding = '0';
 		ghost.style.margin = '0';
-		ghost.style.transform = 'scale(1)';
+		ghost.style.transform = '';
 		ghost.style.opacity = '0.8';
 		ghost.style.pointerEvents = 'none';
 		ghost.style.zIndex = '1000';
+		const innerTile = ghost.querySelector('div');
+		if (innerTile) {
+			innerTile.style.width = '100%';
+			innerTile.style.height = '100%';
+			innerTile.style.maxHeight = '100%';
+		}
 		
 		const touch = e.touches[0];
 		orientGhost(ghost, touch.clientX, touch.clientY, dragOrientation);
