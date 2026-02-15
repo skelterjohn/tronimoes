@@ -39,7 +39,7 @@ const SECTIONS = [
 					round leader.
 				</p>
 				<p>
-					The goal is to win the round, which can be accomplished in a two ways: 
+					The goal is to win the round, which can be accomplished in two ways: 
 					being first to run out of tiles, or being the last player standing.
 				</p>
 				<RulesBoard
@@ -97,7 +97,7 @@ const SECTIONS = [
 					If you are killed, you lose 1 point.
 				</p>
 				<p>
-					(If you kill your own line, there is net-zero points)
+					(If you kill your own line, it's net zero points.)
 				</p>
 				<p>
 					After the last round is played, the player with the most points wins.
@@ -195,8 +195,8 @@ const SECTIONS = [
 					line, and you may only play on your own line.
 				</p>
 				<p>
-					Other players are likely to do bad things to you. If they have your
-					line box itself in, you're dead and they get the credit (it's the
+					Other players are likely to do bad things to you. If they box your
+					line in, you're dead and they get the credit (it's the
 					player who laid the tile that made it so you couldn't continue that
 					gets points for the kill).
 				</p>
@@ -257,7 +257,7 @@ const SECTIONS = [
 		content: (openVisionQuest, chickenFoot) => (
 			<>
 				<p>
-					In this case, they turned you into a corner which killed your line
+					In this case, they backed you into a corner, which killed your line
 					and ended the round.
 				</p>
 				<RulesBoard
@@ -472,7 +472,7 @@ const SECTIONS = [
 				</p>
 				<p>
 					Free lines can be used to kill player lines, and the player who used it to
-					do so is the one that gets credit.
+					do so is the one who gets credit.
 				</p>
 				<p>
 					Free lines can also be killed, but no one gets points (what kind of reprobate 
