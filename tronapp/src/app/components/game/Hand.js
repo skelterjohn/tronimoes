@@ -528,8 +528,7 @@ function Hand({
 						<div className="flex flex-row gap-1 justify-center">
 							<Button
 								size="small"
-								className="w-14 disabled:!bg-gray-400 disabled:!border-gray-400"
-								style={{ fontFamily: '"VT323", monospace' }}
+								className="game-btn w-14"
 								disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
 								onClick={drawTile}
 							>
@@ -537,8 +536,7 @@ function Hand({
 							</Button>
 							<Button
 								size="small"
-								className="w-14 disabled:!bg-gray-400 disabled:!border-gray-400"
-								style={{ fontFamily: '"VT323", monospace' }}
+								className="game-btn w-14"
 								disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
 								onClick={passTurn}
 							>
@@ -559,8 +557,7 @@ function Hand({
 						</div>
 						<Button
 							size="small"
-							className="w-14 disabled:!bg-gray-400 disabled:!border-gray-400"
-							style={{ fontFamily: '"VT323", monospace' }}
+							className="game-btn w-14"
 							onClick={() => setShowReactModal(true)}>
 							react
 						</Button>

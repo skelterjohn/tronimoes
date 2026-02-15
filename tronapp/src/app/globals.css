@@ -57,3 +57,13 @@ body {
 .ant-modal-wrap {
     backdrop-filter: blur(4px);
 }
+
+/* Shared game button style (Hand + Game) */
+.game-btn {
+  font-family: "VT323", monospace;
+}
+.game-btn:disabled,
+.game-btn.ant-btn-disabled {
+  background-color: #9ca3af !important;
+  border-color: #9ca3af !important;
+}

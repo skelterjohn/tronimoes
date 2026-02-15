@@ -699,14 +699,16 @@ function Game({ code }) {
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
 						<Button
-							className="w-20"
+							size="small"
+							className="game-btn w-20"
 							disabled={!playerName || roundInProgress || game?.done || player?.ready}
 							onClick={() => readyToPlay()}
 						>
 							{player === undefined && playerName !== undefined ? "join" : "ready"}
 						</Button>
 						<Button
-							className="w-20"
+							size="small"
+							className="game-btn w-20"
 							onClick={() => leaveOrQuit()}
 						>
 							{(gameInProgress && !game?.done) && (<div>quit</div>) || (<div>leave</div>)}
