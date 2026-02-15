@@ -519,7 +519,7 @@ function Hand({
 						<div className="flex flex-row gap-1 justify-center">
 							<Button
 								size="small"
-								className="game-btn w-14"
+								className="game-btn"
 								disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
 								onClick={drawTile}
 							>
@@ -527,7 +527,7 @@ function Hand({
 							</Button>
 							<Button
 								size="small"
-								className="game-btn w-14"
+								className="game-btn"
 								disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
 								onClick={passTurn}
 							>
@@ -548,7 +548,7 @@ function Hand({
 						</div>
 						<Button
 							size="small"
-							className="game-btn w-14"
+							className="game-btn"
 							onClick={() => setShowReactModal(true)}>
 							react
 						</Button>
