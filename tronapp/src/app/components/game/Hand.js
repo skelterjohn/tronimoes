@@ -498,7 +498,7 @@ function Hand({
 						</div>
 					))}
 					<span className="font-game">
-						{player?.name} - ({player?.score})
+						{player?.name} ({player?.score})
 						{player?.chickenFoot && " (footed)"}
 						{player?.ready && " (ready)"}
 					</span>

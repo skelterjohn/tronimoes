@@ -55,7 +55,7 @@ function Opponent({
 						</div>
 					))}
 					<span>
-						{player?.name} - ({player?.score})
+						{player?.name} ({player?.score})
 						{player?.chickenFoot && " (footed)"}
 						{player?.ready && " (ready)"}
 					</span>

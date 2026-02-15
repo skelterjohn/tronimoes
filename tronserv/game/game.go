@@ -1581,7 +1581,7 @@ func (r *Round) killDeadLines(ctx context.Context, g *Game, player *Player, squa
 		if p.Name == player.Name {
 			g.Note(ctx, fmt.Sprintf("%s+0 ducked out of that situation", player.Name))
 		} else {
-			g.Note(ctx, fmt.Sprintf("%s+1 cut-off %s's-1 line", player.Name, p.Name))
+			g.Note(ctx, fmt.Sprintf("%s+1 cut off %s's-1 line", player.Name, p.Name))
 		}
 		player.Score += 1
 		player.Kills = append(player.Kills, p.Name)
