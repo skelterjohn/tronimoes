@@ -572,7 +572,7 @@ function Hand({
 									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full w-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
 									onClick={spacerClicked}
 								>
-									<span className="font-game [writing-mode:vertical-rl] [text-orientation:mixed] inline-block rotate-180 text-black">
+									<span className="font-game text-3xl [writing-mode:vertical-rl] [text-orientation:mixed] inline-block rotate-180 text-black">
 										FREE LINE
 									</span>
 								</div>
