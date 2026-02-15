@@ -31,12 +31,12 @@ function Hand({
 
 	useEffect(() => {
 		const colorMap = {
-			red: "bg-red-600",
-			blue: "bg-blue-600",
-			green: "bg-green-600",
-			yellow: "bg-yellow-600",
-			orange: "bg-orange-600",
-			fuchsia: "bg-fuchsia-600",
+			red: "bg-red-900",
+			blue: "bg-blue-900",
+			green: "bg-green-900",
+			yellow: "bg-yellow-900",
+			orange: "bg-orange-900",
+			fuchsia: "bg-fuchsia-900",
 			white: "bg-white"
 		};
 		setHandBackground(colorMap[player?.color]);

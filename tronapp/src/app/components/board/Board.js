@@ -143,7 +143,7 @@ export default function Board({
 				setGutterColor(bgColorMap[activePlayer.color]);
 			}
 		} else {
-			setGutterColor("bg-green-900");
+			setGutterColor("bg-[#34495E]");
 		}
 	}, [activePlayer])
 
@@ -394,7 +394,7 @@ export default function Board({
 									<td className={`p-0 border-0 ${gutterColor}`} style={{ height: cellSpan, width: gutterSpan }}>
 									</td>
 									{Array.from({ length: width }, (_, x) => (
-										<td key={y * width + x} className="p-0 border-0 bg-green-900" style={{ height: cellSpan, width: cellSpan }}>
+										<td key={y * width + x} className="p-0 border-0 bg-[#34495E]" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
 												{hints[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">

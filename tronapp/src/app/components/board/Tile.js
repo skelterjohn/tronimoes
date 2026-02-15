@@ -72,7 +72,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 	}, [hintedTiles, pipsa, pipsb]);
 
 	useEffect(() => {
-		const colorMap = {
+		const selectedColorMap = {
 			red: "bg-red-500",
 			blue: "bg-blue-500",
 			green: "bg-green-500",
@@ -99,7 +99,7 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 			fuchsia: "border-fuchsia-700",
 			white: "border-white"
 		};
-		const selectedColorMap = {
+		const colorMap = {
 			red: "bg-red-700",
 			blue: "bg-blue-700",
 			green: "bg-green-700",

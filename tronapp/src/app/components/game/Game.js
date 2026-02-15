@@ -681,7 +681,7 @@ function Game({ code }) {
 	]);
 
 	return (
-		<div className="h-full bg-black text-white flex flex-col">
+		<div className="h-full text-white flex flex-col" style={{ backgroundColor: '#1A1A1D' }}>
 			<div className="flex p-3 justify-end items-center min-h-[50px]">
 				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
 					#{code.substring(0, 6)} {game?.done && "(done)"}

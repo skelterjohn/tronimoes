@@ -23,9 +23,9 @@ export default function Square({
 			return;
 		}
 		if ((x + y) % 2 == 0) {
-			setBgColor("bg-gray-900");
+			setBgColor("bg-[#18222b]");
 		} else {
-			setBgColor("bg-green-900");
+			setBgColor("bg-[#34495E]");
 		}
 	}, [center, x, y,hovered]);
 
