@@ -487,7 +487,7 @@ function Hand({
 	}, []);
 	
 	return (
-		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " + handBackground : ""}`}>
+		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " : ""} ${handBackground}`}>
 			<div className="w-full text-center font-bold ">
 				<div className="flex flex-row items-center justify-center gap-2">
 					{killedPlayers?.map(kp => (
