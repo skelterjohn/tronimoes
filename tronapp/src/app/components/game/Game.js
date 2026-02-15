@@ -7,7 +7,6 @@ import Board from '../board/Board';
 import Hand from './Hand';
 import Opponent from './Opponent';
 import History from './History';
-import { Checkbox } from 'antd';
 import Button from "@/app/components/Button";
 import WhyNot from './WhyNot';
 import VisionQuest from '../visionquest/VisionQuest';
@@ -41,7 +40,7 @@ const chimeUpAudio = loadAudio('/sfx/chime_up.mp3');
 
 function Game({ code }) {
 	const router = useRouter();
-	const { playerName, client, tutorial, setTutorial } = useGameState();
+	const { playerName, client } = useGameState();
 
 	// These states come from the server
 	const [version, setVersion] = useState(-1);
@@ -692,10 +691,6 @@ function Game({ code }) {
 				<Link href="/rules" target="_blank" rel="noopener noreferrer" className="text-sm underline underline-offset-2 hover:text-gray-300 pr-5">
 					rules
 				</Link>
-				<span className="text-sm pr-5">
-					<Checkbox checked={tutorial} onChange={() => setTutorial(!tutorial)} />
-					tutorial
-				</span>
 				<div className="flex flex-col items-end gap-2">
 					<div className="flex gap-2">
 						<Button

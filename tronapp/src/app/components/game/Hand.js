@@ -4,8 +4,6 @@ import ChickenFoot from '../board/ChickenFoot';
 import Button from "@/app/components/Button";
 import Image from "next/image";
 import Reaction from "./Reaction";
-import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
-
 function Hand({
 		player, players,
 		dead = false,
@@ -477,13 +475,6 @@ function Hand({
 		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
 	}, [player, players]);
 	
-	const spacerBundle = useTipBundle("You've got a double that can be used to start a free line. Select it, then choose a square next to a playable line, and choose another square 5 spaces away.");
-	useEffect(() => {
-		if (hintedSpacer && hintedSpacer.length > 0) {
-			spacerBundle.setShow(true);
-		}
-	}, [hintedSpacer]);
-
 	const scrollToTop = useCallback(() => {
 		setSelectedTile(undefined);
 		scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -577,7 +568,6 @@ function Hand({
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">
 							<div className="h-[15vh] w-[7.5vh] shrink-0 pr-1 pt-1">
-								<Tip bundle={spacerBundle} />
 								<div
 									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full w-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
 									onClick={spacerClicked}

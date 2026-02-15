@@ -1,7 +1,6 @@
 "use client";
 
 import Board from "@/app/components/board/Board";
-import { TipProvider } from "@/app/components/tutorial/InnerTip";
 
 const noop = () => {};
 
@@ -24,7 +23,6 @@ export default function RulesBoard({ height, tiles, roundLeader, lineHeads, acti
 		<div
 			className={`w-full max-w-full mx-auto aspect-square ${className}`.trim()}
 		>
-			<TipProvider>
 				<Board
 					width={width}
 					height={height}
@@ -52,7 +50,6 @@ export default function RulesBoard({ height, tiles, roundLeader, lineHeads, acti
 					setSquareSpan={noop}
 					interactive={false}
 				/>
-			</TipProvider>
 		</div>
 	);
 }

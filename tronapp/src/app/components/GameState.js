@@ -13,7 +13,6 @@ export function GameProvider({ children }) {
 	const [client, setClient] = useState(undefined);
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
-	const [tutorial, setTutorial] = useState(false);
 	const [config, setConfig] = useState(null);
 	
 	useEffect(() => {
@@ -64,7 +63,6 @@ export function GameProvider({ children }) {
 			client, setClient,
 			userInfo, setUserInfo,
 			persistentUser, loading, error,
-			tutorial, setTutorial,
 			config, setConfig,
 		}}>
 			{children}

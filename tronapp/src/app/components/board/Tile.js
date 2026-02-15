@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Pips from "./Pips";
-import Tip, { useTipBundle } from "@/app/components/tutorial/Tip";
 
 const TileHalf = ({ pips, back, orientation }) => {
 	var outercnm = "w-full aspect-square";
@@ -127,62 +126,8 @@ export default function Tile({ pipsa, pipsb, orientation, back = false, color = 
 		setIndicated({ a: pipsa, b: pipsb });
 	}
 
-	const playATileBundle = useTipBundle("This tile is raised, which means it is currently playable.");
-	useEffect(() => {
-		if (hinted) {
-			playATileBundle.setShow(true);
-		}
-	}, [hinted]);
-
-	const rotateBundle = useTipBundle("You can rotate the tile by clicking or tapping on it.");
-	useEffect(() => {
-		if (selected) {
-			rotateBundle.setShow(true);
-		}
-	}, [selected]);
-
-	const dragBundle = useTipBundle("Once it's oriented, you can drag it to the board.");
-	useEffect(() => {
-		if (rotateBundle.done() && selected && orientation !== "down") {
-			dragBundle.setShow(true);
-		}
-	}, [selected, orientation, rotateBundle.done()]);
-
-	const roundLeaderBundle = useTipBundle("This tile is the round leader. Your own line must start adjacent to this tile.");
-	useEffect(() => {
-		if (roundLeader && roundLeader.pips_a === pipsa && roundLeader.pips_b === pipsb) {
-			roundLeaderBundle.setShow(true);
-		}
-	}, [roundLeader, pipsa, pipsb]);
-
-	const deadBundle = useTipBundle("This tile and its whole line are dead. If this was a player's line, they can still play on free lines or chicken-footed lines.");
-	useEffect(() => {
-		if (dead) {
-			deadBundle.setShow(true);
-		}
-	}, [dead]);
-
-	const freeLeaderBundle = useTipBundle("This tile is a free line leader. One free line starts here, and anyone may play on it.");
-	useEffect(() => {
-		if (!freeLeaders) {
-			return;
-		}
-		freeLeaders.forEach((fl) => {
-			if (fl.pips_a === pipsa && fl.pips_b === pipsb) {
-				freeLeaderBundle.setShow(true);
-			}
-		});
-	}, [freeLeaders, pipsa, pipsb]);
-
-
 	return (
 		<div className={`h-full w-full ${rotate} ${hinted && "-translate-y-2"}`}>
-			<Tip bundle={playATileBundle} />
-			<Tip bundle={dragBundle} />
-			<Tip bundle={rotateBundle} />
-			<Tip bundle={roundLeaderBundle} />
-			<Tip bundle={freeLeaderBundle} />
-			<Tip bundle={deadBundle} />
 			<div className={height + " w-full"}>
 				<div className={`relative overflow-hidden w-full h-full ${bgcolor} ${bordercolor} rounded-lg border-2`} onClick={interactive ? () => tileClicked() : undefined} style={interactive ? undefined : { pointerEvents: 'none' }}>
 					<table className="w-full h-full table-fixed">
