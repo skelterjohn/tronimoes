@@ -191,13 +191,15 @@ function Game({ code }) {
 			const lastRound = game.rounds[game.rounds.length - 1]
 			setRoundLeader(lastRound?.laid_tiles?.[0]?.tile);
 			setFreeLeaders(new Set(lastRound?.free_lines?.map((fl) => fl[0]?.tile)));
-			lastRound?.laid_tiles?.forEach((lt) => {
+			const laidTilesList = lastRound?.laid_tiles ?? [];
+			laidTilesList.forEach((lt, i) => {
 				allLaidTiles[`${lt.coord.x},${lt.coord.y}`] = {
 					a: lt.tile.pips_a,
 					b: lt.tile.pips_b,
 					orientation: lt.orientation,
 					color: playerColors[lt.player_name],
 					dead: lt.dead,
+					last: i === laidTilesList.length - 1,
 				}
 			});
 			setLineHeads(Object.values(lastRound?.player_lines).map((line) => {

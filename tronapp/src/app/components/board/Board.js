@@ -396,13 +396,14 @@ export default function Board({
 													</div>
 												)}
 												{tiles[`${x},${y}`] && (
-													<div className="w-full h-full z-20 absolute">
+													<div className={`w-full h-full absolute ${tiles[`${x},${y}`].last ? 'z-30' : 'z-20'}`}>
 														<Tile
 															pipsa={tiles[`${x},${y}`].a}
 															pipsb={tiles[`${x},${y}`].b}
 															orientation={tiles[`${x},${y}`].orientation}
 															color={tiles[`${x},${y}`].color}
 															dead={tiles[`${x},${y}`].dead}
+															last={tiles[`${x},${y}`].last}
 															lineHeads={lineHeads}
 															roundLeader={roundLeader}
 															freeLeaders={freeLeaders}
