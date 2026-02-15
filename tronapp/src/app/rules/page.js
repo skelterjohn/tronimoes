@@ -195,8 +195,8 @@ const SECTIONS = [
 					line, and you may only play on your own line.
 				</p>
 				<p>
-					Other players are likely to do bad things to you. If they box your
-					line in, you're dead and they get the credit (it's the
+					Other players are likely to do bad things to you. If they have your
+					line box itself in, you're dead and they get the credit (it's the
 					player who laid the tile that made it so you couldn't continue that
 					gets points for the kill).
 				</p>
@@ -393,7 +393,7 @@ const SECTIONS = [
 					lineHeads={[
 						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
 					]}
-					activePlayer={false}
+					activePlayer={{ color: "blue" }}
 				/>
 				<RulesBoard
 					height={7}
@@ -408,7 +408,7 @@ const SECTIONS = [
 					lineHeads={[
 						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
 					]}
-					activePlayer={false}
+					activePlayer={{ color: "blue" }}
 				/>
 			</>
 		),

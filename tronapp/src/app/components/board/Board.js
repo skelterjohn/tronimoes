@@ -136,7 +136,12 @@ export default function Board({
 	const [gutterColor, setGutterColor] = useState("bg-gray-900")
 	useEffect(() => {
 		if (activePlayer !== undefined) {
-			setGutterColor(bgColorMap[activePlayer.color]);
+			console.log(activePlayer);
+			if (!activePlayer) {
+				setGutterColor("bg-black");
+			} else {
+				setGutterColor(bgColorMap[activePlayer.color]);
+			}
 		} else {
 			setGutterColor("bg-green-900");
 		}
