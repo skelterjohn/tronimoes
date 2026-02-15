@@ -511,6 +511,7 @@ function Game({ code }) {
 	}, [dragOrientation, setDragOrientation]);
 
 	const dropCallback = useCallback((x, y) => {
+		if (!selectedTile) return;
 		playTile({
 			a: selectedTile.a, b: selectedTile.b,
 			coord: {
