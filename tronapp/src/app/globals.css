@@ -58,6 +58,11 @@ body {
     backdrop-filter: blur(4px);
 }
 
+/* Shared game font for consistent UI text (Hand, History, FREE LINE, etc.) */
+.font-game {
+  font-family: "VT323", monospace;
+}
+
 /* Shared game button style (Hand + Game) */
 .game-btn {
   font-family: "VT323", monospace;

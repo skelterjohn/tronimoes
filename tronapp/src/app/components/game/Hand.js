@@ -506,7 +506,7 @@ function Hand({
 							</div>
 						</div>
 					))}
-					<span style={{ fontFamily: '"VT323", monospace' }}>
+					<span className="font-game">
 						{player?.name} - ({player?.score})
 						{player?.chickenFoot && " (footed)"}
 						{player?.ready && " (ready)"}
@@ -551,7 +551,7 @@ function Hand({
 								height={256}
 								className="object-contain w-8 h-8"
 							/>
-							<div className="text-center" style={{ fontFamily: '"VT323", monospace' }}>
+							<div className="font-game text-center">
 								{`x${bagCount}`} 
 							</div>
 						</div>
@@ -576,13 +576,15 @@ function Hand({
 				<div className="w-full min-h-40 flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">
-							<div className="max-h-[15vh] aspect-1/2 p-1">
+							<div className="h-[15vh] w-[7.5vh] shrink-0 pr-1 pt-1">
 								<Tip bundle={spacerBundle} />
 								<div
-									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
+									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full w-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
 									onClick={spacerClicked}
 								>
-									FREE LINE
+									<span className="font-game [writing-mode:vertical-rl] [text-orientation:mixed] inline-block rotate-180 text-black">
+										FREE LINE
+									</span>
 								</div>
 							</div>
 							{handOrder.map((t, i) => {

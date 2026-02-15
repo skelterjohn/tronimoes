@@ -10,8 +10,7 @@ export default function History({ history }) {
 	return (
 		<div 
 			ref={scrollRef}
-			className="pl-2 space-y-1 h-full border-green-700 text-green-700 border overflow-y-scroll"
-			style={{ fontFamily: '"VT323", monospace' }}
+			className="font-game pl-2 space-y-1 h-full border-green-700 text-green-700 border overflow-y-scroll"
 		>
 			<ol className="list-decimal list-inside">
 				{history.map((h, i) => (
