@@ -49,7 +49,7 @@ const SECTIONS = [
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
 						"2,0": { a:5, b:1, orientation: "left", color: "red", dead: false },
-						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false },
+						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -124,7 +124,7 @@ const SECTIONS = [
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"3,2": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
-						"2,0": { a: 5, b:3, orientation: "right", color: "red", dead: false },
+						"2,0": { a: 5, b:3, orientation: "right", color: "red", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -148,7 +148,7 @@ const SECTIONS = [
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: true },
 						"3,2": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
 						"2,0": { a: 5, b:3, orientation: "right", color: "red", dead: true },
-						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false },
+						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -232,7 +232,7 @@ const SECTIONS = [
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
-						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false },
+						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -261,7 +261,7 @@ const SECTIONS = [
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: true },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
 						"4,1": { a: 7, b:0, orientation: "up", color: "blue", dead: false },
-						"3,1": { a: 5, b: 1, orientation: "down", color: "red", dead: true },
+						"3,1": { a: 5, b: 1, orientation: "down", color: "red", dead: true, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -298,7 +298,7 @@ const SECTIONS = [
 					height={7}
 					tiles={{
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
-						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -324,7 +324,7 @@ const SECTIONS = [
 					tiles={{
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
-						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -339,7 +339,7 @@ const SECTIONS = [
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
-						"3,1": { a: 5, b: 5, orientation: "right", color: "red", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "right", color: "red", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -355,7 +355,7 @@ const SECTIONS = [
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: true },
 						"3,1": { a: 5, b: 5, orientation: "right", color: "red", dead: false },
-						"5,1": { a: 5, b: 2, orientation: "down", color: "red", dead: false },
+						"5,1": { a: 5, b: 2, orientation: "down", color: "red", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -381,7 +381,7 @@ const SECTIONS = [
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
 						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
-						"4,1": { a: 5, b: 2, orientation: "right", color: "red", dead: false },
+						"4,1": { a: 5, b: 2, orientation: "right", color: "red", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -396,7 +396,7 @@ const SECTIONS = [
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
 						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
-						"4,0": { a: 5, b: 2, orientation: "right", color: "red", dead: false },
+						"4,0": { a: 5, b: 2, orientation: "right", color: "red", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -434,7 +434,7 @@ const SECTIONS = [
 					tiles={{
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
-						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
+						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
@@ -449,7 +449,7 @@ const SECTIONS = [
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
 						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
 						"4,3": { a: 3, b: 7, orientation: "up", color: "blue", dead: false },
-						"2,6": { a: 6, b: 6, orientation: "right", color: "white", dead: false },
+						"2,6": { a: 6, b: 6, orientation: "right", color: "white", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
