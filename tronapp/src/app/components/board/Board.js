@@ -358,7 +358,7 @@ export default function Board({
 				cursor: interactive ? (isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'default')) : 'default',
 				pointerEvents: interactive ? 'auto' : 'none'
 			}}
-			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor} ${!interactive ? '[&_*]:pointer-events-none' : ''}`}
+			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor} ${!interactive ? '[&_*]:pointer-events-none' : ''} [box-shadow:inset_0_2px_4px_rgba(255,255,255,0.15),0_8px_16px_rgba(0,0,0,0.3),0_4px_8px_rgba(0,0,0,0.2)]`}
 			>
 			<div 
 				className="aspect-square"
