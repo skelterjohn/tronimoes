@@ -65,7 +65,8 @@ const SECTIONS = [
 		content: (
 			<>
 				<p>
-					The round leader is chosen and placed automatically.
+					The round leader, or the tile at the center of the board,
+					is chosen and placed automatically.
 				</p>
 				<p>
 					It is the highest double available from a player's hand that
@@ -131,13 +132,6 @@ const SECTIONS = [
 					]}
 					activePlayer={{ color: "blue" }}
 				/>
-			</>
-		),
-	},
-	{
-		title: "a dead line",
-		content: (
-			<>
 				<p>
 					That's right (probably): blue can place their next tile blocking
 					red from continuing.
