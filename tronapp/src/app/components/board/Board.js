@@ -34,7 +34,7 @@ export default function Board({
 		hoveredSquares, setMouseIsOver,
 		dropCallback,
 		setSquareSpan,
-		zoomEnabled = true
+		interactive = true
 	}) {
 	const [zoom, setZoom] = useState(1);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -355,20 +355,21 @@ export default function Board({
 	return (
 		<div 
 			ref={boardContainerRef}
-			onWheel={zoomEnabled ? handleWheel : undefined}
-			onContextMenu={rightClick}
-			onMouseDown={handleMouseDown}
-			onMouseMove={handleMouseMove}
-			onMouseUp={handleMouseUp}
-			onMouseLeave={handleMouseUp}
-			onTouchStart={handleTouchStart}
-			onTouchMove={handleTouchMove}
-			onTouchEnd={handleTouchEnd}
+			onWheel={interactive ? handleWheel : undefined}
+			onContextMenu={interactive ? rightClick : undefined}
+			onMouseDown={interactive ? handleMouseDown : undefined}
+			onMouseMove={interactive ? handleMouseMove : undefined}
+			onMouseUp={interactive ? handleMouseUp : undefined}
+			onMouseLeave={interactive ? handleMouseUp : undefined}
+			onTouchStart={interactive ? handleTouchStart : undefined}
+			onTouchMove={interactive ? handleTouchMove : undefined}
+			onTouchEnd={interactive ? handleTouchEnd : undefined}
 			style={{
-				touchAction: 'none',
-				cursor: isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'default')
+				touchAction: interactive ? 'none' : 'auto',
+				cursor: interactive ? (isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'default')) : 'default',
+				pointerEvents: interactive ? 'auto' : 'none'
 			}}
-			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor}`}
+			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor} ${!interactive ? '[&_*]:pointer-events-none' : ''}`}
 			>
 			<div 
 				className="aspect-square"
@@ -418,7 +419,8 @@ export default function Board({
 															roundLeader={roundLeader}
 															freeLeaders={freeLeaders}
 															indicated={indicated}
-															setIndicated={setIndicated} />
+															setIndicated={setIndicated}
+															interactive={interactive} />
 													</div>
 												)}
 												{chickenFeet[`${x},${y}`] && (
@@ -431,7 +433,7 @@ export default function Board({
 												)}
 												<div
 													className="z-10 absolute inset-0"
-													onClick={() => clickSquare(x, y)}
+													onClick={interactive ? () => clickSquare(x, y) : undefined}
 												>
 													<Square
 														x={x} y={y}
@@ -441,6 +443,7 @@ export default function Board({
 														center={y == (height - 1) / 2 && (x == (width / 2) - 1 || x == (width / 2))}
 														clicked={playA !== undefined && playA.x == x && playA.y == y}
 														pips={selectedTile?.a}
+														interactive={interactive}
 													/>
 												</div>
 											</div>

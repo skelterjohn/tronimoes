@@ -5,7 +5,8 @@ export default function Square({
 		x, y,
 		center = false, clicked = false,
 		pips,
-		hoveredSquares, setMouseIsOver, dropCallback }) {
+		hoveredSquares, setMouseIsOver, dropCallback,
+		interactive = true }) {
 	const [hovered, setHovered] = useState(false);
 	useEffect(() => {
 		setHovered(hoveredSquares.has(`${x},${y}`));
@@ -46,12 +47,13 @@ export default function Square({
 	}
 
 	return <div
-		onDragOver={onDragOver}
-		onDragEnter={onDragEnter}
-		onDrop={onDrop}
+		onDragOver={interactive ? onDragOver : undefined}
+		onDragEnter={interactive ? onDragEnter : undefined}
+		onDrop={interactive ? onDrop : undefined}
 		data-tron_x={x}
 		data-tron_y={y}
 		className={`w-full aspect-square ${bgColor} ${clicked && "border border-2 border-black"}`}
+		style={interactive ? undefined : { pointerEvents: 'none' }}
 	>
 		{clicked && <Pips pips={pips} />}
 	</div>;

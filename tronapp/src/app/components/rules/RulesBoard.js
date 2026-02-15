@@ -50,7 +50,7 @@ export default function RulesBoard({ height, tiles, roundLeader, lineHeads, acti
 					setMouseIsOver={noop}
 					dropCallback={noop}
 					setSquareSpan={noop}
-					zoomEnabled={false}
+					interactive={false}
 				/>
 			</TipProvider>
 		</div>
