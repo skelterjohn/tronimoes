@@ -506,7 +506,7 @@ function Hand({
 							</div>
 						</div>
 					))}
-					<span>
+					<span style={{ fontFamily: '"VT323", monospace' }}>
 						{player?.name} - ({player?.score})
 						{player?.chickenFoot && " (footed)"}
 						{player?.ready && " (ready)"}
@@ -528,7 +528,8 @@ function Hand({
 						<div className="flex flex-row gap-1 justify-center">
 							<Button
 								size="small"
-								className="w-14"
+								className="w-14 disabled:!bg-gray-400 disabled:!border-gray-400"
+								style={{ fontFamily: '"VT323", monospace' }}
 								disabled={!roundInProgress || !playerTurn || player?.just_drew || bagCount == 0}
 								onClick={drawTile}
 							>
@@ -536,7 +537,8 @@ function Hand({
 							</Button>
 							<Button
 								size="small"
-								className="w-14"
+								className="w-14 disabled:!bg-gray-400 disabled:!border-gray-400"
+								style={{ fontFamily: '"VT323", monospace' }}
 								disabled={!roundInProgress || !playerTurn || !(player?.just_drew || bagCount == 0)}
 								onClick={passTurn}
 							>
@@ -551,13 +553,14 @@ function Hand({
 								height={256}
 								className="object-contain w-8 h-8"
 							/>
-							<div className="text-center">
-							{`x${bagCount}`} 
+							<div className="text-center" style={{ fontFamily: '"VT323", monospace' }}>
+								{`x${bagCount}`} 
 							</div>
 						</div>
 						<Button
 							size="small"
-							className="w-14"
+							className="w-14 disabled:!bg-gray-400 disabled:!border-gray-400"
+							style={{ fontFamily: '"VT323", monospace' }}
 							onClick={() => setShowReactModal(true)}>
 							react
 						</Button>
