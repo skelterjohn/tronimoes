@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function History({ history }) {
+export default function History({ history, cursor = false }) {
 	const scrollRef = useRef();
 
 	useEffect(() => {
@@ -21,6 +21,15 @@ export default function History({ history }) {
 						{h}
 					</li>
 				))}
+				{cursor && <li>
+					<span
+						aria-hidden
+						className="inline-block ml-0.5"
+						style={{ animation: 'history-cursor-blink 1s step-end infinite' }}
+					>
+						█
+					</span>
+				</li>}
 			</ol>
 		</div>
 	);
