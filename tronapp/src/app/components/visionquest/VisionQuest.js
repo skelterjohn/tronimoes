@@ -54,36 +54,35 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 			className="vision-quest-modal"
 			styles={{
 				header: {
-					backgroundColor: '#f5f5f5', // Or use your specific grey, e.g., '#f5f5f5'
+					backgroundColor: 'transparent',
 					marginBottom: 0,
 					paddingBottom: '16px'
 				},
 				content: {
-					backgroundColor: '#f5f5f5', // Ensures the body matches
+					backgroundColor: '#f5f5f5'
 				}
 			}}
 		>
-			<div className="flex items-center justify-between gap-2 mb-4">
+			<div className="flex items-center gap-3 mb-4">
 			    <Input
 			        ref={inputRef}
 			        placeholder="Search KLIPY"
 			        value={path}
 			        onChange={(e) => setPath(e.target.value)}
-			        className="w-4/5" // Keep your 80% width
+			        className="w-[80%] min-w-0"
 			    />
-			    <div className="flex flex-1 justify-end">
+			    <div className="flex-shrink-0 relative h-8 flex items-center">
 			        <img 
 			            src="/klipy_powered.png"
 			            alt="Powered by KLIPY"
-			            className="max-h-10 w-auto object-contain" 
+			            className="max-h-full w-auto object-contain object-center block" 
 			        />
+			        {loading && (
+			            <span className="absolute -top-1 -right-1">
+			                <Spin />
+			            </span>
+			        )}
 			    </div>
-			    
-			    {loading && (
-			        <div className="absolute right-0 flex items-center pr-2">
-			            <Spin />
-			        </div>
-			    )}
 			</div>
 
 			<div className="grid grid-cols-3 gap-4">
