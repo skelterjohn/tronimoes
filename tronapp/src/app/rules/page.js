@@ -191,7 +191,7 @@ const SECTIONS = [
 				<p>
 					Other players are likely to do bad things to you. If they have your
 					line box itself in, you're dead and they get the credit (it's the
-					player who laid the tile that made it so you couldn't continue that
+					player who laid the tile that made it so you couldn't continue who
 					gets points for the kill).
 				</p>
 				<p>
@@ -530,7 +530,7 @@ const SECTIONS = [
 				</p>
 				<p>
 					Then, chose one of the hinted squares adjacent to the current end of some
-					existing line (not necessarily one you could play on, otherwise).
+					existing line (not necessarily one you could play on otherwise).
 				</p>
 				<p>
 					Then, choose another hinted square that is 6 spaces away from the first, with
@@ -538,8 +538,8 @@ const SECTIONS = [
 				</p>
 				<p>
 					Once the spacer is in place, select the double you want to use to begin a new
-					free line. It must begin on the end of the spacer opposite the existing line
-					head.
+					free line. The double must be placed on the end of the spacer opposite the
+					existing line head.
 				</p>
 			</>
 		),
@@ -603,8 +603,8 @@ const SECTIONS = [
 					be able to rejoin.
 				</p>
 				<p>
-					You can also sign in and indicate "anonymous", which will hold your username in
-					the current browser's cookies.
+					You can also sign in and choose "Anonymous", which will store your username and
+					session in the current browser's cookies.
 				</p>
 				<p>
 					Or, you can use Google or Facebook to manage your log-in.
