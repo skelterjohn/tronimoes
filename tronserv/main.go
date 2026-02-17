@@ -27,12 +27,23 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	allowedOrigins := []string{"http://localhost:3000", "http://localhost:*", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"}
-	if *noCors {
-		allowedOrigins = []string{"*"}
+	allowedOriginsList := []string{"http://localhost:3000", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"}
+	allowedOrigins := make(map[string]bool)
+	for _, o := range allowedOriginsList {
+		allowedOrigins[o] = true
 	}
+	allowAnyOrigin := *noCors
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: allowedOrigins,
+		AllowOriginFunc: func(r *http.Request, origin string) bool {
+			if allowAnyOrigin {
+				return true
+			}
+			if allowedOrigins[origin] {
+				return true
+			}
+			log.Printf("CORS rejected origin: %q (allowed: %v)", origin, allowedOriginsList)
+			return false
+		},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders: []string{
 			"Accept", "Authorization", "Content-Type", "X-CSRF-Token",
