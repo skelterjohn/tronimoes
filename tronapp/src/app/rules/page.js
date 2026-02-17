@@ -485,7 +485,7 @@ export default function RulesPage() {
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFoot, setChickenFoot] = useState(null);
-	const [showToc, setShowToc] = useState(true);
+	const [showToc, setShowToc] = useState(false);
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
 		() => ({ ...gameState, config: gameState?.config ?? { tileset: "beehive" } }),
@@ -514,11 +514,11 @@ export default function RulesPage() {
 						<FontAwesomeIcon icon={faGear} className="text-xl" />
 					</button>
 				</header>
-				<div className="flex flex-1 min-h-0">
+				<div className="relative flex-1 min-h-0">
 					{showToc && (
 						<aside
 							aria-label="Table of contents"
-							className="w-52 flex-shrink-0 flex flex-col overflow-hidden border-r border-slate-600 bg-slate-800"
+							className="absolute left-0 top-0 bottom-0 w-52 z-20 flex flex-col overflow-hidden border-r border-slate-600 bg-slate-800 shadow-lg"
 						>
 							<button
 								type="button"
@@ -542,18 +542,16 @@ export default function RulesPage() {
 							</nav>
 						</aside>
 					)}
-					<div className="relative flex-1 overflow-y-auto">
-						{!showToc && (
-							<button
-								type="button"
-								onClick={() => setShowToc(true)}
-								className="sticky top-0 left-0 z-10 mt-2 ml-2 cursor-pointer rounded p-2 text-slate-400 hover:text-slate-200 bg-slate-700/70 hover:bg-slate-600/90"
-								aria-label="Show table of contents"
-								title="Show contents"
-							>
-								<FontAwesomeIcon icon={faList} className="text-xl" />
-							</button>
-						)}
+					<div className="relative w-full h-full overflow-y-auto">
+						<button
+							type="button"
+							onClick={() => setShowToc(true)}
+							className={`sticky top-0 left-0 z-10 mt-2 ml-2 cursor-pointer rounded p-2 text-slate-400 hover:text-slate-200 bg-slate-700/70 hover:bg-slate-600/90 ${showToc ? 'invisible pointer-events-none' : ''}`}
+							aria-label="Show table of contents"
+							title="Show contents"
+						>
+							<FontAwesomeIcon icon={faList} className="text-xl" />
+						</button>
 						{SECTIONS.map((section) => (
 							<Section key={section.title} title={section.title}>
 								{section.contentIsFunction
