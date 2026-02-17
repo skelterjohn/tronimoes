@@ -75,8 +75,8 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 	};
 
 	return (
-		<Modal open={isOpen} title="sign in to tronimoes" onCancel={onClose} footer={null} centered width={800}>
-			<div className="flex">
+		<Modal open={isOpen} title="sign in to tronimoes" onCancel={onClose} footer={null} centered width={800} className="font-game">
+			<div className="flex font-game">
 				<div className="hidden md:block w-1/2">
 					<img 
 						src="/fallingtiles.png" 

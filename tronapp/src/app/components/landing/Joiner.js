@@ -83,24 +83,24 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 
 	if (loading) {
 		return (
-			<div className="bg-black rounded-lg h-16 min-w-[20rem] p-4 border-white border text-white">
-				<p className="font-[Roboto_Mono] text-xl tracking-wider">checking connection...</p>
+			<div className="font-game bg-black rounded-lg h-16 min-w-[20rem] p-4 border-white border text-white">
+				<p className="text-xl tracking-wider">checking connection...</p>
 			</div>
 		);
 	}
-	return <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
+	return <div className="font-game absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
 		{isRegistered ? (
 			<div>
-				<div className="font-[Roboto_Mono] text-white">designation</div>
+				<div className="text-white">designation</div>
 				<div className="bg-black rounded-lg h-16 p-4 border-white border text-white">
-					<p className="font-[Roboto_Mono] text-xl tracking-wider">{playerName}</p>
+					<p className="text-xl tracking-wider">{playerName}</p>
 				</div>
 			</div>
 		) : (
 			<Input
 				placeholder="enter your designation"
 				size="large"
-				className="text-lg"
+				className="font-game text-lg"
 				value={nameInput}
 				disabled={isRegistered}
 				onChange={(e) => setNameInput(e.target.value)}
@@ -112,7 +112,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 			<Input.OTP
 				placeholder="enter code or leave blank"
 				size="large"
-				className="text-lg"
+				className="font-game text-lg"
 				formatter={(str) => str.toUpperCase()}
 				disabled={nameInput === ""}
 				onChange={registerAndJoinCode}
@@ -122,6 +122,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 			<Button
 				type="primary"
 				size="large"
+				className="game-btn"
 				disabled={nameInput === ""}
 				onClick={joinPickup}
 			>

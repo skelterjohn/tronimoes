@@ -60,7 +60,7 @@ body {
 
 /* Shared game font for consistent UI text (Hand, History, FREE LINE, etc.) */
 .font-game {
-  font-family: "VT323", monospace;
+  font-family: "Roboto Mono", monospace;
 }
 
 /* Shared game button style (Hand + Game) */

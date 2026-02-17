@@ -662,7 +662,7 @@ export default function RulesPage() {
 
 	return (
 		<GameContext.Provider value={stateWithConfig}>
-			<main className="flex flex-col h-screen w-full bg-slate-800 text-slate-100 overflow-hidden">
+			<main className="font-game flex flex-col h-screen w-full bg-slate-800 text-slate-100 overflow-hidden">
 				<header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-slate-800 border-b border-slate-600">
 					<div className="flex items-baseline gap-4">
 						<h1 className="text-3xl font-bold tracking-tight">how to tronimoes</h1>

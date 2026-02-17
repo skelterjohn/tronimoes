@@ -20,7 +20,7 @@ export default function Home() {
 	}, [error]);
 
 	return (
-		<main onClick={() => setErrorMessage(null)} className="relative min-h-screen w-screen bg-slate-800">
+		<main onClick={() => setErrorMessage(null)} className="font-game relative min-h-screen w-screen bg-slate-800">
 			<Image 
 				src="/trondude.png"
 				alt="Background"
