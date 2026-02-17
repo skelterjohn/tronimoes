@@ -89,15 +89,6 @@ export default function Tile({pipsa, pipsb, orientation, back = false, color = "
 			fuchsia: "border-fuchsia-500",
 			white: "border-white"
 		};
-		const lineHeadBorderColorMap = {
-			red: "border-red-700",
-			blue: "border-blue-700",
-			green: "border-green-700",
-			yellow: "border-yellow-600",
-			orange: "border-orange-700",
-			fuchsia: "border-fuchsia-700",
-			white: "border-white"
-		};
 		const colorMap = {
 			red: "bg-red-700",
 			blue: "bg-blue-700",
@@ -107,14 +98,20 @@ export default function Tile({pipsa, pipsb, orientation, back = false, color = "
 			fuchsia: "bg-fuchsia-700",
 			white: "bg-gray-200"
 		};
-		setBgcolor(dead ? "bg-gray-500" : (selected ? selectedColorMap[color] : colorMap[color]));
+		const lineHeadColorMap = selectedColorMap;
+		
 		if (dead) {
+			setBgcolor("bg-gray-500");
 			setBordercolor(borderColorMap[color]);
 		} else if (indicated?.a == pipsa && indicated?.b == pipsb) {
+			// this is only for within the hand.
+			setBgcolor(selected ? selectedColorMap[color] : colorMap[color]);
 			setBordercolor("border-white")
 		} else if (isLineHead) {
-			setBordercolor(lineHeadBorderColorMap[color])
+			setBgcolor(lineHeadColorMap[color]);
+			setBordercolor("border-black")
 		} else {
+			setBgcolor(selected ? selectedColorMap[color] : colorMap[color]);
 			setBordercolor("border-black")
 		}
 	}, [selected, dead, isLineHead, indicated, color, pipsa, pipsb]);
