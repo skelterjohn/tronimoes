@@ -479,6 +479,174 @@ const SECTIONS = [
 			</>
 		),
 	},
+	{
+		title: "moving a tile to the board",
+		content: (
+			<>
+				<p>
+					To play a tile, you first select it from your hand, which is next to
+					the board. Your hand's background color is the same as your player color.
+				</p>
+				<p>
+					There are two methods to move it to the board.
+				</p>
+				<p>
+					First, you can click a tile to select it, then click the board square for
+					the tile's "upper" pips, and click the board square for the tile's "lower" pips.
+				</p>
+				<p>
+					Second, once a tile is selected, you can click it again to change its orientation.
+					When the desired orientation is reached, the tile can be dragged into position
+					on the board.
+				</p>
+				<p>
+					These methods also work on mobile, for touch rather than click.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "legal move hints",
+		content: (
+			<>
+				<p>
+					Playable tiles are raised slightly in your hand.
+				</p>
+				<p>
+					Once you've selected a tile, playable squares are indicated on the board
+					by a small white outline. Not all ways to place a tile on those squares are
+					legal. But all legal ways to place a tile will fall within those squares.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "placing a free line spacer",
+		content: (
+			<>
+				<p>
+					If you can begin a free line, the free line spacer will be slightly 
+					raised in your hand. Select it by clicking.
+				</p>
+				<p>
+					Then, chose one of the hinted squares adjacent to the current end of some
+					existing line (not necessarily one you could play on, otherwise).
+				</p>
+				<p>
+					Then, choose another hinted square that is 6 spaces away from the first, with
+					no laid tiles interposed.
+				</p>
+				<p>
+					Once the spacer is in place, select the double you want to use to begin a new
+					free line. It must begin on the end of the spacer opposite the existing line
+					head.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "organizing your hand",
+		content: (
+			<>
+				<p>
+					If you want to change the order of tiles in your hand (for instance, you
+					want to track a list of linked tiles), they can be dragged within the hand.
+				</p>
+				<p>
+					Simply click (or touch) a tile, and move it to the tile currently in the
+					position you want. The rest of the tiles will be shifted to make room.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "managing a large hand",
+		content: (
+			<>
+				<p>
+					If you have so many tiles that they don't all appear on the screen at once,
+					you can scroll through them by clicking/touching the colored field behind the
+					tiles and dragging.
+				</p>
+				<p>
+					Alternatively, there are small up and down arrows to the right of the "react"
+					button, which will scroll the hand up or down one row.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "reactions",
+		content: (
+			<>
+				<p>
+					No one ever wants to read chat text written by their opponents in an online game.
+				</p>
+				<p>
+					Instead, you can "react" by clicking the "react" button, and doing a quick
+					image search for something that gets the message across.
+				</p>
+				<p>
+					The reaction disappears on its own after 10 seconds. Alternatively, you can
+					dismiss a reaction (for yourself only) by clicking on the image.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "signing in and registering your name",
+		content: (
+			<>
+				<p>
+					If you want to be anonymous, you can stay signed out and enter an arbitrary
+					designation and play. If you lose the page holding this game, you will not
+					be able to rejoin.
+				</p>
+				<p>
+					You can also sign in and indicate "anonymous", which will hold your username in
+					the current browser's cookies.
+				</p>
+				<p>
+					Or, you can use Google or Facebook to manage your log-in.
+				</p>
+				<p>
+					When signed in, your username is permanent and cannot be used by others.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "starting and joining games",
+		content: (
+			<>
+				<p>
+					If you want to play a game against the first-available opponents, you can
+					click "pick-up game". If there are no pick-up games available, this will
+					create one.
+				</p>
+				<p>
+					If you want to create a private game, enter a 6-character code of your choice.
+					Other players that use this same 6-character code will join your game.
+				</p>
+				<p>
+					Once a game is created, players can click the "ready" button. Once all players
+					are ready, the game begins and no others may join.
+				</p>
+			</>
+		),
+	},
+	{
+		title: "observing games",
+		content: (
+			<>
+				<p>
+					If you receive the full URL of a game, including the 6-character code extension
+					(beyond the initial 6-character code), you can visit that URL to observe the game
+					without playing.
+				</p>
+			</>
+		),
+	},
 ];
 
 export default function RulesPage() {
@@ -497,7 +665,7 @@ export default function RulesPage() {
 			<main className="flex flex-col h-screen w-full bg-slate-800 text-slate-100 overflow-hidden">
 				<header className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-slate-800 border-b border-slate-600">
 					<div className="flex items-baseline gap-4">
-						<h1 className="text-3xl font-bold tracking-tight">Tronimoes: the rules of play</h1>
+						<h1 className="text-3xl font-bold tracking-tight">how to tronimoes</h1>
 						<a
 							href="https://docs.google.com/document/d/e/2PACX-1vQJivrpZZ14fF60BqqVWWtj5D_3ZH3b-1KU42FXMevsrVjC034QxnRc0a7pYraCnQ-vuYdjmrm9OT8A/pub"
 							className="cursor-pointer underline underline-offset-2 text-slate-400 hover:text-slate-200 text-sm"
