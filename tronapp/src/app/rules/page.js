@@ -518,7 +518,7 @@ export default function RulesPage() {
 					{showToc && (
 						<aside
 							aria-label="Table of contents"
-							className="absolute left-0 top-0 bottom-0 w-52 z-20 flex flex-col overflow-hidden border-r border-slate-600 bg-slate-800 shadow-lg"
+							className="absolute left-0 top-0 bottom-0 w-52 z-20 flex flex-col overflow-hidden border-r border-slate-600/70 bg-slate-800/80 shadow-lg"
 						>
 							<button
 								type="button"
