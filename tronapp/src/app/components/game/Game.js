@@ -695,8 +695,8 @@ function Game({ code }) {
 							`.${game?.rounds?.length}`}
 						{!game?.done && (game?.rounds?.length ?? 0) > 0 &&
 						 game.rounds[game.rounds.length - 1]?.done &&
-							" complete"}
-						{game?.done && "complete"}
+							" round complete"}
+						{game?.done && "game over"}
 					</span>
 				</span>
 				<span className="block md:hidden text-left font-bold mr-auto">
