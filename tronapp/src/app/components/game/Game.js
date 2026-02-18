@@ -362,8 +362,8 @@ function Game({ code }) {
 			orientation: tile.orientation,
 			player_name: player.name,
 			indicated: {
-				pips_a: indicated !== undefined ? indicated.a : -1,
-				pips_b: indicated !== undefined ? indicated.b : -1,
+				pips_a: indicated?.a ?? -1,
+				pips_b: indicated?.b ?? -1,
 			},
 		}).then((resp) => {
 			setSelectedTile(undefined);
