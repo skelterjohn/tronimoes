@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 67.733334 67.733334"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <g id="layer1">
+    <!-- Sixteen pips: 4-4-4-4 pattern -->
+    <circle cx="13.866667" cy="13.866667" r="5" fill="#000000"/>
+    <circle cx="26.933334" cy="13.866667" r="5" fill="#000000"/>
+    <circle cx="40" cy="13.866667" r="5" fill="#000000"/>
+    <circle cx="53.866667" cy="13.866667" r="5" fill="#000000"/>
+    <circle cx="13.866667" cy="27.733334" r="5" fill="#000000"/>
+    <circle cx="26.933334" cy="27.733334" r="5" fill="#000000"/>
+    <circle cx="40" cy="27.733334" r="5" fill="#000000"/>
+    <circle cx="53.866667" cy="27.733334" r="5" fill="#000000"/>
+    <circle cx="13.866667" cy="41.6" r="5" fill="#000000"/>
+    <circle cx="26.933334" cy="41.6" r="5" fill="#000000"/>
+    <circle cx="40" cy="41.6" r="5" fill="#000000"/>
+    <circle cx="53.866667" cy="41.6" r="5" fill="#000000"/>
+    <circle cx="13.866667" cy="55.466667" r="5" fill="#000000"/>
+    <circle cx="26.933334" cy="55.466667" r="5" fill="#000000"/>
+    <circle cx="40" cy="55.466667" r="5" fill="#000000"/>
+    <circle cx="53.866667" cy="55.466667" r="5" fill="#000000"/>
+  </g>
+</svg>

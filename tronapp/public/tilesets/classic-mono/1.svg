@@ -7,6 +7,6 @@
    xmlns="http://www.w3.org/2000/svg">
   <g id="layer1">
     <!-- One pip in center -->
-    <circle cx="33.866667" cy="33.866667" r="4" fill="#000000"/>
+    <circle cx="33.866667" cy="33.866667" r="5" fill="#000000"/>
   </g>
 </svg>

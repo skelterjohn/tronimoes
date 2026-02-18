@@ -7,11 +7,11 @@
    xmlns="http://www.w3.org/2000/svg">
   <g id="layer1">
     <!-- Six pips: two columns of three -->
-    <circle cx="20" cy="20" r="4" fill="#000000"/>
-    <circle cx="20" cy="33.866667" r="4" fill="#000000"/>
-    <circle cx="20" cy="47.733334" r="4" fill="#000000"/>
-    <circle cx="47.733334" cy="20" r="4" fill="#000000"/>
-    <circle cx="47.733334" cy="33.866667" r="4" fill="#000000"/>
-    <circle cx="47.733334" cy="47.733334" r="4" fill="#000000"/>
+    <circle cx="20" cy="20" r="5" fill="#000000"/>
+    <circle cx="20" cy="33.866667" r="5" fill="#000000"/>
+    <circle cx="20" cy="47.733334" r="5" fill="#000000"/>
+    <circle cx="47.733334" cy="20" r="5" fill="#000000"/>
+    <circle cx="47.733334" cy="33.866667" r="5" fill="#000000"/>
+    <circle cx="47.733334" cy="47.733334" r="5" fill="#000000"/>
   </g>
 </svg>

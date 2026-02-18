@@ -7,7 +7,11 @@ const Settings = ({ isOpen, onClose }) => {
 	const { config, setConfig } = useGameState();
 	const [tileSet, setTileSet] = useState("beehive");
 
-	const [allTileSets, setAllTileSets] = useState(["beehive", "numbers"]);
+	const [allTileSets, setAllTileSets] = useState([
+		"beehive",
+		"classic-mono",
+		"numbers",
+	]);
 
 	useEffect(() => {
 		if (config?.tileset) {
