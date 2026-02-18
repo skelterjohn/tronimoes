@@ -13,6 +13,7 @@ const Settings = ({ isOpen, onClose }) => {
 		"classic-mono",
 		"classic-color",
 		"numbers",
+		"numbers-mono",
 	]);
 
 	useEffect(() => {

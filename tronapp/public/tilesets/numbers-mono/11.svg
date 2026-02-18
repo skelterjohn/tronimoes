@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 67.733334 67.733334"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="11.svg"
+   inkscape:export-filename="0.png"
+   inkscape:export-xdpi="47.393879"
+   inkscape:export-ydpi="47.393879"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.68862935"
+     inkscape:cx="411.68736"
+     inkscape:cy="506.80384"
+     inkscape:window-width="1718"
+     inkscape:window-height="1368"
+     inkscape:window-x="1682"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1"
+     inkscape:export-bgcolor="#ffffff00" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g transform="translate(33.866667,33.866667) scale(0.75) translate(-33.866667,-33.866667)">
+      <path
+         d="M 28.174504,54.923519 H 6.1862883 V 50.776858 H 14.643294 V 23.550755 H 6.1862883 v -3.71017 q 1.7186818,0 3.6828897,-0.272807 1.964208,-0.300087 2.973592,-0.8457 1.254911,-0.682017 1.964208,-1.718682 0.736578,-1.063946 0.845701,-2.837189 h 4.228503 v 36.610651 h 8.293322 z m 35.519424,0 H 41.705713 v -4.146661 h 8.457006 V 23.550755 h -8.457006 v -3.71017 q 1.718682,0 3.682889,-0.272807 1.964208,-0.300087 2.973593,-0.8457 1.25491,-0.682017 1.964208,-1.718682 0.736578,-1.063946 0.8457,-2.837189 h 4.228503 v 36.610651 h 8.293322 z"
+         id="text5"
+         style="font-size:55.8708px;fill:#000000;stroke:#000000;stroke-width:0.748268"
+         transform="scale(0.99414053,1.005894)"
+         aria-label="11" />
+    </g>
+  </g>
+</svg>

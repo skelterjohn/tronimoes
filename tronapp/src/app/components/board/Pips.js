@@ -8,7 +8,7 @@ export default function Pips({pips, parentRotation = 0}) {
 	const [isNumbers, setIsNumbers] = useState(false);
 
 	useEffect(() => {
-		setIsNumbers(config?.tileset === 'numbers');
+		setIsNumbers(config?.tileset === 'numbers' || config?.tileset === 'numbers-mono');
 	}, [config]);
 
 	if (pips === -1) {
@@ -36,7 +36,7 @@ export default function Pips({pips, parentRotation = 0}) {
 			{isNumbers ? (
 				<div style={{ transform: `rotate(${-parentRotation}deg)`, transformOrigin: 'center' }}>
 					<Image 
-						src={`/tilesets/numbers/${pips}.svg`}
+						src={`/tilesets/${config?.tileset || 'numbers'}/${pips}.svg`}
 						width={0}
 						height={0}
 						sizes="100%"
