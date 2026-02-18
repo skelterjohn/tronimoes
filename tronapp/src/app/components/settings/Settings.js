@@ -30,6 +30,7 @@ const Settings = ({ isOpen, onClose }) => {
 			title="Settings"
 			open={isOpen}
 			onCancel={onClose}
+			className="font-game"
 			footer={[
 				<Button key="save" type="primary" onClick={handleSave}>
 					Save
