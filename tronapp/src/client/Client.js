@@ -85,12 +85,34 @@ class Client {
 			headers['Authorization'] = `Bearer ${await this.userInfo.getIdToken(false)}`;
 			headers['X-Player-Id'] = this.playerID;
 		}
-        const response = await fetch(`${this.baseURL}${path}`, {
-            method,
-            headers: headers,
-            body: body ? JSON.stringify(body) : null,
-        });
-        const data = await response.json();
+		let response;
+		try {
+			response = await fetch(`${this.baseURL}${path}`, {
+				method,
+				headers: headers,
+				body: body ? JSON.stringify(body) : null,
+			});
+		} catch (err) {
+			const isCorsOrNetwork = err instanceof TypeError ||
+				(err?.message && (
+					String(err.message).toLowerCase().includes('failed to fetch') ||
+					String(err.message).toLowerCase().includes('network error')
+				));
+			if (isCorsOrNetwork) {
+				throw {
+					status: 0,
+					data: { error: 'Request failed (possible CORS or network issue). Check the API URL and that the server allows your origin.' },
+					message: err?.message || 'Failed to fetch'
+				};
+			}
+			throw err;
+		}
+		let data;
+		try {
+			data = await response.json();
+		} catch {
+			data = { error: 'Invalid JSON response' };
+		}
 
         if (!response.ok) {
             throw {
