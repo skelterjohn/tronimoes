@@ -27,7 +27,7 @@ const Settings = ({ isOpen, onClose }) => {
 	}, [config]);
 	
 	const handleSave = () => {
-		setConfig({ ...config, tileset: tileSet, soundEffects: soundEffects });
+		setConfig({ ...config, tileset: tileSet, soundEffects });
 		onClose();
 	};
 
@@ -43,7 +43,7 @@ const Settings = ({ isOpen, onClose }) => {
 				</Button>
 			]}
 		>
-			<Space direction="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
+			<Space orientation="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
 				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 					<span>tileset</span>
 					<Select
