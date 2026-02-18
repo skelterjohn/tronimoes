@@ -684,11 +684,25 @@ function Game({ code }) {
 	return (
 		<div className="h-full text-white flex flex-col" style={{ backgroundColor: '#1A1A1D' }}>
 			<div className="font-game flex p-3 justify-end items-center min-h-[50px]">
-				<span className="hidden md:block text-left text-5xl font-bold mr-auto">
-					#{code.substring(0, 6)} {game?.done && "(done)"}
+				<span className="hidden md:block text-left font-bold mr-auto">
+					<span className="text-5xl">
+						#{code.substring(0, 6)}
+					</span>
+					<span className="text-2xl pl-5">
+						{!game?.done && (game?.rounds?.length ?? 0) === 0 &&
+							`waiting for players...`}
+						{!game?.done && game?.rounds?.length > 0 &&
+							`.${game?.rounds?.length}`}
+						{!game?.done && (game?.rounds?.length ?? 0) > 0 &&
+						 game.rounds[game.rounds.length - 1]?.done &&
+							" complete"}
+						{game?.done && "complete"}
+					</span>
 				</span>
 				<span className="block md:hidden text-left font-bold mr-auto">
-					#{code.substring(0, 6)} {game?.done && "(done)"}
+					#{code.substring(0, 6)}
+					{!game?.done && (game?.rounds?.length ?? 0) !== 0 && `.${game?.rounds?.length}`}
+					{!game?.done && (game?.rounds?.length ?? 0) === 0 && "..."}
 				</span>
 				<Link href="/rules" target="_blank" rel="noopener noreferrer" className="text-sm underline underline-offset-2 hover:text-gray-300 pr-5">
 					rules
