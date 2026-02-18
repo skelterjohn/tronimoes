@@ -43,7 +43,9 @@ const Settings = ({ isOpen, onClose }) => {
 					<Select
 						value={tileSet}
 						onChange={setTileSet}
-						style={{ width: 120 }}
+						style={{ width: 300 }}
+						className="font-game"
+						classNames={{ popup: { root: "font-game" } }}
 						options={allTileSets.map((set) => ({
 							value: set,
 							label: set
