@@ -5,7 +5,7 @@ import { useGameState } from '../GameState';
 
 const Settings = ({ isOpen, onClose }) => {
 	const { config, setConfig } = useGameState();
-	const [tileSet, setTileSet] = useState("classic-color");
+	const [tileSet, setTileSet] = useState("classic");
 	const [soundEffects, setSoundEffects] = useState(true);
 
 	const [allTileSets, setAllTileSets] = useState([

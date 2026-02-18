@@ -8,7 +8,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 export const GameContext = createContext();
 
 const defaultConfig = {
-	tileset: "classic-color",
+	tileset: "classic",
 	soundEffects: true,
 };
 
