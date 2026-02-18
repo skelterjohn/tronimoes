@@ -1,5 +1,13 @@
 import Game from "@/app/components/game/Game";
 
+export async function generateMetadata({ params }) {
+  const p = await params;
+  const code = p?.code ?? "";
+  return {
+    title: code ? `tronimoes [#${code.substring(0, 6)}]` : "tronimoes",
+  };
+}
+
 export default async function Gameboard({ params }) {
   const p = await params;
   const code = p.code;
