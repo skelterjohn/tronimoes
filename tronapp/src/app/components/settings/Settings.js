@@ -10,6 +10,7 @@ const Settings = ({ isOpen, onClose }) => {
 	const [allTileSets, setAllTileSets] = useState([
 		"beehive",
 		"classic-mono",
+		"classic-color",
 		"numbers",
 	]);
 
