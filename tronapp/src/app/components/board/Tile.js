@@ -3,20 +3,23 @@
 import { useEffect, useState } from "react";
 import Pips from "./Pips";
 
-const TileHalf = ({ pips, back, orientation }) => {
+const TileHalf = ({ pips, back, orientation, tileRotation }) => {
 	var outercnm = "w-full aspect-square";
+	var halfRotation = 0;
 	switch (orientation) {
 		case "down": // down
 			outercnm = `${outercnm} rotate-0`;
+			halfRotation = 0;
 			break;
 		case "up": // down
 			outercnm = `${outercnm} rotate-180`;
+			halfRotation = 180;
 			break;
 	}
 	return (
 		<div className={outercnm}>
 			<div className="w-full h-full bg-transparent flex items-center justify-center">
-				{!back && <Pips pips={pips} />}
+				{!back && <Pips pips={pips} parentRotation={tileRotation + halfRotation} />}
 			</div>
 		</div>
 	);
@@ -27,22 +30,27 @@ export default function Tile({pipsa, pipsb, orientation, back = false, color = "
 
 	var height = "";
 	var rotate = 'rotate-0'
+	var tileRotation = 0;
 
 	if (orientation == "down") {
 		height = "h-[200%]";
 		rotate = 'rotate-0'
+		tileRotation = 0;
 	}
 	if (orientation == "up") {
 		height = "h-[200%]";
 		rotate = 'rotate-180'
+		tileRotation = 180;
 	}
 	if (orientation == "left") {
 		height = "h-[200%]";
 		rotate = 'rotate-90'
+		tileRotation = 90;
 	}
 	if (orientation == "right") {
 		height = "h-[200%]";
 		rotate = '-rotate-90'
+		tileRotation = -90;
 	}
 
 	const [isLineHead, setIsLineHead] = useState(false);
@@ -134,11 +142,11 @@ export default function Tile({pipsa, pipsb, orientation, back = false, color = "
 					<table className="w-full h-full table-fixed">
 						<tbody>
 							<tr><td>
-								<TileHalf pips={back ? 0 : pipsa} back={back} orientation={"down"} />
+								<TileHalf pips={back ? 0 : pipsa} back={back} orientation={"down"} tileRotation={tileRotation} />
 								{!back && bar}
 							</td></tr>
 							<tr><td>
-								<TileHalf pips={back ? 0 : pipsb} back={back} orientation={"up"} />
+								<TileHalf pips={back ? 0 : pipsb} back={back} orientation={"up"} tileRotation={tileRotation} />
 							</td></tr>
 						</tbody>
 					</table>
