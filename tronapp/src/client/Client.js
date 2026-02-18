@@ -101,7 +101,7 @@ class Client {
 			if (isCorsOrNetwork) {
 				throw {
 					status: 0,
-					data: { error: 'Request failed (possible CORS or network issue). Check the API URL and that the server allows your origin.' },
+					data: { error: `Request problem: ${err?.message}`},
 					message: err?.message || 'Failed to fetch'
 				};
 			}
