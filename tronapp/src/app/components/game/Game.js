@@ -24,11 +24,16 @@ const availableColors = [
 	"fuchsia",
 ]
 
+let soundEffectsOn = true;
+
 function loadAudio(url) {
-	if (typeof window !== 'undefined') {
-		return new Audio(url);
-	}
-	return null;
+	const audio = typeof window !== 'undefined' ? new Audio(url) : null;
+	return {
+		play() {
+			if (!soundEffectsOn || !audio) return Promise.resolve();
+			return audio.play();
+		},
+	};
 }
 
 const dealAudio = loadAudio('/sfx/deal.mp3');
@@ -40,7 +45,11 @@ const chimeUpAudio = loadAudio('/sfx/chime_up.mp3');
 
 function Game({ code }) {
 	const router = useRouter();
-	const { playerName, client } = useGameState();
+	const { playerName, client, config } = useGameState();
+
+	useEffect(() => {
+		soundEffectsOn = config?.soundEffects !== false;
+	}, [config?.soundEffects]);
 
 	// These states come from the server
 	const [version, setVersion] = useState(-1);

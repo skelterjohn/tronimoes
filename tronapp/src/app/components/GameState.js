@@ -9,6 +9,7 @@ export const GameContext = createContext();
 
 const defaultConfig = {
 	tileset: "classic-color",
+	soundEffects: true,
 };
 
 export function GameProvider({ children }) {

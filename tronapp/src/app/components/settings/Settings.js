@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Space, Select } from 'antd';
+import { Modal, Space, Select, Checkbox } from 'antd';
 import Button from "@/app/components/Button";
 import { useGameState } from '../GameState';
 
 const Settings = ({ isOpen, onClose }) => {
 	const { config, setConfig } = useGameState();
 	const [tileSet, setTileSet] = useState("classic-color");
+	const [soundEffects, setSoundEffects] = useState(true);
 
 	const [allTileSets, setAllTileSets] = useState([
 		"beehive",
@@ -20,10 +21,13 @@ const Settings = ({ isOpen, onClose }) => {
 		if (config?.tileset) {
 			setTileSet(config.tileset);
 		}
-	}, [config, setTileSet]);
+		if (config?.soundEffects !== undefined) {
+			setSoundEffects(config.soundEffects);
+		}
+	}, [config]);
 	
 	const handleSave = () => {
-		setConfig({ ...config, tileset: tileSet });
+		setConfig({ ...config, tileset: tileSet, soundEffects: soundEffects });
 		onClose();
 	};
 
@@ -52,6 +56,14 @@ const Settings = ({ isOpen, onClose }) => {
 							value: set,
 							label: set
 						}))}
+					/>
+				</div>
+				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+					<span>sound effects</span>
+					<Checkbox
+						checked={soundEffects}
+						onChange={(e) => setSoundEffects(e.target.checked)}
+						className="font-game"
 					/>
 				</div>
 			</Space>
