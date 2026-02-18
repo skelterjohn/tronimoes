@@ -7,13 +7,17 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const GameContext = createContext();
 
+const defaultConfig = {
+	tileset: "classic-color",
+};
+
 export function GameProvider({ children }) {
 	const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("");
 	const [client, setClient] = useState(undefined);
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
-	const [config, setConfig] = useState(null);
+	const [config, setConfig] = useState(defaultConfig);
 	
 	useEffect(() => {
 		if (!client?.userInfo) {

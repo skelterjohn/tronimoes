@@ -28,7 +28,7 @@ export default function Pips({pips}) {
 	return (
 		<div className="w-full flex justify-center items-center">
 			<Image 
-				src={`/tilesets/${config?.tileset || 'beehive'}/${pips}.svg`}
+				src={`/tilesets/${config?.tileset || 'classic-mono'}/${pips}.svg`}
 				width={0}
 				height={0}
 				sizes="100%"

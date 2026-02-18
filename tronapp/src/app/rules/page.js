@@ -656,7 +656,7 @@ export default function RulesPage() {
 	const [showToc, setShowToc] = useState(false);
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
-		() => ({ ...gameState, config: gameState?.config ?? { tileset: "beehive" } }),
+		() => ({ ...gameState, config: gameState?.config ?? { tileset: "classic-color" } }),
 		[gameState]
 	);
 
