@@ -94,6 +94,7 @@ func main() {
 
 	for !g.Done {
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
+			log.Printf("It's %s's turn", g.Players[g.Turn].Name)
 			if g.Players[g.Turn].Name == *name {
 				p := g.GetPlayer(ctx, *name)
 				m := a.GetMove(g, p)
@@ -103,6 +104,8 @@ func main() {
 						log.Printf("Could not draw: %v", err)
 						return
 					}
+					log.Println("drew")
+					continue
 				}
 				if m.Pass {
 					g, err = tc.Pass(ctx, m.Selected.X, m.Selected.Y)
@@ -110,6 +113,7 @@ func main() {
 						log.Printf("Could not pass: %v", err)
 						return
 					}
+					log.Println("passed")
 					continue
 				}
 			} else {
