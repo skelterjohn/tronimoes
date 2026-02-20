@@ -43,7 +43,7 @@ type Selected struct {
 }
 
 type Move struct {
-	LaidTile *game.Tile
+	LaidTile *game.LaidTile
 	Spacer   *game.Spacer
 	Draw     bool
 	Pass     bool
@@ -51,9 +51,9 @@ type Move struct {
 }
 
 type Agent interface {
-	Ready()
-	Update(g *game.Game)
-	GetMove(g *game.Game) Move
+	Ready(ctx context.Context)
+	Update(ctx context.Context, g *game.Game)
+	GetMove(ctx context.Context, g *game.Game, p *game.Player) Move
 }
 
 func main() {
@@ -84,7 +84,7 @@ func main() {
 
 	a := RandomAgent{}
 
-	a.Ready()
+	a.Ready(ctx)
 
 	g, err = tc.Start(ctx)
 	if err != nil {
@@ -97,7 +97,7 @@ func main() {
 			log.Printf("It's %s's turn", g.Players[g.Turn].Name)
 			if g.Players[g.Turn].Name == *name {
 				p := g.GetPlayer(ctx, *name)
-				m := a.GetMove(g, p)
+				m := a.GetMove(ctx, g, p)
 				if m.Draw {
 					g, err = tc.Draw(ctx)
 					if err != nil {
@@ -116,8 +116,27 @@ func main() {
 					log.Println("passed")
 					continue
 				}
+				if m.LaidTile != nil {
+					g, err = tc.LayTile(ctx, m.LaidTile)
+					if err != nil {
+						log.Printf("Could not lay tile: %v", err)
+						return
+					}
+					log.Println("laid tile")
+					continue
+				}
+				if m.Spacer != nil {
+					g, err = tc.LaySpacer(ctx, m.Spacer)
+					if err != nil {
+						log.Printf("Could not lay spacer: %v", err)
+						return
+					}
+					log.Println("laid spacer")
+					continue
+				}
+				log.Println("no move")
 			} else {
-				a.Update(g)
+				a.Update(ctx, g)
 			}
 		}
 

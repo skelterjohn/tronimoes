@@ -1,17 +1,36 @@
 package main
 
-import "github.com/skelterjohn/tronimoes/tronserv/game"
+import (
+	"context"
+	"math/rand"
+
+	"github.com/skelterjohn/tronimoes/tronserv/game"
+)
 
 type RandomAgent struct {
 }
 
-func (RandomAgent) Ready() {
+func (RandomAgent) Ready(ctx context.Context) {
 
 }
-func (RandomAgent) Update(g *game.Game) {
+func (RandomAgent) Update(ctx context.Context, g *game.Game) {
 
 }
-func (RandomAgent) GetMove(g *game.Game, p *game.Player) Move {
+func (RandomAgent) GetMove(ctx context.Context, g *game.Game, p *game.Player) Move {
+	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p.Name, p)
+	_ = legalMoves
+	_ = legalSpacers
+
+	if len(legalSpacers) > 0 {
+		return Move{
+			Spacer: legalSpacers[rand.Intn(len(legalSpacers))],
+		}
+	}
+	if len(legalMoves) > 0 {
+		return Move{
+			LaidTile: legalMoves[rand.Intn(len(legalMoves))],
+		}
+	}
 	if p.JustDrew {
 		return Move{
 			Pass: true,

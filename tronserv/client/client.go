@@ -145,3 +145,22 @@ func (c *TronimoesClient) Pass(ctx context.Context, x, y int) (*game.Game, error
 
 	return &g, nil
 }
+
+func (c *TronimoesClient) LayTile(ctx context.Context, lt *game.LaidTile) (*game.Game, error) {
+	var g game.Game
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/tile", c.Code), lt, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+
+	return &g, nil
+}
+
+func (c *TronimoesClient) LaySpacer(ctx context.Context, sp *game.Spacer) (*game.Game, error) {
+	var g game.Game
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/spacer", c.Code), sp, &g); err != nil {
+		return nil, err
+	}
+	fmt.Printf("%+v\n", g)
+	return &g, nil
+}
