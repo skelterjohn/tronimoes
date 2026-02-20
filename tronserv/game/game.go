@@ -1159,32 +1159,55 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 	}
 
 	// verify that x1,y1 is adjacent to a line head.
-	checkLineHead := func(lt *LaidTile) bool {
-		if lt.NextPips == lt.Tile.PipsA && spacer.A.Adj(lt.CoordA()) {
+	checkLineHead := func(lt *LaidTile, c Coord) bool {
+		if lt.NextPips == lt.Tile.PipsA && c.Adj(lt.CoordA()) {
 			return true
 		}
-		if lt.NextPips == lt.Tile.PipsB && spacer.A.Adj(lt.CoordB()) {
+		if lt.NextPips == lt.Tile.PipsB && c.Adj(lt.CoordB()) {
 			return true
 		}
 		return false
 	}
 	isOnLineHead := false
 	for _, line := range r.PlayerLines {
-		if checkLineHead(line[len(line)-1]) {
+		if checkLineHead(line[len(line)-1], spacer.A) {
 			isOnLineHead = true
 			break
 		}
 	}
 	for _, line := range r.FreeLines {
-		if checkLineHead(line[len(line)-1]) {
+		if checkLineHead(line[len(line)-1], spacer.A) {
 			isOnLineHead = true
 			break
+		}
+	}
+	reversed := false
+	if !isOnLineHead {
+		// We only check the other end if the canonical version
+		// isn't starting from a line head. Otherwise, we let the
+		// player indicate a preference by correctly clicking near
+		// the line head first.
+		for _, line := range r.PlayerLines {
+			if checkLineHead(line[len(line)-1], spacer.B) {
+				isOnLineHead = true
+				reversed = true
+				break
+			}
+		}
+		for _, line := range r.FreeLines {
+			if checkLineHead(line[len(line)-1], spacer.B) {
+				isOnLineHead = true
+				reversed = true
+				break
+			}
 		}
 	}
 	if !isOnLineHead {
 		return ErrSpacerNotStartedOnLine
 	}
-
+	if reversed {
+		spacer = &Spacer{A: spacer.B, B: spacer.A}
+	}
 	r.Spacer = spacer
 	return nil
 }
