@@ -29,7 +29,11 @@ export function GameProvider({ children }) {
 			console.log("got player config", resp);
 			setConfig(resp.config);
 		}).catch((error) => {
-			console.error('get player name error', error);
+			if (error.status === 404) {
+				setErrorMessage(error.data.error);
+			} else {
+				setErrorMessage(`get player name error: ${error.message}`);
+			}
 		});
 	}, [client, setPlayerName]);
 
