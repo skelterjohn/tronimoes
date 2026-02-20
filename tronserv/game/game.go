@@ -820,18 +820,34 @@ func (r *Round) Note(ctx context.Context, n string) {
 }
 
 func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) {
+	legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, name, p)
+	hintMap := make(map[string][]string)
+	for _, t := range p.Hand {
+		hintMap[t.String()] = []string{}
+	}
+	for _, lt := range legalMoves {
+		hintMap[lt.Tile.String()] = append(hintMap[lt.Tile.String()], lt.CoordA().String())
+		hintMap[lt.Tile.String()] = append(hintMap[lt.Tile.String()], lt.CoordB().String())
+	}
+	p.Hints = make([][]string, len(p.Hand))
+	for i, t := range p.Hand {
+		for _, coord := range hintMap[t.String()] {
+			p.Hints[i] = append(p.Hints[i], coord)
+		}
+	}
+
+	for _, spacer := range legalSpacers {
+		p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%s-%s", spacer.A, spacer.B))
+	}
+}
+
+func (r *Round) FindLegalMoves(ctx context.Context, g *Game, name string, p *Player) ([]*LaidTile, []*Spacer) {
+	legalMoves := []*LaidTile{}
+	legalSpacers := []*Spacer{}
+
 	squarePips := r.MapTiles(ctx)
 
-	hints := make([]map[string]bool, len(p.Hand))
-	for i := range hints {
-		hints[i] = map[string]bool{}
-	}
-
-	hintAt := func(i int, coord Coord) {
-		hints[i][coord.String()] = true
-	}
-
-	for i, t := range p.Hand {
+	for _, t := range p.Hand {
 		movesOffSquare := func(head *LaidTile, src Coord) {
 
 			for _, orientation := range []string{"up", "down", "left", "right"} {
@@ -840,9 +856,11 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 					Orientation: orientation,
 					Coord:       src,
 				}
-				if r.LayTile(ctx, g, name, lt, true) == nil || r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
-					hintAt(i, lt.CoordA())
-					hintAt(i, lt.CoordB())
+				if r.LayTile(ctx, g, name, lt, true) == nil {
+					legalMoves = append(legalMoves, lt)
+				}
+				if r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
+					legalMoves = append(legalMoves, lt.Reverse())
 				}
 			}
 
@@ -909,9 +927,11 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 						Orientation: orientation,
 						Coord:       A,
 					}
-					if r.LayTile(ctx, g, name, lt, true) == nil || r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
-						hintAt(i, lt.CoordA())
-						hintAt(i, lt.CoordB())
+					if r.LayTile(ctx, g, name, lt, true) == nil {
+						legalMoves = append(legalMoves, lt)
+					}
+					if r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
+						legalMoves = append(legalMoves, lt.Reverse())
 					}
 				}
 			}
@@ -921,12 +941,6 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 			tryA(src.Down())
 		}
 		tryToCoord(r.Spacer.B)
-	}
-	p.Hints = make([][]string, len(p.Hand))
-	for i, hintList := range hints {
-		for h := range hintList {
-			p.Hints[i] = append(p.Hints[i], h)
-		}
 	}
 
 	p.SpacerHints = []string{}
@@ -959,7 +973,7 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 			}
 			for _, dst := range fourWays {
 				if g.sixPathFrom(ctx, squarePips, src, dst) {
-					p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%s-%s", src, dst))
+					legalSpacers = append(legalSpacers, &Spacer{A: src, B: dst})
 				}
 			}
 		}
@@ -987,6 +1001,7 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 			hintSpacerFromTile(line[len(line)-1])
 		}
 	}
+	return legalMoves, legalSpacers
 }
 
 func (r *Round) canPlayOnLine(ctx context.Context, lt *LaidTile, line []*LaidTile) (bool, int, error) {
