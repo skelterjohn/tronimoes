@@ -762,6 +762,10 @@ type Spacer struct {
 	B Coord `json:"b"`
 }
 
+func (s Spacer) String() string {
+	return fmt.Sprintf("%s-%s", s.A, s.B)
+}
+
 type LaidTile struct {
 	Tile        *Tile  `json:"tile"`
 	Coord       Coord  `json:"coord"`
@@ -837,7 +841,7 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 	}
 
 	for _, spacer := range legalSpacers {
-		p.SpacerHints = append(p.SpacerHints, fmt.Sprintf("%s-%s", spacer.A, spacer.B))
+		p.SpacerHints = append(p.SpacerHints, spacer.String())
 	}
 }
 
