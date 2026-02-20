@@ -82,6 +82,8 @@ func main() {
 		return
 	}
 
+	lastMoveTime := time.Now()
+
 	a := RandomAgent{}
 
 	for !g.Done {
@@ -100,6 +102,12 @@ func main() {
 			if g.Players[g.Turn].Name == *name {
 				p := g.GetPlayer(ctx, *name)
 				m := a.GetMove(ctx, g, p)
+				if time.Since(lastMoveTime) < 3*time.Second {
+					// Always wait at least 3 seconds between moves, so
+					// as not to confuse the normies.
+					time.Sleep(1*time.Second - time.Since(lastMoveTime))
+				}
+				lastMoveTime = time.Now()
 				if m.Draw {
 					g, err = tc.Draw(ctx)
 					if err != nil {

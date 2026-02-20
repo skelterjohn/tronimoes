@@ -76,8 +76,6 @@ func (c *TronimoesClient) GetPlayer(ctx context.Context, name string) (*game.Pla
 	if err := c.Do(ctx, "GET", "players/jt", nil, &pi); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", pi)
-
 	return nil, nil
 }
 
@@ -86,63 +84,46 @@ func (c *TronimoesClient) JoinGame(ctx context.Context, code string) (*game.Game
 		Name: c.Name,
 	}
 	var g game.Game
-
 	if err := c.Do(ctx, "PUT", fmt.Sprintf("game/%s", code), p, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
-
 	c.Code = g.Code
-
 	return &g, nil
 }
 
 func (c *TronimoesClient) GetGame(ctx context.Context, version int64) (*game.Game, error) {
 	var g game.Game
-
 	if err := c.Do(ctx, "GET", fmt.Sprintf("game/%s", c.Code), nil, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
-
 	return &g, nil
 }
 
 func (c *TronimoesClient) Start(ctx context.Context) (*game.Game, error) {
 	var g game.Game
-
 	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/start", c.Code), nil, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
-
 	return &g, nil
 }
 
 func (c *TronimoesClient) Draw(ctx context.Context) (*game.Game, error) {
 	var g game.Game
-
 	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/draw", c.Code), nil, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
-
 	return &g, nil
 }
 
 func (c *TronimoesClient) Pass(ctx context.Context, x, y int) (*game.Game, error) {
 	var g game.Game
-
 	sel := map[string]int{
 		"selected_x": x,
 		"selected_y": y,
 	}
-
 	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/pass", c.Code), sel, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
-
 	return &g, nil
 }
 
@@ -151,8 +132,6 @@ func (c *TronimoesClient) LayTile(ctx context.Context, lt *game.LaidTile) (*game
 	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/tile", c.Code), lt, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
-
 	return &g, nil
 }
 
@@ -161,6 +140,5 @@ func (c *TronimoesClient) LaySpacer(ctx context.Context, sp *game.Spacer) (*game
 	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/spacer", c.Code), sp, &g); err != nil {
 		return nil, err
 	}
-	fmt.Printf("%+v\n", g)
 	return &g, nil
 }
