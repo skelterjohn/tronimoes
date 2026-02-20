@@ -105,7 +105,7 @@ func main() {
 				if time.Since(lastMoveTime) < 3*time.Second {
 					// Always wait at least 3 seconds between moves, so
 					// as not to confuse the normies.
-					time.Sleep(1*time.Second - time.Since(lastMoveTime))
+					time.Sleep(3*time.Second - time.Since(lastMoveTime))
 				}
 				lastMoveTime = time.Now()
 				if m.Draw {
@@ -132,7 +132,7 @@ func main() {
 						log.Printf("Could not lay tile: %v", err)
 						return
 					}
-					log.Println("laid tile")
+					log.Printf("laid tile: %v", m.LaidTile)
 					continue
 				}
 				if m.Spacer != nil {
@@ -141,7 +141,7 @@ func main() {
 						log.Printf("Could not lay spacer: %v", err)
 						return
 					}
-					log.Println("laid spacer")
+					log.Printf("laid spacer: %v", m.Spacer)
 					continue
 				}
 				log.Println("no move")
