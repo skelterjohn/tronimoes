@@ -84,15 +84,17 @@ func main() {
 
 	a := RandomAgent{}
 
-	a.Ready(ctx)
-
-	g, err = tc.Start(ctx)
-	if err != nil {
-		log.Printf("Error starting game: %v", err)
-		return
-	}
-
 	for !g.Done {
+		r := g.CurrentRound(ctx)
+		if r == nil || r.Done {
+			a.Ready(ctx)
+
+			g, err = tc.Start(ctx)
+			if err != nil {
+				log.Printf("Error starting game: %v", err)
+				return
+			}
+		}
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
 			log.Printf("It's %s's turn", g.Players[g.Turn].Name)
 			if g.Players[g.Turn].Name == *name {
