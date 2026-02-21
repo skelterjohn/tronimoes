@@ -17,7 +17,7 @@ func (RandomAgent) Update(ctx context.Context, g *game.Game) {
 
 }
 func (RandomAgent) GetMove(ctx context.Context, g *game.Game, p *game.Player) Move {
-	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p.Name, p)
+	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 	_ = legalMoves
 	_ = legalSpacers
 
