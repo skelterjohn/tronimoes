@@ -334,3 +334,22 @@ func (s *FireStore) UpdatePlayerConfig(ctx context.Context, playerID string, con
 	}})
 	return err
 }
+
+func (s *FireStore) issues(ctx context.Context) *firestore.CollectionRef {
+	return s.storeClient.Collection("envs").Doc(s.env).Collection("issues")
+}
+
+func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen string) error {
+	gameData, err := json.Marshal(game)
+	if err != nil {
+		return fmt.Errorf("could not marshal: %v", err)
+	}
+	_, err = s.issues(ctx).NewDoc().Set(ctx, map[string]any{
+		"reported_by":      playerName,
+		"summary":          summary,
+		"whatHappened":     whatHappened,
+		"whatShouldHappen": whatShouldHappen,
+		"game_json":        string(gameData),
+	})
+	return err
+}

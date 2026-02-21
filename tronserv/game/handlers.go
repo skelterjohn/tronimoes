@@ -38,6 +38,7 @@ func RegisterHandlers(r chi.Router, s Store) {
 	gs := &GameServer{store: s}
 	r.Get("/game/{code}", gs.HandleGetGame)
 	r.Put("/game/{code}", gs.HandlePutGame)
+	r.Post("/game/{code}/report", gs.HandleReportIssue)
 	r.Post("/game/{code}/start", gs.HandleStartRound)
 	r.Post("/game/{code}/tile", gs.HandleLayTile)
 	r.Post("/game/{code}/spacer", gs.HandleLaySpacer)
@@ -982,4 +983,38 @@ func (s *GameServer) HandleUpdatePlayerConfig(w http.ResponseWriter, r *http.Req
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cfg)
+}
+
+type ReportIssueRequest struct {
+	Summary          string `json:"summary"`
+	WhatHappened     string `json:"what_happened"`
+	WhatShouldHappen string `json:"what_should_happen"`
+}
+
+func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	defer r.Body.Close()
+
+	code := chi.URLParam(r, "code")
+	name, err := s.getName(ctx, r)
+	if err != nil {
+		log.Printf("Error getting name: %v", err)
+		writeErr(w, err, http.StatusForbidden)
+		return
+	}
+
+	reqBody := ReportIssueRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		log.Printf("Error decoding report issue request: %v", err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+
+	g, err := s.store.ReadGame(ctx, code)
+	if err != nil {
+		log.Printf("Error reading game %q: %v", code, err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	s.store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen)
 }
