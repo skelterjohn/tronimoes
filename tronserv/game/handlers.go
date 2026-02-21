@@ -69,7 +69,7 @@ func isBotName(name string) bool {
 	tokens := strings.Split(name, " ")
 	var initials string
 	for _, t := range tokens {
-		initials += t
+		initials += t[0:1]
 	}
 
 	return reservedInitials[initials]
