@@ -92,6 +92,10 @@ func validatePlayerName(name string) error {
 	return nil
 }
 
+type GameOptions struct {
+	Roodle bool `json:"roodle"`
+}
+
 type GameServer struct {
 	store Store
 }
@@ -638,6 +642,15 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	options := &GameOptions{}
+	if err := json.NewDecoder(r.Body).Decode(options); err != nil {
+		log.Printf("Error decoding game options for %q / %q: %v", name, code, err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+	r.Body.Close()
+	log.Printf("Game options for %q / %q: %v", name, code, options)
+
 	var g *Game
 
 	pickup := code == "PICKUP"
@@ -702,18 +715,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	player := &Player{}
-	if err := json.NewDecoder(r.Body).Decode(player); err != nil {
-		log.Printf("Error decoding player for %q / %q", name, code)
-		writeErr(w, err, http.StatusBadRequest)
-		return
-	}
-
-	if player.Name != name {
-		log.Printf("Header name %q does not match payload name %q", name, player.Name)
-		writeErr(w, ErrNotYou, http.StatusForbidden)
-		return
-	}
+	player := &Player{Name: name}
 
 	if !inGame {
 		if err := g.AddPlayer(ctx, player); err != nil {

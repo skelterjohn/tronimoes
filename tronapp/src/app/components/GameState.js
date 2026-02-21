@@ -12,6 +12,10 @@ const defaultConfig = {
 	soundEffects: true,
 };
 
+const defaultOptions = {
+	roodle: false,
+};
+
 export function GameProvider({ children }) {
 	const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("");
@@ -19,6 +23,7 @@ export function GameProvider({ children }) {
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
 	const [config, setConfig] = useState(defaultConfig);
+	const [options, setOptions] = useState(defaultOptions);
 	
 	useEffect(() => {
 		if (!client?.userInfo) {
@@ -69,6 +74,7 @@ export function GameProvider({ children }) {
 			userInfo, setUserInfo,
 			persistentUser, loading, error,
 			config, setConfig,
+			options, setOptions,
 		}}>
 			{children}
 		</GameContext.Provider>

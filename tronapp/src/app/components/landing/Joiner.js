@@ -4,12 +4,14 @@ import Button from '@/app/components/Button';
 import { useRouter } from "next/navigation";
 
 import { useGameState } from '../../components/GameState';
+import Options from './Options';
 
 export default function Joiner({userInfo, loading, setErrorMessage}) {
 	const router = useRouter();
 
-	const { setGameCode, playerName, setPlayerName, setPlayerKey, client } = useGameState();
+	const { setGameCode, playerName, setPlayerName, setPlayerKey, client, options } = useGameState();
 	const [isRegistered, setIsRegistered] = useState(false);
+	const [showOptionsModal, setShowOptionsModal] = useState(false);
 
 	const [nameInput, setNameInput] = useState('');
 
@@ -64,7 +66,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	function joinCode(code) {
 		console.log('joining', nameInput, code);
 		setPlayerName(nameInput);
-		client.JoinGame(code, nameInput).then((resp) => {
+		client.JoinGame(code, nameInput, options).then((resp) => {
 			console.log('joined game', resp);
 			setGameCode(resp.code);
 			router.push(`/gameboard/${resp.code}`);
@@ -118,7 +120,14 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				onChange={registerAndJoinCode}
 			/>
 		</div>
-		<div className="flex justify-end gap-2 items-center">
+		<div className="flex justify-between gap-2 items-center">
+			<Button
+				size="small"
+				className="game-btn"
+				onClick={() => setShowOptionsModal(true)}
+			>
+				game options
+			</Button>
 			<Button
 				type="primary"
 				size="large"
@@ -129,5 +138,9 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				pick-up game
 			</Button>
 		</div>
+		<Options
+			isOpen={showOptionsModal}
+			onClose={() => setShowOptionsModal(false)}
+		/>
 	</div>;
 }

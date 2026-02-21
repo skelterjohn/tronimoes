@@ -33,7 +33,7 @@ const Settings = ({ isOpen, onClose }) => {
 
 	return (
 		<Modal
-			title="Settings"
+			title="settings"
 			open={isOpen}
 			onCancel={onClose}
 			className="font-game"

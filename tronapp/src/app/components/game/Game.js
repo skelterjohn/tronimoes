@@ -45,7 +45,7 @@ const chimeUpAudio = loadAudio('/sfx/chime_up.mp3');
 
 function Game({ code }) {
 	const router = useRouter();
-	const { playerName, client, config } = useGameState();
+	const { playerName, client, config, options } = useGameState();
 
 	useEffect(() => {
 		soundEffectsOn = config?.soundEffects !== false;
@@ -331,7 +331,7 @@ function Game({ code }) {
 
 	const readyToPlay = useCallback(() => {
 		if (player === undefined && playerName !== undefined) {
-			client.JoinGame(code, playerName).then((resp) => {
+			client.JoinGame(code, playerName, options).then((resp) => {
 				console.log("joined game", resp);
 			}).catch((error) => {
 				console.error("error", error);
