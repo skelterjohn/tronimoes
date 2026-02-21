@@ -567,7 +567,7 @@ function Hand({
 				<div className="w-full min-h-40 flex flex-col flex-1">
 					<div className="w-full flex flex-row justify-center">
 						<div className="w-[calc(100%-1rem)] flex flex-wrap content-start justify-start">
-							<div className="h-[15vh] w-[7.5vh] shrink-0 pr-1 pt-1">
+							<div className="h-[15vh] w-[7.5vh] shrink-0 pr-1 pt-1 pb-2">
 								<div
 									className={`${spacerColor} ${spacerAvailable && "-translate-y-2"} h-full w-full border-black rounded-lg border-2 flex items-center justify-center text-center`}
 									onClick={spacerClicked}
