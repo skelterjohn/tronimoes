@@ -2,7 +2,6 @@ package game
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -39,48 +38,6 @@ func NewGame(ctx context.Context, code string) *Game {
 		BoardHeight: 11,
 		MaxPips:     16,
 	}
-}
-
-func (g *Game) CheckForDupes(ctx context.Context, when string) bool {
-	if g.CurrentRound(ctx) == nil {
-		return false
-	}
-	seen := map[string]bool{}
-	anyDupes := false
-	visit := func(t *Tile, where string) bool {
-		if seen[t.String()] {
-			log.Printf("dupe tile: %s in %s", t.String(), where)
-			anyDupes = true
-			seen[t.String()] = true
-			return true
-		}
-		seen[t.String()] = true
-		return false
-	}
-	for _, lt := range g.CurrentRound(ctx).LaidTiles {
-		visit(lt.Tile, "laid tiles")
-	}
-	for _, p := range g.Players {
-		newHand := []*Tile{}
-		for _, t := range p.Hand {
-			if !visit(t, p.Name) {
-				newHand = append(newHand, t)
-			}
-		}
-		p.Hand = newHand
-	}
-	newBag := []*Tile{}
-	for _, t := range g.Bag {
-		if !visit(t, "bag") {
-			newBag = append(newBag, t)
-		}
-	}
-	g.Bag = newBag
-	if anyDupes {
-		data, _ := json.Marshal(g)
-		log.Printf("dupes during %s: %s", when, string(data))
-	}
-	return anyDupes
 }
 
 func (g *Game) LeaveOrQuit(ctx context.Context, name string) bool {

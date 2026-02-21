@@ -28,9 +28,5 @@ func TestDrawForLeader(t *testing.T) {
 		game.Rounds = append(game.Rounds, prevRound)
 
 		game.Start(ctx, "p1")
-
-		if game.CheckForDupes(ctx, "test") {
-			t.Errorf("dupes found")
-		}
 	}
 }
