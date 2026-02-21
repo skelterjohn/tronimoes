@@ -150,11 +150,11 @@ func main() {
 			}
 		}
 
-		vers := g.Version
-		g, err = tc.GetGame(ctx, vers)
-		for g.Version == vers || err == client.ErrTimeout {
+		previousGame := g
+		g, err = tc.GetGame(ctx, previousGame.Version)
+		for g.Version == previousGame.Version || err == client.ErrTimeout {
 			time.Sleep(5 * time.Second)
-			g, err = tc.GetGame(ctx, vers)
+			g, err = tc.GetGame(ctx, previousGame.Version)
 		}
 		if err != nil {
 			log.Printf("Could not get game: %v", err)
@@ -162,5 +162,35 @@ func main() {
 		}
 
 		lastMoveTime = time.Now()
+
+		currentRound := g.CurrentRound(ctx)
+		previousCurrentRound := previousGame.CurrentRound(ctx)
+		if currentRound == nil || previousCurrentRound == nil {
+			continue
+		}
+		if currentRound.Done {
+			log.Println("round is done")
+			continue
+		}
+		lastPlayer := g.Players[previousGame.Turn]
+		if len(currentRound.LaidTiles) > len(previousCurrentRound.LaidTiles) {
+			lastTile := currentRound.LaidTiles[len(currentRound.LaidTiles)-1]
+			log.Printf("%s laid %s", lastPlayer.Name, lastTile)
+			continue
+		}
+		if currentRound.Spacer != nil {
+			log.Printf("%s laid spacer: %s", lastPlayer.Name, currentRound.Spacer)
+			continue
+		}
+		for _, p := range g.Players {
+			if p.JustDrew {
+				log.Printf("%s just drew", p.Name)
+				continue
+			}
+		}
+		if previousGame.Turn != g.Turn {
+			log.Printf("%s passed", lastPlayer.Name)
+			continue
+		}
 	}
 }
