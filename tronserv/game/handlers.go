@@ -200,7 +200,7 @@ func (s *GameServer) encodeFilteredGame(ctx context.Context, w http.ResponseWrit
 	if len(g.Players) > g.Turn {
 		p := g.Players[g.Turn]
 		if !g.Done && r != nil && p.Name == name {
-			r.FindHints(ctx, g, name, p)
+			r.FindHints(ctx, g, p)
 		}
 	}
 

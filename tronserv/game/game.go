@@ -780,8 +780,8 @@ func (r *Round) Note(ctx context.Context, n string) {
 	r.History = append(r.History, n)
 }
 
-func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) {
-	legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, name, p)
+func (r *Round) FindHints(ctx context.Context, g *Game, p *Player) {
+	legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, p)
 	hintMap := make(map[string][]string)
 	for _, t := range p.Hand {
 		hintMap[t.String()] = []string{}
@@ -802,11 +802,13 @@ func (r *Round) FindHints(ctx context.Context, g *Game, name string, p *Player) 
 	}
 }
 
-func (r *Round) FindLegalMoves(ctx context.Context, g *Game, name string, p *Player) ([]*LaidTile, []*Spacer) {
+func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*LaidTile, []*Spacer) {
 	legalMoves := []*LaidTile{}
 	legalSpacers := []*Spacer{}
 
 	squarePips := r.MapTiles(ctx)
+
+	name := p.Name
 
 	for _, t := range p.Hand {
 		movesOffSquare := func(head *LaidTile, src Coord) {
