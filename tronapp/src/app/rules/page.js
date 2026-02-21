@@ -647,6 +647,20 @@ const SECTIONS = [
 			</>
 		),
 	},
+	{
+		title: "reporting issues",
+		content: (
+			<>
+				<p>
+					Buried in the settings menu, you can report issues with the game. When you report,
+					a copy of the game is saved, along with your name and the information you provide.
+				</p>
+				<p>
+					These reports are used to create tests that keep the game working properly.
+				</p>
+			</>
+		),
+	},
 ];
 
 export default function RulesPage() {
