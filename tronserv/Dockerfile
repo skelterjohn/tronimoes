@@ -17,5 +17,5 @@ EXPOSE 8080
 ENV PORT 8080
 USER nonroot
 
-ENTRYPOINT ["/app/bin/tronserv"]
+ENTRYPOINT ["/app/tronserv"]
 CMD ["--addr", "0.0.0.0", "--env", "prod"]
