@@ -63,8 +63,8 @@ class Client {
 	async ReportIssue(code, summary, whatHappened, whatShouldHappen) {
 		return this.post(`/game/${code}/report`, {
 			summary: summary,
-			whatHappened: whatHappened,
-			whatShouldHappen: whatShouldHappen,
+			what_happened: whatHappened,
+			what_should_happen: whatShouldHappen,
 		});
 	}
 
