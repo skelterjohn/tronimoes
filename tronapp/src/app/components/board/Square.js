@@ -56,10 +56,10 @@ export default function Square({
 		style={interactive ? undefined : { pointerEvents: 'none' }}
 	>
 		{x === 0 && (
-			<span className="absolute top-0.5 left-0.5 font-game text-[10px] text-gray-400 select-none">{y}</span>
+			<span className="absolute top-0.5 left-0.5 font-game text-[8px] text-gray-400 select-none">{y}</span>
 		)}
 		{y === 0 && x !== 0 && (
-			<span className="absolute top-0.5 left-0.5 font-game text-[10px] text-gray-400 select-none">{x}</span>
+			<span className="absolute top-0.5 left-0.5 font-game text-[8px] text-gray-400 select-none">{x}</span>
 		)}
 		{clicked && <Pips pips={pips} />}
 	</div>;
