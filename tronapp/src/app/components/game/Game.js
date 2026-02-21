@@ -365,12 +365,12 @@ function Game({ code }) {
 		setInFlight("laying tile");
 		client.LayTile(code, {
 			tile: {
-				pips_a: tile.a,
-				pips_b: tile.b,
+				pips_a: tile?.a ?? -1,
+				pips_b: tile?.b ?? -1,
 			},
-			coord: tile.coord,
-			orientation: tile.orientation,
-			player_name: player.name,
+			coord: tile?.coord ?? { x: -1, y: -1 },
+			orientation: tile?.orientation ?? "down",
+			player_name: player?.name ?? "",
 			indicated: {
 				pips_a: indicated?.a ?? -1,
 				pips_b: indicated?.b ?? -1,
@@ -382,7 +382,6 @@ function Game({ code }) {
 			setHints({});
 			console.log("laid tile", resp);
 		}).catch((error) => {
-			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 			setHoveredSquares(new Set([]));
 		}).finally(() => {
