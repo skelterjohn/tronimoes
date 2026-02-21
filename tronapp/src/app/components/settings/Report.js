@@ -17,6 +17,10 @@ const ReportIssue = ({ isOpen, onClose, code }) => {
 		setError(null);
 		try {
 			await client.ReportIssue(code, summary, whatHappened, whatShouldHappen);
+			setSummary('');
+			setWhatHappened('');
+			setWhatShouldHappen('');
+			setError(null);
 			onClose();
 		} catch (err) {
 			setError(err?.message || err?.data?.error || 'Failed to report');
