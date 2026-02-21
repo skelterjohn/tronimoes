@@ -2,6 +2,8 @@
 FROM cgr.dev/chainguard/go:latest AS builder
 WORKDIR /app
 COPY . .
+RUN go install .
+RUN go test ./...
 RUN CGO_ENABLED=0 go build -o tronserv
 
 # Production stage
