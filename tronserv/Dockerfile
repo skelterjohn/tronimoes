@@ -4,17 +4,18 @@ WORKDIR /app
 COPY . .
 RUN CGO_ENABLED=0 go install . ./agent
 RUN CGO_ENABLED=0 go test ./...
-RUN cp $HOME/go/bin/* /app/
+RUN mkdir /app/bin
+RUN cp $HOME/go/bin/* /app/bin
 
 # Production stage
 FROM cgr.dev/chainguard/static:latest
 WORKDIR /app
-COPY --from=builder /app/tronserv .
-COPY --from=builder /app/agent .
+COPY --from=builder /app/bin/tronserv .
+COPY --from=builder /app/bin/agent .
 
 EXPOSE 8080
 ENV PORT 8080
 USER nonroot
 
-ENTRYPOINT ["/app/tronserv"]
+ENTRYPOINT ["/app/bin/tronserv"]
 CMD ["--addr", "0.0.0.0", "--env", "prod"]
