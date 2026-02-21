@@ -93,7 +93,8 @@ func (c *TronimoesClient) JoinGame(ctx context.Context, code string) (*game.Game
 
 func (c *TronimoesClient) GetGame(ctx context.Context, version int64) (*game.Game, error) {
 	var g game.Game
-	if err := c.Do(ctx, "GET", fmt.Sprintf("game/%s", c.Code), nil, &g); err != nil {
+	qstr := fmt.Sprintf("?version=%d", version)
+	if err := c.Do(ctx, "GET", fmt.Sprintf("game/%s%s", c.Code, qstr), nil, &g); err != nil {
 		return nil, err
 	}
 	return &g, nil

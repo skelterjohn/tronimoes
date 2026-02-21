@@ -160,5 +160,7 @@ func main() {
 			log.Printf("Could not get game: %v", err)
 			return
 		}
+
+		lastMoveTime = time.Now()
 	}
 }
