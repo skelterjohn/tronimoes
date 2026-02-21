@@ -163,34 +163,33 @@ func main() {
 
 		lastMoveTime = time.Now()
 
-		currentRound := g.CurrentRound(ctx)
+		currentRound := g.Rounds[len(g.Rounds)-1]
 		previousCurrentRound := previousGame.CurrentRound(ctx)
 		if currentRound == nil || previousCurrentRound == nil {
 			continue
 		}
-		if currentRound.Done {
-			log.Println("round is done")
-			continue
-		}
 		lastPlayer := g.Players[previousGame.Turn]
+		knownPlay := false
 		if len(currentRound.LaidTiles) > len(previousCurrentRound.LaidTiles) {
 			lastTile := currentRound.LaidTiles[len(currentRound.LaidTiles)-1]
 			log.Printf("%s laid %s", lastPlayer.Name, lastTile)
-			continue
+			knownPlay = true
 		}
 		if currentRound.Spacer != nil {
 			log.Printf("%s laid spacer: %s", lastPlayer.Name, currentRound.Spacer)
-			continue
+			knownPlay = true
 		}
 		for _, p := range g.Players {
 			if p.JustDrew {
 				log.Printf("%s just drew", p.Name)
-				continue
+				knownPlay = true
 			}
 		}
-		if previousGame.Turn != g.Turn {
+		if !knownPlay && previousGame.Turn != g.Turn {
 			log.Printf("%s passed", lastPlayer.Name)
-			continue
+		}
+		if currentRound.Done {
+			log.Println("round is done")
 		}
 	}
 }
