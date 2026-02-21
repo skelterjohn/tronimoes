@@ -647,7 +647,7 @@ type Coord struct {
 }
 
 func (c Coord) String() string {
-	return fmt.Sprintf("%d,%d", c.X, c.Y)
+	return fmt.Sprintf("(%d,%d)", c.X, c.Y)
 }
 
 func (c Coord) Plus(dx, dy int) Coord {
@@ -759,7 +759,7 @@ func (lt *LaidTile) CoordB() Coord {
 }
 
 func (lt *LaidTile) String() string {
-	return fmt.Sprintf("{%d:%d %s:%s %d}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), lt.NextPips)
+	return fmt.Sprintf("{%d:%d %s-%s %d}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), lt.NextPips)
 }
 
 type Round struct {

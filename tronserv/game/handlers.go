@@ -431,7 +431,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	if err := g.LayTile(ctx, name, lt); err != nil {
 		log.Printf("Error laying tile for %q / %q: %v", name, code, err)
-		tileErr := fmt.Errorf("(%v %v:%v) %v", lt.Tile, lt.CoordA(), lt.CoordB(), err)
+		tileErr := fmt.Errorf("%s %v", lt, err)
 		writeErr(w, tileErr, http.StatusBadRequest)
 		return
 	}
