@@ -1,4 +1,7 @@
 steps:
+- name: 'cgr.dev/chainguard/go:latest'
+  dir: 'tronserv'
+  args: ['test', './...']
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'tronserv'
   args: ['build', '--tag=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA', '.']
