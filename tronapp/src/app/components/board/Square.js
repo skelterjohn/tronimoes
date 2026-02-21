@@ -52,9 +52,15 @@ export default function Square({
 		onDrop={interactive ? onDrop : undefined}
 		data-tron_x={x}
 		data-tron_y={y}
-		className={`w-full aspect-square ${bgColor} ${clicked && "border border-2 border-black"}`}
+		className={`relative w-full aspect-square ${bgColor} ${clicked && "border border-2 border-black"}`}
 		style={interactive ? undefined : { pointerEvents: 'none' }}
 	>
+		{x === 0 && (
+			<span className="absolute top-0.5 left-0.5 font-game text-[10px] text-gray-400 select-none">{y}</span>
+		)}
+		{y === 0 && x !== 0 && (
+			<span className="absolute top-0.5 left-0.5 font-game text-[10px] text-gray-400 select-none">{x}</span>
+		)}
 		{clicked && <Pips pips={pips} />}
 	</div>;
 }
