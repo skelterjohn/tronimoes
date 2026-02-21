@@ -3,7 +3,7 @@ import { Modal, Space, Select, Checkbox } from 'antd';
 import Button from "@/app/components/Button";
 import { useGameState } from '../GameState';
 
-const Settings = ({ isOpen, onClose }) => {
+const Settings = ({ isOpen, onClose, setShowReportIssueModal }) => {
 	const { config, setConfig } = useGameState();
 	const [tileSet, setTileSet] = useState("classic");
 	const [soundEffects, setSoundEffects] = useState(true);
@@ -31,17 +31,31 @@ const Settings = ({ isOpen, onClose }) => {
 		onClose();
 	};
 
+	const handleReportIssue = () => {
+		onClose();
+		setShowReportIssueModal(true);
+	};
+
 	return (
 		<Modal
 			title="settings"
 			open={isOpen}
 			onCancel={onClose}
 			className="font-game"
-			footer={[
-				<Button key="save" type="primary" onClick={handleSave}>
-					Save
-				</Button>
-			]}
+			footer={
+				<div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+					<Button
+						key="report"
+						className="game-btn"
+						onClick={handleReportIssue}
+					>
+						report issue
+					</Button>
+					<Button key="save" type="primary" onClick={handleSave}>
+						save
+					</Button>
+				</div>
+			}
 		>
 			<Space orientation="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
 				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

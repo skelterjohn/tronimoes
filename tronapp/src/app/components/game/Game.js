@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import Settings from '../settings/Settings';
+import ReportIssue from '../settings/Report';
 
 const availableColors = [
 	"red",
@@ -635,6 +636,7 @@ function Game({ code }) {
 	const [squareSpan, setSquareSpan] = useState(0);
 
 	const [showSettingsModal, setShowSettingsModal] = useState(false);
+	const [showReportIssueModal, setShowReportIssueModal] = useState(false);
 
 	const renderHand = useCallback(() => {
 		if (player === undefined) {
@@ -840,6 +842,12 @@ function Game({ code }) {
 			<Settings
 				isOpen={showSettingsModal}
 				onClose={() => setShowSettingsModal(false)}
+				setShowReportIssueModal={setShowReportIssueModal}
+			/>
+			<ReportIssue
+				isOpen={showReportIssueModal}
+				onClose={() => setShowReportIssueModal(false)}
+				code={code}
 			/>
 		</div>
 	);

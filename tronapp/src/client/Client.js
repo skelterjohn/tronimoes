@@ -60,6 +60,14 @@ class Client {
 		return this.post(`/game/${code}/react`, { url: url });
 	}
 
+	async ReportIssue(code, summary, whatHappened, whatShouldHappen) {
+		return this.post(`/game/${code}/report`, {
+			summary: summary,
+			whatHappened: whatHappened,
+			whatShouldHappen: whatShouldHappen,
+		});
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }
