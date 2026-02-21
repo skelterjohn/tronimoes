@@ -2,17 +2,19 @@ package game
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"testing"
 )
 
-var encodedGames = map[string]string{
-	"basic_report": `{"created":1771699419,"version":3,"pickup":true,"done":false,"code":"VOWNSL-QHDDRQ","players":[{"name":"skelterjohn","ready":false,"score":0,"hand":[{"pips_a":2,"pips_b":3},{"pips_a":0,"pips_b":6},{"pips_a":0,"pips_b":0},{"pips_a":1,"pips_b":6},{"pips_a":0,"pips_b":4},{"pips_a":1,"pips_b":3},{"pips_a":1,"pips_b":2},{"pips_a":3,"pips_b":6}],"hints":null,"spacer_hints":null,"chicken_foot":false,"dead":false,"just_drew":false,"chicken_foot_coord":{"x":0,"y":0},"chicken_foot_url":"","react_url":"","kills":null}],"turn":0,"rounds":[{"laid_tiles":[{"tile":{"pips_a":3,"pips_b":3},"coord":{"x":2,"y":3},"orientation":"right","player_name":"","next_pips":3,"dead":false,"indicated":null},{"tile":{"pips_a":0,"pips_b":3},"coord":{"x":3,"y":1},"orientation":"down","player_name":"skelterjohn","next_pips":0,"dead":false,"indicated":{"pips_a":-1,"pips_b":-1}}],"spacer":null,"done":false,"history":["skelterjohn laid 3:3","skelterjohn laid 0:3"],"player_lines":{"skelterjohn":[{"tile":{"pips_a":3,"pips_b":3},"coord":{"x":2,"y":3},"orientation":"right","player_name":"","next_pips":3,"dead":false,"indicated":null},{"tile":{"pips_a":0,"pips_b":3},"coord":{"x":3,"y":1},"orientation":"down","player_name":"skelterjohn","next_pips":0,"dead":false,"indicated":{"pips_a":-1,"pips_b":-1}}]},"free_lines":[],"bagless_passes":0,"highest_leader":3}],"bag":[{"pips_a":0,"pips_b":5},{"pips_a":0,"pips_b":1},{"pips_a":0,"pips_b":2},{"pips_a":2,"pips_b":4},{"pips_a":3,"pips_b":5},{"pips_a":5,"pips_b":5},{"pips_a":4,"pips_b":4},{"pips_a":2,"pips_b":6},{"pips_a":4,"pips_b":5},{"pips_a":1,"pips_b":1},{"pips_a":1,"pips_b":5},{"pips_a":2,"pips_b":5},{"pips_a":4,"pips_b":6},{"pips_a":5,"pips_b":6},{"pips_a":3,"pips_b":4},{"pips_a":6,"pips_b":6},{"pips_a":1,"pips_b":4},{"pips_a":2,"pips_b":2}],"board_width":6,"board_height":7,"max_pips":6,"history":["skelterjohn started round 1 - 3:3"]}`,
-}
-
 func decodeGame(t *testing.T, label string) *Game {
-	encoded := encodedGames[label]
+	path := filepath.Join("testdata", label+".json")
+	encoded, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("could not read %s: %v", path, err)
+	}
 	var game Game
-	if err := json.Unmarshal([]byte(encoded), &game); err != nil {
+	if err := json.Unmarshal(encoded, &game); err != nil {
 		t.Fatalf("could not unmarshal: %v", err)
 	}
 	return &game
