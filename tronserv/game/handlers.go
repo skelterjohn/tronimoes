@@ -313,6 +313,7 @@ type ChickenFoot struct {
 
 func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(ctx, r)
@@ -379,6 +380,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(ctx, r)
@@ -452,6 +454,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(ctx, r)
@@ -633,6 +636,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(ctx, r)
@@ -648,7 +652,6 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
-	r.Body.Close()
 	log.Printf("Game options for %q / %q: %v", name, code, options)
 
 	var g *Game
@@ -782,6 +785,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(ctx, r)
@@ -833,6 +837,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 
 	code := chi.URLParam(r, "code")
 	name, err := s.getName(ctx, r)
@@ -883,6 +888,7 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	playerID := r.Header.Get("X-Player-ID")
 
 	pi := &PlayerInfo{}
@@ -953,6 +959,7 @@ func (s *GameServer) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
 
 func (s *GameServer) HandleUpdatePlayerConfig(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	defer r.Body.Close()
 	playerID := chi.URLParam(r, "playerID")
 	if err := s.validatePlayerID(ctx, playerID, r); err != nil {
 		log.Printf("Error validating player ID: %v", err)
