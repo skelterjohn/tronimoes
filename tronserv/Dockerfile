@@ -2,14 +2,13 @@
 FROM cgr.dev/chainguard/go:latest AS builder
 WORKDIR /app
 COPY . .
-RUN go install .
-RUN go test ./...
-RUN CGO_ENABLED=0 go build -o tronserv
+RUN CGO_ENABLED=0 go install .
+RUN CGO_ENABLED=0 go test ./...
 
 # Production stage
 FROM cgr.dev/chainguard/static:latest
 WORKDIR /app
-COPY --from=builder /app/tronserv .
+COPY --from=builder /go/bin/tronserv .
 
 EXPOSE 8080
 ENV PORT 8080
