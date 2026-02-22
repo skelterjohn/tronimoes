@@ -72,7 +72,7 @@ func main() {
 		Name:         *name,
 	}
 
-	log.Printf("Starting %s agent, connecting to %s for game %s", *which, *tronserv_addr, *gamecode)
+	log.Printf("Starting %s agent %s, connecting to %s for game %s", *which, *name, *tronserv_addr, *gamecode)
 
 	g, err := tc.JoinGame(ctx, *gamecode)
 	if err != nil {
@@ -103,7 +103,11 @@ func main() {
 			}
 		}
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
-			log.Printf("It's %s's turn", g.Players[g.Turn].Name)
+			if g.Players[g.Turn].Name == *name {
+				log.Printf("It's my turn")
+			} else {
+				log.Printf("It's %s's turn", g.Players[g.Turn].Name)
+			}
 			if g.Players[g.Turn].Name == *name {
 				p := g.GetPlayer(ctx, *name)
 				m := a.GetMove(ctx, g, p)
@@ -119,7 +123,7 @@ func main() {
 						log.Printf("Could not draw: %v", err)
 						return
 					}
-					log.Println("drew")
+					log.Println("I just drew")
 					continue
 				}
 				if m.Pass {
@@ -128,7 +132,7 @@ func main() {
 						log.Printf("Could not pass: %v", err)
 						return
 					}
-					log.Println("passed")
+					log.Println("I passed")
 					continue
 				}
 				if m.LaidTile != nil {
@@ -137,7 +141,7 @@ func main() {
 						log.Printf("Could not lay tile: %v", err)
 						return
 					}
-					log.Printf("laid tile: %v", m.LaidTile)
+					log.Printf("I laid %v", m.LaidTile)
 					continue
 				}
 				if m.Spacer != nil {
@@ -146,10 +150,10 @@ func main() {
 						log.Printf("Could not lay spacer: %v", err)
 						return
 					}
-					log.Printf("laid spacer: %v", m.Spacer)
+					log.Printf("I placed a spacer: %v", m.Spacer)
 					continue
 				}
-				log.Println("no move")
+				log.Println("I did not make a move")
 			} else {
 				a.Update(ctx, g)
 			}
@@ -181,7 +185,7 @@ func main() {
 			knownPlay = true
 		}
 		if currentRound.Spacer != nil {
-			log.Printf("%s laid spacer: %s", lastPlayer.Name, currentRound.Spacer)
+			log.Printf("%s placed a spacer: %s", lastPlayer.Name, currentRound.Spacer)
 			knownPlay = true
 		}
 		for _, p := range g.Players {
