@@ -396,7 +396,7 @@ export default function Board({
 													</div>
 												)}
 												{tiles[`${x},${y}`] && (
-													<div className={`w-full h-full absolute ${tiles[`${x},${y}`].last ? 'z-30' : 'z-20'}`}>
+													<div className={`w-full h-full absolute ${tiles[`${x},${y}`].last ? 'z-21' : 'z-20'}`}>
 														<Tile
 															pipsa={tiles[`${x},${y}`].a}
 															pipsb={tiles[`${x},${y}`].b}
