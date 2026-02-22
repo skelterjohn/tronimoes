@@ -38,17 +38,12 @@ func (a *AgentRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	return a.Next.RoundTrip(req)
 }
 
-type Selected struct {
-	X int
-	Y int
-}
-
 type Move struct {
 	LaidTile *game.LaidTile
 	Spacer   *game.Spacer
 	Draw     bool
 	Pass     bool
-	Selected Selected
+	Selected game.Coord
 }
 
 type Agent interface {
@@ -76,6 +71,8 @@ func main() {
 		Client:       c,
 		Name:         *name,
 	}
+
+	log.Printf("Starting %s agent, connecting to %s for game %s", *which, *tronserv_addr, *gamecode)
 
 	g, err := tc.JoinGame(ctx, *gamecode)
 	if err != nil {

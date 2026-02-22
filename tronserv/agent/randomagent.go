@@ -34,7 +34,7 @@ func (RandomAgent) GetMove(ctx context.Context, g *game.Game, p *game.Player) Mo
 	if p.JustDrew {
 		return Move{
 			Pass: true,
-			Selected: Selected{
+			Selected: game.Coord{
 				X: g.BoardWidth / 2,
 				Y: (g.BoardHeight / 2) - 1,
 			},
