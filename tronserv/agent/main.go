@@ -20,6 +20,7 @@ var (
 	name          = flag.String("name", "", "name of the agent")
 	gamecode      = flag.String("code", "", "code of the game to connect to")
 	which         = flag.String("which", "random", "which agent to use: random, gibbs")
+	minMoveTime   = flag.Duration("min-move-time", 3*time.Second, "minimum time between moves")
 	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
 )
 
@@ -111,10 +112,10 @@ func main() {
 			if g.Players[g.Turn].Name == *name {
 				p := g.GetPlayer(ctx, *name)
 				m := a.GetMove(ctx, g, p)
-				if time.Since(lastMoveTime) < 3*time.Second {
+				if time.Since(lastMoveTime) < *minMoveTime {
 					// Always wait at least 3 seconds between moves, so
 					// as not to confuse the normies.
-					time.Sleep(3*time.Second - time.Since(lastMoveTime))
+					time.Sleep(*minMoveTime - time.Since(lastMoveTime))
 				}
 				lastMoveTime = time.Now()
 				if m.Draw {
