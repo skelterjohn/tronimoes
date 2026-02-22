@@ -19,6 +19,7 @@ var (
 	tronserv_addr = flag.String("addr", "http://localhost:8080", "host/port for the tronimoes game server")
 	name          = flag.String("name", "", "name of the agent")
 	gamecode      = flag.String("code", "", "code of the game to connect to")
+	which         = flag.String("which", "random", "which agent to use: random, gibbs")
 	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
 )
 
@@ -84,7 +85,14 @@ func main() {
 
 	lastMoveTime := time.Now()
 
-	a := RandomAgent{}
+	var a Agent
+	switch *which {
+	case "random":
+		a = RandomAgent{}
+	case "gibbs":
+	default:
+		log.Fatalf("Unknown agent: %s", *which)
+	}
 
 	for !g.Done {
 		r := g.CurrentRound(ctx)
