@@ -93,9 +93,17 @@ func main() {
 	}
 
 	for !g.Done {
+		if len(g.Rounds) == 0 {
+			log.Print("New game beginning")
+		} else if g.Rounds[len(g.Rounds)-1].Done {
+			log.Print("Round done")
+		}
+
 		r := g.CurrentRound(ctx)
 		if r == nil || r.Done {
 			a.Ready(ctx)
+
+			log.Print("Ready to begin a new round.")
 
 			g, err = tc.Start(ctx)
 			if err != nil {
@@ -198,8 +206,6 @@ func main() {
 		if !knownPlay && previousGame.Turn != g.Turn {
 			log.Printf("%s passed", lastPlayer.Name)
 		}
-		if currentRound.Done {
-			log.Println("round is done")
-		}
 	}
+	log.Println("Game over")
 }
