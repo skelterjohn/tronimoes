@@ -17,24 +17,36 @@ const Options = ({ isOpen, onClose }) => {
 
 	return (
 		<Modal
-			title="game options"
+			title="create game options"
 			open={isOpen}
 			onCancel={onClose}
 			className="font-game"
-			footer={[
-				<Button key="ok" type="primary" onClick={onClose}>
-					Ok
-				</Button>,
-			]}
+			footer={
+				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16, width: '100%' }}>
+					<span style={{ display: 'block', flex: '1 1 0', fontSize: 12, color: 'rgba(0,0,0,0.45)', minWidth: 0, textAlign: 'left' }}>
+						These options are only used if you create the game.
+					</span>
+					<span style={{ flexShrink: 0 }}>
+						<Button key="ok" type="primary" className="game-btn" onClick={onClose}>
+							Ok
+						</Button>
+					</span>
+				</div>
+			}
 		>
 			<Space orientation="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
-				<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-					<span>roodle crush</span>
-					<Checkbox
-						checked={roodle}
-						onChange={(e) => setRoodle(e.target.checked)}
-						className="font-game"
-					/>
+				<div>
+					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+						<span>roodle crush</span>
+						<Checkbox
+							checked={roodle}
+							onChange={(e) => setRoodle(e.target.checked)}
+							className="font-game"
+						/>
+					</div>
+					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
+						Add the roodle crush bot to your game.
+					</div>
 				</div>
 			</Space>
 		</Modal>
