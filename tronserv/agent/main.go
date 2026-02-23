@@ -11,8 +11,8 @@ import (
 
 	"cloud.google.com/go/compute/metadata"
 
+	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/client"
-	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
 var (
@@ -37,20 +37,6 @@ func (a *AgentRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	req = req.Clone(req.Context())
 	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(token))
 	return a.Next.RoundTrip(req)
-}
-
-type Move struct {
-	LaidTile *game.LaidTile
-	Spacer   *game.Spacer
-	Draw     bool
-	Pass     bool
-	Selected game.Coord
-}
-
-type Agent interface {
-	Ready(ctx context.Context)
-	Update(ctx context.Context, g *game.Game)
-	GetMove(ctx context.Context, g *game.Game, p *game.Player) Move
 }
 
 func main() {
@@ -83,7 +69,7 @@ func main() {
 
 	lastMoveTime := time.Now()
 
-	var a Agent
+	var a types.Agent
 	switch *which {
 	case "random":
 		a = RandomChoice{}

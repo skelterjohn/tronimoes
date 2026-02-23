@@ -1,4 +1,4 @@
-package main
+package gibbs_planner
 
 import (
 	"context"
@@ -8,16 +8,16 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
-type RandomChoice struct {
+type GibbsPlanner struct {
 }
 
-func (RandomChoice) Ready(ctx context.Context) {
+func (GibbsPlanner) Ready(ctx context.Context) {
 
 }
-func (RandomChoice) Update(ctx context.Context, g *game.Game) {
+func (GibbsPlanner) Update(ctx context.Context, g *game.Game) {
 
 }
-func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
+func (GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
 	if len(legalSpacers) > 0 {
