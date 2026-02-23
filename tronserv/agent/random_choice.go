@@ -7,16 +7,16 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
-type RandomAgent struct {
+type RandomChoice struct {
 }
 
-func (RandomAgent) Ready(ctx context.Context) {
+func (RandomChoice) Ready(ctx context.Context) {
 
 }
-func (RandomAgent) Update(ctx context.Context, g *game.Game) {
+func (RandomChoice) Update(ctx context.Context, g *game.Game) {
 
 }
-func (RandomAgent) GetMove(ctx context.Context, g *game.Game, p *game.Player) Move {
+func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) Move {
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
 	if len(legalSpacers) > 0 {

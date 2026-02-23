@@ -86,7 +86,7 @@ func main() {
 	var a Agent
 	switch *which {
 	case "random":
-		a = RandomAgent{}
+		a = RandomChoice{}
 	case "gibbs":
 	default:
 		log.Fatalf("Unknown agent: %s", *which)
