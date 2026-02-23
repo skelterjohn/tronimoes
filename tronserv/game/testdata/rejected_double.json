@@ -1,0 +1,1567 @@
+{
+  "created": 1771799124,
+  "version": 122,
+  "pickup": true,
+  "done": false,
+  "code": "EFRLLU-SRNATX",
+  "players": [
+    {
+      "name": "Roodle Crush",
+      "ready": false,
+      "score": 0,
+      "hand": [
+        {
+          "pips_a": 0,
+          "pips_b": 3
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 4
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 4
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 3
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 4,
+          "pips_b": 6
+        }
+      ],
+      "hints": null,
+      "spacer_hints": null,
+      "chicken_foot": false,
+      "dead": false,
+      "just_drew": false,
+      "chicken_foot_coord": {
+        "x": 5,
+        "y": 3
+      },
+      "chicken_foot_url": "",
+      "react_url": "",
+      "kills": null
+    },
+    {
+      "name": "TJ",
+      "ready": false,
+      "score": -1,
+      "hand": [
+        {
+          "pips_a": 1,
+          "pips_b": 1
+        },
+        {
+          "pips_a": 5,
+          "pips_b": 5
+        },
+        {
+          "pips_a": 4,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 2
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 2
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 3
+        }
+      ],
+      "hints": null,
+      "spacer_hints": null,
+      "chicken_foot": false,
+      "dead": false,
+      "just_drew": false,
+      "chicken_foot_coord": {
+        "x": 1,
+        "y": 6
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/90/eb/t3FKt1yY.gif",
+      "react_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/59/1d/jjg91kdZ.gif",
+      "kills": null
+    },
+    {
+      "name": "skelterjohn",
+      "ready": false,
+      "score": 1,
+      "hand": [
+        {
+          "pips_a": 0,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 6,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 6,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 5
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 2
+        },
+        {
+          "pips_a": 7,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 5,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 4
+        }
+      ],
+      "hints": null,
+      "spacer_hints": null,
+      "chicken_foot": false,
+      "dead": false,
+      "just_drew": false,
+      "chicken_foot_coord": {
+        "x": 8,
+        "y": 1
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/1f/d2/1x6hwpLz.gif",
+      "react_url": "https://static.klipy.com/ii/ffd4ac143e6335ac68951b787d3c1902/b0/40/zSeX4ViL.gif",
+      "kills": null
+    }
+  ],
+  "turn": 2,
+  "rounds": [
+    {
+      "laid_tiles": [
+        {
+          "tile": {
+            "pips_a": 8,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 4,
+            "y": 5
+          },
+          "orientation": "right",
+          "player_name": "",
+          "next_pips": 8,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 7,
+            "y": 5
+          },
+          "orientation": "left",
+          "player_name": "TJ",
+          "next_pips": 2,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 6,
+            "y": 4
+          },
+          "orientation": "left",
+          "player_name": "skelterjohn",
+          "next_pips": 4,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 2,
+            "y": 5
+          },
+          "orientation": "right",
+          "player_name": "Roodle Crush",
+          "next_pips": 6,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 7,
+            "y": 6
+          },
+          "orientation": "left",
+          "player_name": "TJ",
+          "next_pips": 5,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 8,
+            "y": 4
+          },
+          "orientation": "left",
+          "player_name": "skelterjohn",
+          "next_pips": 3,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 3,
+            "y": 4
+          },
+          "orientation": "left",
+          "player_name": "Roodle Crush",
+          "next_pips": 4,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 6,
+            "y": 8
+          },
+          "orientation": "up",
+          "player_name": "TJ",
+          "next_pips": 1,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 8,
+            "y": 5
+          },
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "next_pips": 3,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 8,
+            "y": 7
+          },
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "next_pips": 6,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 4,
+            "y": 4
+          },
+          "orientation": "up",
+          "player_name": "Roodle Crush",
+          "next_pips": 5,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 1
+          },
+          "coord": {
+            "x": 5,
+            "y": 8
+          },
+          "orientation": "left",
+          "player_name": "TJ",
+          "next_pips": 1,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 4,
+            "y": 7
+          },
+          "orientation": "up",
+          "player_name": "TJ",
+          "next_pips": 8,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 3,
+            "y": 7
+          },
+          "orientation": "up",
+          "player_name": "TJ",
+          "next_pips": 7,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 2,
+            "y": 7
+          },
+          "orientation": "left",
+          "player_name": "TJ",
+          "next_pips": 7,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 0,
+            "y": 6
+          },
+          "orientation": "down",
+          "player_name": "TJ",
+          "next_pips": 3,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 9,
+            "y": 7
+          },
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "next_pips": 1,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 0,
+            "y": 4
+          },
+          "orientation": "down",
+          "player_name": "TJ",
+          "next_pips": 2,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 9,
+            "y": 6
+          },
+          "orientation": "up",
+          "player_name": "skelterjohn",
+          "next_pips": 7,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 6,
+            "y": 3
+          },
+          "orientation": "left",
+          "player_name": "Roodle Crush",
+          "next_pips": 5,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 9,
+            "y": 3
+          },
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "next_pips": 5,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 0,
+            "y": 3
+          },
+          "orientation": "right",
+          "player_name": "TJ",
+          "next_pips": 7,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 8,
+            "y": 3
+          },
+          "orientation": "left",
+          "player_name": "skelterjohn",
+          "next_pips": 8,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 1,
+            "y": 5
+          },
+          "orientation": "up",
+          "player_name": "TJ",
+          "next_pips": 4,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 5,
+            "y": 2
+          },
+          "orientation": "right",
+          "player_name": "Roodle Crush",
+          "next_pips": 3,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 2,
+            "y": 6
+          },
+          "orientation": "left",
+          "player_name": "TJ",
+          "next_pips": 0,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 4,
+            "y": 1
+          },
+          "orientation": "right",
+          "player_name": "Roodle Crush",
+          "next_pips": 1,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 3,
+            "y": 1
+          },
+          "orientation": "down",
+          "player_name": "Roodle Crush",
+          "next_pips": 4,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 2,
+            "y": 1
+          },
+          "orientation": "down",
+          "player_name": "Roodle Crush",
+          "next_pips": 2,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 8
+          },
+          "coord": {
+            "x": 7,
+            "y": 1
+          },
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "next_pips": 3,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 8,
+            "y": 2
+          },
+          "orientation": "up",
+          "player_name": "skelterjohn",
+          "next_pips": 0,
+          "dead": true,
+          "indicated": null
+        }
+      ],
+      "spacer": null,
+      "done": true,
+      "history": [
+        "Roodle Crush laid 8:8",
+        "TJ laid 2:8",
+        "skelterjohn laid 4:8",
+        "Roodle Crush laid 6:8",
+        "TJ laid 2:5",
+        "skelterjohn laid 3:4",
+        "Roodle Crush laid 4:6",
+        "TJ laid 1:5",
+        "skelterjohn laid 3:3",
+        "skelterjohn laid 3:6",
+        "Roodle Crush laid 4:5",
+        "TJ laid 1:1",
+        "TJ passed and is on the foot",
+        "skelterjohn laid 1:8",
+        "Roodle Crush laid 7:8",
+        "TJ laid 7:7 and is off the foot",
+        "TJ laid 3:7",
+        "skelterjohn passed and is on the foot",
+        "Roodle Crush laid 1:6",
+        "TJ laid 2:3",
+        "skelterjohn laid 1:7 and is off the foot",
+        "Roodle Crush laid 5:5",
+        "Roodle Crush passed and is on the foot",
+        "TJ passed and is on the foot",
+        "skelterjohn laid 5:7",
+        "Roodle Crush passed",
+        "TJ laid 2:7 and is off the foot",
+        "skelterjohn laid 5:8",
+        "Roodle Crush passed",
+        "TJ passed and is on the foot",
+        "skelterjohn laid 4:7",
+        "Roodle Crush laid 3:5 and is off the foot",
+        "TJ passed",
+        "skelterjohn laid 0:4",
+        "Roodle Crush laid 1:3",
+        "TJ passed",
+        "skelterjohn passed and is on the foot",
+        "Roodle Crush laid 1:4",
+        "TJ passed",
+        "skelterjohn passed on an empty bag",
+        "Roodle Crush laid 2:4",
+        "TJ laid 3:8",
+        "skelterjohn passed on an empty bag",
+        "Roodle Crush laid 0:3",
+        "TJ passed on an empty bag"
+      ],
+      "player_lines": {
+        "Roodle Crush": [
+          {
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 8,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 2,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "Roodle Crush",
+            "next_pips": 6,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 6
+            },
+            "coord": {
+              "x": 3,
+              "y": 4
+            },
+            "orientation": "left",
+            "player_name": "Roodle Crush",
+            "next_pips": 4,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 4,
+              "y": 4
+            },
+            "orientation": "up",
+            "player_name": "Roodle Crush",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 6,
+              "y": 3
+            },
+            "orientation": "left",
+            "player_name": "Roodle Crush",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 5,
+              "y": 2
+            },
+            "orientation": "right",
+            "player_name": "Roodle Crush",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 4,
+              "y": 1
+            },
+            "orientation": "right",
+            "player_name": "Roodle Crush",
+            "next_pips": 1,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 3,
+              "y": 1
+            },
+            "orientation": "down",
+            "player_name": "Roodle Crush",
+            "next_pips": 4,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 2,
+              "y": 1
+            },
+            "orientation": "down",
+            "player_name": "Roodle Crush",
+            "next_pips": 2,
+            "dead": false,
+            "indicated": null
+          }
+        ],
+        "TJ": [
+          {
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 8,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 7,
+              "y": 5
+            },
+            "orientation": "left",
+            "player_name": "TJ",
+            "next_pips": 2,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 7,
+              "y": 6
+            },
+            "orientation": "left",
+            "player_name": "TJ",
+            "next_pips": 5,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 6,
+              "y": 8
+            },
+            "orientation": "up",
+            "player_name": "TJ",
+            "next_pips": 1,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 1
+            },
+            "coord": {
+              "x": 5,
+              "y": 8
+            },
+            "orientation": "left",
+            "player_name": "TJ",
+            "next_pips": 1,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 4,
+              "y": 7
+            },
+            "orientation": "up",
+            "player_name": "TJ",
+            "next_pips": 8,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 3,
+              "y": 7
+            },
+            "orientation": "up",
+            "player_name": "TJ",
+            "next_pips": 7,
+            "dead": true,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 2,
+              "y": 7
+            },
+            "orientation": "left",
+            "player_name": "TJ",
+            "next_pips": 7,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 0,
+              "y": 6
+            },
+            "orientation": "down",
+            "player_name": "TJ",
+            "next_pips": 3,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 0,
+              "y": 4
+            },
+            "orientation": "down",
+            "player_name": "TJ",
+            "next_pips": 2,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 0,
+              "y": 3
+            },
+            "orientation": "right",
+            "player_name": "TJ",
+            "next_pips": 7,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 1,
+              "y": 5
+            },
+            "orientation": "up",
+            "player_name": "TJ",
+            "next_pips": 4,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 2,
+              "y": 6
+            },
+            "orientation": "left",
+            "player_name": "TJ",
+            "next_pips": 0,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          }
+        ],
+        "skelterjohn": [
+          {
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 8,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 6,
+              "y": 4
+            },
+            "orientation": "left",
+            "player_name": "skelterjohn",
+            "next_pips": 4,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 8,
+              "y": 4
+            },
+            "orientation": "left",
+            "player_name": "skelterjohn",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 8,
+              "y": 5
+            },
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 6
+            },
+            "coord": {
+              "x": 8,
+              "y": 7
+            },
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "next_pips": 6,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 6
+            },
+            "coord": {
+              "x": 9,
+              "y": 7
+            },
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "next_pips": 1,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 9,
+              "y": 6
+            },
+            "orientation": "up",
+            "player_name": "skelterjohn",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 9,
+              "y": 3
+            },
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 8,
+              "y": 3
+            },
+            "orientation": "left",
+            "player_name": "skelterjohn",
+            "next_pips": 8,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 8
+            },
+            "coord": {
+              "x": 7,
+              "y": 1
+            },
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 8,
+              "y": 2
+            },
+            "orientation": "up",
+            "player_name": "skelterjohn",
+            "next_pips": 0,
+            "dead": false,
+            "indicated": null
+          }
+        ]
+      },
+      "free_lines": [],
+      "bagless_passes": 3,
+      "highest_leader": 8
+    },
+    {
+      "laid_tiles": [
+        {
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 4,
+            "y": 5
+          },
+          "orientation": "right",
+          "player_name": "",
+          "next_pips": 7,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 4,
+            "y": 3
+          },
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "next_pips": 6,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 6,
+            "y": 4
+          },
+          "orientation": "left",
+          "player_name": "Roodle Crush",
+          "next_pips": 5,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 7,
+            "y": 5
+          },
+          "orientation": "left",
+          "player_name": "TJ",
+          "next_pips": 3,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        }
+      ],
+      "spacer": null,
+      "done": false,
+      "history": [
+        "TJ laid 7:7",
+        "skelterjohn laid 6:7",
+        "Roodle Crush laid 5:7",
+        "TJ laid 3:7"
+      ],
+      "player_lines": {
+        "Roodle Crush": [
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 6,
+              "y": 4
+            },
+            "orientation": "left",
+            "player_name": "Roodle Crush",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": null
+          }
+        ],
+        "TJ": [
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 7,
+              "y": 5
+            },
+            "orientation": "left",
+            "player_name": "TJ",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          }
+        ],
+        "skelterjohn": [
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 4,
+              "y": 3
+            },
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "next_pips": 6,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          }
+        ]
+      },
+      "free_lines": [],
+      "bagless_passes": 0,
+      "highest_leader": 7
+    }
+  ],
+  "bag": [
+    {
+      "pips_a": 2,
+      "pips_b": 7
+    },
+    {
+      "pips_a": 4,
+      "pips_b": 4
+    },
+    {
+      "pips_a": 4,
+      "pips_b": 8
+    },
+    {
+      "pips_a": 1,
+      "pips_b": 5
+    },
+    {
+      "pips_a": 8,
+      "pips_b": 8
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 1
+    },
+    {
+      "pips_a": 1,
+      "pips_b": 8
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 0
+    },
+    {
+      "pips_a": 5,
+      "pips_b": 6
+    },
+    {
+      "pips_a": 2,
+      "pips_b": 5
+    },
+    {
+      "pips_a": 2,
+      "pips_b": 6
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 5
+    },
+    {
+      "pips_a": 4,
+      "pips_b": 5
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 4
+    },
+    {
+      "pips_a": 1,
+      "pips_b": 3
+    }
+  ],
+  "board_width": 10,
+  "board_height": 11,
+  "max_pips": 8,
+  "history": [
+    "Roodle Crush started round 1 - 8:8",
+    "skelterjohn+1 cut off TJ's-1 line",
+    "stalemate",
+    "TJ started round 2 - 7:7"
+  ]
+}

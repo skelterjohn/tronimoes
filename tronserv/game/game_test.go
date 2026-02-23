@@ -61,3 +61,17 @@ func TestChickenFoot(t *testing.T) {
 		{Tile: &Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 3, Y: 8}, Orientation: "up"},
 	}, []*Spacer{})
 }
+
+func TestAdjacent(t *testing.T) {
+	game := decodeGame(t, "adjacent")
+	testLegalMovesContains(t, game, []*LaidTile{
+		{Tile: &Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 2, Y: 7}, Orientation: "right"},
+	}, []*Spacer{})
+}
+
+func TestRejectedDouble(t *testing.T) {
+	game := decodeGame(t, "rejected_double")
+	testLegalMovesContains(t, game, []*LaidTile{
+		{Tile: &Tile{PipsA: 6, PipsB: 6}, Coord: Coord{X: 3, Y: 3}, Orientation: "down"},
+	}, []*Spacer{})
+}
