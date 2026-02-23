@@ -45,7 +45,7 @@ const Options = ({ isOpen, onClose }) => {
 						/>
 					</div>
 					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
-						Add the roodle crush bot to your game.
+						Add the roodle crush bot to your game. (not implemented yet)
 					</div>
 				</div>
 			</Space>
