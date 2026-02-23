@@ -339,7 +339,7 @@ func (s *FireStore) issues(ctx context.Context) *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("issues")
 }
 
-func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen string) error {
+func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error {
 	gameData, err := json.Marshal(game)
 	if err != nil {
 		return fmt.Errorf("could not marshal: %v", err)
@@ -349,6 +349,7 @@ func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Ga
 		"summary":          summary,
 		"whatHappened":     whatHappened,
 		"whatShouldHappen": whatShouldHappen,
+		"errorMessage":     errorMessage,
 		"game_json":        string(gameData),
 	})
 	return err

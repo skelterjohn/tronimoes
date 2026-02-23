@@ -32,7 +32,7 @@ type Store interface {
 	RecordPlayerActive(ctx context.Context, code, playerName string, lastActive int64) error
 	PlayerLastActive(ctx context.Context, code, playerName string) (int64, error)
 	UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error
-	ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen string) error
+	ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error
 }
 
 type MemoryStore struct {
@@ -274,6 +274,6 @@ func (s *MemoryStore) UpdatePlayerConfig(ctx context.Context, playerID string, c
 	return nil
 }
 
-func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen string) error {
+func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error {
 	return nil
 }

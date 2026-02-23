@@ -971,6 +971,7 @@ type ReportIssueRequest struct {
 	Summary          string `json:"summary"`
 	WhatHappened     string `json:"what_happened"`
 	WhatShouldHappen string `json:"what_should_happen"`
+	ErrorMessage     string `json:"error_message"`
 }
 
 func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
@@ -998,5 +999,5 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
-	s.store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen)
+	s.store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen, reqBody.ErrorMessage)
 }

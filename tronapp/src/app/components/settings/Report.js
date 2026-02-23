@@ -3,7 +3,7 @@ import { Modal, Space, Input } from 'antd';
 import Button from "@/app/components/Button";
 import { useGameState } from '../GameState';
 
-const ReportIssue = ({ isOpen, onClose, code }) => {
+const ReportIssue = ({ isOpen, onClose, code, playErrorMessage }) => {
 	const { client } = useGameState();
 	const [summary, setSummary] = useState('');
 	const [whatHappened, setWhatHappened] = useState('');
@@ -16,7 +16,7 @@ const ReportIssue = ({ isOpen, onClose, code }) => {
 		setSubmitting(true);
 		setError(null);
 		try {
-			await client.ReportIssue(code, summary, whatHappened, whatShouldHappen);
+			await client.ReportIssue(code, summary, whatHappened, whatShouldHappen, playErrorMessage);
 			setSummary('');
 			setWhatHappened('');
 			setWhatShouldHappen('');
@@ -45,6 +45,10 @@ const ReportIssue = ({ isOpen, onClose, code }) => {
 			}
 		>
 			<Space orientation="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
+				<div>
+					<div style={{ marginBottom: 8 }}>current error message</div>
+					<div className="text-red-500">{playErrorMessage || "<none>"}</div>
+				</div>
 				<div>
 					<div style={{ marginBottom: 8 }}>summary</div>
 					<Input

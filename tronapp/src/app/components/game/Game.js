@@ -847,6 +847,7 @@ function Game({ code }) {
 				isOpen={showReportIssueModal}
 				onClose={() => setShowReportIssueModal(false)}
 				code={code}
+				playErrorMessage={playErrorMessage}
 			/>
 		</div>
 	);
