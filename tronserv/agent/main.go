@@ -11,6 +11,7 @@ import (
 
 	"cloud.google.com/go/compute/metadata"
 
+	"github.com/skelterjohn/tronimoes/tronserv/agent/gibbs_planner"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/client"
 )
@@ -74,6 +75,7 @@ func main() {
 	case "random":
 		a = RandomChoice{}
 	case "gibbs":
+		a = &gibbs_planner.GibbsPlanner{}
 	default:
 		log.Fatalf("Unknown agent: %s", *which)
 	}
