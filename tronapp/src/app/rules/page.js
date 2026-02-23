@@ -13,12 +13,16 @@ function slugify(title) {
 	return title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
-function Section({ title, children }) {
+function Section({ title, children, indicated }) {
 	const id = slugify(title);
 	return (
-		<div id={id} className="mx-auto px-6 py-5 max-w-2xl space-y-10 scroll-mt-24">
-			<h2 className="text-2xl font-bold tracking-tight text-white border-b border-slate-500 pb-2 mb-1">{title}</h2>
-			{children}
+		<div className="flex scroll-mt-24" id={id}>
+			<div className="flex-1 min-w-0" />
+			<div className={`w-full max-w-2xl px-6 py-5 space-y-10 shrink-0 ${indicated ? "border-l border-white" : ""}`}>
+				<h2 className="text-2xl font-bold tracking-tight text-white border-b border-slate-500 pb-2 mb-1">{title}</h2>
+				{children}
+			</div>
+			<div className="flex-1 min-w-0" />
 		</div>
 	);
 }
@@ -668,6 +672,7 @@ export default function RulesPage() {
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFoot, setChickenFoot] = useState(null);
 	const [showToc, setShowToc] = useState(false);
+	const [indicatedSectionId, setIndicatedSectionId] = useState(null);
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
 		() => ({ ...gameState, config: gameState?.config ?? { tileset: "classic" } }),
@@ -712,15 +717,19 @@ export default function RulesPage() {
 								<FontAwesomeIcon icon={faList} className="text-xl" />
 							</button>
 							<nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-1">
-								{SECTIONS.map((section) => (
-									<a
-										key={section.title}
-										href={`#${slugify(section.title)}`}
-										className="block py-1.5 text-sm text-slate-300 hover:text-slate-100 focus:text-slate-100 focus:outline-none underline-offset-2 hover:underline"
-									>
-										{section.title}
-									</a>
-								))}
+								{SECTIONS.map((section) => {
+									const sectionId = slugify(section.title);
+									return (
+										<a
+											key={section.title}
+											href={`#${sectionId}`}
+											onClick={() => setIndicatedSectionId(sectionId)}
+											className="block py-1.5 text-sm text-slate-300 hover:text-slate-100 focus:text-slate-100 focus:outline-none underline-offset-2 hover:underline"
+										>
+											{section.title}
+										</a>
+									);
+								})}
 							</nav>
 						</aside>
 					)}
@@ -735,7 +744,11 @@ export default function RulesPage() {
 							<FontAwesomeIcon icon={faList} className="text-xl" />
 						</button>
 						{SECTIONS.map((section) => (
-							<Section key={section.title} title={section.title}>
+							<Section
+								key={section.title}
+								title={section.title}
+								indicated={indicatedSectionId === slugify(section.title)}
+							>
 								{section.contentIsFunction
 									? section.content(() => setShowVisionQuestModal(true), chickenFoot)
 									: section.content}
