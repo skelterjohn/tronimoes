@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import RulesBoard from "@/app/components/rules/RulesBoard";
 import { GameContext } from "@/app/components/GameState";
 import { useGameState } from "@/app/components/GameState";
@@ -672,7 +672,26 @@ export default function RulesPage() {
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFoot, setChickenFoot] = useState(null);
 	const [showToc, setShowToc] = useState(false);
-	const [indicatedSectionId, setIndicatedSectionId] = useState(null);
+	const [indicatedSectionId, setIndicatedSectionId] = useState(() => {
+		if (typeof window === "undefined") return null;
+		const id = window.location.hash.slice(1);
+		return id && SECTIONS.some((s) => slugify(s.title) === id) ? id : null;
+	});
+
+	const syncIndicatedFromHash = useMemo(() => {
+		const sectionIds = new Set(SECTIONS.map((s) => slugify(s.title)));
+		return () => {
+			const id = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+			setIndicatedSectionId(id && sectionIds.has(id) ? id : null);
+		};
+	}, []);
+
+	useEffect(() => {
+		syncIndicatedFromHash();
+		window.addEventListener("hashchange", syncIndicatedFromHash);
+		return () => window.removeEventListener("hashchange", syncIndicatedFromHash);
+	}, [syncIndicatedFromHash]);
+
 	const gameState = useGameState();
 	const stateWithConfig = useMemo(
 		() => ({ ...gameState, config: gameState?.config ?? { tileset: "classic" } }),
