@@ -6,7 +6,7 @@ import { GameContext } from "@/app/components/GameState";
 import { useGameState } from "@/app/components/GameState";
 import Settings from "@/app/components/settings/Settings";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faList } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faList, faHashtag } from "@fortawesome/free-solid-svg-icons";
 import VisionQuest from "@/app/components/visionquest/VisionQuest";
 
 function slugify(title) {
@@ -19,7 +19,16 @@ function Section({ title, children, indicated }) {
 		<div className="flex scroll-mt-24" id={id}>
 			<div className="flex-1 min-w-0" />
 			<div className={`w-full max-w-2xl px-6 py-5 space-y-10 shrink-0 ${indicated ? "border-l border-white" : ""}`}>
-				<h2 className="text-2xl font-bold tracking-tight text-white border-b border-slate-500 pb-2 mb-1">{title}</h2>
+				<div className="flex items-center gap-2 border-b border-slate-500 pb-2 mb-1">
+					<h2 className="text-2xl font-bold tracking-tight text-white">{title}</h2>
+					<a
+						href={`#${id}`}
+						className="text-slate-500 hover:text-slate-300 text-sm ml-auto focus:outline-none focus:text-slate-300 shrink-0"
+						aria-label={`Link to ${title}`}
+					>
+						<FontAwesomeIcon icon={faHashtag} />
+					</a>
+				</div>
 				{children}
 			</div>
 			<div className="flex-1 min-w-0" />
