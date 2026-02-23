@@ -9,7 +9,11 @@ import (
 	"time"
 )
 
-var Colors = []string{"red", "blue", "green"}
+func dbg(format string, a ...interface{}) {
+	if false {
+		fmt.Printf(format+"\n", a...)
+	}
+}
 
 type Game struct {
 	Created int64 `json:"created"`
@@ -803,6 +807,7 @@ func (r *Round) FindHints(ctx context.Context, g *Game, p *Player) {
 }
 
 func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*LaidTile, []*Spacer) {
+	dbg("Finding moves for " + p.Name)
 	legalMoves := []*LaidTile{}
 	legalSpacers := []*Spacer{}
 
@@ -811,8 +816,9 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 	name := p.Name
 
 	for _, t := range p.Hand {
+		dbg("Considering %s", t)
 		movesOffSquare := func(head *LaidTile, src Coord) {
-
+			dbg("Considering playing from %s", src)
 			for _, orientation := range []string{"up", "down", "left", "right"} {
 				lt := &LaidTile{
 					Tile:        t,
@@ -830,6 +836,10 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 		}
 
 		movesOffTile := func(head *LaidTile) {
+			if t.PipsA != head.NextPips && t.PipsB != head.NextPips {
+				return
+			}
+			dbg("Considering playing off %s", head)
 			for _, c := range head.CoordA().Neighbors() {
 				movesOffSquare(head, c)
 			}
@@ -849,10 +859,12 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 					continue
 				}
 			}
+			dbg("Considering line for %s", op.Name)
 			movesOffTile(line[len(line)-1])
 		}
 
 		if p.Dead || !p.ChickenFoot {
+			dbg("Considering free lines")
 			for _, line := range r.FreeLines {
 				movesOffTile(line[len(line)-1])
 			}
@@ -1172,6 +1184,7 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 }
 
 func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
+	dbg("Attempting %s", lt)
 	if r.Done {
 		return ErrRoundAlreadyDone
 	}
@@ -1214,10 +1227,12 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	playerFoot := ""
 	// if this is on someone's foot, it's definitely made part of their line.
 	for _, p := range g.Players {
-		if p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB() {
+		if p.ChickenFoot && (p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB()) {
+			dbg("This is %s's foot", p.Name)
 			playerFoot = p.Name
 
 			if p.Name == player.Name {
+				dbg("This is my own foot")
 				// you can always play on your own foot.
 				break
 			}

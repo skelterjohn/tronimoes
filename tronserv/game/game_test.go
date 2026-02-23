@@ -23,7 +23,7 @@ func decodeGame(t *testing.T, label string) *Game {
 func testLegalMovesContains(t *testing.T, game *Game, expectedMoves []*LaidTile, expectedSpacers []*Spacer) {
 
 	r := game.CurrentRound(t.Context())
-	moves, spacers := r.FindLegalMoves(t.Context(), game, game.Players[0])
+	moves, spacers := r.FindLegalMoves(t.Context(), game, game.Players[game.Turn])
 
 	foundMoveStrings := make(map[string]bool)
 	for _, move := range moves {
@@ -52,5 +52,12 @@ func TestBasicReport(t *testing.T) {
 	testLegalMovesContains(t, game, []*LaidTile{
 		{Tile: &Tile{PipsA: 0, PipsB: 4}, Coord: Coord{X: 4, Y: 1}, Orientation: "right"},
 		{Tile: &Tile{PipsA: 0, PipsB: 6}, Coord: Coord{X: 3, Y: 0}, Orientation: "right"},
+	}, []*Spacer{})
+}
+
+func TestChickenFoot(t *testing.T) {
+	game := decodeGame(t, "chickenfoot")
+	testLegalMovesContains(t, game, []*LaidTile{
+		{Tile: &Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 3, Y: 8}, Orientation: "up"},
 	}, []*Spacer{})
 }
