@@ -649,6 +649,18 @@ const SECTIONS = [
 		),
 	},
 	{
+		title: "game options",
+		content: (
+			<>
+				<p>
+					You may set game options that will be in place for a game that you create. If,
+					instead, you join a game (the code is already created, or you join an existing
+					pick-up game), the options are ignored.
+				</p>
+			</>
+		),
+	},
+	{
 		title: "observing games",
 		content: (
 			<>
