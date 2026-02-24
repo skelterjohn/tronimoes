@@ -75,7 +75,9 @@ func main() {
 	case "random":
 		a = RandomChoice{}
 	case "gibbs":
-		a = &gibbs_planner.GibbsPlanner{}
+		a = &gibbs_planner.GibbsPlanner{
+			Name: *name,
+		}
 	default:
 		log.Fatalf("Unknown agent: %s", *which)
 	}
