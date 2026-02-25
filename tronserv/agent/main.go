@@ -19,7 +19,7 @@ import (
 var (
 	tronserv_addr = flag.String("addr", "http://localhost:8080", "host/port for the tronimoes game server")
 	name          = flag.String("name", "", "name of the agent")
-	gamecode      = flag.String("code", "", "code of the game to connect to")
+	gamecode      = flag.String("code", "PICKUP", "code of the game to connect to")
 	which         = flag.String("which", "random", "which agent to use: random, gibbs")
 	minMoveTime   = flag.Duration("min-move-time", 3*time.Second, "minimum time between moves")
 	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
@@ -100,6 +100,8 @@ func main() {
 				log.Printf("Error starting game: %v", err)
 				return
 			}
+		} else {
+			a.Update(ctx, g)
 		}
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
 			if g.Players[g.Turn].Name == *name {
@@ -153,8 +155,6 @@ func main() {
 					continue
 				}
 				log.Println("I did not make a move")
-			} else {
-				a.Update(ctx, g)
 			}
 		}
 

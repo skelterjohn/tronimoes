@@ -14,7 +14,7 @@ type HandState struct {
 	justDrew      bool
 	justPassed    bool
 	justLaid      game.Tile
-	opportunities []game.Tile
+	opportunities []*game.LaidTile
 }
 
 type GibbsPlanner struct {
@@ -52,6 +52,59 @@ func (gp *GibbsPlanner) RemoveTileFromHand(ctx context.Context, whichPlayer int,
 	return false
 }
 
+func (gp *GibbsPlanner) addOpportunities(ctx context.Context, g *game.Game) {
+	r := g.CurrentRound(ctx)
+
+	playerLineHeads := []*game.LaidTile{}
+	for _, p := range g.Players {
+		playerLineHeads = append(playerLineHeads, r.PlayerLines[p.Name][len(r.PlayerLines[p.Name])-1])
+	}
+	freeLineHeads := []*game.LaidTile{}
+	for _, fl := range r.FreeLines {
+		freeLineHeads = append(freeLineHeads, fl[len(fl)-1])
+	}
+	// Identify the player whose turn it is and identify the opportunities.
+	nextPlayer := g.Players[g.Turn]
+	nextPlayerHS := gp.hands[g.Turn]
+
+	nextPlayerHS.opportunities = []*game.LaidTile{}
+	nextPlayerHS.justDrew = false
+	nextPlayerHS.justPassed = false
+	nextPlayerHS.justLaid = game.Tile{}
+
+	for pi, plh := range playerLineHeads {
+		// No one can play a dead line.
+		if plh.Dead {
+			continue
+		}
+		// For other player lines...
+		if pi != g.Turn {
+			// You can't play them if they're not chicken footed.
+			if !g.Players[pi].ChickenFoot {
+				continue
+			}
+			// You can't play them if you're chicken footed.
+			if nextPlayer.ChickenFoot {
+				continue
+			}
+		}
+		nextPlayerHS.opportunities = append(nextPlayerHS.opportunities, plh)
+	}
+	for _, flh := range freeLineHeads {
+		// No one can play a dead line.
+		if flh.Dead {
+			continue
+		}
+		// You can't play them if you're chicken footed.
+		if nextPlayer.ChickenFoot {
+			continue
+		}
+		nextPlayerHS.opportunities = append(nextPlayerHS.opportunities, flh)
+	}
+
+	// Identify the player who went last, and fill in the action.
+}
+
 func (gp *GibbsPlanner) Update(ctx context.Context, g *game.Game) {
 	if gp.lastGame == nil {
 		gp.createInitialGuesses(ctx, g)
@@ -59,9 +112,12 @@ func (gp *GibbsPlanner) Update(ctx context.Context, g *game.Game) {
 		gp.fixBadGuesses(ctx, g)
 	}
 
+	gp.addOpportunities(ctx, g)
+
 	//log.Printf("guessed bag: %v", gp.bag)
 	for i, hs := range gp.hands {
 		log.Printf("guessed hand[%d]: %v", i, hs.tiles)
+		log.Printf("last opportunities[%d]: %v", i, hs.opportunities)
 	}
 
 	gp.lastGame = g
