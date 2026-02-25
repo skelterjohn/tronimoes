@@ -16,6 +16,6 @@ type Move struct {
 
 type Agent interface {
 	Ready(ctx context.Context)
-	Update(ctx context.Context, g *game.Game)
+	Update(ctx context.Context, previousGame *game.Game, g *game.Game)
 	GetMove(ctx context.Context, g *game.Game, p *game.Player) Move
 }

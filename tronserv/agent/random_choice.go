@@ -14,7 +14,7 @@ type RandomChoice struct {
 func (RandomChoice) Ready(ctx context.Context) {
 
 }
-func (RandomChoice) Update(ctx context.Context, g *game.Game) {
+func (RandomChoice) Update(ctx context.Context, previousGame *game.Game, g *game.Game) {
 
 }
 func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {

@@ -417,6 +417,9 @@ func (g *Game) Note(ctx context.Context, n string) {
 }
 
 func (g *Game) CurrentRound(ctx context.Context) *Round {
+	if g == nil {
+		return nil
+	}
 	if len(g.Rounds) == 0 {
 		return nil
 	}

@@ -13,7 +13,7 @@ type HandState struct {
 	tiles         []game.Tile
 	justDrew      bool
 	justPassed    bool
-	justLaid      game.Tile
+	justLaid      *game.LaidTile
 	opportunities []*game.LaidTile
 }
 
@@ -52,7 +52,7 @@ func (gp *GibbsPlanner) RemoveTileFromHand(ctx context.Context, whichPlayer int,
 	return false
 }
 
-func (gp *GibbsPlanner) addOpportunities(ctx context.Context, g *game.Game) {
+func (gp *GibbsPlanner) addOpportunities(ctx context.Context, previousGame, g *game.Game) {
 	r := g.CurrentRound(ctx)
 
 	playerLineHeads := []*game.LaidTile{}
@@ -70,7 +70,7 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, g *game.Game) {
 	nextPlayerHS.opportunities = []*game.LaidTile{}
 	nextPlayerHS.justDrew = false
 	nextPlayerHS.justPassed = false
-	nextPlayerHS.justLaid = game.Tile{}
+	nextPlayerHS.justLaid = nil
 
 	for pi, plh := range playerLineHeads {
 		// No one can play a dead line.
@@ -103,27 +103,37 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, g *game.Game) {
 	}
 
 	// Identify the player who went last, and fill in the action.
+	pr := previousGame.CurrentRound(ctx)
+	log.Printf("pr != nil: %v, previousGame.Turn: %d, g.Turn: %d", pr != nil, previousGame.Turn, g.Turn)
+	if pr != nil && previousGame.Turn != g.Turn {
+		pi := previousGame.Turn
+		lastPlayer := previousGame.Players[pi]
+		log.Printf(" %d vs %d", len(g.Players[pi].Hand), len(previousGame.Players[pi].Hand))
+		nextPlayerHS.justDrew = len(g.Players[pi].Hand) > len(previousGame.Players[pi].Hand)
+		nextPlayerHS.justPassed = lastPlayer.ChickenFoot
+		if len(r.LaidTiles) > len(pr.LaidTiles) {
+			nextPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
+		}
+	}
 }
 
-func (gp *GibbsPlanner) Update(ctx context.Context, g *game.Game) {
+func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *game.Game) {
 	if gp.lastGame == nil {
 		gp.createInitialGuesses(ctx, g)
 	} else {
 		gp.fixBadGuesses(ctx, g)
 	}
 
-	gp.addOpportunities(ctx, g)
+	gp.addOpportunities(ctx, previousGame, g)
 
 	//log.Printf("guessed bag: %v", gp.bag)
 	for i, hs := range gp.hands {
-		log.Printf("guessed hand[%d]: %v", i, hs.tiles)
-		log.Printf("last opportunities[%d]: %v", i, hs.opportunities)
+		log.Printf("inference[%d]: %v", i, hs)
 	}
 
 	gp.lastGame = g
 }
 func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
-	gp.Update(ctx, g)
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
 	if len(legalSpacers) > 0 {

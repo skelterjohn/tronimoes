@@ -68,6 +68,8 @@ func main() {
 		return
 	}
 
+	lastUpdateGame := g
+
 	lastMoveTime := time.Now()
 
 	var a types.Agent
@@ -101,7 +103,8 @@ func main() {
 				return
 			}
 		} else {
-			a.Update(ctx, g)
+			a.Update(ctx, lastUpdateGame, g)
+			lastUpdateGame = g
 		}
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
 			if g.Players[g.Turn].Name == *name {
@@ -160,7 +163,11 @@ func main() {
 
 		previousGame := g
 		g, err = tc.GetGame(ctx, previousGame.Version)
-		for g.Version == previousGame.Version || err == client.ErrTimeout {
+		for err != nil || g.Version == previousGame.Version {
+			if err != nil {
+				log.Printf("Game fetch error: %v", err)
+				return
+			}
 			time.Sleep(5 * time.Second)
 			g, err = tc.GetGame(ctx, previousGame.Version)
 		}
