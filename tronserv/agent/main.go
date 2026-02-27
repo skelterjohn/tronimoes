@@ -171,10 +171,6 @@ func main() {
 			time.Sleep(5 * time.Second)
 			g, err = tc.GetGame(ctx, previousGame.Version)
 		}
-		if err != nil {
-			log.Printf("Could not get game: %v", err)
-			return
-		}
 
 		lastMoveTime = time.Now()
 
