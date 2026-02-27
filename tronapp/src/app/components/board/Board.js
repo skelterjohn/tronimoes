@@ -134,7 +134,6 @@ export default function Board({
 	const [gutterColor, setGutterColor] = useState("bg-gray-900")
 	useEffect(() => {
 		if (activePlayer !== undefined) {
-			console.log(activePlayer);
 			if (!activePlayer) {
 				setGutterColor("bg-black");
 			} else {
@@ -207,7 +206,7 @@ export default function Board({
 	}, [spacerHints, selectedTile, hints]);
 
 	function clickForSpacer(x, y) {
-		if (!(`${x},${y}` in spacerHintPrefix)) {
+		if (!(`(${x},${y})` in spacerHintPrefix)) {
 			setPlayA(undefined);
 			return;
 		}
@@ -380,12 +379,12 @@ export default function Board({
 									{Array.from({ length: width }, (_, x) => (
 										<td key={y * width + x} className="p-0 border-0 bg-[#34495E]" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
-												{hints[`${x},${y}`] && (
+												{hints[`(${x},${y})`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint />
 													</div>
 												)}
-												{spacerHintPrefix[`${x},${y}`] && (
+												{spacerHintPrefix[`(${x},${y})`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint />
 													</div>
