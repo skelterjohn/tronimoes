@@ -28,6 +28,7 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 	rand.Shuffle(len(gp.bag), func(i, j int) {
 		gp.bag[i], gp.bag[j] = gp.bag[j], gp.bag[i]
 	})
+	gp.hands = nil
 	for i, p := range g.Players {
 		if i == gp.myPlayerIndex {
 			// we know our own hand.

@@ -121,11 +121,12 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, previousGame, g *g
 			lastPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
 		}
 		log.Printf("inference[%d]: %s", pi, lastPlayerHS)
+		log.Printf("In the bag: %d", len(gp.bag))
 	}
 }
 
 func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *game.Game) {
-	if gp.lastGame == nil {
+	if gp.lastGame == nil || len(g.Rounds) != len(previousGame.Rounds) {
 		gp.createInitialGuesses(ctx, g)
 	} else {
 		gp.fixBadGuesses(ctx, g)
