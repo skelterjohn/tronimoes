@@ -99,7 +99,7 @@ func (gp *GibbsPlanner) ConsiderSwaps(ctx context.Context) {
 					if pj == gp.myPlayerIndex {
 						continue
 					}
-					if pj == pi {
+					if pj <= pi {
 						continue
 					}
 					gp.ConsiderSwapHands(ctx, pi, pj)
@@ -110,7 +110,18 @@ func (gp *GibbsPlanner) ConsiderSwaps(ctx context.Context) {
 }
 
 func (gp *GibbsPlanner) ConsiderSwapHands(ctx context.Context, pi, pj int) {
-
+	for i, ti := range gp.hands[pi].tiles {
+		scores := make([]float64, len(gp.hands[pj].tiles)+1)
+		for j, tj := range gp.hands[pj].tiles {
+			scores[j] = gp.ScoreInHand(ctx, gp.hands[pi], tj, ti)
+		}
+		scores[len(gp.hands[pj].tiles)] = gp.ScoreInHand(ctx, gp.hands[pi], ti, ti)
+		chosenIndex := ChooseIndex(scores)
+		if chosenIndex == len(gp.hands[pj].tiles) {
+			continue
+		}
+		gp.hands[pi].tiles[i], gp.hands[pj].tiles[chosenIndex] = gp.hands[pj].tiles[chosenIndex], gp.hands[pi].tiles[i]
+	}
 }
 
 func (gp *GibbsPlanner) ConsiderSwapBag(ctx context.Context, pi int) {
