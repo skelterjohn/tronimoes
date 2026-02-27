@@ -1,0 +1,1060 @@
+{
+  "created": 1772162583,
+  "version": 59,
+  "pickup": true,
+  "done": false,
+  "code": "DIADPB-OKRNFZ",
+  "players": [
+    {
+      "name": "xyzzy",
+      "ready": false,
+      "score": 3,
+      "hand": [
+        {
+          "pips_a": 1,
+          "pips_b": 2
+        },
+        {
+          "pips_a": 5,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 5,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 5
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 4
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 7,
+          "pips_b": 7
+        }
+      ],
+      "hints": null,
+      "spacer_hints": null,
+      "chicken_foot": false,
+      "dead": false,
+      "just_drew": false,
+      "chicken_foot_coord": {
+        "x": 7,
+        "y": 7
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/0f/9a/BoZyoG5f.gif",
+      "react_url": "",
+      "kills": null
+    },
+    {
+      "name": "Glower Pearson",
+      "ready": false,
+      "score": -1,
+      "hand": [
+        {
+          "pips_a": 6,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 3
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 0
+        }
+      ],
+      "hints": null,
+      "spacer_hints": null,
+      "chicken_foot": false,
+      "dead": false,
+      "just_drew": false,
+      "chicken_foot_coord": {
+        "x": 1,
+        "y": 4
+      },
+      "chicken_foot_url": "",
+      "react_url": "",
+      "kills": null
+    }
+  ],
+  "turn": 0,
+  "rounds": [
+    {
+      "laid_tiles": [
+        {
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 3,
+            "y": 4
+          },
+          "orientation": "right",
+          "player_name": "",
+          "next_pips": 7,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 4,
+            "y": 2
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 5,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 4,
+            "y": 5
+          },
+          "orientation": "left",
+          "player_name": "Glower Pearson",
+          "next_pips": 2,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 3,
+            "y": 3
+          },
+          "orientation": "up",
+          "player_name": "xyzzy",
+          "next_pips": 0,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 4,
+            "y": 6
+          },
+          "orientation": "left",
+          "player_name": "Glower Pearson",
+          "next_pips": 3,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 1
+          },
+          "coord": {
+            "x": 2,
+            "y": 3
+          },
+          "orientation": "left",
+          "player_name": "xyzzy",
+          "next_pips": 1,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 1,
+            "y": 4
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 4,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 0,
+            "y": 4
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 0,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 2,
+            "y": 5
+          },
+          "orientation": "down",
+          "player_name": "Glower Pearson",
+          "next_pips": 1,
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        }
+      ],
+      "spacer": null,
+      "done": true,
+      "history": [
+        "Glower Pearson laid 7:7",
+        "xyzzy laid 5:7",
+        "Glower Pearson laid 2:7",
+        "xyzzy laid 0:5",
+        "Glower Pearson laid 2:3",
+        "xyzzy passed and is on the foot",
+        "Glower Pearson laid 0:1",
+        "xyzzy laid 1:4 and is off the foot",
+        "Glower Pearson passed and is on the foot",
+        "xyzzy passed and is on the foot",
+        "Glower Pearson passed",
+        "xyzzy laid 0:4 and is off the foot",
+        "Glower Pearson passed",
+        "xyzzy laid 1:3"
+      ],
+      "player_lines": {
+        "Glower Pearson": [
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 3,
+              "y": 4
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "left",
+            "player_name": "Glower Pearson",
+            "next_pips": 2,
+            "dead": true,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 4,
+              "y": 6
+            },
+            "orientation": "left",
+            "player_name": "Glower Pearson",
+            "next_pips": 3,
+            "dead": true,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 2,
+              "y": 5
+            },
+            "orientation": "down",
+            "player_name": "Glower Pearson",
+            "next_pips": 1,
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          }
+        ],
+        "xyzzy": [
+          {
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 3,
+              "y": 4
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 4,
+              "y": 2
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 3,
+              "y": 3
+            },
+            "orientation": "up",
+            "player_name": "xyzzy",
+            "next_pips": 0,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 1
+            },
+            "coord": {
+              "x": 2,
+              "y": 3
+            },
+            "orientation": "left",
+            "player_name": "xyzzy",
+            "next_pips": 1,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 1,
+              "y": 4
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 4,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 0,
+              "y": 4
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 0,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          }
+        ]
+      },
+      "free_lines": [],
+      "bagless_passes": 0,
+      "highest_leader": 7
+    },
+    {
+      "laid_tiles": [
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 3,
+            "y": 4
+          },
+          "orientation": "right",
+          "player_name": "",
+          "next_pips": 3,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 3,
+            "y": 5
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 6,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 4,
+            "y": 3
+          },
+          "orientation": "left",
+          "player_name": "Glower Pearson",
+          "next_pips": 4,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 4,
+            "y": 5
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 0,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 2,
+            "y": 2
+          },
+          "orientation": "right",
+          "player_name": "Glower Pearson",
+          "next_pips": 2,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 2
+          },
+          "coord": {
+            "x": 1,
+            "y": 3
+          },
+          "orientation": "up",
+          "player_name": "Glower Pearson",
+          "next_pips": 0,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 5,
+            "y": 5
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 4,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 1,
+            "y": 4
+          },
+          "orientation": "left",
+          "player_name": "Glower Pearson",
+          "next_pips": 5,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 6,
+            "y": 6
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 5,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 4
+          },
+          "coord": {
+            "x": 2,
+            "y": 7
+          },
+          "orientation": "left",
+          "player_name": "",
+          "next_pips": 4,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 2,
+            "y": 6
+          },
+          "orientation": "left",
+          "player_name": "",
+          "next_pips": 6,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 6
+          },
+          "coord": {
+            "x": 2,
+            "y": 5
+          },
+          "orientation": "left",
+          "player_name": "",
+          "next_pips": 2,
+          "dead": true,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 7,
+            "y": 6
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 3,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 2
+          },
+          "coord": {
+            "x": 2,
+            "y": 3
+          },
+          "orientation": "down",
+          "player_name": "",
+          "next_pips": 2,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 3
+          },
+          "coord": {
+            "x": 7,
+            "y": 4
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 1,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 5
+          },
+          "coord": {
+            "x": 0,
+            "y": 2
+          },
+          "orientation": "down",
+          "player_name": "Glower Pearson",
+          "next_pips": 2,
+          "dead": false,
+          "indicated": null
+        },
+        {
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 1
+          },
+          "coord": {
+            "x": 6,
+            "y": 3
+          },
+          "orientation": "down",
+          "player_name": "xyzzy",
+          "next_pips": 0,
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          }
+        },
+        {
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 7
+          },
+          "coord": {
+            "x": 0,
+            "y": 1
+          },
+          "orientation": "up",
+          "player_name": "Glower Pearson",
+          "next_pips": 7,
+          "dead": false,
+          "indicated": null
+        }
+      ],
+      "spacer": null,
+      "done": false,
+      "history": [
+        "Glower Pearson laid 3:3",
+        "xyzzy laid 3:6",
+        "Glower Pearson laid 3:4",
+        "xyzzy laid 0:6",
+        "Glower Pearson laid 2:4",
+        "xyzzy passed and is on the foot",
+        "Glower Pearson laid 0:2",
+        "xyzzy laid 0:4 and is off the foot",
+        "Glower Pearson laid 0:5",
+        "xyzzy laid 4:5",
+        "Glower Pearson laid 4:4",
+        "Glower Pearson laid 4:6",
+        "xyzzy passed and is on the foot",
+        "Glower Pearson laid 2:6",
+        "xyzzy laid 3:5 and is off the foot",
+        "Glower Pearson laid 2:2",
+        "Glower Pearson passed and is on the foot",
+        "xyzzy passed and is on the foot",
+        "Glower Pearson passed",
+        "xyzzy passed",
+        "Glower Pearson passed",
+        "xyzzy laid 1:3 and is off the foot",
+        "Glower Pearson laid 2:5 and is off the foot",
+        "xyzzy laid 0:1",
+        "Glower Pearson laid 2:7"
+      ],
+      "player_lines": {
+        "Glower Pearson": [
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 3,
+              "y": 4
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 4,
+              "y": 3
+            },
+            "orientation": "left",
+            "player_name": "Glower Pearson",
+            "next_pips": 4,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 2,
+              "y": 2
+            },
+            "orientation": "right",
+            "player_name": "Glower Pearson",
+            "next_pips": 2,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 2
+            },
+            "coord": {
+              "x": 1,
+              "y": 3
+            },
+            "orientation": "up",
+            "player_name": "Glower Pearson",
+            "next_pips": 0,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 1,
+              "y": 4
+            },
+            "orientation": "left",
+            "player_name": "Glower Pearson",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 0,
+              "y": 2
+            },
+            "orientation": "down",
+            "player_name": "Glower Pearson",
+            "next_pips": 2,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 7
+            },
+            "coord": {
+              "x": 0,
+              "y": 1
+            },
+            "orientation": "up",
+            "player_name": "Glower Pearson",
+            "next_pips": 7,
+            "dead": false,
+            "indicated": null
+          }
+        ],
+        "xyzzy": [
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 3,
+              "y": 4
+            },
+            "orientation": "right",
+            "player_name": "",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": null
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 6
+            },
+            "coord": {
+              "x": 3,
+              "y": 5
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 6,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 6
+            },
+            "coord": {
+              "x": 4,
+              "y": 5
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 0,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 4
+            },
+            "coord": {
+              "x": 5,
+              "y": 5
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 4,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 6,
+              "y": 6
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 5,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 5
+            },
+            "coord": {
+              "x": 7,
+              "y": 6
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 3,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 3
+            },
+            "coord": {
+              "x": 7,
+              "y": 4
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 1,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          },
+          {
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 1
+            },
+            "coord": {
+              "x": 6,
+              "y": 3
+            },
+            "orientation": "down",
+            "player_name": "xyzzy",
+            "next_pips": 0,
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            }
+          }
+        ]
+      },
+      "free_lines": [],
+      "bagless_passes": 0,
+      "highest_leader": 4
+    }
+  ],
+  "bag": [
+    {
+      "pips_a": 1,
+      "pips_b": 6
+    },
+    {
+      "pips_a": 5,
+      "pips_b": 5
+    },
+    {
+      "pips_a": 1,
+      "pips_b": 1
+    },
+    {
+      "pips_a": 6,
+      "pips_b": 6
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 7
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 3
+    },
+    {
+      "pips_a": 4,
+      "pips_b": 7
+    }
+  ],
+  "board_width": 8,
+  "board_height": 9,
+  "max_pips": 7,
+  "history": [
+    "Glower Pearson started round 1 - 7:7",
+    "xyzzy+1 cut off Glower Pearson's-1 line",
+    "xyzzy+2 wins the round through attrition",
+    "Glower Pearson started round 2 - 3:3",
+    "Glower Pearson started a free line",
+    "what kind of reprobate cuts off a free line? (Glower Pearson+0)"
+  ]
+}

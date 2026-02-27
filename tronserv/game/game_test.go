@@ -75,3 +75,11 @@ func TestRejectedDouble(t *testing.T) {
 		{Tile: &Tile{PipsA: 6, PipsB: 6}, Coord: Coord{X: 3, Y: 3}, Orientation: "down"},
 	}, []*Spacer{})
 }
+
+func TestFreeLine(t *testing.T) {
+	game := decodeGame(t, "freeline")
+	testLegalMovesContains(t, game, []*LaidTile{}, []*Spacer{{
+		A: Coord{X: 1, Y: 0},
+		B: Coord{X: 6, Y: 0},
+	}})
+}

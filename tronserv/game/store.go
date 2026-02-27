@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 	"sync"
 )
@@ -275,5 +277,7 @@ func (s *MemoryStore) UpdatePlayerConfig(ctx context.Context, playerID string, c
 }
 
 func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error {
+	log.Printf("reporting issue for game: %s", game.Code)
+	json.NewEncoder(os.Stdout).Encode(game)
 	return nil
 }
