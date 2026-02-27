@@ -2,6 +2,7 @@ package gibbs_planner
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math/rand"
 
@@ -15,6 +16,10 @@ type HandState struct {
 	justPassed    bool
 	justLaid      *game.LaidTile
 	opportunities []*game.LaidTile
+}
+
+func (hs *HandState) String() string {
+	return fmt.Sprintf("HandState{tiles: %v, justDrew: %v, justPassed: %v, justLaid: %s, opportunities: %s}", hs.tiles, hs.justDrew, hs.justPassed, hs.justLaid, hs.opportunities)
 }
 
 type GibbsPlanner struct {
@@ -101,19 +106,21 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, previousGame, g *g
 		}
 		nextPlayerHS.opportunities = append(nextPlayerHS.opportunities, flh)
 	}
+	nextPlayerHS.justDrew = false
+	nextPlayerHS.justPassed = false
+	nextPlayerHS.justLaid = nil
 
 	// Identify the player who went last, and fill in the action.
 	pr := previousGame.CurrentRound(ctx)
-	log.Printf("pr != nil: %v, previousGame.Turn: %d, g.Turn: %d", pr != nil, previousGame.Turn, g.Turn)
-	if pr != nil && previousGame.Turn != g.Turn {
+	if pr != nil && (previousGame.Turn != g.Turn || len(r.LaidTiles) > len(pr.LaidTiles)) {
 		pi := previousGame.Turn
-		lastPlayer := previousGame.Players[pi]
-		log.Printf(" %d vs %d", len(g.Players[pi].Hand), len(previousGame.Players[pi].Hand))
-		nextPlayerHS.justDrew = len(g.Players[pi].Hand) > len(previousGame.Players[pi].Hand)
-		nextPlayerHS.justPassed = lastPlayer.ChickenFoot
+		lastPlayerHS := gp.hands[pi]
+		lastPlayerHS.justPassed = g.Players[pi].ChickenFoot
+		lastPlayerHS.justDrew = lastPlayerHS.justPassed || len(g.Players[pi].Hand) > len(previousGame.Players[pi].Hand)
 		if len(r.LaidTiles) > len(pr.LaidTiles) {
-			nextPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
+			lastPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
 		}
+		log.Printf("inference[%d]: %s", pi, lastPlayerHS)
 	}
 }
 
@@ -125,12 +132,6 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 	}
 
 	gp.addOpportunities(ctx, previousGame, g)
-
-	//log.Printf("guessed bag: %v", gp.bag)
-	for i, hs := range gp.hands {
-		log.Printf("inference[%d]: %v", i, hs)
-	}
-
 	gp.lastGame = g
 }
 func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
