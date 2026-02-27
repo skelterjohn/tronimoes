@@ -164,7 +164,7 @@ func main() {
 		previousGame := g
 		g, err = tc.GetGame(ctx, previousGame.Version)
 		for err != nil || g.Version == previousGame.Version {
-			if err != nil {
+			if err != nil && err != client.ErrTimeout {
 				log.Printf("Game fetch error: %v", err)
 				return
 			}
