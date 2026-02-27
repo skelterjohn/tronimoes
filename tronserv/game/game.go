@@ -644,7 +644,7 @@ type Tile struct {
 	PipsB int `json:"pips_b"`
 }
 
-func (t *Tile) String() string {
+func (t Tile) String() string {
 	return fmt.Sprintf("%d:%d", t.PipsA, t.PipsB)
 }
 
