@@ -28,24 +28,34 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 	rand.Shuffle(len(gp.bag), func(i, j int) {
 		gp.bag[i], gp.bag[j] = gp.bag[j], gp.bag[i]
 	})
-	gp.hands = nil
+
+	for _, t := range g.CurrentRound(ctx).LaidTiles {
+		gp.RemoveTileFromBag(ctx, *t.Tile)
+	}
+
+	gp.hands = make([]*HandState, len(g.Players))
 	for i, p := range g.Players {
-		if i == gp.myPlayerIndex {
-			// we know our own hand.
-			log.Printf("our own hand: %v", p.Hand)
-			gp.hands = append(gp.hands, &HandState{})
-			for _, pts := range p.Hand {
-				gp.RemoveTileFromBag(ctx, *pts)
-				gp.hands[i].tiles = append(gp.hands[i].tiles, *pts)
-			}
+		if i != gp.myPlayerIndex {
 			continue
 		}
-		gp.hands = append(gp.hands, &HandState{
+		// we know our own hand.
+		gp.hands[i] = &HandState{}
+		for _, pts := range p.Hand {
+			gp.RemoveTileFromBag(ctx, *pts)
+			gp.hands[i].tiles = append(gp.hands[i].tiles, *pts)
+		}
+		break
+	}
+	for i, p := range g.Players {
+		if i == gp.myPlayerIndex {
+			continue
+		}
+		gp.hands[i] = &HandState{
 			tiles: gp.bag[:len(p.Hand)],
-		})
+		}
 		gp.bag = gp.bag[len(p.Hand):]
 	}
-	log.Printf("initial bag: %v", gp.bag)
+	log.Printf("initial bag (%d): %v", len(gp.bag), gp.bag)
 	for i, hs := range gp.hands {
 		log.Printf("initial hand[%d]: %v", i, hs.tiles)
 	}
@@ -109,8 +119,8 @@ func (gp *GibbsPlanner) fixBadGuesses(ctx context.Context, g *game.Game) {
 func (gp *GibbsPlanner) RemoveTileFromBag(ctx context.Context, tile game.Tile) bool {
 	for i := range gp.bag {
 		if gp.bag[i] == tile {
-			gp.bag[i] = gp.bag[len(gp.bag)-1]
-			gp.bag = gp.bag[:len(gp.bag)-1]
+			gp.bag[i] = gp.bag[0]
+			gp.bag = gp.bag[1:]
 			return true
 		}
 	}
