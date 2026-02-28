@@ -400,6 +400,10 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 
 	squarePips := r.MapTiles(ctx)
 
+	if _, ok := squarePips[coord]; ok {
+		return ErrTileOccluded
+	}
+
 	for _, n := range coord.Neighbors() {
 		if !g.InBounds(ctx, n) {
 			continue
