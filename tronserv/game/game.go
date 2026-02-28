@@ -821,6 +821,7 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 	name := p.Name
 
 	for _, t := range p.Hand {
+		Debug = t.PipsA == 2 && t.PipsB == 6
 		dbg("Considering %s", t)
 		movesOffSquare := func(head *LaidTile, src Coord) {
 			dbg("Considering playing from %s", src)
@@ -856,15 +857,17 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 		// first consider direct plays
 		for opname, line := range r.PlayerLines {
 			op := g.GetPlayer(ctx, opname)
+			dbg("Considering line for %s", op.Name)
 			if opname != name {
-				if p.ChickenFoot || p.Dead {
+				if !op.ChickenFoot {
+					dbg("other player not chicken-footed")
 					continue
 				}
-				if !op.ChickenFoot {
+				if !p.Dead && p.ChickenFoot {
+					dbg("p is alive and well, but chicken-footed")
 					continue
 				}
 			}
-			dbg("Considering line for %s", op.Name)
 			movesOffTile(line[len(line)-1])
 		}
 
@@ -1189,6 +1192,7 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 }
 
 func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
+	Debug = lt.CoordA().X == 5 && lt.CoordA().Y == 3 && lt.Orientation == "down"
 	dbg("Attempting %s", lt)
 	if r.Done {
 		return ErrRoundAlreadyDone
@@ -1251,6 +1255,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 
 	var potentialError error
 	cerr := func(err error) {
+		dbg("cerr %v", err)
 		precedence := []error{ErrYouAreFooted, ErrWrongSide, ErrMustMatchPips, ErrPlayerAlreadyDead, ErrLineIsNotFooted, ErrNotAdjacent}
 		for _, e := range precedence {
 			if potentialError == e || err == e {
@@ -1262,10 +1267,11 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	}
 
 	playedALine := false
-
+	dbg("1")
 	if r.Spacer == nil && !player.Dead && (playerFoot == "" || playerFoot == player.Name) {
 		mainLine := r.PlayerLines[player.Name]
 
+		dbg("2")
 		onFoot := false
 		if player.ChickenFoot && len(mainLine) == 1 {
 			if player.ChickenFootCoord == lt.CoordA() {
@@ -1293,6 +1299,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 
 	if !playedALine && r.Spacer == nil {
 		for oname, line := range r.PlayerLines {
+			dbg("Looking at line %s", oname)
 			if playerFoot != "" && playerFoot != oname {
 				// tile is on a foot but not from this line
 				continue
@@ -1315,29 +1322,38 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 					// this line begins elsewhere, the player surely (?!) noticed they didn't play on the foot.
 					continue
 				}
+				dbg("Compare %s vs %s", lt.CoordA(), line[0])
 				if lt.CoordA() == op.ChickenFootCoord && lt.Tile.PipsA != line[0].NextPips {
+					dbg("No A")
 					cerr(ErrMustMatchPips)
 					continue
 				}
 				if lt.CoordB() == op.ChickenFootCoord && lt.Tile.PipsB != line[0].NextPips {
+					dbg("No B")
 					cerr(ErrMustMatchPips)
 					continue
 				}
+				dbg("All good")
 			}
 			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
+				dbg("We can play it, but...")
 				if op.Dead {
+					dbg("Player is dead")
 					cerr(ErrPlayerAlreadyDead)
 					continue
 				}
 				if !op.ChickenFoot {
+					dbg("Player is not footed")
 					cerr(ErrLineIsNotFooted)
 					continue
 				}
 				if player.ChickenFoot && !player.Dead {
+					dbg("Player is chicken-footed and not dead")
 					cerr(ErrYouAreFooted)
 					continue
 				}
 				playedALine = true
+				dbg("Playing it")
 				if !dryRun {
 					lt.PlayerName = oname
 					r.PlayerLines[oname] = append(line, lt)

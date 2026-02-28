@@ -21,7 +21,6 @@ func decodeGame(t *testing.T, label string) *Game {
 }
 
 func testLegalMovesContains(t *testing.T, game *Game, expectedMoves []*LaidTile, expectedSpacers []*Spacer) {
-
 	r := game.CurrentRound(t.Context())
 	moves, spacers := r.FindLegalMoves(t.Context(), game, game.Players[game.Turn])
 
@@ -88,5 +87,12 @@ func TestLeadfoot(t *testing.T) {
 	game := decodeGame(t, "leadfoot")
 	testLegalMovesContains(t, game, []*LaidTile{
 		{Tile: &Tile{PipsA: 1, PipsB: 6}, Coord: Coord{X: 4, Y: 4}, Orientation: "right"},
+	}, []*Spacer{})
+}
+
+func TestLeadfoot2(t *testing.T) {
+	game := decodeGame(t, "leadfoot2")
+	testLegalMovesContains(t, game, []*LaidTile{
+		{Tile: &Tile{PipsA: 2, PipsB: 6}, Coord: Coord{X: 5, Y: 3}, Orientation: "down"},
 	}, []*Spacer{})
 }
