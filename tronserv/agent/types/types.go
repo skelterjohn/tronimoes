@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
@@ -12,6 +13,10 @@ type Move struct {
 	Draw     bool
 	Pass     bool
 	Selected game.Coord
+}
+
+func (m Move) String() string {
+	return fmt.Sprintf("Move{%v, %v, %v, %v, %v}", m.LaidTile, m.Spacer, m.Draw, m.Pass, m.Selected)
 }
 
 type Agent interface {
