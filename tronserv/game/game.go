@@ -9,8 +9,10 @@ import (
 	"time"
 )
 
+var Debug = false
+
 func dbg(format string, a ...interface{}) {
-	if false {
+	if Debug {
 		fmt.Printf(format+"\n", a...)
 	}
 }
@@ -1317,7 +1319,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 					cerr(ErrMustMatchPips)
 					continue
 				}
-				if lt.CoordB() == op.ChickenFootCoord && lt.Tile.PipsB == line[0].NextPips {
+				if lt.CoordB() == op.ChickenFootCoord && lt.Tile.PipsB != line[0].NextPips {
 					cerr(ErrMustMatchPips)
 					continue
 				}

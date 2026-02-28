@@ -83,3 +83,10 @@ func TestFreeLine(t *testing.T) {
 		B: Coord{X: 6, Y: 0},
 	}})
 }
+
+func TestLeadfoot(t *testing.T) {
+	game := decodeGame(t, "leadfoot")
+	testLegalMovesContains(t, game, []*LaidTile{
+		{Tile: &Tile{PipsA: 1, PipsB: 6}, Coord: Coord{X: 4, Y: 4}, Orientation: "right"},
+	}, []*Spacer{})
+}
