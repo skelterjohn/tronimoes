@@ -395,7 +395,7 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 	leader := r.PlayerLines[player.Name][0]
 
 	if !leader.CoordA().Adj(coord) && !leader.CoordB().Adj(coord) {
-		return ErrMustBeNearRoundLeader
+		return ErrMustPickChickenFoot
 	}
 
 	squarePips := r.MapTiles(ctx)
