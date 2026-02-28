@@ -125,7 +125,7 @@ func main() {
 					g, err = tc.Draw(ctx)
 					if err != nil {
 						log.Printf("Could not draw: %v", err)
-						return
+						continue
 					}
 					log.Println("I just drew")
 					continue
@@ -134,7 +134,7 @@ func main() {
 					g, err = tc.Pass(ctx, m.Selected.X, m.Selected.Y)
 					if err != nil {
 						log.Printf("Could not pass: %v", err)
-						return
+						continue
 					}
 					log.Println("I passed")
 					continue
@@ -143,7 +143,7 @@ func main() {
 					g, err = tc.LayTile(ctx, m.LaidTile)
 					if err != nil {
 						log.Printf("Could not lay tile: %v", err)
-						return
+						continue
 					}
 					log.Printf("I laid %v", m.LaidTile)
 					continue
@@ -152,7 +152,7 @@ func main() {
 					g, err = tc.LaySpacer(ctx, m.Spacer)
 					if err != nil {
 						log.Printf("Could not lay spacer: %v", err)
-						return
+						continue
 					}
 					log.Printf("I placed a spacer: %v", m.Spacer)
 					continue

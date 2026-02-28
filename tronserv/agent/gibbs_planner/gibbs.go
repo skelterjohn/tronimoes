@@ -71,12 +71,26 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 	}
 	if p.JustDrew {
+		// randomly choose one, so if it's bad we randomly choose again.
+		cfSelection := game.Coord{
+			X: g.BoardWidth / 2,
+			Y: (g.BoardHeight / 2),
+		}
+		var dx = rand.Intn(2)
+		dy := rand.Intn(3) - 1
+		if dy == 0 {
+			if dx == 0 {
+				dx = -1
+			} else {
+				dx = 2
+			}
+		}
+		cfSelection.X += dx
+		cfSelection.Y += dy
+
 		return types.Move{
-			Pass: true,
-			Selected: game.Coord{
-				X: g.BoardWidth / 2,
-				Y: (g.BoardHeight / 2) - 1,
-			},
+			Pass:     true,
+			Selected: cfSelection,
 		}
 	}
 	return types.Move{
