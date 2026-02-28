@@ -25,9 +25,26 @@ const TileHalf = ({ pips, back, orientation, tileRotation }) => {
 	);
 }
 
-export default function Tile({pipsa, pipsb, orientation, back = false, color = "white", dead = false, selected = false, lineHeads, indicated, setIndicated, hintedTiles, roundLeader = undefined, freeLeaders = undefined, interactive = true, last = false }) {
-	var bar = <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[4px] bg-gray-300" />;
+const playedColorMap = {
+	red: "bg-red-500",
+	blue: "bg-blue-500",
+	green: "bg-green-500",
+	yellow: "bg-yellow-400",
+	orange: "bg-orange-500",
+	fuchsia: "bg-fuchsia-500",
+	white: "bg-gray-200"
+};
 
+function TileBar({ playedColor }) {
+	const lineColor = playedColorMap[playedColor] ?? playedColorMap.white;
+	return (
+		<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[5px] bg-gray-300 flex items-center justify-center">
+			<div className={`w-full h-[1px] ${lineColor}`} />
+		</div>
+	);
+}
+
+export default function Tile({pipsa, pipsb, orientation, back = false, color = "white", playedColor = "white", dead = false, selected = false, lineHeads, indicated, setIndicated, hintedTiles, roundLeader = undefined, freeLeaders = undefined, interactive = true, last = false }) {
 	var height = "";
 	var rotate = 'rotate-0'
 	var tileRotation = 0;
@@ -143,7 +160,7 @@ export default function Tile({pipsa, pipsb, orientation, back = false, color = "
 						<tbody>
 							<tr><td>
 								<TileHalf pips={back ? 0 : pipsa} back={back} orientation={"down"} tileRotation={tileRotation} />
-								{!back && bar}
+								{!back && <TileBar playedColor={playedColor} />}
 							</td></tr>
 							<tr><td>
 								<TileHalf pips={back ? 0 : pipsb} back={back} orientation={"up"} tileRotation={tileRotation} />

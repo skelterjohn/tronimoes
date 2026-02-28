@@ -528,6 +528,7 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 	}
 
 	firstTile := len(round.LaidTiles) == 0
+	tile.WhoLaidIt = name
 	if err := round.LayTile(ctx, g, name, tile, false); err != nil {
 		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
 			// try it with the indicated tile
@@ -740,6 +741,7 @@ type LaidTile struct {
 	NextPips    int    `json:"next_pips"`
 	Dead        bool   `json:"dead"`
 	Indicated   *Tile  `json:"indicated"`
+	WhoLaidIt   string `json:"who_laid_it"`
 }
 
 func (lt *LaidTile) Reverse() *LaidTile {

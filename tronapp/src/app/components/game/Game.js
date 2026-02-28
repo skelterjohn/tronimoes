@@ -208,6 +208,7 @@ function Game({ code }) {
 					b: lt.tile.pips_b,
 					orientation: lt.orientation,
 					color: playerColors[lt.player_name],
+					playedColor: playerColors[lt.who_laid_it],
 					dead: lt.dead,
 					last: i === laidTilesList.length - 1,
 				}

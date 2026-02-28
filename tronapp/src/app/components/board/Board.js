@@ -401,6 +401,7 @@ export default function Board({
 															pipsb={tiles[`${x},${y}`].b}
 															orientation={tiles[`${x},${y}`].orientation}
 															color={tiles[`${x},${y}`].color}
+															playedColor={tiles[`${x},${y}`].playedColor}
 															dead={tiles[`${x},${y}`].dead}
 															last={tiles[`${x},${y}`].last}
 															lineHeads={lineHeads}
