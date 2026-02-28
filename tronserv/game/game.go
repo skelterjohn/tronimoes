@@ -821,7 +821,6 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 	name := p.Name
 
 	for _, t := range p.Hand {
-		Debug = t.PipsA == 2 && t.PipsB == 6
 		dbg("Considering %s", t)
 		movesOffSquare := func(head *LaidTile, src Coord) {
 			dbg("Considering playing from %s", src)
@@ -1192,7 +1191,7 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 }
 
 func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
-	Debug = lt.CoordA().X == 5 && lt.CoordA().Y == 3 && lt.Orientation == "down"
+	// Debug = lt.CoordA().X == 5 && lt.CoordA().Y == 3 && lt.Orientation == "down"
 	dbg("Attempting %s", lt)
 	if r.Done {
 		return ErrRoundAlreadyDone
