@@ -1596,13 +1596,8 @@ func (r *Round) killDeadLines(ctx context.Context, g *Game, player *Player, squa
 			tilesInFreeLine := map[string]bool{}
 			for _, lt := range line {
 				tilesInFreeLine[lt.Tile.String()] = true
+				deadTileKeys[lt.Tile.String()] = true
 			}
-			for _, lt := range r.LaidTiles {
-				if tilesInFreeLine[lt.Tile.String()] {
-					lt.Dead = true
-				}
-			}
-			// lt.Dead = true
 			continue
 		}
 		newFreeLines = append(newFreeLines, line)
