@@ -78,7 +78,10 @@ func main() {
 		a = RandomChoice{}
 	case "gibbs":
 		a = &gibbs_planner.GibbsPlanner{
-			Name: *name,
+			Name:               *name,
+			MaxInferenceTime:   1 * time.Second,
+			MaxSimulationTime:  1 * time.Second,
+			MaxSimulationDepth: 30,
 		}
 	default:
 		log.Fatalf("Unknown agent: %s", *which)

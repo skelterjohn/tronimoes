@@ -2,6 +2,7 @@ package gibbs_planner
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math"
@@ -25,7 +26,11 @@ func (hs *HandState) String() string {
 }
 
 type GibbsPlanner struct {
-	Name          string
+	Name               string
+	MaxInferenceTime   time.Duration
+	MaxSimulationTime  time.Duration
+	MaxSimulationDepth int
+
 	lastGame      *game.Game
 	bag           []game.Tile
 	hands         []*HandState
@@ -46,7 +51,7 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 	gp.addOpportunities(ctx, previousGame, g)
 	gp.lastGame = g
 
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, gp.MaxInferenceTime)
 	defer cancel()
 	gp.ConsiderSwaps(ctx)
 	for i := range gp.hands {
@@ -60,39 +65,78 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
-	if len(legalSpacers) > 0 {
-		return types.Move{
-			Spacer: legalSpacers[rand.Intn(len(legalSpacers))],
+	root := NewPlanNode(g.Turn, len(gp.hands))
+
+	ctx, cancel := context.WithTimeout(ctx, gp.MaxSimulationTime)
+	defer cancel()
+
+	for i, hs := range gp.hands {
+		if i == gp.myPlayerIndex {
+			continue
+		}
+		g.Players[i].Hand = nil
+		for _, t := range hs.tiles {
+			g.Players[i].Hand = append(g.Players[i].Hand, &t)
 		}
 	}
-	if len(legalMoves) > 0 {
-		return types.Move{
-			LaidTile: legalMoves[rand.Intn(len(legalMoves))],
+	g.Bag = nil
+	for _, t := range gp.bag {
+		g.Bag = append(g.Bag, &t)
+	}
+
+	gdata, err := json.Marshal(g)
+	if err != nil {
+		log.Printf("error marshalling game: %v", err)
+	}
+
+	simulating := true
+	for simulating {
+		select {
+		case <-ctx.Done():
+			simulating = false
+		default:
+		}
+		var sg game.Game
+		if err := json.Unmarshal(gdata, &sg); err != nil {
+			log.Printf("error unmarshalling game: %v", err)
+		}
+		if err := gp.SimulateGame(ctx, &sg, root, gp.MaxSimulationDepth); err != nil {
+			log.Printf("error simulating game: %v", err)
 		}
 	}
-	if p.JustDrew {
-		// randomly choose one, so if it's bad we randomly choose again.
-		cfSelection := game.Coord{
-			X: g.BoardWidth / 2,
-			Y: (g.BoardHeight / 2),
-		}
-		var dx = rand.Intn(2)
-		dy := rand.Intn(3) - 1
-		if dy == 0 {
-			if dx == 0 {
-				dx = -1
-			} else {
-				dx = 2
+	bestMove, err := root.ChooseBestMove(ctx)
+	if err != nil {
+		log.Printf("error choosing best move: %v", err)
+	} else {
+		log.Printf("best move: %s", bestMove)
+	}
+
+	for _, m := range legalMoves {
+		if m.String() == bestMove {
+			return types.Move{
+				LaidTile: m,
 			}
 		}
-		cfSelection.X += dx
-		cfSelection.Y += dy
-
-		return types.Move{
-			Pass:     true,
-			Selected: cfSelection,
+	}
+	for _, s := range legalSpacers {
+		if s.String() == bestMove {
+			return types.Move{
+				Spacer: s,
+			}
 		}
 	}
+	if bestMove == "draw" {
+		return types.Move{
+			Draw: true,
+		}
+	}
+	if bestMove == "pass" {
+		return types.Move{
+			Pass:     true,
+			Selected: types.RandomInitialFoot(g),
+		}
+	}
+
 	return types.Move{
 		Draw: true,
 	}
