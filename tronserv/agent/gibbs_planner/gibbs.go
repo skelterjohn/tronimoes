@@ -26,10 +26,11 @@ func (hs *HandState) String() string {
 }
 
 type GibbsPlanner struct {
-	Name               string
-	MaxInferenceTime   time.Duration
-	MaxSimulationTime  time.Duration
-	MaxSimulationDepth int
+	Name                  string
+	MaxInferenceTime      time.Duration
+	MaxSimulationTime     time.Duration
+	MaxSimulationDepth    int
+	MaxSimulationsPerMove int
 
 	lastGame      *game.Game
 	bag           []game.Tile
@@ -90,6 +91,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 
 	simulating := true
+	simulations := 0
 	for simulating {
 		select {
 		case <-ctx.Done():
@@ -102,6 +104,10 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 		if err := gp.SimulateGame(ctx, &sg, root, gp.MaxSimulationDepth); err != nil {
 			log.Printf("error simulating game: %v", err)
+		}
+		simulations++
+		if gp.MaxSimulationsPerMove > 0 && simulations >= gp.MaxSimulationsPerMove {
+			simulating = false
 		}
 	}
 	bestMove, err := root.ChooseBestMove(ctx)

@@ -27,6 +27,7 @@ func NewPlanNode(turn int, count int) *PlanNode {
 }
 
 func (n *PlanNode) Next(move string, turn, count int) *PlanNode {
+	// log.Printf("Next %s", move)
 	nextNode, ok := n.Moves[move]
 	if !ok {
 		nextNode = NewPlanNode(turn, count)
@@ -63,9 +64,11 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			maxDepth--
 		}
 		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, g.Players[g.Turn])
+		// log.Printf("%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
 		moveCount += 1 // draw or pass
 		whichMove := rand.Intn(moveCount)
+		// log.Printf("whichMove: %d", whichMove)
 		if whichMove < len(legalMoves) {
 			move := legalMoves[whichMove]
 			move.PlayerName = g.Players[g.Turn].Name
@@ -74,8 +77,8 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			}
 			curNode = curNode.Next(move.String(), g.Turn, len(gp.hands))
 			nodesInSimulation = append(nodesInSimulation, curNode)
-		} else if whichMove == len(legalMoves) {
-			if g.Players[g.Turn].JustDrew {
+		} else if whichMove == moveCount-1 {
+			if !g.Players[g.Turn].JustDrew {
 				if !g.DrawTile(ctx, g.Players[g.Turn].Name) {
 					return errors.New("drawing failed")
 				}

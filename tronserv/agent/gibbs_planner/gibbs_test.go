@@ -52,3 +52,35 @@ func TestGibbsUpdateAndGetMove(t *testing.T) {
 	t.Logf("move: Draw=%v Pass=%v LaidTile=%v Spacer=%v",
 		move.Draw, move.Pass, move.LaidTile, move.Spacer)
 }
+
+func TestShortSimulation(t *testing.T) {
+	ctx := t.Context()
+	g := game.NewGame(ctx, "AAAAAA")
+	if err := g.AddPlayer(ctx, &game.Player{Name: "A"}); err != nil {
+		t.Fatalf("error adding player A: %v", err)
+	}
+	if err := g.AddPlayer(ctx, &game.Player{Name: "B"}); err != nil {
+		t.Fatalf("error adding player B: %v", err)
+	}
+	if err := g.Start(ctx, "A"); err != nil {
+		t.Fatalf("error starting game: %v", err)
+	}
+	if err := g.Start(ctx, "B"); err != nil {
+		t.Fatalf("error starting game: %v", err)
+	}
+
+	gp := &GibbsPlanner{
+		Name:                  "A",
+		MaxInferenceTime:      1 * time.Second,
+		MaxSimulationTime:     1 * time.Second,
+		MaxSimulationDepth:    10,
+		MaxSimulationsPerMove: 0,
+	}
+
+	gp.Update(ctx, nil, g)
+
+	move := gp.GetMove(ctx, g, g.Players[g.Turn])
+	t.Logf("move: Draw=%v Pass=%v LaidTile=%v Spacer=%v",
+		move.Draw, move.Pass, move.LaidTile, move.Spacer)
+	t.Error(move.String())
+}
