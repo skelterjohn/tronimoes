@@ -96,3 +96,10 @@ func TestLeadfoot2(t *testing.T) {
 		{Tile: &Tile{PipsA: 2, PipsB: 6}, Coord: Coord{X: 5, Y: 3}, Orientation: "down"},
 	}, []*Spacer{})
 }
+
+func TestPlayfoot(t *testing.T) {
+	game := decodeGame(t, "playfoot")
+	testLegalMovesContains(t, game, []*LaidTile{
+		{Tile: &Tile{PipsA: 0, PipsB: 7}, Coord: Coord{X: 1, Y: 2}, Orientation: "right"},
+	}, []*Spacer{})
+}

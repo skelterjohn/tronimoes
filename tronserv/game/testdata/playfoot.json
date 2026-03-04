@@ -1,0 +1,2761 @@
+{
+  "bag": [
+    {
+      "pips_a": 4,
+      "pips_b": 10
+    },
+    {
+      "pips_a": 1,
+      "pips_b": 4
+    },
+    {
+      "pips_a": 7,
+      "pips_b": 7
+    },
+    {
+      "pips_a": 4,
+      "pips_b": 9
+    },
+    {
+      "pips_a": 5,
+      "pips_b": 7
+    },
+    {
+      "pips_a": 4,
+      "pips_b": 5
+    },
+    {
+      "pips_a": 1,
+      "pips_b": 1
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 8
+    },
+    {
+      "pips_a": 0,
+      "pips_b": 0
+    },
+    {
+      "pips_a": 2,
+      "pips_b": 9
+    }
+  ],
+  "board_height": 13,
+  "board_width": 12,
+  "code": "ZRTTNW-PDRRNK",
+  "created": 1772573519,
+  "done": false,
+  "history": [
+    "Xavier started round 1 - 9:9",
+    "skelterjohn+0 ducked out of that situation",
+    "david+1 cut off Xavier's-1 line",
+    "skelterjohn+1 cut off david's-1 line",
+    "TJ.Tice+2 wins the round through attrition",
+    "TJ.Tice started round 2 - 8:8",
+    "skelterjohn+1 cut off david's-1 line",
+    "skelterjohn started a free line",
+    "skelterjohn+1 cut off TJ.Tice's-1 line"
+  ],
+  "max_pips": 10,
+  "pickup": true,
+  "players": [
+    {
+      "chicken_foot": false,
+      "chicken_foot_coord": {
+        "x": 0,
+        "y": 0
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/ffd4ac143e6335ac68951b787d3c1902/7b/d9/gytP3Aix.gif",
+      "dead": false,
+      "hand": [
+        {
+          "pips_a": 6,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 6,
+          "pips_b": 9
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 7
+        }
+      ],
+      "hints": null,
+      "just_drew": false,
+      "kills": [
+        "david",
+        "TJ.Tice"
+      ],
+      "name": "skelterjohn",
+      "react_url": "https://static.klipy.com/ii/4184567b4c2af0d810857689fd514076/3b/d8/941hMMGHWHNX8.gif",
+      "ready": false,
+      "score": 3,
+      "spacer_hints": null
+    },
+    {
+      "chicken_foot": false,
+      "chicken_foot_coord": {
+        "x": 6,
+        "y": 8
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/99/29/xJMFwGmi.gif",
+      "dead": false,
+      "hand": [
+        {
+          "pips_a": 1,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 7,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 7,
+          "pips_b": 9
+        },
+        {
+          "pips_a": 4,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 9,
+          "pips_b": 9
+        },
+        {
+          "pips_a": 1,
+          "pips_b": 7
+        }
+      ],
+      "hints": null,
+      "just_drew": false,
+      "kills": null,
+      "name": "Xavier",
+      "react_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/c3/41/osbpAMPD.gif",
+      "ready": false,
+      "score": -1,
+      "spacer_hints": null
+    },
+    {
+      "chicken_foot": false,
+      "chicken_foot_coord": {
+        "x": 10,
+        "y": 3
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/5c/0c/zJ0R2Czc.gif",
+      "dead": true,
+      "hand": [
+        {
+          "pips_a": 1,
+          "pips_b": 9
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 9
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 3
+        },
+        {
+          "pips_a": 6,
+          "pips_b": 7
+        },
+        {
+          "pips_a": 3,
+          "pips_b": 5
+        },
+        {
+          "pips_a": 5,
+          "pips_b": 6
+        },
+        {
+          "pips_a": 4,
+          "pips_b": 4
+        },
+        {
+          "pips_a": 9,
+          "pips_b": 10
+        }
+      ],
+      "hints": null,
+      "just_drew": false,
+      "kills": null,
+      "name": "david",
+      "react_url": "",
+      "ready": false,
+      "score": -1,
+      "spacer_hints": null
+    },
+    {
+      "chicken_foot": false,
+      "chicken_foot_coord": {
+        "x": 3,
+        "y": 1
+      },
+      "chicken_foot_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/50/28/InVszwNs.gif",
+      "dead": true,
+      "hand": [
+        {
+          "pips_a": 8,
+          "pips_b": 9
+        },
+        {
+          "pips_a": 4,
+          "pips_b": 8
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 10
+        },
+        {
+          "pips_a": 2,
+          "pips_b": 3
+        },
+        {
+          "pips_a": 0,
+          "pips_b": 7
+        }
+      ],
+      "hints": null,
+      "just_drew": true,
+      "kills": null,
+      "name": "TJ.Tice",
+      "react_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/81/ec/bG8Q7yp6.gif",
+      "ready": false,
+      "score": 1,
+      "spacer_hints": null
+    }
+  ],
+  "rounds": [
+    {
+      "bagless_passes": 0,
+      "done": true,
+      "free_lines": [],
+      "highest_leader": 9,
+      "history": [
+        "Xavier laid 9:9",
+        "david laid 4:9",
+        "TJ.Tice laid 7:9",
+        "skelterjohn laid 9:10",
+        "Xavier laid 8:9",
+        "david laid 4:8",
+        "TJ.Tice laid 3:7",
+        "skelterjohn laid 1:10",
+        "Xavier laid 2:8",
+        "david laid 0:8",
+        "TJ.Tice laid 2:3",
+        "skelterjohn laid 1:6",
+        "Xavier laid 2:6",
+        "david passed and is on the foot",
+        "TJ.Tice laid 2:4",
+        "skelterjohn laid 0:6",
+        "Xavier laid 0:7",
+        "david laid 7:10 and is off the foot",
+        "TJ.Tice laid 4:6",
+        "skelterjohn laid 0:10",
+        "Xavier passed and is on the foot",
+        "david laid 5:6",
+        "TJ.Tice laid 6:8",
+        "skelterjohn passed",
+        "Xavier passed",
+        "david passed and is on the foot",
+        "TJ.Tice laid 5:8",
+        "skelterjohn laid 8:10",
+        "Xavier laid 8:8",
+        "Xavier laid 7:8",
+        "david laid 6:7 and is off the foot",
+        "TJ.Tice laid 5:9",
+        "skelterjohn passed",
+        "Xavier passed",
+        "david passed and is on the foot",
+        "TJ.Tice laid 6:9",
+        "skelterjohn laid 3:6"
+      ],
+      "laid_tiles": [
+        {
+          "coord": {
+            "x": 5,
+            "y": 6
+          },
+          "dead": false,
+          "indicated": null,
+          "next_pips": 9,
+          "orientation": "right",
+          "player_name": "",
+          "tile": {
+            "pips_a": 9,
+            "pips_b": 9
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 7
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 4,
+          "orientation": "left",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 9
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 5,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 7,
+          "orientation": "down",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 9
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 6
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 10,
+          "orientation": "right",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 9,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 3,
+            "y": 6
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 8,
+          "orientation": "right",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 8,
+            "pips_b": 9
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 7
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 8,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 8
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 3,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 3,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 7
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 9,
+            "y": 7
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 1,
+          "orientation": "up",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 2,
+            "y": 5
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "down",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 8
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 10,
+            "y": 8
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 0,
+          "orientation": "left",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 8
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 1,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 3
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 10,
+            "y": 7
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "right",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 6
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 1,
+            "y": 5
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "down",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 6
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 0,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 4,
+          "orientation": "up",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 4
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 11,
+            "y": 9
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 0,
+          "orientation": "up",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 6
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 10,
+            "y": 9
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 7,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 7
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 10,
+            "y": 11
+          },
+          "dead": true,
+          "indicated": null,
+          "next_pips": 10,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 10
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 1,
+            "y": 3
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 6
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 11,
+            "y": 10
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 10,
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 0,
+            "y": 5
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 5,
+          "orientation": "down",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 6
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 3,
+            "y": 3
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 8,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 8
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 6,
+            "y": 3
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 5,
+          "orientation": "left",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 8
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 12
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 8,
+          "orientation": "right",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 8,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 11
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 8,
+          "orientation": "right",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 8,
+            "pips_b": 8
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 9,
+            "y": 9
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 7,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 8
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 9
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "right",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 7
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 3
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 9,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 9
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 9,
+            "y": 2
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "down",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 9
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 10
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 3,
+          "orientation": "left",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 6
+          },
+          "who_laid_it": "skelterjohn"
+        }
+      ],
+      "player_lines": {
+        "TJ.Tice": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 9,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 9,
+              "pips_b": 9
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 5,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 7,
+            "orientation": "down",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 9
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 3,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 3,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 7
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 1,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 3
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 0,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 4,
+            "orientation": "up",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 4
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 1,
+              "y": 3
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 6
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 3,
+              "y": 3
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 6,
+              "y": 3
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 5,
+            "orientation": "left",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 3
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 9,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 9
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 9,
+              "y": 2
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "down",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 9
+            },
+            "who_laid_it": "TJ.Tice"
+          }
+        ],
+        "Xavier": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 9,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 9,
+              "pips_b": 9
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 3,
+              "y": 6
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 9
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 2,
+              "y": 5
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "down",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 8
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 1,
+              "y": 5
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "down",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 6
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 0,
+              "y": 5
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 5,
+            "orientation": "down",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 6
+            },
+            "who_laid_it": "david"
+          }
+        ],
+        "david": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 9,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 9,
+              "pips_b": 9
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 7
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 4,
+            "orientation": "left",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 9
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 7
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 8,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 8
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 10,
+              "y": 8
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 0,
+            "orientation": "left",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 8
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 10,
+              "y": 9
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 7,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 7
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 10,
+              "y": 11
+            },
+            "dead": true,
+            "indicated": null,
+            "next_pips": 10,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 10
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 12
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 11
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 9,
+              "y": 9
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 7,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 8
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 9
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "right",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 7
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 10
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 3,
+            "orientation": "left",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 6
+            },
+            "who_laid_it": "skelterjohn"
+          }
+        ],
+        "skelterjohn": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 9,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 9,
+              "pips_b": 9
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 6
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 10,
+            "orientation": "right",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 9,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 9,
+              "y": 7
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 1,
+            "orientation": "up",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 10,
+              "y": 7
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "right",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 6
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 11,
+              "y": 9
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 0,
+            "orientation": "up",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 6
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 11,
+              "y": 10
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 10,
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          }
+        ]
+      },
+      "spacer": null
+    },
+    {
+      "bagless_passes": 0,
+      "done": false,
+      "free_lines": [
+        [
+          {
+            "coord": {
+              "x": 4,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 10,
+            "orientation": "left",
+            "player_name": "",
+            "tile": {
+              "pips_a": 10,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 3,
+              "y": 2
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 7,
+            "orientation": "down",
+            "player_name": "",
+            "tile": {
+              "pips_a": 7,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          }
+        ]
+      ],
+      "highest_leader": 10,
+      "history": [
+        "TJ.Tice laid 8:8",
+        "skelterjohn laid 5:8",
+        "Xavier laid 2:8",
+        "david passed and is on the foot",
+        "TJ.Tice laid 1:8",
+        "skelterjohn laid 2:5",
+        "Xavier laid 1:5",
+        "david laid 5:9 and is off the foot",
+        "TJ.Tice laid 8:10",
+        "skelterjohn laid 1:2",
+        "Xavier passed and is on the foot",
+        "david laid 3:9",
+        "TJ.Tice laid 2:10",
+        "skelterjohn laid 1:10",
+        "Xavier passed",
+        "david laid 3:4",
+        "TJ.Tice laid 6:10",
+        "skelterjohn laid 3:10",
+        "Xavier laid 5:10 and is off the foot",
+        "david laid 2:4",
+        "TJ.Tice laid 6:8",
+        "skelterjohn laid 1:3",
+        "Xavier laid 5:5",
+        "Xavier laid 0:5",
+        "david laid 2:2",
+        "david passed and is on the foot",
+        "TJ.Tice laid 3:8",
+        "skelterjohn laid 0:2",
+        "Xavier laid 0:4",
+        "david passed",
+        "TJ.Tice laid 3:3",
+        "TJ.Tice passed and is on the foot",
+        "skelterjohn laid 0:1",
+        "Xavier laid 3:6",
+        "david passed",
+        "TJ.Tice laid 2:6 and is off the foot",
+        "skelterjohn laid 10:10",
+        "skelterjohn laid 7:10",
+        "Xavier laid 4:6",
+        "david passed"
+      ],
+      "laid_tiles": [
+        {
+          "coord": {
+            "x": 5,
+            "y": 6
+          },
+          "dead": false,
+          "indicated": null,
+          "next_pips": 8,
+          "orientation": "right",
+          "player_name": "",
+          "tile": {
+            "pips_a": 8,
+            "pips_b": 8
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 6,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 5,
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 8
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 5,
+            "y": 8
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "up",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 8
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 5
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 1,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 8
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "left",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 5
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 5
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 5,
+          "orientation": "right",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 5
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 9,
+            "y": 4
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 9,
+          "orientation": "up",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 9
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 5,
+            "y": 5
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 10,
+          "orientation": "up",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 8,
+            "pips_b": 10
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 2
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 1,
+          "orientation": "down",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 2
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 9,
+            "y": 1
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 3,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 9
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 6,
+            "y": 8
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 10,
+          "orientation": "up",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 10
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 1
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 10,
+          "orientation": "up",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 9,
+            "y": 0
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 4,
+          "orientation": "right",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 4
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 5,
+            "y": 2
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "down",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 10
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 6,
+            "y": 0
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 3,
+          "orientation": "right",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 8
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 5,
+          "orientation": "up",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 10
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 11,
+            "y": 1
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "up",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 4
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 5,
+            "y": 1
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 8,
+          "orientation": "up",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 6,
+            "pips_b": 8
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 1
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 1,
+          "orientation": "left",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 1,
+            "pips_b": 3
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 8,
+            "y": 8
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 5,
+          "orientation": "down",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 5,
+            "pips_b": 5
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 7,
+            "y": 10
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 0,
+          "orientation": "up",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 5
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 11,
+            "y": 2
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 2
+          },
+          "who_laid_it": "david"
+        },
+        {
+          "coord": {
+            "x": 3,
+            "y": 0
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 3,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 8
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 10,
+            "y": 2
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 0,
+          "orientation": "down",
+          "player_name": "david",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 2
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 6,
+            "y": 10
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": 0,
+            "pips_b": 5
+          },
+          "next_pips": 4,
+          "orientation": "left",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 4
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 2,
+            "y": 0
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 3,
+          "orientation": "down",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 3
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 6,
+            "y": 2
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 0,
+          "orientation": "right",
+          "player_name": "skelterjohn",
+          "tile": {
+            "pips_a": 0,
+            "pips_b": 1
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 3,
+            "y": 1
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "right",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 3,
+            "pips_b": 6
+          },
+          "who_laid_it": "Xavier"
+        },
+        {
+          "coord": {
+            "x": 4,
+            "y": 3
+          },
+          "dead": true,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 2,
+          "orientation": "up",
+          "player_name": "TJ.Tice",
+          "tile": {
+            "pips_a": 2,
+            "pips_b": 6
+          },
+          "who_laid_it": "TJ.Tice"
+        },
+        {
+          "coord": {
+            "x": 4,
+            "y": 4
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 10,
+          "orientation": "left",
+          "player_name": "",
+          "tile": {
+            "pips_a": 10,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 3,
+            "y": 2
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 7,
+          "orientation": "down",
+          "player_name": "",
+          "tile": {
+            "pips_a": 7,
+            "pips_b": 10
+          },
+          "who_laid_it": "skelterjohn"
+        },
+        {
+          "coord": {
+            "x": 4,
+            "y": 10
+          },
+          "dead": false,
+          "indicated": {
+            "pips_a": -1,
+            "pips_b": -1
+          },
+          "next_pips": 6,
+          "orientation": "up",
+          "player_name": "Xavier",
+          "tile": {
+            "pips_a": 4,
+            "pips_b": 6
+          },
+          "who_laid_it": "Xavier"
+        }
+      ],
+      "player_lines": {
+        "TJ.Tice": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 5,
+              "y": 5
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 10,
+            "orientation": "up",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 10
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 5,
+              "y": 2
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "down",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 10
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 5,
+              "y": 1
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 8,
+            "orientation": "up",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 6,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 3,
+              "y": 0
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 3,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 2,
+              "y": 0
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 3,
+            "orientation": "down",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 3
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 3,
+              "y": 1
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "right",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 6
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 4,
+              "y": 3
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "up",
+            "player_name": "TJ.Tice",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 6
+            },
+            "who_laid_it": "TJ.Tice"
+          }
+        ],
+        "Xavier": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 5,
+              "y": 8
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "up",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 8
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 6,
+              "y": 8
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 10,
+            "orientation": "up",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 10
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 8
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 5,
+            "orientation": "up",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 10
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 8
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 5,
+            "orientation": "down",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 5
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 10
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 0,
+            "orientation": "up",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 5
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 6,
+              "y": 10
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": 0,
+              "pips_b": 5
+            },
+            "next_pips": 4,
+            "orientation": "left",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 4
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 4,
+              "y": 10
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 6,
+            "orientation": "up",
+            "player_name": "Xavier",
+            "tile": {
+              "pips_a": 4,
+              "pips_b": 6
+            },
+            "who_laid_it": "Xavier"
+          }
+        ],
+        "david": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 5
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 1,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 5
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 5,
+            "orientation": "right",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 5
+            },
+            "who_laid_it": "Xavier"
+          },
+          {
+            "coord": {
+              "x": 9,
+              "y": 4
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 9,
+            "orientation": "up",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 9
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 9,
+              "y": 1
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 3,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 9
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 9,
+              "y": 0
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 4,
+            "orientation": "right",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 4
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 11,
+              "y": 1
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "up",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 4
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 11,
+              "y": 2
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 2
+            },
+            "who_laid_it": "david"
+          },
+          {
+            "coord": {
+              "x": 10,
+              "y": 2
+            },
+            "dead": true,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 0,
+            "orientation": "down",
+            "player_name": "david",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 2
+            },
+            "who_laid_it": "skelterjohn"
+          }
+        ],
+        "skelterjohn": [
+          {
+            "coord": {
+              "x": 5,
+              "y": 6
+            },
+            "dead": false,
+            "indicated": null,
+            "next_pips": 8,
+            "orientation": "right",
+            "player_name": "",
+            "tile": {
+              "pips_a": 8,
+              "pips_b": 8
+            },
+            "who_laid_it": "TJ.Tice"
+          },
+          {
+            "coord": {
+              "x": 6,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 5,
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 5,
+              "pips_b": 8
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 4
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 2,
+            "orientation": "left",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 2,
+              "pips_b": 5
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 2
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 1,
+            "orientation": "down",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 2
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 8,
+              "y": 1
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 10,
+            "orientation": "up",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 6,
+              "y": 0
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 3,
+            "orientation": "right",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 3,
+              "pips_b": 10
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 7,
+              "y": 1
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 1,
+            "orientation": "left",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 1,
+              "pips_b": 3
+            },
+            "who_laid_it": "skelterjohn"
+          },
+          {
+            "coord": {
+              "x": 6,
+              "y": 2
+            },
+            "dead": false,
+            "indicated": {
+              "pips_a": -1,
+              "pips_b": -1
+            },
+            "next_pips": 0,
+            "orientation": "right",
+            "player_name": "skelterjohn",
+            "tile": {
+              "pips_a": 0,
+              "pips_b": 1
+            },
+            "who_laid_it": "skelterjohn"
+          }
+        ]
+      },
+      "spacer": null
+    }
+  ],
+  "turn": 3,
+  "version": 133
+}
