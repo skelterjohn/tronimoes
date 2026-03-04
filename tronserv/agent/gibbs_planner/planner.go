@@ -64,6 +64,9 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			maxDepth--
 		}
 		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, g.Players[g.Turn])
+		for _, m := range legalMoves {
+			m.NextPips = 0
+		}
 		// log.Printf("%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
 		moveCount += 1 // draw or pass

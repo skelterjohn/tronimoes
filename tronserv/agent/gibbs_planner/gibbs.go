@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
@@ -122,6 +123,8 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 			return types.Move{
 				LaidTile: m,
 			}
+		} else {
+			log.Printf("best %s != %s", bestMove, m.String())
 		}
 	}
 	for _, s := range legalSpacers {
@@ -136,7 +139,8 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 			Draw: true,
 		}
 	}
-	if bestMove == "pass" {
+	if strings.HasPrefix(bestMove, "pass") {
+		// TODO get selected
 		return types.Move{
 			Pass:     true,
 			Selected: types.RandomInitialFoot(g),

@@ -118,6 +118,7 @@ func main() {
 			if g.Players[g.Turn].Name == *name {
 				p := g.GetPlayer(ctx, *name)
 				m := a.GetMove(ctx, g, p)
+				log.Printf("Move: %+v", m)
 				if time.Since(lastMoveTime) < *minMoveTime {
 					// Always wait at least 3 seconds between moves, so
 					// as not to confuse the normies.
@@ -128,7 +129,7 @@ func main() {
 					g, err = tc.Draw(ctx)
 					if err != nil {
 						log.Printf("Could not draw: %v", err)
-						continue
+						return
 					}
 					log.Println("I just drew")
 					continue
@@ -137,7 +138,7 @@ func main() {
 					g, err = tc.Pass(ctx, m.Selected.X, m.Selected.Y)
 					if err != nil {
 						log.Printf("Could not pass: %v", err)
-						continue
+						return
 					}
 					log.Println("I passed")
 					continue
@@ -146,7 +147,7 @@ func main() {
 					g, err = tc.LayTile(ctx, m.LaidTile)
 					if err != nil {
 						log.Printf("Could not lay tile: %v", err)
-						continue
+						return
 					}
 					log.Printf("I laid %v", m.LaidTile)
 					continue
@@ -155,7 +156,7 @@ func main() {
 					g, err = tc.LaySpacer(ctx, m.Spacer)
 					if err != nil {
 						log.Printf("Could not lay spacer: %v", err)
-						continue
+						return
 					}
 					log.Printf("I placed a spacer: %v", m.Spacer)
 					continue
