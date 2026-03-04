@@ -16,7 +16,7 @@ const noop = () => {};
  * @param {{ a: { x: number, y: number }, b?: { x: number, y: number } }} [spacer] - Optional; spacer placement (Board shows Spacer at spacer.a)
  * @param {string} [className] - Optional extra classes for the board container
  */
-export default function RulesBoard({ height, tiles, roundLeader, lineHeads, activePlayer, chickenFeet = {}, chickenFeetURLs = {}, spacer, className = "" }) {
+export default function RulesBoard({ height, tiles, roundLeader, lineHeads, activePlayer, chickenFeet = {}, chickenFeetURLs = {}, spacer, indicated, className = "" }) {
 	const width = height - 1;
 
 	return (
@@ -37,7 +37,7 @@ export default function RulesBoard({ height, tiles, roundLeader, lineHeads, acti
 					clearSpacer={noop}
 					chickenFeet={chickenFeet}
 					chickenFeetURLs={chickenFeetURLs}
-					indicated={undefined}
+					indicated={indicated}
 					setIndicated={noop}
 					activePlayer={activePlayer}
 					hints={{}}

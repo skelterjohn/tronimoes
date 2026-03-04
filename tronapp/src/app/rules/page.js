@@ -493,6 +493,90 @@ const SECTIONS = [
 		),
 	},
 	{
+		title: "indicated tiles",
+		content: (openVisionQuest, chickenFoot) => (
+			<>
+				<p>
+					Sometimes the line you play on may be ambiguous. Tronimoes will guess, but if
+					you don't want to depend on its guess, you can "indicate" the tile you want to
+					play off by clicking it before making your move.
+				</p>
+				<p>
+					In this example, it's red's turn and they want to kill blue's line. However,
+					because both lines have a next-pips of 4, a tile played there would be legal
+					on both.
+				</p>
+				<p>
+					It would be disastrous if red played their tile on blue's line, dooming them
+					to line-death in the near future rather than winning the round. So, red may
+					"indicate" their own line by clicking on it before playing.
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 4, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
+						"4,1": { a: 5, b: 4, orientation: "right", color: "red", dead: false, last: true },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+					chickenFeet={{ "4,3": "blue" }}
+					chickenFeetURLs={{ "4,3": chickenFoot }}
+				/>
+				<p>
+					It would be disastrous if red played their tile on blue's line, dooming themselves
+					to line-death in the near future rather than winning the round. So, red may
+					"indicate" their own line by clicking on it before playing.
+				</p>
+				<p>
+					You can clear an indication by right-clicking.
+				</p>
+				<RulesBoard
+					key="rules-board-with-indicated"
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 4, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
+						"4,1": { a: 5, b: 4, orientation: "right", color: "red", dead: false, last: true },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "red" }}
+					chickenFeet={{ "4,3": "blue" }}
+					chickenFeetURLs={{ "4,3": chickenFoot }}
+					indicated={{ a: 5, b: 4 }}
+				/>
+				<RulesBoard
+					key="rules-board-with-indicated"
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 4, orientation: "up", color: "blue", dead: true },
+						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
+						"4,1": { a: 5, b: 4, orientation: "right", color: "red", dead: false },
+						"5,2": { a: 4, b: 6, orientation: "down", color: "red", dead: false },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={false}
+				/>
+			</>
+		),
+		contentIsFunction: true,
+	},
+	{
 		title: "moving a tile to the board",
 		content: (
 			<>
