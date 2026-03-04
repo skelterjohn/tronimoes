@@ -65,7 +65,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		}
 		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, g.Players[g.Turn])
 		for _, m := range legalMoves {
-			m.NextPips = 0
+			m.NextPips = -1
 		}
 		// log.Printf("%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
@@ -78,6 +78,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			if err := g.LayTile(ctx, g.Players[g.Turn].Name, move); err != nil {
 				return fmt.Errorf("laying: %w", err)
 			}
+			move.NextPips = -1
 			curNode = curNode.Next(move.String(), g.Turn, len(gp.hands))
 			nodesInSimulation = append(nodesInSimulation, curNode)
 		} else if whichMove == moveCount-1 {

@@ -778,7 +778,15 @@ func (lt *LaidTile) CoordB() Coord {
 }
 
 func (lt *LaidTile) String() string {
-	return fmt.Sprintf("{%d:%d %s-%s %d}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), lt.NextPips)
+	indicatedString := ""
+	if lt.Indicated != nil {
+		indicatedString = fmt.Sprintf(" i%d:%d", lt.Indicated.PipsA, lt.Indicated.PipsB)
+	}
+	nextPipsString := ""
+	if lt.NextPips >= 0 {
+		nextPipsString = fmt.Sprintf(" n%d", lt.NextPips)
+	}
+	return fmt.Sprintf("{%d:%d %s-%s%s%s}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), nextPipsString, indicatedString)
 }
 
 type Round struct {
@@ -839,6 +847,8 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 					Tile:        t,
 					Orientation: orientation,
 					Coord:       src,
+					NextPips:    -1,
+					Indicated:   nil,
 				}
 				if r.LayTile(ctx, g, name, lt, true) == nil {
 					legalMoves = append(legalMoves, lt)
@@ -918,6 +928,8 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 						Tile:        t,
 						Orientation: orientation,
 						Coord:       A,
+						NextPips:    -1,
+						Indicated:   nil,
 					}
 					if r.LayTile(ctx, g, name, lt, true) == nil {
 						legalMoves = append(legalMoves, lt)
