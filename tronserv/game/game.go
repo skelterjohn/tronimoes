@@ -1539,13 +1539,23 @@ func (r *Round) findOuroboros(ctx context.Context, g *Game, player *Player, lt *
 
 	if len(consumed) > 0 {
 		if lt.PlayerName != "" {
-			consumed = append(consumed, fmt.Sprintf("%s-1", lt.PlayerName))
+			consumed = append(consumed, lt.PlayerName)
 		}
+
+		consumedNotes := []string{}
+		for _, n := range consumed {
+			if n == player.Name {
+				consumedNotes = append(consumedNotes, n)
+			} else {
+				consumedNotes = append(consumedNotes, fmt.Sprintf("%s-1", n))
+			}
+		}
+
 		freeLineNote := ""
 		if freeLines > 0 {
 			freeLineNote = fmt.Sprintf("%d free line(s)", freeLines)
 		}
-		g.Note(ctx, fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", player.Name, len(consumed), strings.Join(append(consumed, freeLineNote), ", ")))
+		g.Note(ctx, fmt.Sprintf("%s's+%d IL OUROBOROS consumes %s", player.Name, len(consumed), strings.Join(append(consumedNotes, freeLineNote), ", ")))
 		for _, n := range consumed {
 			op := g.GetPlayer(ctx, n)
 			op.Dead = true
