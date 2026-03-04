@@ -102,4 +102,15 @@ func TestPlayfoot(t *testing.T) {
 	testLegalMovesContains(t, game, []*LaidTile{
 		{Tile: &Tile{PipsA: 0, PipsB: 7}, Coord: Coord{X: 1, Y: 2}, Orientation: "right"},
 	}, []*Spacer{})
+
+	err := game.LayTile(t.Context(), "TJ.Tice", &LaidTile{
+		Tile:        &Tile{PipsA: 0, PipsB: 7},
+		Coord:       Coord{X: 1, Y: 2},
+		Orientation: "right",
+		PlayerName:  "TJ.Tice",
+		Indicated:   &Tile{PipsA: 2, PipsB: 6},
+	})
+	if err != nil {
+		t.Fatalf("error laying tile: %v", err)
+	}
 }

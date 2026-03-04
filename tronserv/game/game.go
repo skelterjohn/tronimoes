@@ -535,8 +535,12 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 	tile.WhoLaidIt = name
 	if err := round.LayTile(ctx, g, name, tile, false); err != nil {
 		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
-			// try it with the indicated tile
+			// try it without the indicated tile
 			tile.Indicated = nil
+			if err := round.LayTile(ctx, g, name, tile, false); err == nil {
+				return nil
+			}
+			// try it reversed
 			rt := tile.Reverse()
 			if reverseErr := round.LayTile(ctx, g, name, rt, false); reverseErr != nil {
 				log.Printf("error with the reverse: %v", reverseErr)
