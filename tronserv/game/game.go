@@ -779,14 +779,10 @@ func (lt *LaidTile) CoordB() Coord {
 
 func (lt *LaidTile) String() string {
 	indicatedString := ""
-	if lt.Indicated != nil {
+	if lt.Indicated != nil && lt.Indicated.PipsA != -1 && lt.Indicated.PipsB != -1 {
 		indicatedString = fmt.Sprintf(" i%d:%d", lt.Indicated.PipsA, lt.Indicated.PipsB)
 	}
-	nextPipsString := ""
-	if lt.NextPips >= 0 {
-		nextPipsString = fmt.Sprintf(" n%d", lt.NextPips)
-	}
-	return fmt.Sprintf("{%d:%d %s-%s%s%s}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), nextPipsString, indicatedString)
+	return fmt.Sprintf("{%d:%d %s-%s%s}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), indicatedString)
 }
 
 type Round struct {
