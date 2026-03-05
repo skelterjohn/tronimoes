@@ -506,11 +506,6 @@ const SECTIONS = [
 					because both lines have a next-pips of 4, a tile played there would be legal
 					on both.
 				</p>
-				<p>
-					It would be disastrous if red played their tile on blue's line, dooming them
-					to line-death in the near future rather than winning the round. So, red may
-					"indicate" their own line by clicking on it before playing.
-				</p>
 				<RulesBoard
 					height={7}
 					tiles={{
@@ -530,8 +525,28 @@ const SECTIONS = [
 				/>
 				<p>
 					It would be disastrous if red played their tile on blue's line, dooming themselves
-					to line-death in the near future rather than winning the round. So, red may
-					"indicate" their own line by clicking on it before playing.
+					to line-death in the near future rather than winning the round.
+				</p>
+				<RulesBoard
+					height={7}
+					tiles={{
+						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
+						"2,2": { a: 3, b: 5, orientation: "up", color: "red", dead: false },
+						"4,3": { a: 3, b: 4, orientation: "up", color: "blue", dead: false },
+						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
+						"4,1": { a: 5, b: 4, orientation: "right", color: "red", dead: false },
+						"5,2": { a: 4, b: 6, orientation: "down", color: "blue", dead: false, last: true },
+					}}
+					roundLeader={{ pips_a: 3, pips_b: 3 }}
+					lineHeads={[
+						{ tile: { pips_a: 3, pips_b: 3 }, coord: { x: 2, y: 3 } },
+					]}
+					activePlayer={{ color: "blue" }}
+					chickenFeet={{ "5,2": "blue" }}
+					chickenFeetURLs={{ "5,2": chickenFoot }}
+				/>
+				<p>
+					So, red may "indicate" their own line by clicking on it before playing.
 				</p>
 				<p>
 					You can clear an indication by right-clicking.
@@ -556,7 +571,6 @@ const SECTIONS = [
 					indicated={{ a: 5, b: 4 }}
 				/>
 				<RulesBoard
-					key="rules-board-with-indicated"
 					height={7}
 					tiles={{
 						"2,3": { a: 3, b: 3, orientation: "right", color: "white", dead: false },
@@ -564,7 +578,7 @@ const SECTIONS = [
 						"4,3": { a: 3, b: 4, orientation: "up", color: "blue", dead: true },
 						"3,1": { a: 5, b: 5, orientation: "up", color: "red", dead: false },
 						"4,1": { a: 5, b: 4, orientation: "right", color: "red", dead: false },
-						"5,2": { a: 4, b: 6, orientation: "down", color: "red", dead: false },
+						"5,2": { a: 4, b: 6, orientation: "down", color: "red", dead: false, last: true },
 					}}
 					roundLeader={{ pips_a: 3, pips_b: 3 }}
 					lineHeads={[
