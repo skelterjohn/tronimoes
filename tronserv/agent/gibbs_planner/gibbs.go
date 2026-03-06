@@ -32,6 +32,7 @@ type GibbsPlanner struct {
 	MaxSimulationTime     time.Duration
 	MaxSimulationDepth    int
 	MaxSimulationsPerMove int
+	EvalDecay             float64
 
 	lastGame      *game.Game
 	bag           []game.Tile
@@ -115,16 +116,33 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	if err != nil {
 		log.Printf("error choosing best move: %v", err)
 	} else {
-		log.Printf("best move: %s", bestMove)
+		log.Printf("best move: %s %v", bestMove, root.Moves[bestMove].Eval)
 	}
 
+	if bestMove == "draw" {
+		return types.Move{
+			Draw: true,
+		}
+	}
+	if strings.HasPrefix(bestMove, "pass") {
+		rest := bestMove[4:]
+		var x, y int
+		if _, err := fmt.Sscanf(rest, "(%d,%d)", &x, &y); err == nil {
+			return types.Move{
+				Pass:     true,
+				Selected: game.Coord{X: x, Y: y},
+			}
+		}
+		return types.Move{
+			Pass:     true,
+			Selected: types.RandomInitialFoot(g),
+		}
+	}
 	for _, m := range legalMoves {
 		if m.String() == bestMove {
 			return types.Move{
 				LaidTile: m,
 			}
-		} else {
-			log.Printf("best %s != %s", bestMove, m.String())
 		}
 	}
 	for _, s := range legalSpacers {
@@ -132,18 +150,6 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 			return types.Move{
 				Spacer: s,
 			}
-		}
-	}
-	if bestMove == "draw" {
-		return types.Move{
-			Draw: true,
-		}
-	}
-	if strings.HasPrefix(bestMove, "pass") {
-		// TODO get selected
-		return types.Move{
-			Pass:     true,
-			Selected: types.RandomInitialFoot(g),
 		}
 	}
 

@@ -80,8 +80,9 @@ func main() {
 		a = &gibbs_planner.GibbsPlanner{
 			Name:               *name,
 			MaxInferenceTime:   1 * time.Second,
-			MaxSimulationTime:  1 * time.Second,
-			MaxSimulationDepth: 30,
+			MaxSimulationTime:  5 * time.Second,
+			MaxSimulationDepth: 50,
+			EvalDecay:          0.9,
 		}
 	default:
 		log.Fatalf("Unknown agent: %s", *which)

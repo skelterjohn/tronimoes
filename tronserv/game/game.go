@@ -3,7 +3,6 @@ package game
 import (
 	"context"
 	"fmt"
-	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -153,7 +152,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 		}
 		if !p.Ready {
 			allReady = false
-			log.Printf("%s is not ready", p.Name)
+			dbg("%s is not ready", p.Name)
 		}
 	}
 
@@ -198,7 +197,6 @@ func (g *Game) Start(ctx context.Context, name string) error {
 
 	switch g.Code[:6] {
 	case "AAAAAA":
-		log.Print("secret code")
 		g.Bag = []*Tile{{
 			PipsA: 1, PipsB: 1,
 		}, {
@@ -236,7 +234,6 @@ func (g *Game) Start(ctx context.Context, name string) error {
 			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
 		}
 	case "BBBBBB":
-		log.Print("secret code")
 		g.Bag = []*Tile{{
 			PipsA: 0, PipsB: 0,
 		}, {
@@ -273,7 +270,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 				if !p.HasRoundLeader(potentialLeader) {
 					continue
 				}
-				log.Printf("%s is the round leader", p.Name)
+				dbg("%s is the round leader", p.Name)
 				foundLeader = true
 				g.Turn = i
 				break
@@ -289,7 +286,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 			if len(g.Bag) == 0 {
 				return ErrEmptyBag
 			}
-			log.Printf("%s got %v from the bag", p.Name, g.Bag[0])
+			dbg("%s got %v from the bag", p.Name, g.Bag[0])
 			p.Hand = append(p.Hand, g.Bag[0])
 			g.Bag = g.Bag[1:]
 		}
@@ -419,7 +416,7 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 
 func (g *Game) Note(ctx context.Context, n string) {
 	g.History = append(g.History, n)
-	log.Print(n)
+	dbg(n)
 }
 
 func (g *Game) CurrentRound(ctx context.Context) *Round {
@@ -543,7 +540,7 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 			// try it reversed
 			rt := tile.Reverse()
 			if reverseErr := round.LayTile(ctx, g, name, rt, false); reverseErr != nil {
-				log.Printf("error with the reverse: %v", reverseErr)
+				dbg("error with the reverse: %v", reverseErr)
 				return err
 			}
 			tile = rt
@@ -1699,34 +1696,21 @@ func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]
 		playersToSatisfy = append(playersToSatisfy, p)
 	}
 
-	// depth := 0
-	// l := func(fmt string, items ...any) {
-	// 	prefix := strings.Repeat(" ", depth)
-	// 	log.Printf(prefix+fmt, items...)
-	// }
-
 	// returns true if the player can be satisfied.
 	var recursiveEnsurePlayersOK func(playersLeft []*Player, prevBlocks map[Coord]bool, lt *LaidTile) bool
 	recursiveEnsurePlayersOK = func(playersLeft []*Player, prevBlocks map[Coord]bool, lt *LaidTile) bool {
-		// l("dropping %s:%s for %s", lt.CoordA(), lt.CoordB(), lt.PlayerName)
-
-		// depth += 1
-		// defer func() { depth -= 1 }()
 
 		if len(playersLeft) == 0 {
-			// l("looks good")
 			return true
 		}
 
 		p := playersLeft[0]
-		// l("considering player %s", p.Name)
 		// Definitely not on someone else's reserved foot.
 		for op, coord := range playerChickenFeetCoords {
 			if op == lt.PlayerName {
 				continue
 			}
 			if coord == lt.CoordA() || coord == lt.CoordB() {
-				// l("on %s's foot", op)
 				return false
 			}
 		}
@@ -1745,22 +1729,17 @@ func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]
 			return !blocks[src]
 		}
 		checkCoord := func(src Coord, orientations []string) (bool, bool) {
-			// l("checking coord A %d,%d", x, y)
 			if !isOpen(src) {
-				// l("%s A-blocked at %d,%d", p.Name, x, y)
 				return false, false
 			}
 			possibilities := allFrom(src, orientations)
 			canFitMyself := false
 			for _, pos := range possibilities {
 				pos.PlayerName = p.Name
-				// l("checking coord B %s", pos.CoordB())
 				if !isOpen(pos.CoordB()) {
-					// l("%s B-blocked at %s:%s", p.Name, pos.CoordA(), pos.CoordB())
 					continue
 				}
 				canFitMyself = true
-				// l("trying %s:%s with %v", pos.CoordA(), pos.CoordB(), playersLeft[1:])
 				if recursiveEnsurePlayersOK(playersLeft[1:], blocks, pos) {
 					return true, canFitMyself
 				}

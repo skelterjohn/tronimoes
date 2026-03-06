@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 
@@ -27,7 +26,7 @@ func NewPlanNode(turn int, count int) *PlanNode {
 }
 
 func (n *PlanNode) Next(move string, turn, count int) *PlanNode {
-	// log.Printf("Next %s", move)
+	// fmt.Printf("Next %s\n", move)
 	nextNode, ok := n.Moves[move]
 	if !ok {
 		nextNode = NewPlanNode(turn, count)
@@ -56,6 +55,8 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	nodesInSimulation := []*PlanNode{root}
 	r := g.CurrentRound(ctx)
 
+	// fmt.Printf("Simulating game at depth %d\n", maxDepth)
+
 	for !r.Done && maxDepth > 0 {
 		select {
 		case <-ctx.Done():
@@ -71,6 +72,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		moveCount := len(legalMoves) + len(legalSpacers)
 		moveCount += 1 // draw or pass
 		whichMove := rand.Intn(moveCount)
+		// fmt.Printf("count: %d\n", moveCount)
 		// log.Printf("whichMove: %d", whichMove)
 		if whichMove < len(legalMoves) {
 			move := legalMoves[whichMove]
@@ -117,7 +119,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	for i := range lastNode.Eval {
 		lastNode.Eval[i] = float64(g.Players[i].Score)
 	}
-	log.Printf("lastNode.Eval: %v", lastNode.Eval)
+	// log.Printf("lastNode.Eval: %v", lastNode.Eval)
 
 	// For every node, we assume that the player is maximizing their own score.
 	// This is myopic to the round, missing outcomes that might win the game. Alas.
@@ -127,8 +129,11 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		if err != nil {
 			return fmt.Errorf("choosing best move: %w", err)
 		}
-		cur.Eval = cur.Moves[bestMove].Eval
-		log.Printf("propagated eval: %v", cur.Eval)
+		bestEval := cur.Moves[bestMove].Eval
+		for i, be := range bestEval {
+			cur.Eval[i] = gp.EvalDecay*be + (1-gp.EvalDecay)*cur.Eval[i]
+		}
+		// fmt.Printf("propagated eval: %s\t%v\n", bestMove, cur.Eval)
 	}
 	return nil
 }
