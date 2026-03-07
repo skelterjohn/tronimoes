@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -35,7 +34,7 @@ func TestOneshot(t *testing.T) {
 		MaxInferenceTime:   1 * time.Second,
 		MaxSimulationTime:  1 * time.Second,
 		MaxSimulationDepth: 4,
-		EvalDecay:          0.9,
+		ValueDecay:         0.9,
 	}
 
 	// Previous game has no rounds so Update runs createInitialGuesses.
@@ -47,18 +46,17 @@ func TestOneshot(t *testing.T) {
 	gp.Update(ctx, previousGame, g)
 
 	move := gp.GetMove(ctx, g, currentPlayer)
-	expectedMove := types.Move{
-		LaidTile: &game.LaidTile{
-			Tile: &game.Tile{
-				PipsA: 3,
-				PipsB: 4,
-			},
-			Coord:       game.Coord{X: 3, Y: 2},
-			Orientation: "down",
-			Indicated:   nil,
-		},
+	if move.LaidTile == nil {
+		t.Fatalf("Did not play a one-shot: %s", move)
 	}
-	if move.String() != expectedMove.String() {
-		t.Errorf("wrong move: got %s != want %s", move, expectedMove)
+
+	move.LaidTile.PlayerName = currentPlayer.Name
+	if err := g.LayTile(ctx, currentPlayer.Name, move.LaidTile); err != nil {
+		t.Fatalf("could not lay tile: %v", err)
 	}
+
+	if r := g.CurrentRound(ctx); r != nil {
+		t.Fatalf("Round is not done after move: %s", move)
+	}
+
 }

@@ -15,6 +15,8 @@ type PlanNode struct {
 	Turn  int
 	Moves map[string]*PlanNode
 	Eval  []float64
+	R     []float64
+	V     []float64
 }
 
 func NewPlanNode(turn int, count int) *PlanNode {
@@ -22,6 +24,8 @@ func NewPlanNode(turn int, count int) *PlanNode {
 		Turn:  turn,
 		Moves: make(map[string]*PlanNode),
 		Eval:  make([]float64, count),
+		R:     make([]float64, count),
+		V:     make([]float64, count),
 	}
 }
 
@@ -37,11 +41,11 @@ func (n *PlanNode) Next(move string, turn, count int) *PlanNode {
 
 func (n *PlanNode) ChooseBestMove(ctx context.Context) (string, error) {
 	bestMove := ""
-	bestEval := -math.MaxFloat64
+	bestV := -math.MaxFloat64
 	for move, next := range n.Moves {
-		nextEval := next.Eval[n.Turn]
-		if nextEval > bestEval {
-			bestEval = nextEval
+		nextV := next.V[n.Turn]
+		if nextV > bestV {
+			bestV = nextV
 			bestMove = move
 		}
 	}
@@ -55,7 +59,10 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	nodesInSimulation := []*PlanNode{root}
 	r := g.CurrentRound(ctx)
 
-	// fmt.Printf("Simulating game at depth %d\n", maxDepth)
+	for i := range root.Eval {
+		root.Eval[i] = float64(g.Players[i].Score)
+	}
+	fmt.Printf("Simulating game at depth %d\n", maxDepth)
 
 	for !r.Done && maxDepth > 0 {
 		select {
@@ -74,6 +81,10 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		whichMove := rand.Intn(moveCount)
 		// fmt.Printf("count: %d\n", moveCount)
 		// log.Printf("whichMove: %d", whichMove)
+
+		var nextNode *PlanNode
+		var bestMove string
+
 		if whichMove < len(legalMoves) {
 			move := legalMoves[whichMove]
 			move.PlayerName = g.Players[g.Turn].Name
@@ -81,32 +92,43 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 				return fmt.Errorf("laying: %w", err)
 			}
 			move.NextPips = -1
-			curNode = curNode.Next(move.String(), g.Turn, len(gp.hands))
-			nodesInSimulation = append(nodesInSimulation, curNode)
+			bestMove = move.String()
 		} else if whichMove == moveCount-1 {
 			if !g.Players[g.Turn].JustDrew {
 				if !g.DrawTile(ctx, g.Players[g.Turn].Name) {
 					return errors.New("drawing failed")
 				}
-				curNode = curNode.Next("draw", g.Turn, len(gp.hands))
-				nodesInSimulation = append(nodesInSimulation, curNode)
+				bestMove = "draw"
 			} else {
 				cfSelection := types.RandomInitialFoot(g)
 				if err := g.Pass(ctx, g.Players[g.Turn].Name, cfSelection.X, cfSelection.Y); err != nil {
 					return fmt.Errorf("passing: %w", err)
 				}
-				move := fmt.Sprintf("pass(%d,%d)", cfSelection.X, cfSelection.Y)
-				curNode = curNode.Next(move, g.Turn, len(gp.hands))
-				nodesInSimulation = append(nodesInSimulation, curNode)
+				bestMove = fmt.Sprintf("pass(%d,%d)", cfSelection.X, cfSelection.Y)
 			}
 		} else {
 			spacer := legalSpacers[whichMove-len(legalMoves)]
 			if err := g.LaySpacer(ctx, g.Players[g.Turn].Name, spacer); err != nil {
 				return fmt.Errorf("spacing: %w", err)
 			}
-			curNode = curNode.Next(spacer.String(), g.Turn, len(gp.hands))
-			nodesInSimulation = append(nodesInSimulation, curNode)
+			bestMove = spacer.String()
 		}
+
+		// fmt.Printf("%d -> %s\n", curNode.Turn, bestMove)
+
+		nextNode = curNode.Next(bestMove, g.Turn, len(gp.hands))
+		nextNode.Eval = make([]float64, len(gp.hands))
+		for i := range nextNode.Eval {
+			nextNode.Eval[i] = float64(g.Players[i].Score)
+		}
+		nextNode.R = make([]float64, len(gp.hands))
+		for i := range nextNode.R {
+			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i]
+		}
+		// fmt.Printf("E: %v\n", nextNode.Eval)
+		// fmt.Printf("  R: %v\n", nextNode.R)
+		nodesInSimulation = append(nodesInSimulation, nextNode)
+		curNode = nextNode
 	}
 
 	// The rest is fast so we still do it if we ran out of time.
@@ -114,26 +136,39 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	// Now that we've simulated a random game, let's backprop its eval.
 
 	// First we start with the score at the end of this simulation.
-	lastNode := nodesInSimulation[len(nodesInSimulation)-1]
-	lastNode.Eval = make([]float64, len(gp.hands))
-	for i := range lastNode.Eval {
-		lastNode.Eval[i] = float64(g.Players[i].Score)
+
+	// for i, n := range nodesInSimulation {
+	// 	fmt.Printf("%d: p%d\n", i, n.Turn)
+	// 	fmt.Printf("   V: %v\n", n.V)
+	// 	fmt.Printf("   R: %v\n", n.R)
+	// }
+
+	// lastNode := nodesInSimulation[len(nodesInSimulation)-1]
+	curNode.Eval = make([]float64, len(gp.hands))
+	for i := range curNode.Eval {
+		curNode.Eval[i] = float64(g.Players[i].Score)
 	}
-	// log.Printf("lastNode.Eval: %v", lastNode.Eval)
+	// fmt.Printf("last V: %v\n", curNode.V)
+	// fmt.Printf("last R: %v\n", curNode.R)
 
 	// For every node, we assume that the player is maximizing their own score.
 	// This is myopic to the round, missing outcomes that might win the game. Alas.
-	for i := len(nodesInSimulation) - 2; i >= 0; i-- {
+	for i := len(nodesInSimulation) - 1; i >= 0; i-- {
 		cur := nodesInSimulation[i]
 		bestMove, err := cur.ChooseBestMove(ctx)
 		if err != nil {
 			return fmt.Errorf("choosing best move: %w", err)
 		}
-		bestEval := cur.Moves[bestMove].Eval
-		for i, be := range bestEval {
-			cur.Eval[i] = gp.EvalDecay*be + (1-gp.EvalDecay)*cur.Eval[i]
+		bestNode := cur.Moves[bestMove]
+		if bestNode == nil {
+			copy(cur.V, cur.R)
+			continue
 		}
-		// fmt.Printf("propagated eval: %s\t%v\n", bestMove, cur.Eval)
+		bestV := bestNode.V
+		for i, bv := range bestV {
+			cur.V[i] = gp.ValueDecay*bv + cur.R[i]
+		}
+		// fmt.Printf("prop V: %v\n", cur.V)
 	}
 	return nil
 }

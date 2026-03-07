@@ -32,7 +32,7 @@ type GibbsPlanner struct {
 	MaxSimulationTime     time.Duration
 	MaxSimulationDepth    int
 	MaxSimulationsPerMove int
-	EvalDecay             float64
+	ValueDecay            float64
 
 	lastGame      *game.Game
 	bag           []game.Tile
@@ -116,7 +116,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	if err != nil {
 		log.Printf("error choosing best move: %v", err)
 	} else {
-		log.Printf("best move: %s %v", bestMove, root.Moves[bestMove].Eval)
+		log.Printf("best move: %s %v", bestMove, root.Moves[bestMove].V)
 	}
 
 	if bestMove == "draw" {
