@@ -10,10 +10,10 @@ These JSON files are the same format as `tronserv/game/testdata`: serialized `ga
 
 Used by `TestOneshot` in `gibbs_test.go`:
 
-- **Scenario:** Current player can win the round in one move (play a tile that empties their hand and ends the round).
+- **Scenario:** Current player can win the round in one move by playing a tile that **kills** the opponent’s line. A line is dead when it has no more playable moves (the head has no open adjacent cell that can take a matching tile).
 - **Assertions:** `GetMove` returns a lay (not pass); after applying that move with `g.LayTile`, `g.CurrentRound(ctx)` is nil (round is done).
 
-So this file is a mid-round game state where `g.Players[g.Turn]` has a winning play available.
+So this file is a mid-round game state where `g.Players[g.Turn]` has a winning play: a lay that cuts off the opponent’s line and ends the round.
 
 ## Adding new testdata
 
