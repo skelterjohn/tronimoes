@@ -83,6 +83,7 @@ func main() {
 			MaxSimulationTime:  5 * time.Second,
 			MaxSimulationDepth: 50,
 			ValueDecay:         0.9,
+			OptimismBonus:      0.1,
 		}
 	default:
 		log.Fatalf("Unknown agent: %s", *which)

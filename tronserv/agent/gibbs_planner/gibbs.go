@@ -33,6 +33,7 @@ type GibbsPlanner struct {
 	MaxSimulationDepth    int
 	MaxSimulationsPerMove int
 	ValueDecay            float64
+	OptimismBonus         float64
 
 	lastGame      *game.Game
 	bag           []game.Tile

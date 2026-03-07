@@ -123,7 +123,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		}
 		nextNode.R = make([]float64, len(gp.hands))
 		for i := range nextNode.R {
-			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i]
+			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i] + gp.OptimismBonus
 		}
 		// fmt.Printf("E: %v\n", nextNode.Eval)
 		// fmt.Printf("  R: %v\n", nextNode.R)
