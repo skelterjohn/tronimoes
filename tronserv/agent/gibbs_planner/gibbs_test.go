@@ -24,6 +24,7 @@ func loadGameFromTestdata(t *testing.T, label string) *game.Game {
 }
 
 func TestOneshot(t *testing.T) {
+	t.Parallel()
 	g := loadGameFromTestdata(t, "oneshot")
 	ctx := t.Context()
 
@@ -58,6 +59,50 @@ func TestOneshot(t *testing.T) {
 
 	if r := g.CurrentRound(ctx); r != nil {
 		t.Fatalf("Round is not done after move: %s", move)
+	}
+
+}
+
+func TestNoSelfKill(t *testing.T) {
+	t.Parallel()
+	g := loadGameFromTestdata(t, "noselfkill")
+	ctx := t.Context()
+
+	currentPlayer := g.Players[g.Turn]
+	gp := &GibbsPlanner{
+		Name:               currentPlayer.Name,
+		MaxInferenceTime:   1 * time.Second,
+		MaxSimulationTime:  1 * time.Second,
+		MaxSimulationDepth: 4,
+		ValueDecay:         0.9,
+		OptimismBonus:      0.1,
+	}
+
+	previousGame := &game.Game{
+		Players: g.Players,
+		MaxPips: g.MaxPips,
+	}
+
+	gp.Update(ctx, previousGame, g)
+
+	move := gp.GetMove(ctx, g, currentPlayer)
+	if move.LaidTile == nil && !move.Draw {
+		t.Fatalf("Did not play a tile or draw a tile: %s", move)
+	}
+
+	if move.LaidTile != nil {
+		move.LaidTile.PlayerName = currentPlayer.Name
+		if err := g.LayTile(ctx, currentPlayer.Name, move.LaidTile); err != nil {
+			t.Fatalf("could not lay tile: %v", err)
+		}
+	} else if move.Draw {
+		if !g.DrawTile(ctx, currentPlayer.Name) {
+			t.Fatal("could not draw tile")
+		}
+	}
+
+	if r := g.CurrentRound(ctx); r == nil {
+		t.Fatalf("Round is done after move (player killed own line): %s", move)
 	}
 
 }
