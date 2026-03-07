@@ -36,7 +36,6 @@ func TestOneshot(t *testing.T) {
 		MaxSimulationTime:  1 * time.Second,
 		MaxSimulationDepth: 4,
 		ValueDecay:         0.9,
-		OptimismBonus:      0.1,
 	}
 
 	// Previous game has no rounds so Update runs createInitialGuesses.
@@ -75,7 +74,6 @@ func TestNoSelfKill(t *testing.T) {
 		MaxSimulationTime:  1 * time.Second,
 		MaxSimulationDepth: 4,
 		ValueDecay:         0.9,
-		OptimismBonus:      0.1,
 	}
 
 	previousGame := &game.Game{

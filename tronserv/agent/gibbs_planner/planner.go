@@ -17,6 +17,7 @@ type PlanNode struct {
 	Eval  []float64
 	R     []float64
 	V     []float64
+	H     []float64
 }
 
 func NewPlanNode(turn int, count int) *PlanNode {
@@ -26,6 +27,7 @@ func NewPlanNode(turn int, count int) *PlanNode {
 		Eval:  make([]float64, count),
 		R:     make([]float64, count),
 		V:     make([]float64, count),
+		H:     make([]float64, count),
 	}
 }
 
@@ -123,7 +125,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		}
 		nextNode.R = make([]float64, len(gp.hands))
 		for i := range nextNode.R {
-			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i] + gp.OptimismBonus
+			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i]
 		}
 		// fmt.Printf("E: %v\n", nextNode.Eval)
 		// fmt.Printf("  R: %v\n", nextNode.R)
@@ -131,6 +133,9 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		curNode = nextNode
 	}
 
+	if !r.Done {
+		curNode.H = gp.Heuristic(ctx, g, root)
+	}
 	// The rest is fast so we still do it if we ran out of time.
 
 	// Now that we've simulated a random game, let's backprop its eval.
@@ -166,7 +171,8 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		}
 		bestV := bestNode.V
 		for i, bv := range bestV {
-			cur.V[i] = gp.ValueDecay*bv + cur.R[i]
+			vh := bestNode.H[i] + bv
+			cur.V[i] = gp.ValueDecay*vh + cur.R[i]
 		}
 		// fmt.Printf("prop V: %v\n", cur.V)
 	}
