@@ -62,7 +62,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	for i := range root.Eval {
 		root.Eval[i] = float64(g.Players[i].Score)
 	}
-	fmt.Printf("Simulating game at depth %d\n", maxDepth)
+	// fmt.Printf("Simulating game at depth %d\n", maxDepth)
 
 	for !r.Done && maxDepth > 0 {
 		select {

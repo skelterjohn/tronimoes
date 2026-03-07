@@ -114,6 +114,7 @@ func main() {
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
 			if g.Players[g.Turn].Name == *name {
 				log.Printf("It's my turn")
+				log.Printf(" %v", g.Players[g.Turn].Hand)
 			} else {
 				log.Printf("It's %s's turn", g.Players[g.Turn].Name)
 			}
