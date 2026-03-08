@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,6 +17,7 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/agent/gibbs_planner"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/client"
+	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
 var (
@@ -23,6 +27,7 @@ var (
 	which         = flag.String("which", "random", "which agent to use: random, gibbs")
 	minMoveTime   = flag.Duration("min-move-time", 3*time.Second, "minimum time between moves")
 	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
+	archive       = flag.String("archive", "", "directory to save JSON game state and chosen move per turn; empty = don't save")
 )
 
 type AgentRoundTripper struct {
@@ -61,6 +66,11 @@ func main() {
 	}
 
 	log.Printf("Starting %s agent %s, connecting to %s for game %s", *which, *name, *tronserv_addr, *gamecode)
+	if *archive != "" {
+		if err := os.MkdirAll(*archive, 0755); err != nil {
+			log.Fatalf("save-dir: %v", err)
+		}
+	}
 
 	g, err := tc.JoinGame(ctx, *gamecode)
 	if err != nil {
@@ -121,6 +131,18 @@ func main() {
 				p := g.GetPlayer(ctx, *name)
 				m := a.GetMove(ctx, g, p)
 				log.Printf("Move: %+v", m)
+				if *archive != "" {
+					path := filepath.Join(*archive, fmt.Sprintf("%s_%d.json", g.Code, g.Version))
+					blob, err := json.MarshalIndent(struct {
+						Game *game.Game `json:"game"`
+						Move types.Move `json:"move"`
+					}{Game: g, Move: m}, "", "  ")
+					if err != nil {
+						log.Printf("save marshal: %v", err)
+					} else if err := os.WriteFile(path, blob, 0644); err != nil {
+						log.Printf("save %s: %v", path, err)
+					}
+				}
 				if time.Since(lastMoveTime) < *minMoveTime {
 					// Always wait at least 3 seconds between moves, so
 					// as not to confuse the normies.
