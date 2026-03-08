@@ -12,13 +12,14 @@ import (
 )
 
 type PlanNode struct {
-	Depth int
-	Turn  int
-	Moves map[string]*PlanNode
-	Eval  []float64
-	R     []float64
-	V     []float64
-	H     []float64
+	Depth   int
+	Visited int
+	Turn    int
+	Moves   map[string]*PlanNode
+	Eval    []float64
+	R       []float64
+	V       []float64
+	H       []float64
 }
 
 func NewPlanNode(turn int, count int, depth int) *PlanNode {
@@ -171,6 +172,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	}
 
 	for i, n := range nodesInSimulation {
+		n.Visited++
 		game.Debug(ctx, "%d: p%d @ %d", i, n.Turn, n.Depth)
 		game.Debug(ctx, "   V: %v", n.V)
 		game.Debug(ctx, "   R: %v", n.R)
