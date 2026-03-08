@@ -43,7 +43,7 @@ func loadGame(testdataDir, label string) (*game.Game, error) {
 	return &g, nil
 }
 
-func runCase(ctx context.Context, testdataDir string, tc TestCase) (success bool, message string) {
+func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulationsPerMove int) (success bool, message string) {
 	g, err := loadGame(testdataDir, tc.Label)
 	if err != nil {
 		return false, err.Error()
@@ -52,11 +52,12 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase) (success bool
 	currentPlayer := g.Players[g.Turn]
 
 	gp := &gibbs_planner.GibbsPlanner{
-		Name:               currentPlayer.Name,
-		MaxInferenceTime:   1 * time.Second,
-		MaxSimulationTime:  1 * time.Second,
-		MaxSimulationDepth: 4,
-		ValueDecay:         0.9,
+		Name:                  currentPlayer.Name,
+		MaxInferenceTime:      1 * time.Second,
+		MaxSimulationTime:     1 * time.Second,
+		MaxSimulationDepth:    4,
+		MaxSimulationsPerMove: maxSimulationsPerMove,
+		ValueDecay:            0.9,
 	}
 
 	previousGame := &game.Game{
@@ -106,6 +107,7 @@ func main() {
 	concurrencyFlag := flag.Int("concurrency", 1, "run this many tests at a time")
 	logDirFlag := flag.String("logdir", "evaluate_logs", "directory for run logs; a timestamped subdir (YYYYMMDD_HHMMSS) is created under it")
 	logFailOnlyFlag := flag.Bool("logfail", true, "only write log files for failed test runs")
+	maxSimFlag := flag.Int("maxsim", 0, "max simulations per move (0 = no limit)")
 	flag.Parse()
 
 	testdataDir := "testdata"
@@ -238,7 +240,7 @@ func main() {
 			startTime := time.Now()
 			runCtx := game.WithLogBuffer(ctx, &logBuf)
 			runCtx = game.WithLogStart(runCtx, startTime)
-			ok, msg := runCase(runCtx, testdataDir, j.tc)
+			ok, msg := runCase(runCtx, testdataDir, j.tc, *maxSimFlag)
 			verdict := "OK"
 			if !ok {
 				verdict = "FAIL"

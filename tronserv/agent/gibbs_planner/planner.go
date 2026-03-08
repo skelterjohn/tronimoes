@@ -90,6 +90,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		if whichMove < len(legalMoves) {
 			move := legalMoves[whichMove]
 			move.PlayerName = g.Players[g.Turn].Name
+			game.Debug(ctx, "p%d lays %s", g.Turn, move)
 			if err := g.LayTile(ctx, g.Players[g.Turn].Name, move); err != nil {
 				return fmt.Errorf("laying: %w", err)
 			}
