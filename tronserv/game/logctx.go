@@ -1,4 +1,4 @@
-package gibbs_planner
+package game
 
 import (
 	"context"

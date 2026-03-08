@@ -54,9 +54,9 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 		}
 		gp.bag = gp.bag[len(p.Hand):]
 	}
-	Debug(ctx, "initial bag (%d): %v", len(gp.bag), gp.bag)
+	game.Debug(ctx, "initial bag (%d): %v", len(gp.bag), gp.bag)
 	for i, hs := range gp.hands {
-		Debug(ctx, "initial hand[%d]: %v", i, hs.tiles)
+		game.Debug(ctx, "initial hand[%d]: %v", i, hs.tiles)
 	}
 }
 
@@ -201,7 +201,7 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, previousGame, g *g
 		if len(r.LaidTiles) > len(pr.LaidTiles) {
 			lastPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
 		}
-		Debug(ctx, "inference[%d]: %s", pi, lastPlayerHS)
-		Debug(ctx, "In the bag: %d", len(gp.bag))
+		game.Debug(ctx, "inference[%d]: %s", pi, lastPlayerHS)
+		game.Debug(ctx, "In the bag: %d", len(gp.bag))
 	}
 }

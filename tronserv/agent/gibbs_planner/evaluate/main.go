@@ -236,8 +236,8 @@ func main() {
 			defer func() { <-sem }()
 			var logBuf bytes.Buffer
 			startTime := time.Now()
-			runCtx := gibbs_planner.WithLogBuffer(ctx, &logBuf)
-			runCtx = gibbs_planner.WithLogStart(runCtx, startTime)
+			runCtx := game.WithLogBuffer(ctx, &logBuf)
+			runCtx = game.WithLogStart(runCtx, startTime)
 			ok, msg := runCase(runCtx, testdataDir, j.tc)
 			verdict := "OK"
 			if !ok {

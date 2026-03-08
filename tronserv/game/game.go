@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-var Debug = false
+var Verbose = false
 
 func dbg(format string, a ...interface{}) {
-	if Debug {
+	if Verbose {
 		fmt.Printf(format+"\n", a...)
 	}
 }
@@ -415,6 +415,7 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 }
 
 func (g *Game) Note(ctx context.Context, n string) {
+	Debug(ctx, n)
 	g.History = append(g.History, n)
 	dbg(n)
 }
@@ -794,6 +795,7 @@ type Round struct {
 }
 
 func (r *Round) Note(ctx context.Context, n string) {
+	Debug(ctx, n)
 	if r == nil {
 		return
 	}
@@ -1206,7 +1208,7 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 }
 
 func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
-	// Debug = lt.CoordA().X == 5 && lt.CoordA().Y == 3 && lt.Orientation == "down"
+	// Verbose = lt.CoordA().X == 5 && lt.CoordA().Y == 3 && lt.Orientation == "down"
 	dbg("Attempting %s", lt)
 	if r.Done {
 		return ErrRoundAlreadyDone
