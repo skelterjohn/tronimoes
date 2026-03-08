@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -96,6 +97,7 @@ func main() {
 	countFlag := flag.Int("count", 1, "run each test this many times")
 	concurrencyFlag := flag.Int("concurrency", 1, "run this many tests at a time")
 	logDirFlag := flag.String("logdir", "evaluate_logs", "directory for run logs; a timestamped subdir (YYYYMMDD_HHMMSS) is created under it")
+	logFailOnlyFlag := flag.Bool("logfail", true, "only write log files for failed test runs")
 	flag.Parse()
 
 	testdataDir := "testdata"
@@ -190,6 +192,7 @@ func main() {
 		msg     string
 	}
 	results := make(chan result, len(jobs))
+	logFailOnly := *logFailOnlyFlag
 	startTime := time.Now()
 	for _, j := range jobs {
 		wg.Add(1)
@@ -213,9 +216,11 @@ func main() {
 				verdict = "FAIL"
 				fmt.Fprintf(&logBuf, "\n--- result: %s ---\n", msg)
 			}
-			fname := fmt.Sprintf("%s_%s_%0*d.log", verdict, safeFilename(j.tc.Name), j.runWidth, j.run)
-			path := filepath.Join(logDir, fname)
-			_ = os.WriteFile(path, logBuf.Bytes(), 0644)
+			if !logFailOnly || !ok {
+				fname := fmt.Sprintf("%s_%s_%0*d.log", verdict, safeFilename(j.tc.Name), j.runWidth, j.run)
+				path := filepath.Join(logDir, fname)
+				_ = os.WriteFile(path, logBuf.Bytes(), 0644)
+			}
 			results <- result{name: j.tc.Name, run: j.run, success: ok, msg: msg}
 		}(j)
 	}
@@ -239,15 +244,26 @@ func main() {
 		}
 		byName[r.name] = ent
 	}
+	var summary bytes.Buffer
 	for _, tc := range tests {
 		ent := byName[tc.Name]
 		total := ent.pass + ent.fail
 		if ent.fail == 0 {
-			fmt.Printf("PASS %s (%d/%d)\n", tc.Name, ent.pass, total)
+			fmt.Fprintf(&summary, "PASS %s (%d/%d)\n", tc.Name, ent.pass, total)
 		} else {
-			fmt.Printf("FAIL %s (%d/%d passed): %s\n", tc.Name, ent.pass, total, ent.lastFail)
+			fmt.Fprintf(&summary, "FAIL %s (%d/%d passed): %s\n", tc.Name, ent.pass, total, ent.lastFail)
 		}
 	}
-	fmt.Fprintf(os.Stderr, "Logs written to: %s\n", logDir)
-	fmt.Fprintf(os.Stderr, "Total time: %s\n", time.Since(startTime))
+	fmt.Fprintf(&summary, "Total time: %s\n", time.Since(startTime))
+	resultsPath := filepath.Join(logDir, "results.log")
+	if err := os.WriteFile(resultsPath, summary.Bytes(), 0644); err != nil {
+		fmt.Fprintf(os.Stderr, "could not write %s: %v\n", resultsPath, err)
+	} else {
+		fmt.Fprintf(os.Stderr, "Logs written to: %s\n", logDir)
+		f, _ := os.Open(resultsPath)
+		if f != nil {
+			io.Copy(os.Stdout, f)
+			f.Close()
+		}
+	}
 }
