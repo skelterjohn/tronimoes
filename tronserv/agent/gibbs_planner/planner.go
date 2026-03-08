@@ -91,6 +91,14 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			nn := curNode.Next(lt.String(), g.Turn, len(gp.hands))
 			// bias the planner towards high-value, away from low-value.
 			unnormalizedLogLikelihoods[i] += nn.V[g.Turn]
+			// bias the planner away from options that have been considered a lot.
+			if nn.Visited > 1000 {
+				unnormalizedLogLikelihoods[i] -= 1000
+			} else if nn.Visited > 100 {
+				unnormalizedLogLikelihoods[i] -= 5
+			} else if nn.Visited > 10 {
+				unnormalizedLogLikelihoods[i] -= 1
+			}
 		}
 		for i := range legalSpacers {
 			// free lines are exciting, and good opportunities to harass opponents.
@@ -187,7 +195,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 	for i, n := range nodesInSimulation {
 		n.Visited++
-		game.Debug(ctx, "%d: p%d @ %d", i, n.Turn, n.Depth)
+		game.Debug(ctx, "%d: p%d @ %d / %d", i, n.Turn, n.Depth, n.Visited)
 		game.Debug(ctx, "   V: %v", n.V)
 		game.Debug(ctx, "   R: %v", n.R)
 		game.Debug(ctx, "   H: %v", n.H)
