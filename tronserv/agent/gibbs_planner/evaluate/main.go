@@ -165,15 +165,17 @@ func main() {
 	logDir, _ = filepath.Abs(logDir)
 	fmt.Fprintf(os.Stderr, "Logs will be written to: %s\n", logDir)
 
-	// Build jobs: (test case, run index).
+	// Build jobs: (test case, run index). Run number is zero-padded to runWidth in filenames.
+	runWidth := len(fmt.Sprintf("%d", count-1))
 	type job struct {
-		tc  TestCase
-		run int
+		tc       TestCase
+		run      int
+		runWidth int
 	}
 	var jobs []job
 	for _, tc := range tests {
 		for run := 0; run < count; run++ {
-			jobs = append(jobs, job{tc: tc, run: run})
+			jobs = append(jobs, job{tc: tc, run: run, runWidth: runWidth})
 		}
 	}
 
@@ -209,7 +211,7 @@ func main() {
 				verdict = "FAIL"
 				fmt.Fprintf(&logBuf, "\n--- result: %s ---\n", msg)
 			}
-			fname := fmt.Sprintf("%s_%d_%s.log", safeFilename(j.tc.Name), j.run, verdict)
+			fname := fmt.Sprintf("%s_%0*d_%s.log", safeFilename(j.tc.Name), j.runWidth, j.run, verdict)
 			path := filepath.Join(logDir, fname)
 			_ = os.WriteFile(path, logBuf.Bytes(), 0644)
 			results <- result{name: j.tc.Name, run: j.run, success: ok, msg: msg}
