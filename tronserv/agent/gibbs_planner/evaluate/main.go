@@ -194,7 +194,9 @@ func main() {
 			defer wg.Done()
 			defer func() { <-sem }()
 			var logBuf bytes.Buffer
+			startTime := time.Now()
 			runCtx := gibbs_planner.WithLogBuffer(ctx, &logBuf)
+			runCtx = gibbs_planner.WithLogStart(runCtx, startTime)
 			gp := &gibbs_planner.GibbsPlanner{
 				MaxInferenceTime:   1 * time.Second,
 				MaxSimulationTime:  1 * time.Second,
