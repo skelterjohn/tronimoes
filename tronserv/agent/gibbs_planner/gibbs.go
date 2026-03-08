@@ -60,7 +60,7 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 		if i == gp.myPlayerIndex {
 			continue
 		}
-		Log(ctx, "sampled hand[%d]: %v", i, gp.hands[i].tiles)
+		Debug(ctx, "sampled hand[%d]: %v", i, gp.hands[i].tiles)
 	}
 }
 
@@ -88,7 +88,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 
 	gdata, err := json.Marshal(g)
 	if err != nil {
-		Log(ctx, "error marshalling game: %v", err)
+		Debug(ctx, "error marshalling game: %v", err)
 	}
 
 	simulating := true
@@ -101,10 +101,10 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 		var sg game.Game
 		if err := json.Unmarshal(gdata, &sg); err != nil {
-			Log(ctx, "error unmarshalling game: %v", err)
+			Debug(ctx, "error unmarshalling game: %v", err)
 		}
 		if err := gp.SimulateGame(ctx, &sg, root, gp.MaxSimulationDepth); err != nil {
-			Log(ctx, "error simulating game: %v", err)
+			Debug(ctx, "error simulating game: %v", err)
 		}
 		simulations++
 		if gp.MaxSimulationsPerMove > 0 && simulations >= gp.MaxSimulationsPerMove {
@@ -113,10 +113,10 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 	bestMove, err := root.ChooseBestMove(ctx)
 	if err != nil {
-		Log(ctx, "error choosing best move: %v", err)
+		Debug(ctx, "error choosing best move: %v", err)
 	}
-	Log(ctx, "hand: %v", g.Players[g.Turn].Hand)
-	Log(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
+	Debug(ctx, "hand: %v", g.Players[g.Turn].Hand)
+	Debug(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
 
 	if bestMove == "draw" {
 		return types.Move{
