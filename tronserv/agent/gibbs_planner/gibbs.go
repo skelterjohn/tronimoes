@@ -67,6 +67,20 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
+	if len(legalMoves) == 0 && len(legalSpacers) == 0 {
+		if p.JustDrew {
+			Log(ctx, "no legal moves or spacers, and just drew; passing")
+			return types.Move{
+				Pass:     true,
+				Selected: types.RandomInitialFoot(g),
+			}
+		}
+		Log(ctx, "no legal moves or spacers, and haven't drawn yet; drawing")
+		return types.Move{
+			Draw: true,
+		}
+	}
+
 	root := NewPlanNode(g.Turn, len(gp.hands))
 
 	ctx, cancel := context.WithTimeout(ctx, gp.MaxSimulationTime)
