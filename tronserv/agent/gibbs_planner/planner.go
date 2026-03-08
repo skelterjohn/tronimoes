@@ -86,6 +86,18 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			unnormalizedLogLikelihoods[i] = 0
 		}
 
+		for i, lt := range legalMoves {
+			lt.PlayerName = g.Players[g.Turn].Name
+			nn := curNode.Next(lt.String(), g.Turn, len(gp.hands))
+			// bias the planner towards high-value, away from low-value.
+			unnormalizedLogLikelihoods[i] += nn.V[g.Turn]
+		}
+		for i := range legalSpacers {
+			// free lines are exciting, and good opportunities to harass opponents.
+			unnormalizedLogLikelihoods[i+len(legalMoves)] += 1
+		}
+		// drawing is less exciting, so let's examine it less than other options.
+		// the agent will still draw when it has to.
 		whichMove := ChooseIndex(unnormalizedLogLikelihoods)
 
 		var nextNode *PlanNode
@@ -93,7 +105,6 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		if whichMove < len(legalMoves) {
 			move := legalMoves[whichMove]
-			move.PlayerName = g.Players[g.Turn].Name
 			game.Debug(ctx, "p%d lays %s", g.Turn, move)
 			if err := g.LayTile(ctx, g.Players[g.Turn].Name, move); err != nil {
 				return fmt.Errorf("laying: %w", err)
