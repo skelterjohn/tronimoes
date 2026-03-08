@@ -3,3 +3,4 @@ local.properties
 .idea
 tronimoes.sublime-workspace
 **.exe
+evaluate_logs/

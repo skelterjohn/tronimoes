@@ -95,6 +95,7 @@ func main() {
 	testsFlag := flag.String("tests", "", "comma-separated list of test names (e.g. Oneshot,NoSelfKill); empty runs all")
 	countFlag := flag.Int("count", 1, "run each test this many times")
 	concurrencyFlag := flag.Int("concurrency", 1, "run this many tests at a time")
+	logDirFlag := flag.String("logdir", "evaluate_logs", "directory for run logs; a timestamped subdir (YYYYMMDD_HHMMSS) is created under it")
 	flag.Parse()
 
 	testdataDir := "testdata"
@@ -157,9 +158,9 @@ func main() {
 		concurrency = 1
 	}
 
-	logDir, err := os.MkdirTemp("", "gibbs-eval-")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not create temp dir for logs: %v\n", err)
+	logDir := filepath.Join(*logDirFlag, time.Now().Format("20060102_150405"))
+	if err := os.MkdirAll(logDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "could not create log dir %s: %v\n", logDir, err)
 		os.Exit(1)
 	}
 	logDir, _ = filepath.Abs(logDir)
@@ -189,6 +190,7 @@ func main() {
 		msg     string
 	}
 	results := make(chan result, len(jobs))
+	startTime := time.Now()
 	for _, j := range jobs {
 		wg.Add(1)
 		sem <- struct{}{}
@@ -211,7 +213,7 @@ func main() {
 				verdict = "FAIL"
 				fmt.Fprintf(&logBuf, "\n--- result: %s ---\n", msg)
 			}
-			fname := fmt.Sprintf("%s_%0*d_%s.log", safeFilename(j.tc.Name), j.runWidth, j.run, verdict)
+			fname := fmt.Sprintf("%s_%s_%0*d.log", verdict, safeFilename(j.tc.Name), j.runWidth, j.run)
 			path := filepath.Join(logDir, fname)
 			_ = os.WriteFile(path, logBuf.Bytes(), 0644)
 			results <- result{name: j.tc.Name, run: j.run, success: ok, msg: msg}
@@ -247,4 +249,5 @@ func main() {
 		}
 	}
 	fmt.Fprintf(os.Stderr, "Logs written to: %s\n", logDir)
+	fmt.Fprintf(os.Stderr, "Total time: %s\n", time.Since(startTime))
 }

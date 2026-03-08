@@ -64,7 +64,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	for i := range root.Eval {
 		root.Eval[i] = float64(g.Players[i].Score)
 	}
-	// fmt.Printf("Simulating game at depth %d\n", maxDepth)
+	Log(ctx, "Simulating game at depth %d", maxDepth)
 
 	for !r.Done && maxDepth > 0 {
 		select {
@@ -77,7 +77,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		for _, m := range legalMoves {
 			m.NextPips = -1
 		}
-		// log.Printf("%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
+		Log(ctx, "%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
 		moveCount += 1 // draw or pass
 		whichMove := rand.Intn(moveCount)
@@ -116,7 +116,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			bestMove = spacer.String()
 		}
 
-		// fmt.Printf("%d -> %s\n", curNode.Turn, bestMove)
+		Log(ctx, "%d -> %s", curNode.Turn, bestMove)
 
 		nextNode = curNode.Next(bestMove, g.Turn, len(gp.hands))
 		nextNode.Eval = make([]float64, len(gp.hands))
@@ -127,14 +127,13 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		for i := range nextNode.R {
 			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i]
 		}
-		// fmt.Printf("E: %v\n", nextNode.Eval)
-		// fmt.Printf("  R: %v\n", nextNode.R)
 		nodesInSimulation = append(nodesInSimulation, nextNode)
 		curNode = nextNode
 	}
 
 	if !r.Done {
 		curNode.H = gp.Heuristic(ctx, g, root)
+		Log(ctx, "Heuristic: %v", curNode.H)
 	}
 	// The rest is fast so we still do it if we ran out of time.
 
@@ -142,11 +141,11 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 	// First we start with the score at the end of this simulation.
 
-	// for i, n := range nodesInSimulation {
-	// 	fmt.Printf("%d: p%d\n", i, n.Turn)
-	// 	fmt.Printf("   V: %v\n", n.V)
-	// 	fmt.Printf("   R: %v\n", n.R)
-	// }
+	for i, n := range nodesInSimulation {
+		Log(ctx, "%d: p%d", i, n.Turn)
+		Log(ctx, "   V: %v", n.V)
+		Log(ctx, "   R: %v", n.R)
+	}
 
 	// lastNode := nodesInSimulation[len(nodesInSimulation)-1]
 	curNode.Eval = make([]float64, len(gp.hands))

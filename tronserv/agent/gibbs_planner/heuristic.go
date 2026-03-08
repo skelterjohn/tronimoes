@@ -9,7 +9,7 @@ import (
 func (gp *GibbsPlanner) Heuristic(ctx context.Context, g *game.Game, root *PlanNode) []float64 {
 	h := make([]float64, len(gp.hands))
 	for i := range h {
-		h[i] = float64(g.Players[i].Score) - root.Eval[i] + 1
+		h[i] = float64(g.Players[i].Score) - root.Eval[i] + .5
 	}
 	return h
 }

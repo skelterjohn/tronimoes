@@ -114,9 +114,9 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	bestMove, err := root.ChooseBestMove(ctx)
 	if err != nil {
 		Log(ctx, "error choosing best move: %v", err)
-	} else {
-		Log(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
 	}
+	Log(ctx, "hand: %v", g.Players[g.Turn].Hand)
+	Log(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
 
 	if bestMove == "draw" {
 		return types.Move{
