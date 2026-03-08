@@ -91,7 +91,7 @@ func main() {
 			Name:               *name,
 			MaxInferenceTime:   1 * time.Second,
 			MaxSimulationTime:  5 * time.Second,
-			MaxSimulationDepth: 50,
+			MaxSimulationDepth: 15,
 			ValueDecay:         0.9,
 		}
 	default:
