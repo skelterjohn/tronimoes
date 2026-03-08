@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
@@ -81,9 +80,13 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		game.Debug(ctx, "%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
 		moveCount += 1 // draw or pass
-		whichMove := rand.Intn(moveCount)
-		// fmt.Printf("count: %d\n", moveCount)
-		// log.Printf("whichMove: %d", whichMove)
+
+		unnormalizedLogLikelihoods := make([]float64, moveCount)
+		for i := range unnormalizedLogLikelihoods {
+			unnormalizedLogLikelihoods[i] = 0
+		}
+
+		whichMove := ChooseIndex(unnormalizedLogLikelihoods)
 
 		var nextNode *PlanNode
 		var bestMove string
