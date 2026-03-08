@@ -81,7 +81,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 	}
 
-	root := NewPlanNode(g.Turn, len(gp.hands))
+	root := NewPlanNode(g.Turn, len(gp.hands), 0)
 
 	ctx, cancel := context.WithTimeout(ctx, gp.MaxSimulationTime)
 	defer cancel()

@@ -12,6 +12,7 @@ import (
 )
 
 type PlanNode struct {
+	Depth int
 	Turn  int
 	Moves map[string]*PlanNode
 	Eval  []float64
@@ -20,9 +21,10 @@ type PlanNode struct {
 	H     []float64
 }
 
-func NewPlanNode(turn int, count int) *PlanNode {
+func NewPlanNode(turn int, count int, depth int) *PlanNode {
 	return &PlanNode{
 		Turn:  turn,
+		Depth: depth,
 		Moves: make(map[string]*PlanNode),
 		Eval:  make([]float64, count),
 		R:     make([]float64, count),
@@ -35,7 +37,7 @@ func (n *PlanNode) Next(move string, turn, count int) *PlanNode {
 	// fmt.Printf("Next %s\n", move)
 	nextNode, ok := n.Moves[move]
 	if !ok {
-		nextNode = NewPlanNode(turn, count)
+		nextNode = NewPlanNode(turn, count, n.Depth+1)
 		n.Moves[move] = nextNode
 	}
 	return nextNode
@@ -132,7 +134,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 	if !r.Done {
 		curNode.H = gp.Heuristic(ctx, g, root)
-		game.Debug(ctx, "Heuristic: %v", curNode.H)
+		game.Debug(ctx, "Heuristic: %v @ %d", curNode.H, curNode.Depth)
 	}
 	// The rest is fast so we still do it if we ran out of time.
 
@@ -141,9 +143,10 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	// First we start with the score at the end of this simulation.
 
 	for i, n := range nodesInSimulation {
-		game.Debug(ctx, "%d: p%d", i, n.Turn)
+		game.Debug(ctx, "%d: p%d @ %d", i, n.Turn, n.Depth)
 		game.Debug(ctx, "   V: %v", n.V)
 		game.Debug(ctx, "   R: %v", n.R)
+		game.Debug(ctx, "   H: %v", n.H)
 	}
 
 	// lastNode := nodesInSimulation[len(nodesInSimulation)-1]
@@ -167,11 +170,12 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			copy(cur.V, cur.R)
 			continue
 		}
-		bestV := bestNode.V
-		for i, bv := range bestV {
+		game.Debug(ctx, "best from %d +1 H: %v V: %v", cur.Depth, bestNode.H, bestNode.V)
+		for i, bv := range bestNode.V {
 			vh := bestNode.H[i] + bv
 			cur.V[i] = gp.ValueDecay*vh + cur.R[i]
 		}
+		game.Debug(ctx, " V: %v", cur.V)
 		// fmt.Printf("prop V: %v\n", cur.V)
 	}
 	return nil
