@@ -1,0 +1,408 @@
+{
+	"created": 1772942818,
+	"version": 5,
+	"pickup": true,
+	"done": false,
+	"code": "BTBRJX-TEVUMT",
+	"players": [
+		{
+			"name": "xyzzy",
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 5,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 3
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 6,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 4
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "",
+			"react_url": "",
+			"kills": null
+		},
+		{
+			"name": "Gorbison Pulicker",
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 0,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 6
+				}
+			],
+			"hints": [
+				null,
+				[
+					"(3,2)",
+					"(3,3)",
+					"(2,3)",
+					"(3,3)",
+					"(3,6)",
+					"(3,5)",
+					"(2,5)",
+					"(3,5)",
+					"(3,5)",
+					"(4,5)",
+					"(4,5)",
+					"(3,5)",
+					"(2,3)",
+					"(2,4)",
+					"(2,5)",
+					"(2,4)",
+					"(1,4)",
+					"(2,4)",
+					"(4,6)",
+					"(4,5)",
+					"(4,5)",
+					"(3,5)",
+					"(3,5)",
+					"(4,5)",
+					"(5,5)",
+					"(4,5)",
+					"(5,3)",
+					"(5,4)",
+					"(5,5)",
+					"(5,4)",
+					"(6,4)",
+					"(5,4)"
+				],
+				null,
+				null,
+				[
+					"(3,2)",
+					"(3,3)",
+					"(2,3)",
+					"(3,3)",
+					"(3,6)",
+					"(3,5)",
+					"(2,5)",
+					"(3,5)",
+					"(3,5)",
+					"(4,5)",
+					"(4,5)",
+					"(3,5)",
+					"(2,3)",
+					"(2,4)",
+					"(2,5)",
+					"(2,4)",
+					"(1,4)",
+					"(2,4)",
+					"(4,6)",
+					"(4,5)",
+					"(4,5)",
+					"(3,5)",
+					"(3,5)",
+					"(4,5)",
+					"(5,5)",
+					"(4,5)",
+					"(5,3)",
+					"(5,4)",
+					"(5,5)",
+					"(5,4)",
+					"(6,4)",
+					"(5,4)"
+				],
+				null,
+				[
+					"(3,2)",
+					"(3,3)",
+					"(2,3)",
+					"(3,3)",
+					"(3,6)",
+					"(3,5)",
+					"(2,5)",
+					"(3,5)",
+					"(3,5)",
+					"(4,5)",
+					"(4,5)",
+					"(3,5)",
+					"(2,3)",
+					"(2,4)",
+					"(2,5)",
+					"(2,4)",
+					"(1,4)",
+					"(2,4)",
+					"(4,6)",
+					"(4,5)",
+					"(4,5)",
+					"(3,5)",
+					"(3,5)",
+					"(4,5)",
+					"(5,5)",
+					"(4,5)",
+					"(5,3)",
+					"(5,4)",
+					"(5,5)",
+					"(5,4)",
+					"(6,4)",
+					"(5,4)"
+				],
+				null,
+				null
+			],
+			"spacer_hints": [],
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "",
+			"react_url": "",
+			"kills": null
+		}
+	],
+	"turn": 1,
+	"rounds": [
+		{
+			"laid_tiles": [
+				{
+					"tile": {
+						"pips_a": 7,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 3,
+						"y": 4
+					},
+					"orientation": "right",
+					"player_name": "",
+					"next_pips": 7,
+					"dead": false,
+					"indicated": null,
+					"who_laid_it": "Gorbison Pulicker"
+				},
+				{
+					"tile": {
+						"pips_a": 0,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 4,
+						"y": 2
+					},
+					"orientation": "down",
+					"player_name": "xyzzy",
+					"next_pips": 0,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "xyzzy"
+				}
+			],
+			"spacer": null,
+			"done": false,
+			"history": [
+				"Gorbison Pulicker laid 7:7",
+				"xyzzy laid 0:7"
+			],
+			"player_lines": {
+				"Gorbison Pulicker": [
+					{
+						"tile": {
+							"pips_a": 7,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 3,
+							"y": 4
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 7,
+						"dead": false,
+						"indicated": null,
+						"who_laid_it": "Gorbison Pulicker"
+					}
+				],
+				"xyzzy": [
+					{
+						"tile": {
+							"pips_a": 7,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 3,
+							"y": 4
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 7,
+						"dead": false,
+						"indicated": null,
+						"who_laid_it": "Gorbison Pulicker"
+					},
+					{
+						"tile": {
+							"pips_a": 0,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 4,
+							"y": 2
+						},
+						"orientation": "down",
+						"player_name": "xyzzy",
+						"next_pips": 0,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "xyzzy"
+					}
+				]
+			},
+			"free_lines": [],
+			"bagless_passes": 0,
+			"highest_leader": 7
+		}
+	],
+	"bag": [
+		{
+			"pips_a": 1,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 1
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 1
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 0
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 3
+		}
+	],
+	"board_width": 8,
+	"board_height": 9,
+	"max_pips": 7,
+	"history": [
+		"Gorbison Pulicker started round 1 - 7:7"
+	]
+}

@@ -136,7 +136,7 @@ func main() {
 					blob, err := json.MarshalIndent(struct {
 						Game *game.Game `json:"game"`
 						Move types.Move `json:"move"`
-					}{Game: g, Move: m}, "", "  ")
+					}{Game: g, Move: m}, "", "\t")
 					if err != nil {
 						log.Printf("save marshal: %v", err)
 					} else if err := os.WriteFile(path, blob, 0644); err != nil {

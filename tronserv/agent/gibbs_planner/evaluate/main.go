@@ -43,14 +43,22 @@ func loadGame(testdataDir, label string) (*game.Game, error) {
 	return &g, nil
 }
 
-func runCase(ctx context.Context, testdataDir string, tc TestCase, gp *gibbs_planner.GibbsPlanner) (success bool, message string) {
+func runCase(ctx context.Context, testdataDir string, tc TestCase) (success bool, message string) {
 	g, err := loadGame(testdataDir, tc.Label)
 	if err != nil {
 		return false, err.Error()
 	}
 
 	currentPlayer := g.Players[g.Turn]
-	gp.Name = currentPlayer.Name
+
+	gp := &gibbs_planner.GibbsPlanner{
+		Name:               currentPlayer.Name,
+		MaxInferenceTime:   1 * time.Second,
+		MaxSimulationTime:  1 * time.Second,
+		MaxSimulationDepth: 4,
+		ValueDecay:         0.9,
+	}
+
 	previousGame := &game.Game{
 		Players: g.Players,
 		MaxPips: g.MaxPips,
@@ -145,6 +153,16 @@ func main() {
 				return true, ""
 			},
 		},
+		{
+			Name:  "NoDrawBTBRJX",
+			Label: "no_draw_btbrjx",
+			Success: func(g *game.Game, move types.Move) (bool, string) {
+				if move.LaidTile == nil {
+					return false, "agent play a tile in this position"
+				}
+				return true, ""
+			},
+		},
 	}
 
 	// Filter by -tests if set.
@@ -220,14 +238,7 @@ func main() {
 			startTime := time.Now()
 			runCtx := gibbs_planner.WithLogBuffer(ctx, &logBuf)
 			runCtx = gibbs_planner.WithLogStart(runCtx, startTime)
-			gp := &gibbs_planner.GibbsPlanner{
-				Name:               "Gorbison Pulicker",
-				MaxInferenceTime:   1 * time.Second,
-				MaxSimulationTime:  1 * time.Second,
-				MaxSimulationDepth: 4,
-				ValueDecay:         0.9,
-			}
-			ok, msg := runCase(runCtx, testdataDir, j.tc, gp)
+			ok, msg := runCase(runCtx, testdataDir, j.tc)
 			verdict := "OK"
 			if !ok {
 				verdict = "FAIL"

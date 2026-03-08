@@ -116,7 +116,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			bestMove = spacer.String()
 		}
 
-		Debug(ctx, "%d -> %s", curNode.Turn, bestMove)
+		Debug(ctx, "p%d -> %s", curNode.Turn, bestMove)
 
 		nextNode = curNode.Next(bestMove, g.Turn, len(gp.hands))
 		nextNode.Eval = make([]float64, len(gp.hands))
@@ -127,6 +127,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		for i := range nextNode.R {
 			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i]
 		}
+		Debug(ctx, " R <- %v from %v-%v", nextNode.R, nextNode.Eval, curNode.Eval)
 		nodesInSimulation = append(nodesInSimulation, nextNode)
 		curNode = nextNode
 	}
