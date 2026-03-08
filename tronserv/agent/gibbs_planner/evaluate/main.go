@@ -129,6 +129,22 @@ func main() {
 				return true, ""
 			},
 		},
+		{
+			Name:  "PlayTheGame",
+			Label: "playthegame",
+			Success: func(g *game.Game, move types.Move) (bool, string) {
+				if move.LaidTile == nil {
+					if move.Pass {
+						return false, "expected agent to play a tile, not pass"
+					}
+					if move.Draw {
+						return false, "expected agent to play a tile, not draw"
+					}
+					return false, "expected agent to play a tile"
+				}
+				return true, ""
+			},
+		},
 	}
 
 	// Filter by -tests if set.
@@ -205,6 +221,7 @@ func main() {
 			runCtx := gibbs_planner.WithLogBuffer(ctx, &logBuf)
 			runCtx = gibbs_planner.WithLogStart(runCtx, startTime)
 			gp := &gibbs_planner.GibbsPlanner{
+				Name:               "Gorbison Pulicker",
 				MaxInferenceTime:   1 * time.Second,
 				MaxSimulationTime:  1 * time.Second,
 				MaxSimulationDepth: 4,

@@ -6,7 +6,7 @@
   "code": "NOSELF-KILL01",
   "players": [
     {
-      "name": "solo",
+      "name": "Gorbison Pulicker",
       "ready": false,
       "score": 0,
       "hand": [
@@ -41,27 +41,27 @@
           "next_pips": 6,
           "dead": false,
           "indicated": null,
-          "who_laid_it": "solo"
+          "who_laid_it": "Gorbison Pulicker"
         },
         {
           "tile": {"pips_a": 1, "pips_b": 6},
           "coord": {"x": 2, "y": 1},
           "orientation": "down",
-          "player_name": "solo",
+          "player_name": "Gorbison Pulicker",
           "next_pips": 1,
           "dead": false,
           "indicated": null,
-          "who_laid_it": "solo"
+          "who_laid_it": "Gorbison Pulicker"
         },
         {
           "tile": {"pips_a": 1, "pips_b": 3},
           "coord": {"x": 3, "y": 1},
           "orientation": "right",
-          "player_name": "solo",
+          "player_name": "Gorbison Pulicker",
           "next_pips": 3,
           "dead": false,
           "indicated": null,
-          "who_laid_it": "solo"
+          "who_laid_it": "Gorbison Pulicker"
         }
       ],
       "spacer": null,
@@ -72,7 +72,7 @@
         "solo laid 1:3"
       ],
       "player_lines": {
-        "solo": [
+        "Gorbison Pulicker": [
           {
             "tile": {"pips_a": 6, "pips_b": 6},
             "coord": {"x": 2, "y": 3},
@@ -81,27 +81,27 @@
             "next_pips": 6,
             "dead": false,
             "indicated": null,
-            "who_laid_it": "solo"
+            "who_laid_it": "Gorbison Pulicker"
           },
           {
             "tile": {"pips_a": 1, "pips_b": 6},
             "coord": {"x": 2, "y": 1},
             "orientation": "down",
-            "player_name": "solo",
+            "player_name": "Gorbison Pulicker",
             "next_pips": 1,
             "dead": false,
             "indicated": null,
-            "who_laid_it": "solo"
+            "who_laid_it": "Gorbison Pulicker"
           },
           {
             "tile": {"pips_a": 1, "pips_b": 3},
             "coord": {"x": 2, "y": 1},
             "orientation": "right",
-            "player_name": "solo",
+            "player_name": "Gorbison Pulicker",
             "next_pips": 3,
             "dead": false,
             "indicated": null,
-            "who_laid_it": "solo"
+            "who_laid_it": "Gorbison Pulicker"
           }
         ]
       },
