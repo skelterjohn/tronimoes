@@ -54,8 +54,8 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulation
 	gp := &gibbs_planner.GibbsPlanner{
 		Name:                  currentPlayer.Name,
 		MaxInferenceTime:      1 * time.Second,
-		MaxSimulationTime:     1 * time.Second,
-		MaxSimulationDepth:    4,
+		MaxSimulationTime:     5 * time.Second,
+		MaxSimulationDepth:    10,
 		MaxSimulationsPerMove: maxSimulationsPerMove,
 		ValueDecay:            0.9,
 	}
