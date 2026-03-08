@@ -2,7 +2,6 @@ package gibbs_planner
 
 import (
 	"context"
-	"log"
 	"math/rand"
 
 	"github.com/skelterjohn/tronimoes/tronserv/game"
@@ -55,9 +54,9 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 		}
 		gp.bag = gp.bag[len(p.Hand):]
 	}
-	log.Printf("initial bag (%d): %v", len(gp.bag), gp.bag)
+	Log(ctx, "initial bag (%d): %v", len(gp.bag), gp.bag)
 	for i, hs := range gp.hands {
-		log.Printf("initial hand[%d]: %v", i, hs.tiles)
+		Log(ctx, "initial hand[%d]: %v", i, hs.tiles)
 	}
 }
 
@@ -202,7 +201,7 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, previousGame, g *g
 		if len(r.LaidTiles) > len(pr.LaidTiles) {
 			lastPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
 		}
-		log.Printf("inference[%d]: %s", pi, lastPlayerHS)
-		log.Printf("In the bag: %d", len(gp.bag))
+		Log(ctx, "inference[%d]: %s", pi, lastPlayerHS)
+		Log(ctx, "In the bag: %d", len(gp.bag))
 	}
 }

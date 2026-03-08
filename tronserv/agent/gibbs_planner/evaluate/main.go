@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -10,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/gibbs_planner"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
@@ -79,6 +81,16 @@ func listNames(tests []TestCase) string {
 	return strings.Join(names, ", ")
 }
 
+// safeFilename returns a filesystem-safe name for the test case.
+func safeFilename(name string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '_' || r == '-' {
+			return r
+		}
+		return '_'
+	}, name)
+}
+
 func main() {
 	testsFlag := flag.String("tests", "", "comma-separated list of test names (e.g. Oneshot,NoSelfKill); empty runs all")
 	countFlag := flag.Int("count", 1, "run each test this many times")
@@ -145,6 +157,14 @@ func main() {
 		concurrency = 1
 	}
 
+	logDir, err := os.MkdirTemp("", "gibbs-eval-")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "could not create temp dir for logs: %v\n", err)
+		os.Exit(1)
+	}
+	logDir, _ = filepath.Abs(logDir)
+	fmt.Fprintf(os.Stderr, "Logs will be written to: %s\n", logDir)
+
 	// Build jobs: (test case, run index).
 	type job struct {
 		tc  TestCase
@@ -157,7 +177,7 @@ func main() {
 		}
 	}
 
-	// Run with limited concurrency. Each job uses its own planner and loaded game.
+	// Run with limited concurrency. Each job uses its own planner, log buffer, and loaded game.
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, concurrency)
 	type result struct {
@@ -173,13 +193,23 @@ func main() {
 		go func(j job) {
 			defer wg.Done()
 			defer func() { <-sem }()
+			var logBuf bytes.Buffer
+			runCtx := gibbs_planner.WithLogBuffer(ctx, &logBuf)
 			gp := &gibbs_planner.GibbsPlanner{
 				MaxInferenceTime:   1 * time.Second,
 				MaxSimulationTime:  1 * time.Second,
 				MaxSimulationDepth: 4,
 				ValueDecay:         0.9,
 			}
-			ok, msg := runCase(ctx, testdataDir, j.tc, gp)
+			ok, msg := runCase(runCtx, testdataDir, j.tc, gp)
+			verdict := "OK"
+			if !ok {
+				verdict = "FAIL"
+				fmt.Fprintf(&logBuf, "\n--- result: %s ---\n", msg)
+			}
+			fname := fmt.Sprintf("%s_%d_%s.log", safeFilename(j.tc.Name), j.run, verdict)
+			path := filepath.Join(logDir, fname)
+			_ = os.WriteFile(path, logBuf.Bytes(), 0644)
 			results <- result{name: j.tc.Name, run: j.run, success: ok, msg: msg}
 		}(j)
 	}
@@ -189,7 +219,10 @@ func main() {
 	}()
 
 	// Aggregate and print.
-	byName := make(map[string]struct{ pass, fail int; lastFail string })
+	byName := make(map[string]struct {
+		pass, fail int
+		lastFail   string
+	})
 	for r := range results {
 		ent := byName[r.name]
 		if r.success {
@@ -209,4 +242,5 @@ func main() {
 			fmt.Printf("FAIL %s (%d/%d passed): %s\n", tc.Name, ent.pass, total, ent.lastFail)
 		}
 	}
+	fmt.Fprintf(os.Stderr, "Logs written to: %s\n", logDir)
 }
