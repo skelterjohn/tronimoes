@@ -142,13 +142,6 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 	// First we start with the score at the end of this simulation.
 
-	for i, n := range nodesInSimulation {
-		game.Debug(ctx, "%d: p%d @ %d", i, n.Turn, n.Depth)
-		game.Debug(ctx, "   V: %v", n.V)
-		game.Debug(ctx, "   R: %v", n.R)
-		game.Debug(ctx, "   H: %v", n.H)
-	}
-
 	// lastNode := nodesInSimulation[len(nodesInSimulation)-1]
 	curNode.Eval = make([]float64, len(gp.hands))
 	for i := range curNode.Eval {
@@ -175,8 +168,13 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			vh := bestNode.H[i] + bv
 			cur.V[i] = gp.ValueDecay*vh + cur.R[i]
 		}
-		game.Debug(ctx, " V: %v", cur.V)
-		// fmt.Printf("prop V: %v\n", cur.V)
+	}
+
+	for i, n := range nodesInSimulation {
+		game.Debug(ctx, "%d: p%d @ %d", i, n.Turn, n.Depth)
+		game.Debug(ctx, "   V: %v", n.V)
+		game.Debug(ctx, "   R: %v", n.R)
+		game.Debug(ctx, "   H: %v", n.H)
 	}
 	return nil
 }
