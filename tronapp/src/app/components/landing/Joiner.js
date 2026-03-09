@@ -45,24 +45,24 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		setGameCode(undefined);
 	}, []);
 
-	function registerAndJoinCode(code) {
-		if (!isRegistered) {
-			setPlayerName(nameInput);
-			console.log('registering', nameInput);
-			client.RegisterPlayerName(nameInput).then(() => {
-				setIsRegistered(true);
-				joinCode(code);
-			}).catch((error) => {
+	function register() {
+		if (isRegistered) return Promise.resolve();
+		if (!nameInput.trim()) return Promise.reject(new Error('empty name'));
+		setPlayerName(nameInput);
+		console.log('registering', nameInput);
+		return client.RegisterPlayerName(nameInput)
+			.then(() => setIsRegistered(true))
+			.catch((error) => {
 				console.error('register error', error);
 				setPlayerName('');
 				setNameInput('');
 				setIsRegistered(false);
 				setErrorMessage(error.data.error);
+				throw error;
 			});
-		} else {
-			joinCode(code);
-		}
 	}
+
+
 	function joinCode(code) {
 		console.log('joining', nameInput, code);
 		setPlayerName(nameInput);
@@ -80,7 +80,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	}
 
 	function joinPickup() {
-		registerAndJoinCode("PICKUP");
+		joinCode("PICKUP");
 	}
 
 	if (loading) {
@@ -102,7 +102,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				value={isRegistered ? playerName : nameInput}
 				disabled={isRegistered}
 				onChange={(e) => !isRegistered && setNameInput(e.target.value)}
-				onPressEnter={joinPickup}
+				onPressEnter={register}
 			/>
 		</div>
 		<div className="flex gap-2 text-white">
@@ -112,8 +112,8 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				size="large"
 				className="font-game text-lg"
 				formatter={(str) => str.toUpperCase()}
-				disabled={nameInput === ""}
-				onChange={registerAndJoinCode}
+				disabled={playerName === ""}
+				onChange={joinCode}
 			/>
 		</div>
 		<div className="flex justify-between gap-2 items-center">
