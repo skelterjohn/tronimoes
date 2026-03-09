@@ -452,9 +452,8 @@ func (g *Game) DrawTile(ctx context.Context, name string) bool {
 	if len(g.Bag) > 0 {
 		player.Hand = append(player.Hand, g.Bag[0])
 		g.Bag = g.Bag[1:]
+		player.JustDrew = true
 	}
-
-	player.JustDrew = true
 
 	return true
 }
