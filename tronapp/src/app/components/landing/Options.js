@@ -4,16 +4,28 @@ import Button from '@/app/components/Button';
 import { useGameState } from '../GameState';
 	
 const Options = ({ isOpen, onClose }) => {
-	const [roodle, setRoodle] = useState(false);
+	const [randomChoice, setRandomChoice] = useState(false);
+	const [gibbsPlanner, setGibbsPlanner] = useState(false);
 	const { options, setOptions } = useGameState();
 
 	useEffect(() => {
-		setRoodle(options.roodle);
-	}, [options]);
+		if (isOpen) {
+			setRandomChoice(!!options.randomChoice);
+			setGibbsPlanner(!!options.gibbsPlanner);
+		}
+	}, [isOpen, options.randomChoice, options.gibbsPlanner]);
 
-	useEffect(() => {
-		setOptions({ ...options, roodle });
-	}, [roodle]);
+	const handleRandomChoiceChange = (e) => {
+		const value = e.target.checked;
+		setRandomChoice(value);
+		setOptions((prev) => ({ ...prev, randomChoice: value }));
+	};
+
+	const handleGibbsPlannerChange = (e) => {
+		const value = e.target.checked;
+		setGibbsPlanner(value);
+		setOptions((prev) => ({ ...prev, gibbsPlanner: value }));
+	};
 
 	return (
 		<Modal
@@ -37,15 +49,28 @@ const Options = ({ isOpen, onClose }) => {
 			<Space orientation="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
 				<div>
 					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-						<span>roodle crush</span>
+						<span>random choice</span>
 						<Checkbox
-							checked={roodle}
-							onChange={(e) => setRoodle(e.target.checked)}
+							checked={randomChoice}
+							onChange={handleRandomChoiceChange}
 							className="font-game"
 						/>
 					</div>
 					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
-						Add the roodle crush bot to your game. (not implemented yet)
+						Add a player based on random choice.
+					</div>
+				</div>
+				<div>
+					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+						<span>gibbs planner</span>
+						<Checkbox
+							checked={gibbsPlanner}
+							onChange={handleGibbsPlannerChange}
+							className="font-game"
+						/>
+					</div>
+					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
+						Add a player based on the Gibbs planner.
 					</div>
 				</div>
 			</Space>

@@ -34,8 +34,7 @@ func writeErr(w http.ResponseWriter, err error, code int) {
 	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 }
 
-func RegisterHandlers(r chi.Router, s Store) {
-	gs := &GameServer{store: s}
+func RegisterHandlers(r chi.Router, gs *GameServer) {
 	r.Get("/game/{code}", gs.HandleGetGame)
 	r.Put("/game/{code}", gs.HandlePutGame)
 	r.Post("/game/{code}/report", gs.HandleReportIssue)
@@ -94,11 +93,13 @@ func validatePlayerName(name string) error {
 }
 
 type GameOptions struct {
-	Roodle bool `json:"roodle"`
+	RandomChoice bool `json:"randomChoice"`
+	GibbsPlanner bool `json:"gibbsPlanner"`
 }
 
 type GameServer struct {
-	store Store
+	Store        Store
+	AgentSpawner AgentSpawner
 }
 
 func (s *GameServer) validateToken(ctx context.Context, r *http.Request) error {
@@ -156,7 +157,7 @@ func (s *GameServer) getName(ctx context.Context, r *http.Request) (string, erro
 			return "", err
 		}
 
-		pi, err := s.store.GetPlayer(ctx, userID)
+		pi, err := s.Store.GetPlayer(ctx, userID)
 		if err == nil {
 			return pi.Name, nil
 		}
@@ -164,7 +165,7 @@ func (s *GameServer) getName(ctx context.Context, r *http.Request) (string, erro
 	}
 
 	tempName := r.Header.Get("X-Player-Name")
-	_, err := s.store.GetPlayerByName(ctx, tempName)
+	_, err := s.Store.GetPlayerByName(ctx, tempName)
 	if err == ErrNoRegisteredPlayer {
 		// anonymous play is ok with unregistered names.
 		if err := validatePlayerName(tempName); err != nil {
@@ -222,7 +223,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
@@ -239,7 +240,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -259,7 +260,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
@@ -295,7 +296,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -328,7 +329,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
@@ -364,7 +365,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -385,7 +386,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
@@ -436,7 +437,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -457,7 +458,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
@@ -500,7 +501,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -535,7 +536,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		if err == ErrNoSuchGame {
@@ -550,7 +551,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		if p.Name != name {
 			continue
 		}
-		if err := s.store.RecordPlayerActive(ctx, code, name, time.Now().Unix()); err != nil {
+		if err := s.Store.RecordPlayerActive(ctx, code, name, time.Now().Unix()); err != nil {
 			log.Printf("Error setting player active for %q / %q: %v", name, code, err)
 		}
 	}
@@ -561,7 +562,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		now := time.Now().Unix()
 		if now-g.Created > 1800 {
 			log.Printf("Culling game %q because it's been waiting too long", code)
-			if err := s.store.DeleteGame(ctx, code); err != nil {
+			if err := s.Store.DeleteGame(ctx, code); err != nil {
 				log.Printf("Error deleting game %q: %v", code, err)
 			}
 			writeErr(w, errors.New("this game took too long to start"), http.StatusNotFound)
@@ -573,7 +574,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			if p.Name == name {
 				continue
 			}
-			lastActive, err := s.store.PlayerLastActive(ctx, code, p.Name)
+			lastActive, err := s.Store.PlayerLastActive(ctx, code, p.Name)
 			if err != nil {
 				log.Printf("Error getting last active for %q / %q: %v", p.Name, code, err)
 				continue
@@ -590,7 +591,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		}
 		if anyBooted {
 			log.Printf("Booted players from %q %v", code, g.Players)
-			if err := s.store.WriteGame(ctx, g); err != nil {
+			if err := s.Store.WriteGame(ctx, g); err != nil {
 				log.Printf("Could not store game after booting players: %v", err)
 			}
 		}
@@ -611,14 +612,14 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		log.Printf("%s broke connection for %q: %v", name, code, err)
-		if err := s.store.RecordPlayerActive(ctx, code, name, 0); err != nil {
+		if err := s.Store.RecordPlayerActive(ctx, code, name, 0); err != nil {
 			log.Printf("Error setting player inactive for %q / %q: %v", name, code, err)
 		}
 		if !g.LeaveOrQuit(ctx, name) {
 			log.Printf("Could not boot %s from %q when the connection broke", name, code)
 		}
 		return
-	case g := <-s.store.WatchGame(ctx, code, version):
+	case g := <-s.Store.WatchGame(ctx, code, version):
 		s.encodeFilteredGame(ctx, w, name, g)
 	}
 }
@@ -647,7 +648,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	pickup := code == "PICKUP"
 	if pickup {
-		g, err = s.store.FindPickupGame(ctx)
+		g, err = s.Store.FindPickupGame(ctx)
 		if err != nil && err != ErrNoSuchGame {
 			log.Printf("Error finding pickup game: %v", err)
 			writeErr(w, err, http.StatusInternalServerError)
@@ -662,7 +663,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			prefix = code[:6]
 		}
 
-		g, err = s.store.FindGameAlreadyPlaying(ctx, prefix, name)
+		g, err = s.Store.FindGameAlreadyPlaying(ctx, prefix, name)
 		if err != nil && err != ErrNoSuchGame {
 			log.Printf("Error reading game %q: %v", prefix, err)
 			writeErr(w, err, http.StatusInternalServerError)
@@ -670,7 +671,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if g == nil {
-			g, err = s.store.FindOpenGame(ctx, prefix)
+			g, err = s.Store.FindOpenGame(ctx, prefix)
 			if err != nil && err != ErrNoSuchGame {
 				log.Printf("Error reading game %q: %v", prefix, err)
 				writeErr(w, err, http.StatusInternalServerError)
@@ -687,7 +688,9 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	createdNewGame := false
 	if g == nil {
+		createdNewGame = true
 		if pickup {
 			code = fmt.Sprintf("%s-%s", RandomString(6), RandomString(6))
 		} else {
@@ -728,7 +731,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := s.store.WriteGame(ctx, g); err != nil {
+		if err := s.Store.WriteGame(ctx, g); err != nil {
 			log.Printf("Error writing game %q: %v", code, err)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
@@ -736,6 +739,23 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.encodeFilteredGame(ctx, w, name, g)
+
+	if createdNewGame {
+		if s.AgentSpawner != nil {
+			whichAgent := ""
+			if options.RandomChoice {
+				whichAgent = "random"
+			}
+			if options.GibbsPlanner {
+				whichAgent = "gibbs"
+			}
+			if whichAgent != "" {
+				if err := s.AgentSpawner.NewAgent(ctx, whichAgent, code); err != nil {
+					log.Printf("Error spawning agent %q for %q: %v", whichAgent, code, err)
+				}
+			}
+		}
+	}
 }
 
 func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
@@ -749,7 +769,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
@@ -762,7 +782,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -782,7 +802,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
@@ -812,7 +832,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 
 	player.ChickenFootURL = url
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -832,7 +852,7 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
@@ -862,7 +882,7 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 
 	player.ReactURL = url
 
-	if err := s.store.WriteGame(ctx, g); err != nil {
+	if err := s.Store.WriteGame(ctx, g); err != nil {
 		log.Printf("Error writing game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -894,7 +914,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if rpi, err := s.store.GetPlayerByName(r.Context(), pi.Name); err == nil {
+	if rpi, err := s.Store.GetPlayerByName(r.Context(), pi.Name); err == nil {
 		if rpi.Id != playerID {
 			log.Printf("Player %q already registered to %q", pi.Name, rpi.Id)
 			writeErr(w, ErrPlayerAlreadyRegistered, http.StatusConflict)
@@ -903,7 +923,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 	}
 
 	if playerID != "" {
-		if err := s.store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
+		if err := s.Store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
 			log.Printf("Error registering player %q: %v", pi.Name, err)
 			writeErr(w, err, http.StatusBadRequest)
 			return
@@ -920,11 +940,11 @@ func (s *GameServer) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	playerID := chi.URLParam(r, "playerID")
-	pi, err := s.store.GetPlayer(ctx, playerID)
+	pi, err := s.Store.GetPlayer(ctx, playerID)
 
 	if err == ErrNoRegisteredPlayer {
 		// If this isn't a valid player ID, try the player by name.
-		pi, err = s.store.GetPlayerByName(ctx, playerID)
+		pi, err = s.Store.GetPlayerByName(ctx, playerID)
 	}
 
 	if err != nil {
@@ -957,7 +977,7 @@ func (s *GameServer) HandleUpdatePlayerConfig(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := s.store.UpdatePlayerConfig(ctx, playerID, cfg); err != nil {
+	if err := s.Store.UpdatePlayerConfig(ctx, playerID, cfg); err != nil {
 		log.Printf("Error updating player config: %v", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
@@ -993,11 +1013,11 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	g, err := s.store.ReadGame(ctx, code)
+	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
 		log.Printf("Error reading game %q: %v", code, err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
-	s.store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen, reqBody.ErrorMessage)
+	s.Store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen, reqBody.ErrorMessage)
 }

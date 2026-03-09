@@ -15,10 +15,11 @@ import (
 )
 
 var (
-	addr   = flag.String("addr", "0.0.0.0", "address to listen on")
-	port   = flag.Int("port", 8080, "port to listen on")
-	env    = flag.String("env", "", "firestore env (unset to use MemoryStore)")
-	noCors = flag.Bool("no-cors", false, "disable cors")
+	addr         = flag.String("addr", "0.0.0.0", "address to listen on")
+	port         = flag.Int("port", 8080, "port to listen on")
+	env          = flag.String("env", "", "firestore env (unset to use MemoryStore)")
+	noCors       = flag.Bool("no-cors", false, "disable cors")
+	agentSpawner = flag.String("agent-spawner", "local", "agent spawner to use: local, gce")
 )
 
 func main() {
@@ -66,7 +67,21 @@ func main() {
 		}
 	}
 
-	game.RegisterHandlers(r, store)
+	var spawner game.AgentSpawner
+	switch *agentSpawner {
+	case "":
+		spawner = nil
+	case "local":
+		spawner = game.LocalAgentSpawner{}
+	default:
+		log.Fatalf("Unknown agent spawner: %s", *agentSpawner)
+	}
+
+	gs := &game.GameServer{
+		Store:        store,
+		AgentSpawner: spawner,
+	}
+	game.RegisterHandlers(r, gs)
 
 	listenAddr := fmt.Sprintf("%s:%d", *addr, *port)
 	log.Printf("Server starting on %s", listenAddr)

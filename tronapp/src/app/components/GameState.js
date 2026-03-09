@@ -13,7 +13,8 @@ const defaultConfig = {
 };
 
 const defaultOptions = {
-	roodle: false,
+	randomChoice: false,
+	gibbsPlanner: false,
 };
 
 export function GameProvider({ children }) {
