@@ -62,6 +62,12 @@ func main() {
 
 	name := *name
 
+	tc := &client.TronimoesClient{
+		TronservAddr: *tronserv_addr,
+		Client:       c,
+		Name:         name,
+	}
+
 	var a types.Agent
 	switch *which {
 	case "random":
@@ -74,7 +80,8 @@ func main() {
 			name = CreateName("GP")
 		}
 		gp := &gibbs_planner.GibbsPlanner{
-			Name: name,
+			Name:   name,
+			Client: tc,
 		}
 		gp.SetDefaults()
 		a = gp
@@ -82,11 +89,7 @@ func main() {
 		log.Fatalf("Unknown agent: %s", *which)
 	}
 
-	tc := client.TronimoesClient{
-		TronservAddr: *tronserv_addr,
-		Client:       c,
-		Name:         name,
-	}
+	tc.Name = name
 
 	log.Printf("Starting %s agent %s, connecting to %s for game %s", *which, name, *tronserv_addr, *gamecode)
 	if *archive != "" {

@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/skelterjohn/tronimoes/tronserv/agent/reacts"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
+	"github.com/skelterjohn/tronimoes/tronserv/client"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -37,6 +39,7 @@ type GibbsPlanner struct {
 	bag           []game.Tile
 	hands         []*HandState
 	myPlayerIndex int
+	Client        *client.TronimoesClient
 }
 
 func (gp *GibbsPlanner) SetDefaults() {
@@ -155,6 +158,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 				Selected: game.Coord{X: x, Y: y},
 			}
 		}
+		gp.React(ctx, "sad")
 		return types.Move{
 			Pass:     true,
 			Selected: types.RandomInitialFoot(g),
@@ -169,6 +173,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 	for _, s := range legalSpacers {
 		if s.String() == bestMove {
+			gp.React(ctx, "freedom")
 			return types.Move{
 				Spacer: s,
 			}
@@ -178,6 +183,14 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	return types.Move{
 		Draw: true,
 	}
+}
+
+func (gp *GibbsPlanner) React(ctx context.Context, query string) {
+	go func(ctx context.Context) {
+		if _, err := gp.Client.React(ctx, reacts.FindImageURL(query)); err != nil {
+			game.Log(ctx, "Error reacting: %v", err)
+		}
+	}(context.Background())
 }
 
 func (gp *GibbsPlanner) ConsiderSwaps(ctx context.Context) {
