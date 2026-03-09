@@ -59,13 +59,37 @@ func main() {
 		}
 	}
 
+	name := *name
+
+	var a types.Agent
+	switch *which {
+	case "random":
+		if name == "" {
+			name = CreateName("RC")
+		}
+		a = RandomChoice{}
+	case "gibbs":
+		if name == "" {
+			name = CreateName("GP")
+		}
+		a = &gibbs_planner.GibbsPlanner{
+			Name:               name,
+			MaxInferenceTime:   1 * time.Second,
+			MaxSimulationTime:  5 * time.Second,
+			MaxSimulationDepth: 15,
+			ValueDecay:         0.9,
+		}
+	default:
+		log.Fatalf("Unknown agent: %s", *which)
+	}
+
 	tc := client.TronimoesClient{
 		TronservAddr: *tronserv_addr,
 		Client:       c,
-		Name:         *name,
+		Name:         name,
 	}
 
-	log.Printf("Starting %s agent %s, connecting to %s for game %s", *which, *name, *tronserv_addr, *gamecode)
+	log.Printf("Starting %s agent %s, connecting to %s for game %s", *which, name, *tronserv_addr, *gamecode)
 	if *archive != "" {
 		if err := os.MkdirAll(*archive, 0755); err != nil {
 			log.Fatalf("save-dir: %v", err)
@@ -81,22 +105,6 @@ func main() {
 	lastUpdateGame := g
 
 	lastMoveTime := time.Now()
-
-	var a types.Agent
-	switch *which {
-	case "random":
-		a = RandomChoice{}
-	case "gibbs":
-		a = &gibbs_planner.GibbsPlanner{
-			Name:               *name,
-			MaxInferenceTime:   1 * time.Second,
-			MaxSimulationTime:  5 * time.Second,
-			MaxSimulationDepth: 15,
-			ValueDecay:         0.9,
-		}
-	default:
-		log.Fatalf("Unknown agent: %s", *which)
-	}
 
 	for !g.Done {
 		if len(g.Rounds) == 0 {
@@ -121,14 +129,14 @@ func main() {
 			lastUpdateGame = g
 		}
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
-			if g.Players[g.Turn].Name == *name {
+			if g.Players[g.Turn].Name == name {
 				log.Printf("It's my turn")
 				log.Printf(" %v", g.Players[g.Turn].Hand)
 			} else {
 				log.Printf("It's %s's turn", g.Players[g.Turn].Name)
 			}
-			if g.Players[g.Turn].Name == *name {
-				p := g.GetPlayer(ctx, *name)
+			if g.Players[g.Turn].Name == name {
+				p := g.GetPlayer(ctx, name)
 				m := a.GetMove(ctx, g, p)
 				log.Printf("Move: %+v", m)
 				if *archive != "" {
