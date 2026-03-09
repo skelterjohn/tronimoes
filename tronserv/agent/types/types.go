@@ -24,6 +24,8 @@ type Agent interface {
 	Ready(ctx context.Context)
 	Update(ctx context.Context, previousGame *game.Game, g *game.Game)
 	GetMove(ctx context.Context, g *game.Game, p *game.Player) Move
+	CompleteRound(ctx context.Context, g *game.Game)
+	CompleteGame(ctx context.Context, g *game.Game)
 }
 
 func RandomInitialFoot(g *game.Game) game.Coord {

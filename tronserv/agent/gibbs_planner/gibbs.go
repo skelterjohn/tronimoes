@@ -50,11 +50,24 @@ func (gp *GibbsPlanner) SetDefaults() {
 	gp.MaxSimulationsPerMove = 0
 }
 
-func (GibbsPlanner) Ready(ctx context.Context) {
+func (gp *GibbsPlanner) Ready(ctx context.Context) {
+	gp.React(ctx, "bow")
+}
 
+func (gp *GibbsPlanner) CheckScore(ctx context.Context, pg, g *game.Game) {
+	if pg != nil {
+		scoreDiff := g.GetPlayer(ctx, gp.Name).Score - pg.GetPlayer(ctx, gp.Name).Score
+		if scoreDiff > 0 {
+			gp.React(ctx, "yes")
+		} else if scoreDiff < 0 {
+			gp.React(ctx, "no")
+		}
+	}
 }
 
 func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *game.Game) {
+	gp.CheckScore(ctx, previousGame, g)
+
 	if gp.lastGame == nil || len(g.Rounds) != len(previousGame.Rounds) {
 		gp.createInitialGuesses(ctx, g)
 	} else {
@@ -76,6 +89,7 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 }
 
 func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
+	gp.CheckScore(ctx, gp.lastGame, g)
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
 	if len(legalMoves) == 0 && len(legalSpacers) == 0 {
@@ -151,6 +165,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 	if strings.HasPrefix(bestMove, "pass") {
 		rest := bestMove[4:]
+		gp.React(ctx, "sad")
 		var x, y int
 		if _, err := fmt.Sscanf(rest, "(%d,%d)", &x, &y); err == nil {
 			return types.Move{
@@ -158,7 +173,6 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 				Selected: game.Coord{X: x, Y: y},
 			}
 		}
-		gp.React(ctx, "sad")
 		return types.Move{
 			Pass:     true,
 			Selected: types.RandomInitialFoot(g),
@@ -185,12 +199,57 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 }
 
+func (gp *GibbsPlanner) CompleteRound(ctx context.Context, g *game.Game) {
+	p := g.GetPlayer(ctx, gp.Name)
+	if p.Dead {
+		gp.React(ctx, "skull")
+	}
+	if len(p.Hand) == 0 {
+		gp.React(ctx, "work")
+	}
+	othersLive := false
+	for _, op := range g.Players {
+		if op.Name == gp.Name {
+			continue
+		}
+		if !op.Dead {
+			othersLive = true
+		}
+	}
+	if !othersLive {
+		gp.React(ctx, "zap")
+	}
+}
+
+func (gp *GibbsPlanner) CompleteGame(ctx context.Context, g *game.Game) {
+	p := g.GetPlayer(ctx, gp.Name)
+	highScore := p.Score
+	for _, op := range g.Players {
+		if op.Score > highScore {
+			highScore = op.Score
+		}
+	}
+	if p.Score == highScore {
+		gp.ReactWait(ctx, "victory")
+	}
+}
+
 func (gp *GibbsPlanner) React(ctx context.Context, query string) {
 	go func(ctx context.Context) {
-		if _, err := gp.Client.React(ctx, reacts.FindImageURL(query)); err != nil {
-			game.Log(ctx, "Error reacting: %v", err)
-		}
+		gp.ReactWait(ctx, query)
 	}(context.Background())
+}
+
+func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {
+	game.Log(ctx, "reacting: %s", query)
+	url, err := reacts.FindImageURL(ctx, query)
+	if err != nil {
+		game.Log(ctx, "Error getting image URL: %v", err)
+		return
+	}
+	if _, err := gp.Client.React(ctx, url); err != nil {
+		game.Log(ctx, "Error reacting: %v", err)
+	}
 }
 
 func (gp *GibbsPlanner) ConsiderSwaps(ctx context.Context) {

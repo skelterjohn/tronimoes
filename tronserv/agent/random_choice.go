@@ -41,3 +41,11 @@ func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) t
 		Draw: true,
 	}
 }
+
+func (RandomChoice) CompleteRound(ctx context.Context, g *game.Game) {
+
+}
+
+func (RandomChoice) CompleteGame(ctx context.Context, g *game.Game) {
+
+}

@@ -110,18 +110,27 @@ func main() {
 
 	lastMoveTime := time.Now()
 
-	footURL := reacts.FindImageURL("bot")
-	g, err = tc.ChooseFoot(ctx, footURL)
+	footURL, err := reacts.FindImageURL(ctx, "bot")
 	if err != nil {
-		log.Printf("Could not choose foot: %v", err)
-		return
+		log.Printf("Could not get image URL: %v", err)
+	} else {
+		g, err = tc.ChooseFoot(ctx, footURL)
+		if err != nil {
+			log.Printf("Could not choose foot: %v", err)
+		}
 	}
+
+	roundDoneCounter := -1
 
 	for !g.Done {
 		if len(g.Rounds) == 0 {
 			log.Print("New game beginning")
 		} else if g.Rounds[len(g.Rounds)-1].Done {
-			log.Print("Round done")
+			if roundDoneCounter < len(g.Rounds) {
+				log.Print("Round done")
+				a.CompleteRound(ctx, g)
+				roundDoneCounter = len(g.Rounds)
+			}
 		}
 
 		r := g.CurrentRound(ctx)
@@ -252,5 +261,6 @@ func main() {
 			log.Printf("%s passed", lastPlayer.Name)
 		}
 	}
+	a.CompleteGame(ctx, g)
 	log.Println("Game over")
 }
