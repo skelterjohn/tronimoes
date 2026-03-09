@@ -91,24 +91,20 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		);
 	}
 	return <div className="font-game absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit min-w-[20rem] space-y-8">
-		{isRegistered ? (
-			<div>
-				<div className="text-white">designation</div>
-				<div className="bg-black rounded-lg h-16 p-4 border-white border text-white">
-					<p className="text-xl tracking-wider">{playerName}</p>
-				</div>
-			</div>
-		) : (
+		<div>
+			<div className="text-white">designation</div>
 			<Input
 				placeholder="enter your designation"
 				size="large"
-				className="font-game text-lg"
-				value={nameInput}
+				className={`font-game text-lg ${isRegistered ? '!bg-black !text-white border-white [&.ant-input-disabled]:!bg-black [&.ant-input-disabled]:!text-white [&.ant-input-disabled]:!opacity-100 [&.ant-input-disabled]:cursor-default' : ''}`}
+				style={isRegistered ? { backgroundColor: 'black', color: 'white' } : undefined}
+				styles={isRegistered ? { input: { backgroundColor: 'black', color: 'white' } } : undefined}
+				value={isRegistered ? playerName : nameInput}
 				disabled={isRegistered}
-				onChange={(e) => setNameInput(e.target.value)}
+				onChange={(e) => !isRegistered && setNameInput(e.target.value)}
 				onPressEnter={joinPickup}
 			/>
-		)}
+		</div>
 		<div className="flex gap-2 text-white">
 			<span className="text-3xl text-white font-bold">#</span>
 			<Input.OTP
