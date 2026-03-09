@@ -58,9 +58,9 @@ func (gp *GibbsPlanner) CheckScore(ctx context.Context, pg, g *game.Game) {
 	if pg != nil {
 		scoreDiff := g.GetPlayer(ctx, gp.Name).Score - pg.GetPlayer(ctx, gp.Name).Score
 		if scoreDiff > 0 {
-			gp.React(ctx, "yes")
+			gp.React(ctx, "happy")
 		} else if scoreDiff < 0 {
-			gp.React(ctx, "no")
+			gp.React(ctx, "sad")
 		}
 	}
 }
@@ -165,7 +165,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 	if strings.HasPrefix(bestMove, "pass") {
 		rest := bestMove[4:]
-		gp.React(ctx, "sad")
+		gp.React(ctx, "frustration")
 		var x, y int
 		if _, err := fmt.Sscanf(rest, "(%d,%d)", &x, &y); err == nil {
 			return types.Move{
@@ -187,7 +187,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	}
 	for _, s := range legalSpacers {
 		if s.String() == bestMove {
-			gp.React(ctx, "freedom")
+			gp.React(ctx, "free")
 			return types.Move{
 				Spacer: s,
 			}
