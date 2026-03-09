@@ -94,7 +94,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		<div>
 			<div className="text-white">designation</div>
 			<Input
-				placeholder="enter your designation"
+				placeholder="enter your username"
 				size="large"
 				className={`font-game text-lg ${isRegistered ? '!bg-black !text-white border-white [&.ant-input-disabled]:!bg-black [&.ant-input-disabled]:!text-white [&.ant-input-disabled]:!opacity-100 [&.ant-input-disabled]:cursor-default' : ''}`}
 				style={isRegistered ? { backgroundColor: 'black', color: 'white' } : undefined}
