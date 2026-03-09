@@ -122,6 +122,11 @@ func main() {
 				log.Printf("Error starting game: %v", err)
 				return
 			}
+
+			if g.CurrentRound(ctx) != nil {
+				a.Update(ctx, lastUpdateGame, g)
+				lastUpdateGame = g
+			}
 		} else {
 			a.Update(ctx, lastUpdateGame, g)
 			lastUpdateGame = g
