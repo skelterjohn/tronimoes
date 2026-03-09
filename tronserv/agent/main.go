@@ -100,6 +100,8 @@ func main() {
 		return
 	}
 
+	log.Printf("Joined game %s", g.Code)
+
 	lastUpdateGame := g
 
 	lastMoveTime := time.Now()

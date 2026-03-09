@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/rand"
 	"strings"
 	"unicode"
 )
@@ -12,11 +13,7 @@ import (
 // Unknown letters are skipped. Same initials produce the same name.
 func CreateName(initials string) string {
 	var parts []string
-	var h uint64
 	for _, c := range initials {
-		h = h*31 + uint64(unicode.ToUpper(c))
-	}
-	for i, c := range initials {
 		c = unicode.ToUpper(c)
 		var list []string
 		switch c {
@@ -34,7 +31,7 @@ func CreateName(initials string) string {
 		if len(list) == 0 {
 			continue
 		}
-		idx := (h + uint64(i)*17) % uint64(len(list))
+		idx := rand.Intn(len(list))
 		parts = append(parts, list[idx])
 	}
 	return strings.Join(parts, " ")
