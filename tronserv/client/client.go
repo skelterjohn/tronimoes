@@ -143,3 +143,25 @@ func (c *TronimoesClient) LaySpacer(ctx context.Context, sp *game.Spacer) (*game
 	}
 	return &g, nil
 }
+
+func (c *TronimoesClient) React(ctx context.Context, url string) (*game.Game, error) {
+	reqBody := map[string]string{
+		"url": url,
+	}
+	var g game.Game
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/react", c.Code), reqBody, &g); err != nil {
+		return nil, err
+	}
+	return &g, nil
+}
+
+func (c *TronimoesClient) ChooseFoot(ctx context.Context, url string) (*game.Game, error) {
+	reqBody := map[string]string{
+		"url": url,
+	}
+	var g game.Game
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/foot", c.Code), reqBody, &g); err != nil {
+		return nil, err
+	}
+	return &g, nil
+}

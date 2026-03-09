@@ -15,6 +15,7 @@ import (
 	"cloud.google.com/go/compute/metadata"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/gibbs_planner"
+	"github.com/skelterjohn/tronimoes/tronserv/agent/reacts"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/client"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
@@ -105,6 +106,13 @@ func main() {
 	lastUpdateGame := g
 
 	lastMoveTime := time.Now()
+
+	footURL := reacts.FindImageURL("bot")
+	g, err = tc.ChooseFoot(ctx, footURL)
+	if err != nil {
+		log.Printf("Could not choose foot: %v", err)
+		return
+	}
 
 	for !g.Done {
 		if len(g.Rounds) == 0 {
