@@ -128,7 +128,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 				type="primary"
 				size="large"
 				className="game-btn"
-				disabled={nameInput === ""}
+				disabled={playerName === ""}
 				onClick={joinPickup}
 			>
 				pick-up game
