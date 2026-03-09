@@ -133,6 +133,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 			simulating = false
 		}
 	}
+	game.Log(ctx, "simulated %d games", simulations)
 	bestMove, err := root.ChooseBestMove(ctx)
 	if err != nil {
 		game.Debug(ctx, "error choosing best move: %v", err)
