@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 )
@@ -276,8 +278,32 @@ func (s *MemoryStore) UpdatePlayerConfig(ctx context.Context, playerID string, c
 	return nil
 }
 
+var filenameSafeRE = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
+
 func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error {
 	log.Printf("reporting issue for game: %s", game.Code)
-	json.NewEncoder(os.Stdout).Encode(game)
+	data, err := json.MarshalIndent(game, "", "\t")
+	if err != nil {
+		return fmt.Errorf("marshaling game: %w", err)
+	}
+	name := strings.ToLower(strings.TrimSpace(summary))
+	if name == "" {
+		name = "issue"
+	}
+	name = filenameSafeRE.ReplaceAllString(name, "_")
+	name = strings.Trim(name, "_")
+	if name == "" {
+		name = "issue"
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return fmt.Errorf("finding executable: %w", err)
+	}
+	testdataDir := filepath.Join(filepath.Dir(exe), "game", "testdata")
+	path := filepath.Join(testdataDir, name+".json")
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", path, err)
+	}
+	log.Printf("wrote issue to %s", path)
 	return nil
 }
