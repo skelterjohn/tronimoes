@@ -49,4 +49,5 @@ var (
 	ErrFreeFromSpacer           = errors.New("free lines must begin off a spacer")
 	ErrPlayerNameTooLong        = errors.New("player name too long")
 	ErrPlayerInitialsReserved   = errors.New("you cannot make a player with those initials")
+	ErrBadCode                  = errors.New("code must be exactly 6 capital letters")
 )

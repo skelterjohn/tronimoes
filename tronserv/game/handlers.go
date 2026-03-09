@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/go-chi/chi/v5"
@@ -694,6 +695,18 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		if pickup {
 			code = fmt.Sprintf("%s-%s", RandomString(6), RandomString(6))
 		} else {
+			if len(code) != 6 {
+				log.Printf("Code %q is the wrong length", code)
+				writeErr(w, ErrBadCode, http.StatusBadRequest)
+				return
+			}
+			for _, c := range code {
+				if !unicode.IsLetter(c) || !unicode.IsUpper(c) {
+					log.Printf("Code %q is not a capital letter", code)
+					writeErr(w, ErrBadCode, http.StatusBadRequest)
+					return
+				}
+			}
 			code = fmt.Sprintf("%s-%s", code, RandomString(6))
 		}
 		g = NewGame(ctx, code)
