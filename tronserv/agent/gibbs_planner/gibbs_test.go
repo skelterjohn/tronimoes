@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
@@ -31,12 +30,9 @@ func TestOneshot(t *testing.T) {
 	// Agent plays as the current player.
 	currentPlayer := g.Players[g.Turn]
 	gp := &GibbsPlanner{
-		Name:               currentPlayer.Name,
-		MaxInferenceTime:   1 * time.Second,
-		MaxSimulationTime:  1 * time.Second,
-		MaxSimulationDepth: 4,
-		ValueDecay:         0.9,
+		Name: currentPlayer.Name,
 	}
+	gp.SetDefaults()
 
 	// Previous game has no rounds so Update runs createInitialGuesses.
 	previousGame := &game.Game{
@@ -69,12 +65,9 @@ func TestNoSelfKill(t *testing.T) {
 
 	currentPlayer := g.Players[g.Turn]
 	gp := &GibbsPlanner{
-		Name:               currentPlayer.Name,
-		MaxInferenceTime:   1 * time.Second,
-		MaxSimulationTime:  1 * time.Second,
-		MaxSimulationDepth: 4,
-		ValueDecay:         0.9,
+		Name: currentPlayer.Name,
 	}
+	gp.SetDefaults()
 
 	previousGame := &game.Game{
 		Players: g.Players,

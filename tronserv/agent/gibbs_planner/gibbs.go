@@ -39,6 +39,14 @@ type GibbsPlanner struct {
 	myPlayerIndex int
 }
 
+func (gp *GibbsPlanner) SetDefaults() {
+	gp.MaxInferenceTime = 1 * time.Second
+	gp.MaxSimulationTime = 5 * time.Second
+	gp.MaxSimulationDepth = 15
+	gp.ValueDecay = 0.9
+	gp.MaxSimulationsPerMove = 0
+}
+
 func (GibbsPlanner) Ready(ctx context.Context) {
 
 }

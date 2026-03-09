@@ -72,13 +72,11 @@ func main() {
 		if name == "" {
 			name = CreateName("GP")
 		}
-		a = &gibbs_planner.GibbsPlanner{
-			Name:               name,
-			MaxInferenceTime:   1 * time.Second,
-			MaxSimulationTime:  5 * time.Second,
-			MaxSimulationDepth: 15,
-			ValueDecay:         0.9,
+		gp := &gibbs_planner.GibbsPlanner{
+			Name: name,
 		}
+		gp.SetDefaults()
+		a = gp
 	default:
 		log.Fatalf("Unknown agent: %s", *which)
 	}

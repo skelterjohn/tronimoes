@@ -52,13 +52,9 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulation
 	currentPlayer := g.Players[g.Turn]
 
 	gp := &gibbs_planner.GibbsPlanner{
-		Name:                  currentPlayer.Name,
-		MaxInferenceTime:      1 * time.Second,
-		MaxSimulationTime:     5 * time.Second,
-		MaxSimulationDepth:    10,
-		MaxSimulationsPerMove: maxSimulationsPerMove,
-		ValueDecay:            0.9,
+		Name: currentPlayer.Name,
 	}
+	gp.SetDefaults()
 
 	previousGame := &game.Game{
 		Players: g.Players,
