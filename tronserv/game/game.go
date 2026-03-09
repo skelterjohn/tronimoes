@@ -1408,11 +1408,16 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 	isDouble := lt.Tile.PipsA == lt.Tile.PipsB
 	if canStartFreeLine && isDouble && playedAtLeastOne {
 		if lt.Tile.PipsA > r.HighestLeader {
+			minX, maxX := r.Spacer.A.X, r.Spacer.B.X
+			if minX > maxX {
+				minX, maxX = maxX, minX
+			}
+			minY, maxY := r.Spacer.A.Y, r.Spacer.B.Y
+			if minY > maxY {
+				minY, maxY = maxY, minY
+			}
 			inSpacer := func(src Coord) bool {
-				if src.X >= r.Spacer.A.X && src.X <= r.Spacer.B.X && src.Y >= r.Spacer.A.Y && src.Y <= r.Spacer.B.Y {
-					return true
-				}
-				return false
+				return src.X >= minX && src.X <= maxX && src.Y >= minY && src.Y <= maxY
 			}
 			canBeFree := r.Spacer.B.Adj(lt.CoordA()) || r.Spacer.B.Adj(lt.CoordB())
 			if inSpacer(lt.CoordA()) || inSpacer(lt.CoordB()) {

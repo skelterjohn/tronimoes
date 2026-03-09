@@ -114,3 +114,18 @@ func TestPlayfoot(t *testing.T) {
 		t.Fatalf("error laying tile: %v", err)
 	}
 }
+
+func TestSpacerPlacementRejected(t *testing.T) {
+	game := decodeGame(t, "spacerplacement")
+	name := game.Players[game.Turn].Name
+	// 6:6 at (0,4) "right" would start a free line but is under the spacer (spacer runs (0,4)-(5,4)); must return ErrFreeFromSpacer.
+	err := game.LayTile(t.Context(), name, &LaidTile{
+		Tile:        &Tile{PipsA: 6, PipsB: 6},
+		Coord:       Coord{X: 0, Y: 4},
+		Orientation: "right",
+		PlayerName:  name,
+	})
+	if err != ErrFreeFromSpacer {
+		t.Fatalf("LayTile under spacer: got err %v, want ErrFreeFromSpacer", err)
+	}
+}
