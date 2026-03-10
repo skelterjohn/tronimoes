@@ -20,6 +20,49 @@ func (m Move) String() string {
 	return fmt.Sprintf("Move{%v, %v, %v, %v, %v}", m.LaidTile, m.Spacer, m.Draw, m.Pass, m.Selected)
 }
 
+func InferMove(ctx context.Context, pg *game.Game, g *game.Game) (Move, bool) {
+	if len(g.Rounds) == 0 {
+		return Move{}, false
+	}
+	currentRound := g.Rounds[len(g.Rounds)-1]
+	previousCurrentRound := pg.CurrentRound(ctx)
+	if currentRound == nil || previousCurrentRound == nil {
+		return Move{}, false
+	}
+	lastPlayer := g.Players[pg.Turn]
+	if len(currentRound.LaidTiles) > len(previousCurrentRound.LaidTiles) {
+		return Move{
+			LaidTile: currentRound.LaidTiles[len(currentRound.LaidTiles)-1],
+		}, true
+	}
+	if currentRound.Spacer != nil {
+		return Move{
+			Spacer: currentRound.Spacer,
+		}, true
+	}
+	for _, p := range g.Players {
+		if p.Name != lastPlayer.Name {
+			continue
+		}
+		if len(p.Hand) > len(pg.GetPlayer(ctx, p.Name).Hand) {
+			return Move{
+				Draw: true,
+			}, true
+		}
+	}
+	if pg.Turn != g.Turn {
+		selected := game.Coord{X: -1, Y: -1}
+		if len(currentRound.PlayerLines[lastPlayer.Name]) == 1 {
+			selected = lastPlayer.ChickenFootCoord
+		}
+		return Move{
+			Pass:     true,
+			Selected: selected,
+		}, true
+	}
+	return Move{}, false
+}
+
 type Agent interface {
 	Ready(ctx context.Context)
 	Update(ctx context.Context, previousGame *game.Game, g *game.Game)

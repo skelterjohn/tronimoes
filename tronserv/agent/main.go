@@ -238,31 +238,13 @@ func main() {
 		if len(g.Rounds) == 0 {
 			continue
 		}
-		currentRound := g.Rounds[len(g.Rounds)-1]
-		previousCurrentRound := previousGame.CurrentRound(ctx)
-		if currentRound == nil || previousCurrentRound == nil {
-			continue
+
+		move, ok := types.InferMove(ctx, previousGame, g)
+		if ok {
+			pp := previousGame.Players[previousGame.Turn]
+			log.Printf("%s played: %s", pp.Name, move)
 		}
-		lastPlayer := g.Players[previousGame.Turn]
-		knownPlay := false
-		if len(currentRound.LaidTiles) > len(previousCurrentRound.LaidTiles) {
-			lastTile := currentRound.LaidTiles[len(currentRound.LaidTiles)-1]
-			log.Printf("%s laid %s", lastPlayer.Name, lastTile)
-			knownPlay = true
-		}
-		if currentRound.Spacer != nil {
-			log.Printf("%s placed a spacer: %s", lastPlayer.Name, currentRound.Spacer)
-			knownPlay = true
-		}
-		for _, p := range g.Players {
-			if p.JustDrew {
-				log.Printf("%s just drew", p.Name)
-				knownPlay = true
-			}
-		}
-		if !knownPlay && previousGame.Turn != g.Turn {
-			log.Printf("%s passed", lastPlayer.Name)
-		}
+
 	}
 	a.CompleteGame(ctx, g)
 	log.Println("Game over")
