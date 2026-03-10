@@ -135,16 +135,16 @@ func main() {
 
 		r := g.CurrentRound(ctx)
 		if r == nil || r.Done {
-			a.Ready(ctx)
-
-			log.Print("Ready to begin a new round.")
-
-			g, err = tc.Start(ctx)
-			if err != nil {
-				log.Printf("Error starting game: %v", err)
-				return
+			p := g.GetPlayer(ctx, name)
+			if !p.Ready {
+				a.Ready(ctx)
+				log.Print("Ready to begin a new round.")
+				g, err = tc.Start(ctx)
+				if err != nil {
+					log.Printf("Error starting game: %v", err)
+					return
+				}
 			}
-
 			if g.CurrentRound(ctx) != nil {
 				a.Update(ctx, lastUpdateGame, g)
 				lastUpdateGame = g
@@ -235,6 +235,9 @@ func main() {
 
 		lastMoveTime = time.Now()
 
+		if len(g.Rounds) == 0 {
+			continue
+		}
 		currentRound := g.Rounds[len(g.Rounds)-1]
 		previousCurrentRound := previousGame.CurrentRound(ctx)
 		if currentRound == nil || previousCurrentRound == nil {
