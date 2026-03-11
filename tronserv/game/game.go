@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var Verbose = false
+var Verbose = true
 
 func dbg(format string, a ...interface{}) {
 	if Verbose {
@@ -534,17 +534,19 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
 			// try it without the indicated tile
 			tile.Indicated = nil
-			if err := round.LayTile(ctx, g, name, tile, false); err == nil {
-				return nil
+			dbg("Trying without the indicated tile")
+			err = round.LayTile(ctx, g, name, tile, false)
+			if err != nil {
+				// try it reversed
+				rt := tile.Reverse()
+				dbg("Trying it without indication and reversed")
+				if reverseErr := round.LayTile(ctx, g, name, rt, false); reverseErr != nil {
+					dbg("error with the reverse: %v", reverseErr)
+					return err
+				}
+				tile = rt
+				err = nil
 			}
-			// try it reversed
-			rt := tile.Reverse()
-			if reverseErr := round.LayTile(ctx, g, name, rt, false); reverseErr != nil {
-				dbg("error with the reverse: %v", reverseErr)
-				return err
-			}
-			tile = rt
-			err = nil
 		}
 		if err != nil {
 			return err
@@ -1008,8 +1010,10 @@ func (r *Round) canPlayOnLine(ctx context.Context, lt *LaidTile, line []*LaidTil
 }
 
 func (r *Round) canPlayOnTile(ctx context.Context, lt, last *LaidTile) (bool, int, error) {
+	dbg("canPlayOnTile: %s on %s", lt, last)
 	if lt.Indicated != nil && lt.Indicated.PipsA != -1 {
 		if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
+			dbg("no, is indicated")
 			return false, 0, ErrMustMatchPips
 		}
 	}
