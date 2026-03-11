@@ -1,0 +1,1054 @@
+{
+	"created": 1773169382,
+	"version": 41,
+	"pickup": true,
+	"done": false,
+	"code": "GQBPWL-DTIRUY",
+	"players": [
+		{
+			"name": "skelterjohn",
+			"ready": false,
+			"score": 3,
+			"hand": [
+				{
+					"pips_a": 0,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 0
+				},
+				{
+					"pips_a": 6,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 5
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": true,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 4,
+				"y": 7
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/ffd4ac143e6335ac68951b787d3c1902/7b/d9/gytP3Aix.gif",
+			"react_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/ba/f7/FyzZQoPR.gif",
+			"kills": null
+		},
+		{
+			"name": "Doncisco",
+			"ready": false,
+			"score": -1,
+			"hand": [
+				{
+					"pips_a": 2,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 3
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 5
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 1,
+				"y": 2
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/fb/97/3EpS4Gwh.gif",
+			"react_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/c8/d2/Xrd6dAmV.gif",
+			"kills": null
+		}
+	],
+	"turn": 1,
+	"rounds": [
+		{
+			"laid_tiles": [
+				{
+					"tile": {
+						"pips_a": 6,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 3,
+						"y": 4
+					},
+					"orientation": "right",
+					"player_name": "",
+					"next_pips": 6,
+					"dead": false,
+					"indicated": null,
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 4,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 5,
+						"y": 3
+					},
+					"orientation": "down",
+					"player_name": "skelterjohn",
+					"next_pips": 4,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 6,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 4,
+						"y": 3
+					},
+					"orientation": "up",
+					"player_name": "Doncisco",
+					"next_pips": 7,
+					"dead": true,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 1,
+						"pips_b": 4
+					},
+					"coord": {
+						"x": 5,
+						"y": 1
+					},
+					"orientation": "down",
+					"player_name": "skelterjohn",
+					"next_pips": 1,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 5,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 2,
+						"y": 2
+					},
+					"orientation": "right",
+					"player_name": "Doncisco",
+					"next_pips": 5,
+					"dead": true,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 3,
+						"pips_b": 5
+					},
+					"coord": {
+						"x": 2,
+						"y": 0
+					},
+					"orientation": "down",
+					"player_name": "Doncisco",
+					"next_pips": 3,
+					"dead": true,
+					"indicated": {
+						"pips_a": 5,
+						"pips_b": 7
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 1,
+						"pips_b": 5
+					},
+					"coord": {
+						"x": 5,
+						"y": 0
+					},
+					"orientation": "right",
+					"player_name": "skelterjohn",
+					"next_pips": 5,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 3,
+						"pips_b": 4
+					},
+					"coord": {
+						"x": 1,
+						"y": 0
+					},
+					"orientation": "left",
+					"player_name": "Doncisco",
+					"next_pips": 4,
+					"dead": true,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 5,
+						"pips_b": 5
+					},
+					"coord": {
+						"x": 6,
+						"y": 1
+					},
+					"orientation": "down",
+					"player_name": "skelterjohn",
+					"next_pips": 5,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 2,
+						"pips_b": 5
+					},
+					"coord": {
+						"x": 7,
+						"y": 3
+					},
+					"orientation": "up",
+					"player_name": "skelterjohn",
+					"next_pips": 2,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 2,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 6,
+						"y": 3
+					},
+					"orientation": "down",
+					"player_name": "skelterjohn",
+					"next_pips": 6,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 4,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 0,
+						"y": 1
+					},
+					"orientation": "down",
+					"player_name": "Doncisco",
+					"next_pips": 7,
+					"dead": true,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 1,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 5,
+						"y": 5
+					},
+					"orientation": "right",
+					"player_name": "skelterjohn",
+					"next_pips": 1,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 0,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 1,
+						"y": 1
+					},
+					"orientation": "down",
+					"player_name": "Doncisco",
+					"next_pips": 0,
+					"dead": true,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				}
+			],
+			"spacer": null,
+			"done": true,
+			"history": [
+				"Doncisco laid 6:6",
+				"skelterjohn laid 4:6",
+				"Doncisco laid 6:7",
+				"skelterjohn laid 1:4",
+				"Doncisco passed and is on the foot",
+				"skelterjohn laid 5:7",
+				"Doncisco laid 3:5 and is off the foot",
+				"skelterjohn laid 1:5",
+				"Doncisco laid 3:4",
+				"skelterjohn laid 5:5",
+				"skelterjohn laid 2:5",
+				"Doncisco passed and is on the foot",
+				"skelterjohn laid 2:6",
+				"Doncisco laid 4:7 and is off the foot",
+				"skelterjohn laid 1:6",
+				"Doncisco passed and is on the foot",
+				"skelterjohn laid 0:7"
+			],
+			"player_lines": {
+				"Doncisco": [
+					{
+						"tile": {
+							"pips_a": 6,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 3,
+							"y": 4
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 6,
+						"dead": false,
+						"indicated": null,
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 6,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 4,
+							"y": 3
+						},
+						"orientation": "up",
+						"player_name": "Doncisco",
+						"next_pips": 7,
+						"dead": true,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 5,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 2,
+							"y": 2
+						},
+						"orientation": "right",
+						"player_name": "Doncisco",
+						"next_pips": 5,
+						"dead": true,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 3,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 2,
+							"y": 0
+						},
+						"orientation": "down",
+						"player_name": "Doncisco",
+						"next_pips": 3,
+						"dead": true,
+						"indicated": {
+							"pips_a": 5,
+							"pips_b": 7
+						},
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 3,
+							"pips_b": 4
+						},
+						"coord": {
+							"x": 1,
+							"y": 0
+						},
+						"orientation": "left",
+						"player_name": "Doncisco",
+						"next_pips": 4,
+						"dead": true,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 4,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 0,
+							"y": 1
+						},
+						"orientation": "down",
+						"player_name": "Doncisco",
+						"next_pips": 7,
+						"dead": true,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 0,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 1,
+							"y": 1
+						},
+						"orientation": "down",
+						"player_name": "Doncisco",
+						"next_pips": 0,
+						"dead": true,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				],
+				"skelterjohn": [
+					{
+						"tile": {
+							"pips_a": 6,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 3,
+							"y": 4
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 6,
+						"dead": false,
+						"indicated": null,
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 4,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 5,
+							"y": 3
+						},
+						"orientation": "down",
+						"player_name": "skelterjohn",
+						"next_pips": 4,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 1,
+							"pips_b": 4
+						},
+						"coord": {
+							"x": 5,
+							"y": 1
+						},
+						"orientation": "down",
+						"player_name": "skelterjohn",
+						"next_pips": 1,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 1,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 5,
+							"y": 0
+						},
+						"orientation": "right",
+						"player_name": "skelterjohn",
+						"next_pips": 5,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 5,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 6,
+							"y": 1
+						},
+						"orientation": "down",
+						"player_name": "skelterjohn",
+						"next_pips": 5,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 2,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 7,
+							"y": 3
+						},
+						"orientation": "up",
+						"player_name": "skelterjohn",
+						"next_pips": 2,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 2,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 6,
+							"y": 3
+						},
+						"orientation": "down",
+						"player_name": "skelterjohn",
+						"next_pips": 6,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 1,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 5,
+							"y": 5
+						},
+						"orientation": "right",
+						"player_name": "skelterjohn",
+						"next_pips": 1,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				]
+			},
+			"free_lines": [],
+			"bagless_passes": 0,
+			"highest_leader": 6
+		},
+		{
+			"laid_tiles": [
+				{
+					"tile": {
+						"pips_a": 5,
+						"pips_b": 5
+					},
+					"coord": {
+						"x": 3,
+						"y": 4
+					},
+					"orientation": "right",
+					"player_name": "",
+					"next_pips": 5,
+					"dead": false,
+					"indicated": null,
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 5,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 5,
+						"y": 4
+					},
+					"orientation": "down",
+					"player_name": "Doncisco",
+					"next_pips": 7,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 5,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 4,
+						"y": 5
+					},
+					"orientation": "down",
+					"player_name": "skelterjohn",
+					"next_pips": 6,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 3,
+						"pips_b": 7
+					},
+					"coord": {
+						"x": 6,
+						"y": 4
+					},
+					"orientation": "down",
+					"player_name": "Doncisco",
+					"next_pips": 3,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 2,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 6,
+						"y": 6
+					},
+					"orientation": "left",
+					"player_name": "skelterjohn",
+					"next_pips": 2,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 3,
+						"pips_b": 5
+					},
+					"coord": {
+						"x": 6,
+						"y": 3
+					},
+					"orientation": "up",
+					"player_name": "Doncisco",
+					"next_pips": 5,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "Doncisco"
+				},
+				{
+					"tile": {
+						"pips_a": 2,
+						"pips_b": 2
+					},
+					"coord": {
+						"x": 5,
+						"y": 7
+					},
+					"orientation": "right",
+					"player_name": "skelterjohn",
+					"next_pips": 2,
+					"dead": false,
+					"indicated": {
+						"pips_a": -1,
+						"pips_b": -1
+					},
+					"who_laid_it": "skelterjohn"
+				}
+			],
+			"spacer": null,
+			"done": false,
+			"history": [
+				"skelterjohn laid 5:5",
+				"Doncisco laid 5:7",
+				"skelterjohn laid 5:6",
+				"Doncisco laid 3:7",
+				"skelterjohn laid 2:6",
+				"Doncisco laid 3:5",
+				"skelterjohn laid 2:2",
+				"skelterjohn passed and is on the foot"
+			],
+			"player_lines": {
+				"Doncisco": [
+					{
+						"tile": {
+							"pips_a": 5,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 3,
+							"y": 4
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 5,
+						"dead": false,
+						"indicated": null,
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 5,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 5,
+							"y": 4
+						},
+						"orientation": "down",
+						"player_name": "Doncisco",
+						"next_pips": 7,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 3,
+							"pips_b": 7
+						},
+						"coord": {
+							"x": 6,
+							"y": 4
+						},
+						"orientation": "down",
+						"player_name": "Doncisco",
+						"next_pips": 3,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "Doncisco"
+					},
+					{
+						"tile": {
+							"pips_a": 3,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 6,
+							"y": 3
+						},
+						"orientation": "up",
+						"player_name": "Doncisco",
+						"next_pips": 5,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "Doncisco"
+					}
+				],
+				"skelterjohn": [
+					{
+						"tile": {
+							"pips_a": 5,
+							"pips_b": 5
+						},
+						"coord": {
+							"x": 3,
+							"y": 4
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 5,
+						"dead": false,
+						"indicated": null,
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 5,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 4,
+							"y": 5
+						},
+						"orientation": "down",
+						"player_name": "skelterjohn",
+						"next_pips": 6,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 2,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 6,
+							"y": 6
+						},
+						"orientation": "left",
+						"player_name": "skelterjohn",
+						"next_pips": 2,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 2,
+							"pips_b": 2
+						},
+						"coord": {
+							"x": 5,
+							"y": 7
+						},
+						"orientation": "right",
+						"player_name": "skelterjohn",
+						"next_pips": 2,
+						"dead": false,
+						"indicated": {
+							"pips_a": -1,
+							"pips_b": -1
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				]
+			},
+			"free_lines": [],
+			"bagless_passes": 0,
+			"highest_leader": 5
+		}
+	],
+	"bag": [
+		{
+			"pips_a": 3,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 1
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 1
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 2
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 7,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 4
+		}
+	],
+	"board_width": 8,
+	"board_height": 9,
+	"max_pips": 7,
+	"history": [
+		"Doncisco started round 1 - 6:6",
+		"skelterjohn+1 cut off Doncisco's-1 line",
+		"skelterjohn+2 wins the round through attrition",
+		"skelterjohn started round 2 - 5:5"
+	]
+}

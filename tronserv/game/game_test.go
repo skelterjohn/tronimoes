@@ -115,6 +115,29 @@ func TestPlayfoot(t *testing.T) {
 	}
 }
 
+func TestDoublesturn(t *testing.T) {
+	game := decodeGame(t, "doublesturn")
+	if game.Turn != 1 {
+		t.Fatalf("doublesturn testdata: expected turn 1, got %d", game.Turn)
+	}
+	player1Name := game.Players[1].Name
+	err := game.LayTile(t.Context(), player1Name, &LaidTile{
+		Tile:        &Tile{PipsA: 2, PipsB: 5},
+		Coord:       Coord{X: 4, Y: 7},
+		Orientation: "down",
+		PlayerName:  player1Name,
+		NextPips:    5,
+		Indicated:   &Tile{PipsA: 2, PipsB: 2},
+		WhoLaidIt:   player1Name,
+	})
+	if err != nil {
+		t.Fatalf("LayTile(2:5 at (4,7) down): %v", err)
+	}
+	if game.Turn != 0 {
+		t.Errorf("after player 1 lays 2:5 at (4,7) down, expected turn 0, got %d", game.Turn)
+	}
+}
+
 func TestSpacerPlacementRejected(t *testing.T) {
 	game := decodeGame(t, "spacerplacement")
 	name := game.Players[game.Turn].Name
