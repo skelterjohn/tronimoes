@@ -744,7 +744,7 @@ function Game({ code }) {
 				</div>
 			</div>
 
-			<div className="flex justify-center items-center gap-4 h-[60px] w-screen md:w-auto">
+			<div className="flex justify-center items-center h-[60px] w-screen md:w-auto">
 				{opponents.map((o, i) => (
 					<div key={i} className="flex-1 overflow-x-auto">
 						<Opponent
