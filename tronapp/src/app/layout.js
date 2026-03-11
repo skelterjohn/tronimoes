@@ -17,6 +17,20 @@ const geistMono = localFont({
 export const metadata = {
 	title: "tronimoes",
 	description: "tronimoes",
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: "black-translucent",
+		title: "tronimoes",
+	},
+};
+
+export const viewport = {
+	themeColor: "#0a0a0a",
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 1,
+	userScalable: false,
+	viewportFit: "cover",
 };
 
 export default function RootLayout({ children }) {
