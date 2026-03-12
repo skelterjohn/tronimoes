@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var Verbose = true
+var Verbose = false
 
 func dbg(format string, a ...interface{}) {
 	if Verbose {
@@ -530,27 +530,8 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 
 	firstTile := len(round.LaidTiles) == 0
 	tile.WhoLaidIt = name
-	if err := round.LayTile(ctx, g, name, tile, false); err != nil {
-		if tile.Indicated != nil && tile.Indicated.PipsA != -1 {
-			// try it without the indicated tile
-			tile.Indicated = nil
-			dbg("Trying without the indicated tile")
-			err = round.LayTile(ctx, g, name, tile, false)
-			if err != nil {
-				// try it reversed
-				rt := tile.Reverse()
-				dbg("Trying it without indication and reversed")
-				if reverseErr := round.LayTile(ctx, g, name, rt, false); reverseErr != nil {
-					dbg("error with the reverse: %v", reverseErr)
-					return err
-				}
-				tile = rt
-				err = nil
-			}
-		}
-		if err != nil {
-			return err
-		}
+	if err := round.LayTileAllWays(ctx, g, name, tile, false); err != nil {
+		return err
 	}
 
 	round.Spacer = nil
@@ -1208,6 +1189,26 @@ func (r *Round) LaySpacer(ctx context.Context, g *Game, name string, spacer *Spa
 	}
 	r.Spacer = spacer
 	return nil
+}
+
+func (r *Round) LayTileAllWays(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
+	// First we try to lay the tile exactly as the RPC indicates.
+	err := r.LayTile(ctx, g, name, lt, dryRun)
+	if err == nil {
+		return nil
+	}
+	// But maybe the user accidentally added an indication.
+	lt.Indicated = nil
+	if noIndicatedErr := r.LayTile(ctx, g, name, lt, dryRun); noIndicatedErr == nil {
+		return nil
+	}
+	// Or maybe the user played it backwards.
+	rt := lt.Reverse()
+	if revErr := r.LayTile(ctx, g, name, rt, dryRun); revErr == nil {
+		return nil
+	}
+	// just use the first error
+	return err
 }
 
 func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile, dryRun bool) error {
