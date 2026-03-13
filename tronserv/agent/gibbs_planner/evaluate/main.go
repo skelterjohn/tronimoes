@@ -159,6 +159,16 @@ func main() {
 			},
 		},
 		{
+			Name:  "LeaderPass",
+			Label: "leaderpass",
+			Success: func(g *game.Game, move types.Move) (bool, string) {
+				if !move.Pass {
+					return false, "expected agent to pass, not play a tile"
+				}
+				return true, ""
+			},
+		},
+		{
 			Name:  "NoDrawBTBRJX",
 			Label: "no_draw_btbrjx",
 			Success: func(g *game.Game, move types.Move) (bool, string) {

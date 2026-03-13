@@ -91,7 +91,10 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	gp.CheckScore(ctx, gp.lastGame, g)
 	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
-	if len(legalMoves) == 0 && len(legalSpacers) == 0 {
+	playingOffRoundLeader := len(g.CurrentRound(ctx).PlayerLines[p.Name]) == 1
+	// If it's the round leader, we still have a choice to make that can be
+	// improved with planning. Otherwise, just pass/draw without planning.
+	if !playingOffRoundLeader && len(legalMoves) == 0 && len(legalSpacers) == 0 {
 		if p.JustDrew {
 			game.Log(ctx, "no legal moves or spacers, and just drew; passing")
 			return types.Move{
