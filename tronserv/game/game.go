@@ -500,7 +500,10 @@ func (g *Game) LaySpacer(ctx context.Context, name string, spacer *Spacer) error
 }
 
 func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
-	player := g.GetPlayer(ctx, tile.PlayerName)
+	if g.Players[g.Turn].Name != name {
+		return ErrNotYourTurn
+	}
+	player := g.GetPlayer(ctx, name)
 	if player == nil {
 		return ErrPlayerNotFound
 	}

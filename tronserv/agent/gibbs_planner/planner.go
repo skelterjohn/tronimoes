@@ -47,7 +47,6 @@ func (n *PlanNode) Next(ctx context.Context, move types.Move, turn, count int) *
 	if !ok {
 		isDouble := false
 		if move.LayTile {
-			game.Debug(ctx, "Next on the line of %q", move.LaidTile.PlayerName)
 			isDouble = move.LaidTile.Tile.PipsA == move.LaidTile.Tile.PipsB
 		}
 		if move.Pass || (move.LayTile && !isDouble) {
