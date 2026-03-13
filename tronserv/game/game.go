@@ -823,7 +823,7 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 					Tile:        t,
 					Orientation: orientation,
 					Coord:       src,
-					NextPips:    -1,
+					WhoLaidIt:   name,
 				}
 				if r.LayTile(ctx, g, name, &lt, true) == nil {
 					legalMoves = append(legalMoves, lt)
@@ -904,7 +904,7 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 						Tile:        t,
 						Orientation: orientation,
 						Coord:       A,
-						NextPips:    -1,
+						WhoLaidIt:   name,
 					}
 					if r.LayTile(ctx, g, name, &lt, true) == nil {
 						legalMoves = append(legalMoves, lt)
@@ -1246,7 +1246,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		return ErrTileOccluded
 	}
 
-	if r.BlockingFeet(ctx, g, squarePips, lt, name) {
+	if r.BlockingFeet(ctx, g, squarePips, *lt, name) {
 		return ErrNoBlockingFeet
 	}
 
@@ -1306,9 +1306,9 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
 			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, mainLine); ok {
 				playedALine = true
+				lt.NextPips = nextPips
 				if !dryRun {
 					r.PlayerLines[player.Name] = append(mainLine, lt)
-					lt.NextPips = nextPips
 				}
 			} else {
 				cerr(err)
@@ -1373,10 +1373,10 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 				}
 				playedALine = true
 				dbg("Playing it")
+				lt.PlayerName = oname
+				lt.NextPips = nextPips
 				if !dryRun {
-					lt.PlayerName = oname
 					r.PlayerLines[oname] = append(line, lt)
-					lt.NextPips = nextPips
 					// Update the chicken-foot.
 					if lt.NextPips == lt.Tile.PipsA {
 						op.ChickenFootCoord = lt.CoordB()
@@ -1394,10 +1394,10 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 			for i, line := range r.FreeLines {
 				if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
 					playedALine = true
+					lt.PlayerName = ""
+					lt.NextPips = nextPips
 					if !dryRun {
-						lt.PlayerName = ""
 						r.FreeLines[i] = append(line, lt)
-						lt.NextPips = nextPips
 					}
 					break
 				} else {
@@ -1434,10 +1434,10 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 
 			if canBeFree {
 				playedALine = true
+				lt.PlayerName = ""
+				lt.NextPips = lt.Tile.PipsA
 				if !dryRun {
-					lt.PlayerName = ""
 					r.FreeLines = append(r.FreeLines, []*LaidTile{lt})
-					lt.NextPips = lt.Tile.PipsA
 					r.HighestLeader = lt.Tile.PipsA
 					g.Note(ctx, fmt.Sprintf("%s started a free line", name))
 				}
@@ -1664,9 +1664,7 @@ func (r *Round) killDeadLines(ctx context.Context, g *Game, player *Player, squa
 	return deadTileKeys
 }
 
-func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]SquarePips, ot *LaidTile, name string) bool {
-	lt := &LaidTile{}
-	*lt = *ot
+func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]SquarePips, lt LaidTile, name string) bool {
 	lt.PlayerName = name
 
 	allFrom := func(src Coord, orientations []string) []*LaidTile {
@@ -1804,7 +1802,7 @@ func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]
 		return false
 	}
 
-	return !recursiveEnsurePlayersOK(playersToSatisfy, blocks, lt)
+	return !recursiveEnsurePlayersOK(playersToSatisfy, blocks, &lt)
 }
 
 type SquarePips struct {

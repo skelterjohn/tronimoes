@@ -25,7 +25,7 @@ var (
 	countFlag       = flag.Int("count", 20, "run each test this many times")
 	concurrencyFlag = flag.Int("concurrency", 50, "run this many tests at a time")
 	logDirFlag      = flag.String("logdir", "evaluate_logs", "directory for run logs; a timestamped subdir (YYYYMMDD_HHMMSS) is created under it")
-	logFailOnlyFlag = flag.Bool("logfail", true, "only write log files for failed test runs")
+	logSuccessFlag  = flag.Bool("log-success", false, "also write logs for successful test runs")
 	maxSimFlag      = flag.Int("maxsim", 0, "max simulations per move (0 = no limit)")
 )
 
@@ -246,7 +246,7 @@ func main() {
 		msg     string
 	}
 	results := make(chan result, len(jobs))
-	logFailOnly := *logFailOnlyFlag
+	logSuccess := *logSuccessFlag
 	startTime := time.Now()
 	for _, j := range jobs {
 		wg.Add(1)
@@ -264,7 +264,7 @@ func main() {
 				verdict = "FAIL"
 				fmt.Fprintf(&logBuf, "\n--- result: %s ---\n", msg)
 			}
-			if !logFailOnly || !ok {
+			if logSuccess || !ok {
 				fname := fmt.Sprintf("%s_%s_%0*d.log", verdict, safeFilename(j.tc.Name), j.runWidth, j.run)
 				path := filepath.Join(logDir, fname)
 				_ = os.WriteFile(path, logBuf.Bytes(), 0644)

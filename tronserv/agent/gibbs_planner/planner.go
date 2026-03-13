@@ -42,12 +42,12 @@ var CFOffsets = []game.Coord{
 	{X: 1, Y: -1},
 }
 
-func (n *PlanNode) Next(move types.Move, turn, count int) *PlanNode {
-	// fmt.Printf("Next %s\n", move)
+func (n *PlanNode) Next(ctx context.Context, move types.Move, turn, count int) *PlanNode {
 	nextNode, ok := n.Moves[move]
 	if !ok {
 		isDouble := false
 		if move.LayTile {
+			game.Debug(ctx, "Next on the line of %q", move.LaidTile.PlayerName)
 			isDouble = move.LaidTile.Tile.PipsA == move.LaidTile.Tile.PipsB
 		}
 		if move.Pass || (move.LayTile && !isDouble) {
@@ -105,6 +105,18 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			maxDepth--
 		}
 
+		game.Debug(ctx, "curNode.depth=%d", curNode.Depth)
+		cachedTileCount := 0
+		cachedSpacerCount := 0
+		for m := range curNode.Moves {
+			if m.LayTile {
+				cachedTileCount++
+			} else if m.PlaceSpacer {
+				cachedSpacerCount++
+			}
+		}
+		game.Debug(ctx, "cachedTileCount=%d, cachedSpacerCount=%d", cachedTileCount, cachedSpacerCount)
+
 		p := g.Players[g.Turn]
 		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
 
@@ -129,7 +141,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			}
 		}
 
-		//curNode.Cull(ctx, allMoves)
+		curNode.Cull(ctx, allMoves)
 
 		game.Debug(ctx, "%s has %d tiles, %d spacers", p.Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
@@ -146,8 +158,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		}
 
 		for i, lt := range legalMoves {
-			lt.PlayerName = g.Players[g.Turn].Name
-			nn := curNode.Next(types.Move{LayTile: true, LaidTile: lt}, g.Turn, len(gp.hands))
+			nn := curNode.Next(ctx, types.Move{LayTile: true, LaidTile: lt}, g.Turn, len(gp.hands))
 			// bias the planner towards high-value, away from low-value.
 			unnormalizedLogLikelihoods[i] += nn.V[g.Turn]
 			// bias the planner away from options that have been considered a lot.
@@ -175,7 +186,6 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		if whichMove < tileMoves {
 			move := legalMoves[whichMove]
-			move.PlayerName = p.Name
 			game.Debug(ctx, "p%d lays %s", g.Turn, move)
 			if err := g.LayTile(ctx, p.Name, &move); err != nil {
 				game.Debug(ctx, "player=%+v", p)
@@ -212,7 +222,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		game.Debug(ctx, "p%d -> %s", curNode.Turn, bestMove)
 
-		nextNode = curNode.Next(bestMove, g.Turn, len(gp.hands))
+		nextNode = curNode.Next(ctx, bestMove, g.Turn, len(gp.hands))
 		nextNode.Eval = make([]float64, len(gp.hands))
 		for i := range nextNode.Eval {
 			nextNode.Eval[i] = float64(g.Players[i].Score)

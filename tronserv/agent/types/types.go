@@ -20,7 +20,7 @@ type Move struct {
 
 func (m Move) String() string {
 	if m.LayTile {
-		return fmt.Sprintf("LT{%s}", m.LaidTile)
+		return fmt.Sprintf("LT{%s %s %s %s %d %v}", m.LaidTile, m.LaidTile.PlayerName, m.LaidTile.WhoLaidIt, m.LaidTile.Orientation, m.LaidTile.NextPips, m.LaidTile.Dead)
 	}
 	if m.PlaceSpacer {
 		return fmt.Sprintf("PS{%s}", m.Spacer)
