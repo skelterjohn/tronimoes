@@ -100,11 +100,11 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		moveCount := len(legalMoves) + len(legalSpacers)
 
 		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
-		passOptions := 1
+		passOrDrawOptions := 1
 		if playingOffRoundLeader && p.JustDrew {
-			passOptions = 6 // (all 6 ways to pass)
+			passOrDrawOptions = 6 // (all 6 ways to pass)
 		}
-		moveCount += passOptions
+		moveCount += passOrDrawOptions
 
 		unnormalizedLogLikelihoods := make([]float64, moveCount)
 		for i := range unnormalizedLogLikelihoods {
