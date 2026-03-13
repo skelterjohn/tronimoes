@@ -153,7 +153,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			}
 			bestMove = types.Move{Spacer: spacer}
 		} else {
-			if !p.JustDrew {
+			if !p.JustDrew && len(g.Bag) > 0 {
 				if !g.DrawTile(ctx, p.Name) {
 					return errors.New("drawing failed")
 				}
