@@ -38,6 +38,13 @@ func (n *PlanNode) Next(move types.Move, turn, count int) *PlanNode {
 	moveStr := move.JSON()
 	nextNode, ok := n.Moves[moveStr]
 	if !ok {
+		isDouble := false
+		if move.LaidTile != nil {
+			isDouble = move.LaidTile.Tile.PipsA == move.LaidTile.Tile.PipsB
+		}
+		if move.Pass || (move.LaidTile != nil && !isDouble) {
+			turn = (turn + 1) % count
+		}
 		nextNode = NewPlanNode(turn, count, n.Depth+1)
 		n.Moves[moveStr] = nextNode
 	}
