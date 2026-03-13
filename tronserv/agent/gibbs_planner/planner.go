@@ -72,11 +72,16 @@ func (n *PlanNode) ChooseBestMove(ctx context.Context) (types.Move, error) {
 	return bestMove, nil
 }
 
-func (n *PlanNode) Cull(moves map[types.Move]bool) {
+func (n *PlanNode) Cull(ctx context.Context, moves map[types.Move]bool) {
+	delCount := 0
 	for m := range n.Moves {
 		if !moves[m] {
 			delete(n.Moves, m)
+			delCount++
 		}
+	}
+	if delCount > 0 {
+		game.Debug(ctx, "culled %d moves, %d remain", delCount, len(n.Moves))
 	}
 }
 
@@ -124,7 +129,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			}
 		}
 
-		curNode.Cull(allMoves)
+		//curNode.Cull(ctx, allMoves)
 
 		game.Debug(ctx, "%s has %d tiles, %d spacers", p.Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
@@ -170,8 +175,10 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		if whichMove < tileMoves {
 			move := legalMoves[whichMove]
+			move.PlayerName = p.Name
 			game.Debug(ctx, "p%d lays %s", g.Turn, move)
 			if err := g.LayTile(ctx, p.Name, &move); err != nil {
+				game.Debug(ctx, "player=%+v", p)
 				return fmt.Errorf("laying: %w", err)
 			}
 			bestMove = types.Move{LayTile: true, LaidTile: move}

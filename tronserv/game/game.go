@@ -733,32 +733,30 @@ type LaidTile struct {
 	WhoLaidIt   string `json:"who_laid_it"`
 }
 
-func (lt *LaidTile) Reverse() *LaidTile {
-	rt := &LaidTile{}
-	*rt = *lt
-	rt.Coord = rt.CoordB()
+func (lt LaidTile) Reverse() LaidTile {
+	lt.Coord = lt.CoordB()
 	switch lt.Orientation {
 	case "up":
-		rt.Orientation = "down"
+		lt.Orientation = "down"
 	case "down":
-		rt.Orientation = "up"
+		lt.Orientation = "up"
 	case "left":
-		rt.Orientation = "right"
+		lt.Orientation = "right"
 	case "right":
-		rt.Orientation = "left"
+		lt.Orientation = "left"
 	}
-	return rt
+	return lt
 }
 
-func (lt *LaidTile) CoordA() Coord {
+func (lt LaidTile) CoordA() Coord {
 	return lt.Coord
 }
 
-func (lt *LaidTile) CoordB() Coord {
+func (lt LaidTile) CoordB() Coord {
 	return lt.Coord.Orientation(lt.Orientation)
 }
 
-func (lt *LaidTile) String() string {
+func (lt LaidTile) String() string {
 	indicatedString := ""
 	if lt.Indicating {
 		indicatedString = fmt.Sprintf(" i%d:%d", lt.Indicated.PipsA, lt.Indicated.PipsB)
@@ -831,8 +829,8 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 					legalMoves = append(legalMoves, lt)
 				}
 				rt := lt.Reverse()
-				if r.LayTile(ctx, g, name, rt, true) == nil {
-					legalMoves = append(legalMoves, *rt)
+				if r.LayTile(ctx, g, name, &rt, true) == nil {
+					legalMoves = append(legalMoves, rt)
 				}
 			}
 
@@ -912,8 +910,8 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 						legalMoves = append(legalMoves, lt)
 					}
 					rt := lt.Reverse()
-					if r.LayTile(ctx, g, name, rt, true) == nil {
-						legalMoves = append(legalMoves, *rt)
+					if r.LayTile(ctx, g, name, &rt, true) == nil {
+						legalMoves = append(legalMoves, rt)
 					}
 				}
 			}
@@ -1205,7 +1203,7 @@ func (r *Round) LayTileAllWays(ctx context.Context, g *Game, name string, lt *La
 	}
 	// Or maybe the user played it backwards.
 	rt := lt.Reverse()
-	if revErr := r.LayTile(ctx, g, name, rt, dryRun); revErr == nil {
+	if revErr := r.LayTile(ctx, g, name, &rt, dryRun); revErr == nil {
 		return nil
 	}
 	// just use the first error
