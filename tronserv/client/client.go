@@ -145,6 +145,9 @@ func (c *TronimoesClient) LaySpacer(ctx context.Context, sp *game.Spacer) (*game
 }
 
 func (c *TronimoesClient) React(ctx context.Context, url string) (*game.Game, error) {
+	if c == nil {
+		return nil, nil // for local simulation tests
+	}
 	reqBody := map[string]string{
 		"url": url,
 	}

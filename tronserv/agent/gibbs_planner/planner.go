@@ -92,14 +92,16 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		default:
 			maxDepth--
 		}
-		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, g.Players[g.Turn])
 
-		game.Debug(ctx, "%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
+		p := g.Players[g.Turn]
+		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, p)
+
+		game.Debug(ctx, "%s has %d tiles, %d spacers", p.Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
 
-		playingOffRoundLeader := len(r.PlayerLines[g.Players[g.Turn].Name]) == 1
+		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
 		passOptions := 1
-		if playingOffRoundLeader {
+		if playingOffRoundLeader && p.JustDrew {
 			passOptions = 6 // (all 6 ways to pass)
 		}
 		moveCount += passOptions
@@ -140,19 +142,19 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		if whichMove < tileMoves {
 			move := legalMoves[whichMove]
 			game.Debug(ctx, "p%d lays %s", g.Turn, move)
-			if err := g.LayTile(ctx, g.Players[g.Turn].Name, move); err != nil {
+			if err := g.LayTile(ctx, p.Name, move); err != nil {
 				return fmt.Errorf("laying: %w", err)
 			}
 			bestMove = types.Move{LaidTile: move}
 		} else if whichMove < tileAndSpacerMoves {
 			spacer := legalSpacers[whichMove-tileMoves]
-			if err := g.LaySpacer(ctx, g.Players[g.Turn].Name, spacer); err != nil {
+			if err := g.LaySpacer(ctx, p.Name, spacer); err != nil {
 				return fmt.Errorf("spacing: %w", err)
 			}
 			bestMove = types.Move{Spacer: spacer}
 		} else {
-			if !g.Players[g.Turn].JustDrew {
-				if !g.DrawTile(ctx, g.Players[g.Turn].Name) {
+			if !p.JustDrew {
+				if !g.DrawTile(ctx, p.Name) {
 					return errors.New("drawing failed")
 				}
 				bestMove = types.Move{Draw: true}
@@ -165,7 +167,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 						Y: g.BoardHeight/2 + CFOffsets[whichOption].Y,
 					}
 				}
-				if err := g.Pass(ctx, g.Players[g.Turn].Name, cfSelection.X, cfSelection.Y); err != nil {
+				if err := g.Pass(ctx, p.Name, cfSelection.X, cfSelection.Y); err != nil {
 					return fmt.Errorf("passing: %w", err)
 				}
 				bestMove = types.Move{Pass: true, Selected: cfSelection}
