@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -44,6 +45,12 @@ func loadGame(testdataDir, label string) (*game.Game, error) {
 }
 
 func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulationsPerMove int) (success bool, message string) {
+	defer func() {
+		if r := recover(); r != nil {
+			message = fmt.Sprintf("panic: %v", r)
+			game.Debug(ctx, "panic: %v\n%s", r, string(debug.Stack()))
+		}
+	}()
 	g, err := loadGame(testdataDir, tc.Label)
 	if err != nil {
 		return false, err.Error()

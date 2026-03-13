@@ -33,6 +33,15 @@ func NewPlanNode(turn int, count int, depth int) *PlanNode {
 	}
 }
 
+var CFOffsets = []game.Coord{
+	{X: -1, Y: 0},
+	{X: 2, Y: 0},
+	{X: 0, Y: 1},
+	{X: 0, Y: -1},
+	{X: 1, Y: 1},
+	{X: 1, Y: -1},
+}
+
 func (n *PlanNode) Next(move types.Move, turn, count int) *PlanNode {
 	// fmt.Printf("Next %s\n", move)
 	moveStr := move.JSON()
@@ -87,7 +96,13 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		game.Debug(ctx, "%s has %d tiles, %d spacers", g.Players[g.Turn].Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
-		moveCount += 1 // draw or pass
+
+		playingOffRoundLeader := len(r.PlayerLines[g.Players[g.Turn].Name]) == 1
+		passOptions := 1
+		if playingOffRoundLeader {
+			passOptions = 6 // (all 6 ways to pass)
+		}
+		moveCount += passOptions
 
 		unnormalizedLogLikelihoods := make([]float64, moveCount)
 		for i := range unnormalizedLogLikelihoods {
@@ -119,32 +134,42 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		var nextNode *PlanNode
 		var bestMove types.Move
 
-		if whichMove < len(legalMoves) {
+		tileMoves := len(legalMoves)
+		tileAndSpacerMoves := tileMoves + len(legalSpacers)
+
+		if whichMove < tileMoves {
 			move := legalMoves[whichMove]
 			game.Debug(ctx, "p%d lays %s", g.Turn, move)
 			if err := g.LayTile(ctx, g.Players[g.Turn].Name, move); err != nil {
 				return fmt.Errorf("laying: %w", err)
 			}
 			bestMove = types.Move{LaidTile: move}
-		} else if whichMove == moveCount-1 {
+		} else if whichMove < tileAndSpacerMoves {
+			spacer := legalSpacers[whichMove-tileMoves]
+			if err := g.LaySpacer(ctx, g.Players[g.Turn].Name, spacer); err != nil {
+				return fmt.Errorf("spacing: %w", err)
+			}
+			bestMove = types.Move{Spacer: spacer}
+		} else {
 			if !g.Players[g.Turn].JustDrew {
 				if !g.DrawTile(ctx, g.Players[g.Turn].Name) {
 					return errors.New("drawing failed")
 				}
 				bestMove = types.Move{Draw: true}
 			} else {
-				cfSelection := types.RandomInitialFoot(g)
+				whichOption := whichMove - tileAndSpacerMoves
+				cfSelection := game.Coord{X: -1, Y: -1}
+				if playingOffRoundLeader {
+					cfSelection = game.Coord{
+						X: g.BoardWidth/2 + CFOffsets[whichOption].X,
+						Y: g.BoardHeight/2 + CFOffsets[whichOption].Y,
+					}
+				}
 				if err := g.Pass(ctx, g.Players[g.Turn].Name, cfSelection.X, cfSelection.Y); err != nil {
 					return fmt.Errorf("passing: %w", err)
 				}
 				bestMove = types.Move{Pass: true, Selected: cfSelection}
 			}
-		} else {
-			spacer := legalSpacers[whichMove-len(legalMoves)]
-			if err := g.LaySpacer(ctx, g.Players[g.Turn].Name, spacer); err != nil {
-				return fmt.Errorf("spacing: %w", err)
-			}
-			bestMove = types.Move{Spacer: spacer}
 		}
 
 		game.Debug(ctx, "p%d -> %s", curNode.Turn, bestMove)
