@@ -49,29 +49,29 @@ func testLegalMovesContains(t *testing.T, game *Game, expectedMoves []*LaidTile,
 func TestBasicReport(t *testing.T) {
 	game := decodeGame(t, "basic_report")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 0, PipsB: 4}, Coord: Coord{X: 4, Y: 1}, Orientation: "right"},
-		{Tile: &Tile{PipsA: 0, PipsB: 6}, Coord: Coord{X: 3, Y: 0}, Orientation: "right"},
+		{Tile: Tile{PipsA: 0, PipsB: 4}, Coord: Coord{X: 4, Y: 1}, Orientation: "right"},
+		{Tile: Tile{PipsA: 0, PipsB: 6}, Coord: Coord{X: 3, Y: 0}, Orientation: "right"},
 	}, []*Spacer{})
 }
 
 func TestChickenFoot(t *testing.T) {
 	game := decodeGame(t, "chickenfoot")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 3, Y: 8}, Orientation: "up"},
+		{Tile: Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 3, Y: 8}, Orientation: "up"},
 	}, []*Spacer{})
 }
 
 func TestAdjacent(t *testing.T) {
 	game := decodeGame(t, "adjacent")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 2, Y: 7}, Orientation: "right"},
+		{Tile: Tile{PipsA: 1, PipsB: 2}, Coord: Coord{X: 2, Y: 7}, Orientation: "right"},
 	}, []*Spacer{})
 }
 
 func TestRejectedDouble(t *testing.T) {
 	game := decodeGame(t, "rejected_double")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 6, PipsB: 6}, Coord: Coord{X: 3, Y: 3}, Orientation: "down"},
+		{Tile: Tile{PipsA: 6, PipsB: 6}, Coord: Coord{X: 3, Y: 3}, Orientation: "down"},
 	}, []*Spacer{})
 }
 
@@ -86,25 +86,25 @@ func TestFreeLine(t *testing.T) {
 func TestLeadfoot(t *testing.T) {
 	game := decodeGame(t, "leadfoot")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 1, PipsB: 6}, Coord: Coord{X: 4, Y: 4}, Orientation: "right"},
+		{Tile: Tile{PipsA: 1, PipsB: 6}, Coord: Coord{X: 4, Y: 4}, Orientation: "right"},
 	}, []*Spacer{})
 }
 
 func TestLeadfoot2(t *testing.T) {
 	game := decodeGame(t, "leadfoot2")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 2, PipsB: 6}, Coord: Coord{X: 5, Y: 3}, Orientation: "down"},
+		{Tile: Tile{PipsA: 2, PipsB: 6}, Coord: Coord{X: 5, Y: 3}, Orientation: "down"},
 	}, []*Spacer{})
 }
 
 func TestPlayfoot(t *testing.T) {
 	game := decodeGame(t, "playfoot")
 	testLegalMovesContains(t, game, []*LaidTile{
-		{Tile: &Tile{PipsA: 0, PipsB: 7}, Coord: Coord{X: 1, Y: 2}, Orientation: "right"},
+		{Tile: Tile{PipsA: 0, PipsB: 7}, Coord: Coord{X: 1, Y: 2}, Orientation: "right"},
 	}, []*Spacer{})
 
 	err := game.LayTile(t.Context(), "TJ.Tice", &LaidTile{
-		Tile:        &Tile{PipsA: 0, PipsB: 7},
+		Tile:        Tile{PipsA: 0, PipsB: 7},
 		Coord:       Coord{X: 1, Y: 2},
 		Orientation: "right",
 		PlayerName:  "TJ.Tice",
@@ -122,7 +122,7 @@ func TestDoublesturn(t *testing.T) {
 	}
 	player1Name := game.Players[1].Name
 	lt := &LaidTile{
-		Tile:        &Tile{PipsA: 2, PipsB: 5},
+		Tile:        Tile{PipsA: 2, PipsB: 5},
 		Coord:       Coord{X: 4, Y: 7},
 		Orientation: "down",
 		PlayerName:  player1Name,
@@ -142,7 +142,7 @@ func TestSpacerPlacementRejected(t *testing.T) {
 	name := game.Players[game.Turn].Name
 	// 6:6 at (0,4) "right" would start a free line but is under the spacer (spacer runs (0,4)-(5,4)); must return ErrFreeFromSpacer.
 	err := game.LayTile(t.Context(), name, &LaidTile{
-		Tile:        &Tile{PipsA: 6, PipsB: 6},
+		Tile:        Tile{PipsA: 6, PipsB: 6},
 		Coord:       Coord{X: 0, Y: 4},
 		Orientation: "right",
 		PlayerName:  name,
