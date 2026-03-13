@@ -35,7 +35,11 @@ var rateLimit = time.NewTicker(5 * time.Second)
 // FindImageURL calls the KLIPY API with the given query and returns a random URL
 // from the first 30 results (tinygif_transparent), or empty string on error or no results.
 func FindImageURL(ctx context.Context, query string) (string, error) {
-	<-rateLimit.C
+	select {
+	case <-rateLimit.C:
+	default:
+		return "", fmt.Errorf("rate limit exceeded")
+	}
 	u := fmt.Sprintf(
 		"https://api.klipy.com/v2/search?q=%s&key=%s&client_key=%s&limit=%d&searchfilter=sticker",
 		url.QueryEscape(query),
