@@ -1306,6 +1306,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
 			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, mainLine); ok {
 				playedALine = true
+				lt.PlayerName = player.Name
 				lt.NextPips = nextPips
 				if !dryRun {
 					r.PlayerLines[player.Name] = append(mainLine, lt)
