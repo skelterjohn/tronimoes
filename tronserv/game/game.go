@@ -27,7 +27,7 @@ type Game struct {
 	Players     []*Player `json:"players"`
 	Turn        int       `json:"turn"`
 	Rounds      []*Round  `json:"rounds"`
-	Bag         []*Tile   `json:"bag"`
+	Bag         []Tile    `json:"bag"`
 	BoardWidth  int       `json:"board_width"`
 	BoardHeight int       `json:"board_height"`
 	MaxPips     int       `json:"max_pips"`
@@ -184,7 +184,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 	g.Bag = nil
 	for a := 0; a <= g.MaxPips; a++ {
 		for b := a; b <= g.MaxPips; b++ {
-			g.Bag = append(g.Bag, &Tile{
+			g.Bag = append(g.Bag, Tile{
 				PipsA: a,
 				PipsB: b,
 			})
@@ -197,7 +197,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 
 	switch g.Code[:6] {
 	case "AAAAAA":
-		g.Bag = []*Tile{{
+		g.Bag = []Tile{{
 			PipsA: 1, PipsB: 1,
 		}, {
 			PipsA: 1, PipsB: 2,
@@ -231,10 +231,10 @@ func (g *Game) Start(ctx context.Context, name string) error {
 			PipsA: 2, PipsB: 3,
 		}}
 		for i := 2; i <= g.MaxPips; i++ {
-			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
+			g.Bag = append(g.Bag, Tile{PipsA: i, PipsB: i})
 		}
 	case "BBBBBB":
-		g.Bag = []*Tile{{
+		g.Bag = []Tile{{
 			PipsA: 0, PipsB: 0,
 		}, {
 			PipsA: 0, PipsB: 1,
@@ -250,7 +250,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 			PipsA: 0, PipsB: 6,
 		}}
 		for i := 1; i <= g.MaxPips; i++ {
-			g.Bag = append(g.Bag, &Tile{PipsA: i, PipsB: i})
+			g.Bag = append(g.Bag, Tile{PipsA: i, PipsB: i})
 		}
 	}
 
@@ -295,7 +295,7 @@ func (g *Game) Start(ctx context.Context, name string) error {
 	g.Note(ctx, fmt.Sprintf("%s started round %d - %d:%d", g.Players[g.Turn].Name, len(g.Rounds), potentialLeader, potentialLeader))
 
 	if err := g.LayTile(ctx, g.Players[g.Turn].Name, &LaidTile{
-		Tile:        &Tile{PipsA: potentialLeader, PipsB: potentialLeader},
+		Tile:        Tile{PipsA: potentialLeader, PipsB: potentialLeader},
 		PlayerName:  g.Players[g.Turn].Name,
 		Orientation: "right",
 		Coord: Coord{
@@ -505,7 +505,7 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 		return ErrPlayerNotFound
 	}
 
-	newHand := []*Tile{}
+	newHand := []Tile{}
 	foundTile := false
 	for _, t := range player.Hand {
 		if t.PipsA != tile.Tile.PipsA || t.PipsB != tile.Tile.PipsB {
@@ -606,7 +606,7 @@ type Player struct {
 	Name             string     `json:"name"`
 	Ready            bool       `json:"ready"`
 	Score            int        `json:"score"`
-	Hand             []*Tile    `json:"hand"`
+	Hand             []Tile     `json:"hand"`
 	Hints            [][]string `json:"hints"`
 	SpacerHints      []string   `json:"spacer_hints"`
 	ChickenFoot      bool       `json:"chicken_foot"`
@@ -722,7 +722,7 @@ func (s Spacer) String() string {
 }
 
 type LaidTile struct {
-	Tile        *Tile  `json:"tile"`
+	Tile        Tile   `json:"tile"`
 	Coord       Coord  `json:"coord"`
 	Orientation string `json:"orientation"`
 	PlayerName  string `json:"player_name"`

@@ -119,12 +119,12 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 		g.Players[i].Hand = nil
 		for _, t := range hs.tiles {
-			g.Players[i].Hand = append(g.Players[i].Hand, &t)
+			g.Players[i].Hand = append(g.Players[i].Hand, t)
 		}
 	}
 	g.Bag = nil
 	for _, t := range gp.bag {
-		g.Bag = append(g.Bag, &t)
+		g.Bag = append(g.Bag, t)
 	}
 
 	gdata, err := json.Marshal(g)

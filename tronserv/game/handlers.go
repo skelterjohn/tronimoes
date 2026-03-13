@@ -423,11 +423,6 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
-	if lt.Tile == nil {
-		log.Printf("No tile provided for %q / %q", name, code)
-		writeErr(w, ErrNoTile, http.StatusBadRequest)
-		return
-	}
 
 	lt.PlayerName = player.Name
 

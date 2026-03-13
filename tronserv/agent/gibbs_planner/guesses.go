@@ -29,7 +29,7 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 	})
 
 	for _, t := range g.CurrentRound(ctx).LaidTiles {
-		gp.RemoveTileFromBag(ctx, *t.Tile)
+		gp.RemoveTileFromBag(ctx, t.Tile)
 	}
 
 	gp.hands = make([]*HandState, len(g.Players))
@@ -40,8 +40,8 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 		// we know our own hand.
 		gp.hands[i] = &HandState{}
 		for _, pts := range p.Hand {
-			gp.RemoveTileFromBag(ctx, *pts)
-			gp.hands[i].tiles = append(gp.hands[i].tiles, *pts)
+			gp.RemoveTileFromBag(ctx, pts)
+			gp.hands[i].tiles = append(gp.hands[i].tiles, pts)
 		}
 		break
 	}
@@ -67,11 +67,11 @@ func (gp *GibbsPlanner) fixBadGuesses(ctx context.Context, g *game.Game) {
 	// size correct (and guess at what they may have instead).
 	laidTiles := g.CurrentRound(ctx).LaidTiles
 	for _, lt := range laidTiles {
-		if gp.RemoveTileFromBag(ctx, *lt.Tile) {
+		if gp.RemoveTileFromBag(ctx, lt.Tile) {
 			continue
 		}
 		for i := range gp.hands {
-			if gp.RemoveTileFromHand(ctx, i, *lt.Tile) {
+			if gp.RemoveTileFromHand(ctx, i, lt.Tile) {
 				break
 			}
 		}
