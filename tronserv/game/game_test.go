@@ -108,7 +108,8 @@ func TestPlayfoot(t *testing.T) {
 		Coord:       Coord{X: 1, Y: 2},
 		Orientation: "right",
 		PlayerName:  "TJ.Tice",
-		Indicated:   &Tile{PipsA: 2, PipsB: 6},
+		Indicating:  true,
+		Indicated:   Tile{PipsA: 2, PipsB: 6},
 	})
 	if err != nil {
 		t.Fatalf("error laying tile: %v", err)
@@ -126,7 +127,8 @@ func TestDoublesturn(t *testing.T) {
 		Coord:       Coord{X: 4, Y: 7},
 		Orientation: "down",
 		PlayerName:  player1Name,
-		Indicated:   &Tile{PipsA: 3, PipsB: 5},
+		Indicating:  true,
+		Indicated:   Tile{PipsA: 3, PipsB: 5},
 	}
 	err := game.LayTile(t.Context(), player1Name, lt)
 	if err != nil {

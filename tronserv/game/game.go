@@ -728,7 +728,8 @@ type LaidTile struct {
 	PlayerName  string `json:"player_name"`
 	NextPips    int    `json:"next_pips"`
 	Dead        bool   `json:"dead"`
-	Indicated   *Tile  `json:"indicated"`
+	Indicating  bool   `json:"indicating"`
+	Indicated   Tile   `json:"indicated"`
 	WhoLaidIt   string `json:"who_laid_it"`
 }
 
@@ -759,7 +760,7 @@ func (lt *LaidTile) CoordB() Coord {
 
 func (lt *LaidTile) String() string {
 	indicatedString := ""
-	if lt.Indicated != nil && lt.Indicated.PipsA != -1 && lt.Indicated.PipsB != -1 {
+	if lt.Indicating {
 		indicatedString = fmt.Sprintf(" i%d:%d", lt.Indicated.PipsA, lt.Indicated.PipsB)
 	}
 	return fmt.Sprintf("{%d:%d %s-%s%s}", lt.Tile.PipsA, lt.Tile.PipsB, lt.CoordA(), lt.CoordB(), indicatedString)
@@ -825,7 +826,6 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 					Orientation: orientation,
 					Coord:       src,
 					NextPips:    -1,
-					Indicated:   nil,
 				}
 				if r.LayTile(ctx, g, name, lt, true) == nil {
 					legalMoves = append(legalMoves, lt)
@@ -906,7 +906,6 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 						Orientation: orientation,
 						Coord:       A,
 						NextPips:    -1,
-						Indicated:   nil,
 					}
 					if r.LayTile(ctx, g, name, lt, true) == nil {
 						legalMoves = append(legalMoves, lt)
@@ -992,7 +991,7 @@ func (r *Round) canPlayOnLine(ctx context.Context, lt *LaidTile, line []*LaidTil
 
 func (r *Round) canPlayOnTile(ctx context.Context, lt, last *LaidTile) (bool, int, error) {
 	dbg("canPlayOnTile: %s on %s", lt, last)
-	if lt.Indicated != nil && lt.Indicated.PipsA != -1 {
+	if lt.Indicating {
 		if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
 			dbg("no, is indicated")
 			return false, 0, ErrMustMatchPips
@@ -1198,7 +1197,7 @@ func (r *Round) LayTileAllWays(ctx context.Context, g *Game, name string, lt *La
 		return nil
 	}
 	// But maybe the user accidentally added an indication.
-	lt.Indicated = nil
+	lt.Indicating = false
 	if noIndicatedErr := r.LayTile(ctx, g, name, lt, dryRun); noIndicatedErr == nil {
 		return nil
 	}

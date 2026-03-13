@@ -372,6 +372,7 @@ function Game({ code }) {
 			coord: tile?.coord ?? { x: -1, y: -1 },
 			orientation: tile?.orientation ?? "down",
 			player_name: player?.name ?? "",
+			indicating: indicated != null && indicated.a != null && indicated.b != null,
 			indicated: (indicated != null && indicated.a != null && indicated.b != null)
 				? { pips_a: indicated.a, pips_b: indicated.b }
 				: undefined,
