@@ -72,6 +72,14 @@ func (n *PlanNode) ChooseBestMove(ctx context.Context) (types.Move, error) {
 	return bestMove, nil
 }
 
+func (n *PlanNode) Cull(moves map[types.Move]bool) {
+	for m := range n.Moves {
+		if !moves[m] {
+			delete(n.Moves, m)
+		}
+	}
+}
+
 // We need to be given a fresh game copy, because it's gonna get messed up.
 func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *PlanNode, maxDepth int) error {
 	// Play a random game until it's done or we reach max depth or it takes too long.
@@ -93,12 +101,34 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		}
 
 		p := g.Players[g.Turn]
+		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
+
 		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, p)
+
+		allMoves := map[types.Move]bool{}
+		for _, lt := range legalMoves {
+			allMoves[types.Move{LayTile: true, LaidTile: lt}] = true
+		}
+		for _, spacer := range legalSpacers {
+			allMoves[types.Move{PlaceSpacer: true, Spacer: spacer}] = true
+		}
+		if !p.JustDrew && len(g.Bag) > 0 {
+			allMoves[types.Move{Draw: true}] = true
+		} else {
+			if playingOffRoundLeader {
+				for _, cf := range CFOffsets {
+					allMoves[types.Move{Pass: true, Selected: game.Coord{X: g.BoardWidth/2 + cf.X, Y: g.BoardHeight/2 + cf.Y}}] = true
+				}
+			} else {
+				allMoves[types.Move{Pass: true, Selected: game.Coord{X: -1, Y: -1}}] = true
+			}
+		}
+
+		curNode.Cull(allMoves)
 
 		game.Debug(ctx, "%s has %d tiles, %d spacers", p.Name, len(legalMoves), len(legalSpacers))
 		moveCount := len(legalMoves) + len(legalSpacers)
 
-		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
 		passOrDrawOptions := 1
 		if playingOffRoundLeader && p.JustDrew {
 			passOrDrawOptions = 6 // (all 6 ways to pass)
