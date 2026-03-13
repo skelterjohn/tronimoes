@@ -112,7 +112,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		for i, lt := range legalMoves {
 			lt.PlayerName = g.Players[g.Turn].Name
-			nn := curNode.Next(types.Move{LayTile: true, LaidTile: *lt}, g.Turn, len(gp.hands))
+			nn := curNode.Next(types.Move{LayTile: true, LaidTile: lt}, g.Turn, len(gp.hands))
 			// bias the planner towards high-value, away from low-value.
 			unnormalizedLogLikelihoods[i] += nn.V[g.Turn]
 			// bias the planner away from options that have been considered a lot.
@@ -141,16 +141,16 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		if whichMove < tileMoves {
 			move := legalMoves[whichMove]
 			game.Debug(ctx, "p%d lays %s", g.Turn, move)
-			if err := g.LayTile(ctx, p.Name, move); err != nil {
+			if err := g.LayTile(ctx, p.Name, &move); err != nil {
 				return fmt.Errorf("laying: %w", err)
 			}
-			bestMove = types.Move{LayTile: true, LaidTile: *move}
+			bestMove = types.Move{LayTile: true, LaidTile: move}
 		} else if whichMove < tileAndSpacerMoves {
 			spacer := legalSpacers[whichMove-tileMoves]
-			if err := g.LaySpacer(ctx, p.Name, spacer); err != nil {
+			if err := g.LaySpacer(ctx, p.Name, &spacer); err != nil {
 				return fmt.Errorf("spacing: %w", err)
 			}
-			bestMove = types.Move{PlaceSpacer: true, Spacer: *spacer}
+			bestMove = types.Move{PlaceSpacer: true, Spacer: spacer}
 		} else {
 			if !p.JustDrew && len(g.Bag) > 0 {
 				if !g.DrawTile(ctx, p.Name) {

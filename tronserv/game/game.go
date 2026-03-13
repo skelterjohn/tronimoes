@@ -807,10 +807,10 @@ func (r *Round) FindHints(ctx context.Context, g *Game, p *Player) {
 	}
 }
 
-func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*LaidTile, []*Spacer) {
+func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidTile, []Spacer) {
 	dbg("Finding moves for " + p.Name)
-	legalMoves := []*LaidTile{}
-	legalSpacers := []*Spacer{}
+	legalMoves := []LaidTile{}
+	legalSpacers := []Spacer{}
 
 	squarePips := r.MapTiles(ctx)
 
@@ -818,26 +818,27 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 
 	for _, t := range p.Hand {
 		dbg("Considering %s", t)
-		movesOffSquare := func(head *LaidTile, src Coord) {
+		movesOffSquare := func(head LaidTile, src Coord) {
 			dbg("Considering playing from %s", src)
 			for _, orientation := range []string{"up", "down", "left", "right"} {
-				lt := &LaidTile{
+				lt := LaidTile{
 					Tile:        t,
 					Orientation: orientation,
 					Coord:       src,
 					NextPips:    -1,
 				}
-				if r.LayTile(ctx, g, name, lt, true) == nil {
+				if r.LayTile(ctx, g, name, &lt, true) == nil {
 					legalMoves = append(legalMoves, lt)
 				}
-				if r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
-					legalMoves = append(legalMoves, lt.Reverse())
+				rt := lt.Reverse()
+				if r.LayTile(ctx, g, name, rt, true) == nil {
+					legalMoves = append(legalMoves, *rt)
 				}
 			}
 
 		}
 
-		movesOffTile := func(head *LaidTile) {
+		movesOffTile := func(head LaidTile) {
 			if t.PipsA != head.NextPips && t.PipsB != head.NextPips {
 				return
 			}
@@ -864,13 +865,13 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 					continue
 				}
 			}
-			movesOffTile(line[len(line)-1])
+			movesOffTile(*line[len(line)-1])
 		}
 
 		if p.Dead || !p.ChickenFoot {
 			dbg("Considering free lines")
 			for _, line := range r.FreeLines {
-				movesOffTile(line[len(line)-1])
+				movesOffTile(*line[len(line)-1])
 			}
 		}
 
@@ -901,17 +902,18 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 		tryToCoord := func(src Coord) {
 			tryA := func(A Coord) {
 				for _, orientation := range []string{"up", "down", "left", "right"} {
-					lt := &LaidTile{
+					lt := LaidTile{
 						Tile:        t,
 						Orientation: orientation,
 						Coord:       A,
 						NextPips:    -1,
 					}
-					if r.LayTile(ctx, g, name, lt, true) == nil {
+					if r.LayTile(ctx, g, name, &lt, true) == nil {
 						legalMoves = append(legalMoves, lt)
 					}
-					if r.LayTile(ctx, g, name, lt.Reverse(), true) == nil {
-						legalMoves = append(legalMoves, lt.Reverse())
+					rt := lt.Reverse()
+					if r.LayTile(ctx, g, name, rt, true) == nil {
+						legalMoves = append(legalMoves, *rt)
 					}
 				}
 			}
@@ -953,7 +955,7 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]*Laid
 			}
 			for _, dst := range fourWays {
 				if g.sixPathFrom(ctx, squarePips, src, dst) {
-					legalSpacers = append(legalSpacers, &Spacer{A: src, B: dst})
+					legalSpacers = append(legalSpacers, Spacer{A: src, B: dst})
 				}
 			}
 		}

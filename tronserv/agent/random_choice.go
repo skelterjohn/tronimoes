@@ -23,13 +23,13 @@ func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) t
 	if len(legalSpacers) > 0 {
 		return types.Move{
 			PlaceSpacer: true,
-			Spacer:      *legalSpacers[rand.Intn(len(legalSpacers))],
+			Spacer:      legalSpacers[rand.Intn(len(legalSpacers))],
 		}
 	}
 	if len(legalMoves) > 0 {
 		return types.Move{
 			LayTile:  true,
-			LaidTile: *legalMoves[rand.Intn(len(legalMoves))],
+			LaidTile: legalMoves[rand.Intn(len(legalMoves))],
 		}
 	}
 	if p.JustDrew {
