@@ -25,7 +25,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	// Use absolute path so Windows allows running it (avoids "cannot run executable found relative to current directory").
 	agentExe := filepath.Join(exeDir, "tronagent.exe")
 	// Use Background so the agent is not killed when the HTTP request context is cancelled.
-	runCtx := context.Background()
+	runCtx := context.WithoutCancel(ctx)
 	cmd := exec.CommandContext(runCtx,
 		agentExe,
 		"--which", which,

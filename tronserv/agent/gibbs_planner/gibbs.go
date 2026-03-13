@@ -39,6 +39,7 @@ type GibbsPlanner struct {
 	hands         []*HandState
 	myPlayerIndex int
 	Client        *client.TronimoesClient
+	currentRoot   *PlanNode
 }
 
 func (gp *GibbsPlanner) SetDefaults() {
@@ -51,6 +52,7 @@ func (gp *GibbsPlanner) SetDefaults() {
 
 func (gp *GibbsPlanner) Ready(ctx context.Context) {
 	gp.React(ctx, "bow")
+	gp.currentRoot = nil
 }
 
 func (gp *GibbsPlanner) CheckScore(ctx context.Context, pg, g *game.Game) {
@@ -207,7 +209,7 @@ func (gp *GibbsPlanner) CompleteGame(ctx context.Context, g *game.Game) {
 func (gp *GibbsPlanner) React(ctx context.Context, query string) {
 	go func(ctx context.Context) {
 		gp.ReactWait(ctx, query)
-	}(context.Background())
+	}(context.WithoutCancel(ctx))
 }
 
 func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {

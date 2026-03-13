@@ -20,9 +20,18 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
+var (
+	testsFlag       = flag.String("tests", "", "comma-separated list of test names (e.g. Oneshot,NoSelfKill); empty runs all")
+	countFlag       = flag.Int("count", 20, "run each test this many times")
+	concurrencyFlag = flag.Int("concurrency", 50, "run this many tests at a time")
+	logDirFlag      = flag.String("logdir", "evaluate_logs", "directory for run logs; a timestamped subdir (YYYYMMDD_HHMMSS) is created under it")
+	logFailOnlyFlag = flag.Bool("logfail", true, "only write log files for failed test runs")
+	maxSimFlag      = flag.Int("maxsim", 0, "max simulations per move (0 = no limit)")
+)
+
 // SuccessFunc is called after loading a game, running the agent, and applying its move.
 // It returns true if the outcome is considered success, and an optional message.
-type SuccessFunc func(g *game.Game, move types.Move) (success bool, message string)
+type SuccessFunc func(ctx context.Context, g *game.Game, move types.Move) (success bool, message string)
 
 // TestCase pairs a start state (testdata JSON label) with a success predicate.
 type TestCase struct {
@@ -62,6 +71,7 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulation
 		Name: currentPlayer.Name,
 	}
 	gp.SetDefaults()
+	gp.MaxSimulationsPerMove = maxSimulationsPerMove
 
 	previousGame := &game.Game{
 		Players: g.Players,
@@ -83,7 +93,7 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulation
 	}
 	// Pass is not applied here for simplicity; add if needed.
 
-	return tc.Success(g, move)
+	return tc.Success(ctx, g, move)
 }
 
 func listNames(tests []TestCase) string {
@@ -105,12 +115,8 @@ func safeFilename(name string) string {
 }
 
 func main() {
-	testsFlag := flag.String("tests", "", "comma-separated list of test names (e.g. Oneshot,NoSelfKill); empty runs all")
-	countFlag := flag.Int("count", 1, "run each test this many times")
-	concurrencyFlag := flag.Int("concurrency", 1, "run this many tests at a time")
-	logDirFlag := flag.String("logdir", "evaluate_logs", "directory for run logs; a timestamped subdir (YYYYMMDD_HHMMSS) is created under it")
-	logFailOnlyFlag := flag.Bool("logfail", true, "only write log files for failed test runs")
-	maxSimFlag := flag.Int("maxsim", 0, "max simulations per move (0 = no limit)")
+	ctx := context.Background()
+
 	flag.Parse()
 
 	testdataDir := "testdata"
@@ -119,11 +125,11 @@ func main() {
 		{
 			Name:  "Oneshot",
 			Label: "oneshot",
-			Success: func(g *game.Game, move types.Move) (bool, string) {
+			Success: func(ctx context.Context, g *game.Game, move types.Move) (bool, string) {
 				if !move.LayTile {
 					return false, "expected a lay (one-shot win), got no tile"
 				}
-				if r := g.CurrentRound(context.Background()); r != nil {
+				if r := g.CurrentRound(ctx); r != nil {
 					return false, "round should be done after winning move"
 				}
 				return true, ""
@@ -132,11 +138,11 @@ func main() {
 		{
 			Name:  "NoSelfKill",
 			Label: "noselfkill",
-			Success: func(g *game.Game, move types.Move) (bool, string) {
+			Success: func(ctx context.Context, g *game.Game, move types.Move) (bool, string) {
 				if !move.LayTile && !move.Draw {
 					return false, "expected a lay or draw, got neither"
 				}
-				if r := g.CurrentRound(context.Background()); r == nil {
+				if r := g.CurrentRound(ctx); r == nil {
 					return false, "round should not be done (player must not kill own line)"
 				}
 				return true, ""
@@ -145,7 +151,7 @@ func main() {
 		{
 			Name:  "PlayTheGame",
 			Label: "playthegame",
-			Success: func(g *game.Game, move types.Move) (bool, string) {
+			Success: func(ctx context.Context, g *game.Game, move types.Move) (bool, string) {
 				if !move.LayTile {
 					if move.Pass {
 						return false, "expected agent to play a tile, not pass"
@@ -161,7 +167,7 @@ func main() {
 		{
 			Name:  "LeaderPass",
 			Label: "leaderpass",
-			Success: func(g *game.Game, move types.Move) (bool, string) {
+			Success: func(ctx context.Context, g *game.Game, move types.Move) (bool, string) {
 				if !move.Pass {
 					return false, "expected agent to pass, not play a tile"
 				}
@@ -171,7 +177,7 @@ func main() {
 		{
 			Name:  "NoDrawBTBRJX",
 			Label: "no_draw_btbrjx",
-			Success: func(g *game.Game, move types.Move) (bool, string) {
+			Success: func(ctx context.Context, g *game.Game, move types.Move) (bool, string) {
 				if !move.LayTile {
 					return false, "agent play a tile in this position"
 				}
@@ -199,7 +205,6 @@ func main() {
 		}
 	}
 
-	ctx := context.Background()
 	count := *countFlag
 	concurrency := *concurrencyFlag
 	if count < 1 {
