@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"strings"
 	"time"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/reacts"
@@ -156,47 +155,15 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		game.Debug(ctx, "error choosing best move: %v", err)
 	}
 	game.Debug(ctx, "hand: %v", g.Players[g.Turn].Hand)
-	game.Debug(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
+	game.Debug(ctx, "best move: %s %v", bestMove, root.Moves[bestMove.JSON()].V)
 
-	if bestMove == "draw" {
-		return types.Move{
-			Draw: true,
-		}
-	}
-	if strings.HasPrefix(bestMove, "pass") {
-		rest := bestMove[4:]
+	if bestMove.Pass {
 		gp.React(ctx, "frustration")
-		var x, y int
-		if _, err := fmt.Sscanf(rest, "(%d,%d)", &x, &y); err == nil {
-			return types.Move{
-				Pass:     true,
-				Selected: game.Coord{X: x, Y: y},
-			}
-		}
-		return types.Move{
-			Pass:     true,
-			Selected: types.RandomInitialFoot(g),
-		}
 	}
-	for _, m := range legalMoves {
-		if m.String() == bestMove {
-			return types.Move{
-				LaidTile: m,
-			}
-		}
+	if bestMove.Spacer != nil {
+		gp.React(ctx, "free")
 	}
-	for _, s := range legalSpacers {
-		if s.String() == bestMove {
-			gp.React(ctx, "free")
-			return types.Move{
-				Spacer: s,
-			}
-		}
-	}
-
-	return types.Move{
-		Draw: true,
-	}
+	return bestMove
 }
 
 func (gp *GibbsPlanner) CompleteRound(ctx context.Context, g *game.Game) {

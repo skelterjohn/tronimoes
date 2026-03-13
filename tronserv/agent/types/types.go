@@ -2,6 +2,7 @@ package types
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 
@@ -14,10 +15,30 @@ type Move struct {
 	Draw     bool
 	Pass     bool
 	Selected game.Coord
+	jsonStr  string
 }
 
 func (m Move) String() string {
 	return fmt.Sprintf("Move{%v, %v, %v, %v, %v}", m.LaidTile, m.Spacer, m.Draw, m.Pass, m.Selected)
+}
+func (m Move) JSON() string {
+	if m.jsonStr != "" {
+		return m.jsonStr
+	}
+	jsonData, err := json.Marshal(m)
+	if err != nil {
+		return ""
+	}
+	m.jsonStr = string(jsonData)
+	return m.jsonStr
+}
+func MoveFromJSON(jsonStr string) (Move, error) {
+	var m Move
+	if err := json.Unmarshal([]byte(jsonStr), &m); err != nil {
+		return Move{}, err
+	}
+	m.jsonStr = jsonStr
+	return m, nil
 }
 
 func InferMove(ctx context.Context, pg *game.Game, g *game.Game) (Move, bool) {

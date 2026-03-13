@@ -33,27 +33,28 @@ func NewPlanNode(turn int, count int, depth int) *PlanNode {
 	}
 }
 
-func (n *PlanNode) Next(move string, turn, count int) *PlanNode {
+func (n *PlanNode) Next(move types.Move, turn, count int) *PlanNode {
 	// fmt.Printf("Next %s\n", move)
-	nextNode, ok := n.Moves[move]
+	moveStr := move.JSON()
+	nextNode, ok := n.Moves[moveStr]
 	if !ok {
 		nextNode = NewPlanNode(turn, count, n.Depth+1)
-		n.Moves[move] = nextNode
+		n.Moves[moveStr] = nextNode
 	}
 	return nextNode
 }
 
-func (n *PlanNode) ChooseBestMove(ctx context.Context) (string, error) {
-	bestMove := ""
+func (n *PlanNode) ChooseBestMove(ctx context.Context) (types.Move, error) {
+	bestMoveStr := ""
 	bestV := -math.MaxFloat64
-	for move, next := range n.Moves {
+	for moveStr, next := range n.Moves {
 		nextV := next.V[n.Turn]
 		if nextV > bestV {
 			bestV = nextV
-			bestMove = move
+			bestMoveStr = moveStr
 		}
 	}
-	return bestMove, nil
+	return types.MoveFromJSON(bestMoveStr)
 }
 
 // We need to be given a fresh game copy, because it's gonna get messed up.
@@ -88,7 +89,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		for i, lt := range legalMoves {
 			lt.PlayerName = g.Players[g.Turn].Name
-			nn := curNode.Next(lt.String(), g.Turn, len(gp.hands))
+			nn := curNode.Next(types.Move{LaidTile: lt}, g.Turn, len(gp.hands))
 			// bias the planner towards high-value, away from low-value.
 			unnormalizedLogLikelihoods[i] += nn.V[g.Turn]
 			// bias the planner away from options that have been considered a lot.
@@ -109,7 +110,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		whichMove := ChooseIndex(unnormalizedLogLikelihoods)
 
 		var nextNode *PlanNode
-		var bestMove string
+		var bestMove types.Move
 
 		if whichMove < len(legalMoves) {
 			move := legalMoves[whichMove]
@@ -117,26 +118,26 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			if err := g.LayTile(ctx, g.Players[g.Turn].Name, move); err != nil {
 				return fmt.Errorf("laying: %w", err)
 			}
-			bestMove = move.String()
+			bestMove = types.Move{LaidTile: move}
 		} else if whichMove == moveCount-1 {
 			if !g.Players[g.Turn].JustDrew {
 				if !g.DrawTile(ctx, g.Players[g.Turn].Name) {
 					return errors.New("drawing failed")
 				}
-				bestMove = "draw"
+				bestMove = types.Move{Draw: true}
 			} else {
 				cfSelection := types.RandomInitialFoot(g)
 				if err := g.Pass(ctx, g.Players[g.Turn].Name, cfSelection.X, cfSelection.Y); err != nil {
 					return fmt.Errorf("passing: %w", err)
 				}
-				bestMove = fmt.Sprintf("pass(%d,%d)", cfSelection.X, cfSelection.Y)
+				bestMove = types.Move{Pass: true, Selected: cfSelection}
 			}
 		} else {
 			spacer := legalSpacers[whichMove-len(legalMoves)]
 			if err := g.LaySpacer(ctx, g.Players[g.Turn].Name, spacer); err != nil {
 				return fmt.Errorf("spacing: %w", err)
 			}
-			bestMove = spacer.String()
+			bestMove = types.Move{Spacer: spacer}
 		}
 
 		game.Debug(ctx, "p%d -> %s", curNode.Turn, bestMove)
@@ -181,7 +182,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		if err != nil {
 			return fmt.Errorf("choosing best move: %w", err)
 		}
-		bestNode := cur.Moves[bestMove]
+		bestNode := cur.Moves[bestMove.JSON()]
 		if bestNode == nil {
 			copy(cur.V, cur.R)
 			continue
