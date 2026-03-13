@@ -43,12 +43,12 @@ func TestOneshot(t *testing.T) {
 	gp.Update(ctx, previousGame, g)
 
 	move := gp.GetMove(ctx, g, currentPlayer)
-	if move.LaidTile == nil {
+	if !move.LayTile {
 		t.Fatalf("Did not play a one-shot: %s", move)
 	}
 
 	move.LaidTile.PlayerName = currentPlayer.Name
-	if err := g.LayTile(ctx, currentPlayer.Name, move.LaidTile); err != nil {
+	if err := g.LayTile(ctx, currentPlayer.Name, &move.LaidTile); err != nil {
 		t.Fatalf("could not lay tile: %v", err)
 	}
 
@@ -77,13 +77,13 @@ func TestNoSelfKill(t *testing.T) {
 	gp.Update(ctx, previousGame, g)
 
 	move := gp.GetMove(ctx, g, currentPlayer)
-	if move.LaidTile == nil && !move.Draw {
+	if !move.LayTile && !move.Draw {
 		t.Fatalf("Did not play a tile or draw a tile: %s", move)
 	}
 
-	if move.LaidTile != nil {
+	if move.LayTile {
 		move.LaidTile.PlayerName = currentPlayer.Name
-		if err := g.LayTile(ctx, currentPlayer.Name, move.LaidTile); err != nil {
+		if err := g.LayTile(ctx, currentPlayer.Name, &move.LaidTile); err != nil {
 			t.Fatalf("could not lay tile: %v", err)
 		}
 	} else if move.Draw {

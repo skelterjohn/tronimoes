@@ -10,12 +10,14 @@ import (
 )
 
 type Move struct {
-	LaidTile *game.LaidTile
-	Spacer   *game.Spacer
-	Draw     bool
-	Pass     bool
-	Selected game.Coord
-	jsonStr  string
+	LayTile     bool
+	LaidTile    game.LaidTile
+	PlaceSpacer bool
+	Spacer      game.Spacer
+	Draw        bool
+	Pass        bool
+	Selected    game.Coord
+	jsonStr     string
 }
 
 func (m Move) String() string {
@@ -53,12 +55,14 @@ func InferMove(ctx context.Context, pg *game.Game, g *game.Game) (Move, bool) {
 	lastPlayer := g.Players[pg.Turn]
 	if len(currentRound.LaidTiles) > len(previousCurrentRound.LaidTiles) {
 		return Move{
-			LaidTile: currentRound.LaidTiles[len(currentRound.LaidTiles)-1],
+			LayTile:  true,
+			LaidTile: *currentRound.LaidTiles[len(currentRound.LaidTiles)-1],
 		}, true
 	}
 	if currentRound.Spacer != nil {
 		return Move{
-			Spacer: currentRound.Spacer,
+			PlaceSpacer: true,
+			Spacer:      *currentRound.Spacer,
 		}, true
 	}
 	for _, p := range g.Players {

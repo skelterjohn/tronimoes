@@ -71,9 +71,9 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulation
 	gp.Update(ctx, previousGame, g)
 	move := gp.GetMove(ctx, g, currentPlayer)
 
-	if move.LaidTile != nil {
+	if move.LayTile {
 		move.LaidTile.PlayerName = currentPlayer.Name
-		if err := g.LayTile(ctx, currentPlayer.Name, move.LaidTile); err != nil {
+		if err := g.LayTile(ctx, currentPlayer.Name, &move.LaidTile); err != nil {
 			return false, fmt.Sprintf("LayTile: %v", err)
 		}
 	} else if move.Draw {
@@ -120,7 +120,7 @@ func main() {
 			Name:  "Oneshot",
 			Label: "oneshot",
 			Success: func(g *game.Game, move types.Move) (bool, string) {
-				if move.LaidTile == nil {
+				if !move.LayTile {
 					return false, "expected a lay (one-shot win), got no tile"
 				}
 				if r := g.CurrentRound(context.Background()); r != nil {
@@ -133,7 +133,7 @@ func main() {
 			Name:  "NoSelfKill",
 			Label: "noselfkill",
 			Success: func(g *game.Game, move types.Move) (bool, string) {
-				if move.LaidTile == nil && !move.Draw {
+				if !move.LayTile && !move.Draw {
 					return false, "expected a lay or draw, got neither"
 				}
 				if r := g.CurrentRound(context.Background()); r == nil {
@@ -146,7 +146,7 @@ func main() {
 			Name:  "PlayTheGame",
 			Label: "playthegame",
 			Success: func(g *game.Game, move types.Move) (bool, string) {
-				if move.LaidTile == nil {
+				if !move.LayTile {
 					if move.Pass {
 						return false, "expected agent to play a tile, not pass"
 					}
@@ -172,7 +172,7 @@ func main() {
 			Name:  "NoDrawBTBRJX",
 			Label: "no_draw_btbrjx",
 			Success: func(g *game.Game, move types.Move) (bool, string) {
-				if move.LaidTile == nil {
+				if !move.LayTile {
 					return false, "agent play a tile in this position"
 				}
 				return true, ""

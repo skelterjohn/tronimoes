@@ -200,8 +200,8 @@ func main() {
 					log.Println("I passed")
 					continue
 				}
-				if m.LaidTile != nil {
-					g, err = tc.LayTile(ctx, m.LaidTile)
+				if m.LayTile {
+					g, err = tc.LayTile(ctx, &m.LaidTile)
 					if err != nil {
 						log.Printf("Could not lay tile: %v", err)
 						return
@@ -209,8 +209,8 @@ func main() {
 					log.Printf("I laid %v", m.LaidTile)
 					continue
 				}
-				if m.Spacer != nil {
-					g, err = tc.LaySpacer(ctx, m.Spacer)
+				if m.PlaceSpacer {
+					g, err = tc.LaySpacer(ctx, &m.Spacer)
 					if err != nil {
 						log.Printf("Could not lay spacer: %v", err)
 						return

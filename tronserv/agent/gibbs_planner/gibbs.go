@@ -163,7 +163,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	if bestMove.Pass {
 		gp.React(ctx, "frustration")
 	}
-	if bestMove.Spacer != nil {
+	if bestMove.PlaceSpacer {
 		gp.React(ctx, "free")
 	}
 	return bestMove
