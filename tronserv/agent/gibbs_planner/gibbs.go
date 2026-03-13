@@ -158,7 +158,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		game.Debug(ctx, "error choosing best move: %v", err)
 	}
 	game.Debug(ctx, "hand: %v", g.Players[g.Turn].Hand)
-	game.Debug(ctx, "best move: %s %v", bestMove, root.Moves[bestMove.JSON()].V)
+	game.Debug(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
 
 	if bestMove.Pass {
 		gp.React(ctx, "frustration")

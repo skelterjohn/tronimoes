@@ -14,7 +14,7 @@ type PlanNode struct {
 	Depth   int
 	Visited int
 	Turn    int
-	Moves   map[string]*PlanNode
+	Moves   map[types.Move]*PlanNode
 	Eval    []float64
 	R       []float64
 	V       []float64
@@ -25,7 +25,7 @@ func NewPlanNode(turn int, count int, depth int) *PlanNode {
 	return &PlanNode{
 		Turn:  turn,
 		Depth: depth,
-		Moves: make(map[string]*PlanNode),
+		Moves: make(map[types.Move]*PlanNode),
 		Eval:  make([]float64, count),
 		R:     make([]float64, count),
 		V:     make([]float64, count),
@@ -44,8 +44,7 @@ var CFOffsets = []game.Coord{
 
 func (n *PlanNode) Next(move types.Move, turn, count int) *PlanNode {
 	// fmt.Printf("Next %s\n", move)
-	moveStr := move.JSON()
-	nextNode, ok := n.Moves[moveStr]
+	nextNode, ok := n.Moves[move]
 	if !ok {
 		isDouble := false
 		if move.LayTile {
@@ -55,22 +54,22 @@ func (n *PlanNode) Next(move types.Move, turn, count int) *PlanNode {
 			turn = (turn + 1) % count
 		}
 		nextNode = NewPlanNode(turn, count, n.Depth+1)
-		n.Moves[moveStr] = nextNode
+		n.Moves[move] = nextNode
 	}
 	return nextNode
 }
 
 func (n *PlanNode) ChooseBestMove(ctx context.Context) (types.Move, error) {
-	bestMoveStr := ""
+	var bestMove types.Move
 	bestV := -math.MaxFloat64
-	for moveStr, next := range n.Moves {
+	for move, next := range n.Moves {
 		nextV := next.V[n.Turn]
 		if nextV > bestV {
 			bestV = nextV
-			bestMoveStr = moveStr
+			bestMove = move
 		}
 	}
-	return types.MoveFromJSON(bestMoveStr)
+	return bestMove, nil
 }
 
 // We need to be given a fresh game copy, because it's gonna get messed up.
@@ -216,7 +215,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		if err != nil {
 			return fmt.Errorf("choosing best move: %w", err)
 		}
-		bestNode := cur.Moves[bestMove.JSON()]
+		bestNode := cur.Moves[bestMove]
 		if bestNode == nil {
 			copy(cur.V, cur.R)
 			continue
