@@ -77,6 +77,7 @@ func main() {
 		gcr := &game.GCRAgentSpawner{
 			ProjectID: "tronimoes",
 			Region:    "us-east4",
+			Code:      "BDIKED-BNHJXU",
 		}
 		if err := gcr.Initialize(ctx); err != nil {
 			log.Printf("Could not infer GCR agent spawner config: %v", err)

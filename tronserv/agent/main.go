@@ -32,18 +32,19 @@ var (
 	roundOut      = flag.Int("round-out", 0, "targeted player count")
 )
 
-type AgentRoundTripper struct {
+type GCEMetadataRoundTripper struct {
 	Next     http.RoundTripper
 	TokenURL string
 }
 
-func (a *AgentRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+func (a *GCEMetadataRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	token, err := metadata.GetWithContext(req.Context(), a.TokenURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch id token: %w", err)
 	}
 	req = req.Clone(req.Context())
 	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(token))
+	log.Printf("Using token: %s and a.Next==nil? %v", strings.TrimSpace(token), a.Next == nil)
 	return a.Next.RoundTrip(req)
 }
 
@@ -84,7 +85,7 @@ func main() {
 	c := http.DefaultClient
 	if *useGCEToken {
 		c = &http.Client{
-			Transport: &AgentRoundTripper{
+			Transport: &GCEMetadataRoundTripper{
 				Next:     http.DefaultClient.Transport,
 				TokenURL: fmt.Sprintf("instance/service-accounts/default/identity?audience=%s", *tronserv_addr),
 			},

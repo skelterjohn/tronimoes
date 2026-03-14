@@ -66,6 +66,8 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 // executes it with overridden args (e.g. --which, --code).
 // When running inside Cloud Run, the default service account is used.
 type GCRAgentSpawner struct {
+	// Code is the code of the game to spawn agents for.
+	Code string
 	// JobsClient is the Cloud Run Jobs API client. If nil, NewAgent will create
 	// one with default credentials (ADC).
 	JobsClient *run.JobsClient
@@ -124,6 +126,9 @@ func (s *GCRAgentSpawner) Initialize(ctx context.Context) error {
 }
 
 func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code string) error {
+	if s.Code != "" {
+		code = s.Code
+	}
 	log.Printf("Spawning agent %q for %q via %q", which, code, s.JobResourceName)
 	req := &runpb.RunJobRequest{
 		Name: s.JobResourceName,
@@ -137,7 +142,7 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 						"--which", which,
 						"--code", code,
 						"--round-out", "4",
-						// "--gce",
+						"--gce",
 					},
 				},
 			},
