@@ -153,9 +153,12 @@ func main() {
 
 	roundDoneCounter := -1
 
+	if len(g.Rounds) == 0 {
+		log.Print("New game beginning")
+	}
+
 	for !g.Done {
 		if len(g.Rounds) == 0 {
-			log.Print("New game beginning")
 			if quitFromRoundOut(ctx, g, name, *roundOut) {
 				log.Print("Round out reached, quitting to leave room")
 				g, err = tc.LeaveOrQuit(ctx)
