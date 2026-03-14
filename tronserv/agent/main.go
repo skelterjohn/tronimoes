@@ -44,7 +44,6 @@ func (a *GCEMetadataRoundTripper) RoundTrip(req *http.Request) (*http.Response, 
 	}
 	req = req.Clone(req.Context())
 	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(token))
-	log.Printf("Using token: %s and a.Next==nil? %v", strings.TrimSpace(token), a.Next == nil)
 	return a.Next.RoundTrip(req)
 }
 
@@ -86,7 +85,7 @@ func main() {
 	if *useGCEToken {
 		c = &http.Client{
 			Transport: &GCEMetadataRoundTripper{
-				Next:     http.DefaultClient.Transport,
+				Next:     http.DefaultTransport,
 				TokenURL: fmt.Sprintf("instance/service-accounts/default/identity?audience=%s", *tronserv_addr),
 			},
 		}
