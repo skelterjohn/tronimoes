@@ -18,4 +18,4 @@ ENV PORT 8080
 USER nonroot
 
 ENTRYPOINT ["/app/tronserv"]
-CMD ["--addr", "0.0.0.0", "--env", "prod"]
+CMD ["--addr", "0.0.0.0", "--env", "prod", "--agent-spawner", "gcr"]
