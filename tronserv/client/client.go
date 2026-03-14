@@ -91,6 +91,14 @@ func (c *TronimoesClient) JoinGame(ctx context.Context, code string) (*game.Game
 	return &g, nil
 }
 
+func (c *TronimoesClient) LeaveOrQuit(ctx context.Context) (*game.Game, error) {
+	var g game.Game
+	if err := c.Do(ctx, "POST", fmt.Sprintf("game/%s/leave", c.Code), nil, &g); err != nil {
+		return nil, err
+	}
+	return &g, nil
+}
+
 func (c *TronimoesClient) GetGame(ctx context.Context, version int64) (*game.Game, error) {
 	var g game.Game
 	qstr := fmt.Sprintf("?version=%d", version)

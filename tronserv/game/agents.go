@@ -37,6 +37,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 		agentExe,
 		"--which", which,
 		"--code", code,
+		"--round-out", "3",
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

@@ -29,6 +29,7 @@ var (
 	minMoveTime   = flag.Duration("min-move-time", 3*time.Second, "minimum time between moves")
 	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
 	archive       = flag.String("archive", "", "directory to save JSON game state and chosen move per turn; empty = don't save")
+	roundOut      = flag.Int("round-out", 0, "targeted player count")
 )
 
 type AgentRoundTripper struct {
@@ -44,6 +45,27 @@ func (a *AgentRoundTripper) RoundTrip(req *http.Request) (*http.Response, error)
 	req = req.Clone(req.Context())
 	req.Header.Set("Authorization", "Bearer "+strings.TrimSpace(token))
 	return a.Next.RoundTrip(req)
+}
+
+func quitFromRoundOut(ctx context.Context, g *game.Game, name string, targetPlayerCount int) bool {
+	if targetPlayerCount == 0 {
+		return false
+	}
+	if len(g.Players) <= targetPlayerCount {
+		return false
+	}
+	// a bot needs to quit. am I the one with the highest number?
+	highestBotNumber := -1
+	for i, p := range g.Players {
+		// only bots are allowed multi-word names
+		if strings.Contains(p.Name, " ") {
+			highestBotNumber = i
+		}
+	}
+	if g.Players[highestBotNumber].Name == name {
+		return true
+	}
+	return false
 }
 
 func main() {
@@ -125,6 +147,14 @@ func main() {
 	for !g.Done {
 		if len(g.Rounds) == 0 {
 			log.Print("New game beginning")
+			if quitFromRoundOut(ctx, g, name, *roundOut) {
+				log.Print("Round out reached, quitting to leave room")
+				g, err = tc.LeaveOrQuit(ctx)
+				if err != nil {
+					log.Printf("Could not leave game: %v", err)
+				}
+				return
+			}
 		} else if g.Rounds[len(g.Rounds)-1].Done {
 			if roundDoneCounter < len(g.Rounds) {
 				log.Print("Round done")
