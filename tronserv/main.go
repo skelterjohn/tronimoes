@@ -19,7 +19,7 @@ var (
 	port         = flag.Int("port", 8080, "port to listen on")
 	env          = flag.String("env", "", "firestore env (unset to use MemoryStore)")
 	noCors       = flag.Bool("no-cors", false, "disable cors")
-	agentSpawner = flag.String("agent-spawner", "local", "agent spawner to use: local, gce")
+	agentSpawner = flag.String("agent-spawner", "local", "agent spawner to use: local, gcr, gcr-dev")
 )
 
 func main() {
@@ -73,6 +73,26 @@ func main() {
 		spawner = nil
 	case "local":
 		spawner = game.LocalAgentSpawner{}
+	case "gcr-dev":
+		gcr := &game.GCRAgentSpawner{
+			ProjectID:     "tronimoes",
+			Region:        "us-east4",
+			ContainerName: "us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:latest",
+		}
+		if err := gcr.Initialize(ctx); err != nil {
+			log.Printf("Could not infer GCR agent spawner config: %v", err)
+			spawner = nil
+		} else {
+			spawner = gcr
+		}
+	case "gcr":
+		gcr := &game.GCRAgentSpawner{}
+		if err := gcr.Initialize(ctx); err != nil {
+			log.Printf("Could not infer GCR agent spawner config: %v", err)
+			spawner = nil
+		} else {
+			spawner = gcr
+		}
 	default:
 		log.Fatalf("Unknown agent spawner: %s", *agentSpawner)
 	}
