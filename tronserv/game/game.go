@@ -69,27 +69,13 @@ func (g *Game) LeaveOrQuit(ctx context.Context, name string) bool {
 	if len(g.Players) == 0 {
 		g.Done = true
 	}
+	if quitting {
+		g.AdjustBoardAndPips(ctx)
+	}
 	return quitting
 }
 
-func (g *Game) AddPlayer(ctx context.Context, player *Player) error {
-	if len(g.Players) >= 6 {
-		return ErrGameTooManyPlayers
-	}
-
-	if len(g.Rounds) > 0 {
-		return ErrGameAlreadyStarted
-	}
-
-	for _, p := range g.Players {
-		if p.Name == player.Name {
-			return ErrPlayerAlreadyInGame
-		}
-	}
-
-	player.Score = 0
-	g.Players = append(g.Players, player)
-
+func (g *Game) AdjustBoardAndPips(ctx context.Context) {
 	switch len(g.Players) {
 	case 1:
 		g.BoardWidth = 6
@@ -116,6 +102,28 @@ func (g *Game) AddPlayer(ctx context.Context, player *Player) error {
 		g.BoardHeight = 17
 		g.MaxPips = 12
 	}
+	Log(ctx, "Resizing game for %d players: %dx%d up to %d pips", len(g.Players), g.BoardWidth, g.BoardHeight, g.MaxPips)
+}
+
+func (g *Game) AddPlayer(ctx context.Context, player *Player) error {
+	if len(g.Players) >= 6 {
+		return ErrGameTooManyPlayers
+	}
+
+	if len(g.Rounds) > 0 {
+		return ErrGameAlreadyStarted
+	}
+
+	for _, p := range g.Players {
+		if p.Name == player.Name {
+			return ErrPlayerAlreadyInGame
+		}
+	}
+
+	player.Score = 0
+	g.Players = append(g.Players, player)
+
+	g.AdjustBoardAndPips(ctx)
 
 	return nil
 }
