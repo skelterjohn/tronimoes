@@ -58,7 +58,7 @@ func quitFromRoundOut(ctx context.Context, g *game.Game, name string, targetPlay
 	highestBotNumber := -1
 	for i, p := range g.Players {
 		// only bots are allowed multi-word names
-		if strings.Contains(p.Name, " ") {
+		if p.Bot {
 			highestBotNumber = i
 		}
 	}
@@ -70,7 +70,7 @@ func quitFromRoundOut(ctx context.Context, g *game.Game, name string, targetPlay
 
 func areWeAllBots(ctx context.Context, g *game.Game) bool {
 	for _, p := range g.Players {
-		if !strings.Contains(p.Name, " ") {
+		if !p.Bot {
 			return false
 		}
 	}
