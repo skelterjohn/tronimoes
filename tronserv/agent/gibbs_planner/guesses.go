@@ -101,9 +101,13 @@ func (gp *GibbsPlanner) fixBadGuesses(ctx context.Context, g *game.Game) {
 		}
 		extraTiles := len(p.Hand) - len(gp.hands[i].tiles)
 		if extraTiles > 0 {
-			// add tiles from the bag (they must have drawn)
-			gp.hands[i].tiles = append(gp.hands[i].tiles, gp.bag[:extraTiles]...)
-			gp.bag = gp.bag[extraTiles:]
+			if len(gp.bag) > 0 {
+				// add tiles from the bag (they must have drawn)
+				gp.hands[i].tiles = append(gp.hands[i].tiles, gp.bag[:extraTiles]...)
+				gp.bag = gp.bag[extraTiles:]
+			} else {
+				game.Log(ctx, "no tiles in the bag to add to hand %d", i)
+			}
 		}
 		if extraTiles < 0 {
 			// remove tiles from the hand (they must have laid)
