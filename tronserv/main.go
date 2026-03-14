@@ -75,9 +75,8 @@ func main() {
 		spawner = game.LocalAgentSpawner{}
 	case "gcr-dev":
 		gcr := &game.GCRAgentSpawner{
-			ProjectID:     "tronimoes",
-			Region:        "us-east4",
-			ContainerName: "us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:latest",
+			ProjectID: "tronimoes",
+			Region:    "us-east4",
 		}
 		if err := gcr.Initialize(ctx); err != nil {
 			log.Printf("Could not infer GCR agent spawner config: %v", err)

@@ -78,9 +78,6 @@ type GCRAgentSpawner struct {
 	// JobResourceName is the full resource name. If set, ProjectID/Region/JobName are ignored.
 	// Format: projects/{project}/locations/{location}/jobs/{job}
 	JobResourceName string
-	// ContainerName is the DNS_LABEL of the container in the job template to override.
-	// If the job has a single container, this is often the container's name from the template.
-	ContainerName string
 	// TronservAddr is the address of the tronimoes game server.
 	TronservAddr string
 }
@@ -102,14 +99,6 @@ func (s *GCRAgentSpawner) Initialize(ctx context.Context) error {
 			return fmt.Errorf("region not set and metadata unavailable: %w", err)
 		}
 		s.Region = path.Base(regionPath)
-	}
-	if s.ContainerName == "" {
-		buildTag := os.Getenv("BUILD_TAG")
-		if buildTag == "" {
-			return fmt.Errorf("build tag is not set")
-		}
-		s.ContainerName = fmt.Sprintf("us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:%s", buildTag)
-
 	}
 	if s.JobName == "" {
 		s.JobName = "tronagent"
@@ -135,13 +124,12 @@ func (s *GCRAgentSpawner) Initialize(ctx context.Context) error {
 }
 
 func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code string) error {
-	log.Printf("Spawning agent %q for %q via %q and %v", which, code, s.JobResourceName, s.ContainerName)
+	log.Printf("Spawning agent %q for %q via %q", which, code, s.JobResourceName)
 	req := &runpb.RunJobRequest{
 		Name: s.JobResourceName,
 		Overrides: &runpb.RunJobRequest_Overrides{
 			ContainerOverrides: []*runpb.RunJobRequest_Overrides_ContainerOverride{
 				{
-					Name: s.ContainerName,
 					Args: []string{
 						"4",
 						"/app/agent",

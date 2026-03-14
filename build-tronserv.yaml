@@ -18,5 +18,15 @@ steps:
   - '--set-env-vars=BUILD_TAG=v$SHORT_SHA'
   - '--port=8080'
   - 'tronserv'
+- name: 'gcr.io/cloud-builders/gcloud'
+  waitFor: ['1']
+  args:
+  - '-q'
+  - 'run'
+  - 'jobs'
+  - 'update'
+  - 'tronagent'
+  - '--image=us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA'
+  - '--region=us-east4'
 images:
 - "us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv:v$SHORT_SHA"
