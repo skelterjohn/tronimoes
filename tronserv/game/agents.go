@@ -114,9 +114,6 @@ func (s *GCRAgentSpawner) Initialize(ctx context.Context) error {
 	if s.JobName == "" {
 		s.JobName = "tronagent"
 	}
-	if s.ContainerName == "" {
-		return fmt.Errorf("container name is not set")
-	}
 
 	s.JobResourceName = fmt.Sprintf("projects/%s/locations/%s/jobs/%s", s.ProjectID, s.Region, s.JobName)
 
@@ -138,7 +135,7 @@ func (s *GCRAgentSpawner) Initialize(ctx context.Context) error {
 }
 
 func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code string) error {
-
+	log.Printf("Spawning agent %q for %q via %q and %v", which, code, s.JobResourceName, s.ContainerName)
 	req := &runpb.RunJobRequest{
 		Name: s.JobResourceName,
 		Overrides: &runpb.RunJobRequest_Overrides{
