@@ -96,13 +96,13 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 			<Input
 				placeholder="enter your username"
 				size="large"
-				className={`font-game text-lg ${isRegistered ? '!bg-black !text-white border-white [&.ant-input-disabled]:!bg-black [&.ant-input-disabled]:!text-white [&.ant-input-disabled]:!opacity-100 [&.ant-input-disabled]:cursor-default' : ''}`}
+				className={`font-game text-lg ${isRegistered ? '!bg-black !text-white border-white [&.ant-input-readonly]:!bg-black [&.ant-input-readonly]:!text-white [&.ant-input-readonly]:!opacity-100 [&.ant-input-readonly]:cursor-default' : ''}`}
 				style={isRegistered ? { backgroundColor: 'black', color: 'white' } : undefined}
 				styles={isRegistered ? { input: { backgroundColor: 'black', color: 'white' } } : undefined}
 				value={isRegistered ? playerName : nameInput}
-				disabled={isRegistered}
+				readOnly={isRegistered}
 				onChange={(e) => !isRegistered && setNameInput(e.target.value)}
-				onPressEnter={register}
+				onPressEnter={() => (isRegistered ? joinPickup() : register())}
 			/>
 		</div>
 		<div className="flex gap-2 text-white">
