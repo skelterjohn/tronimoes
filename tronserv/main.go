@@ -117,9 +117,9 @@ func main() {
 		log.Printf("Bot token check: allowing service account %s", sa)
 	}
 	gs := &game.GameServer{
-		Store:                    store,
-		AgentSpawner:             spawner,
-		CheckBotTokens:           *checkBotTokens,
+		Store:                     store,
+		AgentSpawner:              spawner,
+		CheckBotTokens:            *checkBotTokens,
 		AllowedBotServiceAccounts: allowedBotSAs,
 	}
 	game.RegisterHandlers(r, gs)
