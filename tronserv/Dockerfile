@@ -12,6 +12,7 @@ FROM cgr.dev/chainguard/static:latest
 WORKDIR /app
 COPY --from=builder /app/bin/tronserv .
 COPY --from=builder /app/bin/agent .
+COPY --from=builder /app/bin/replicant .
 
 EXPOSE 8080
 ENV PORT 8080
