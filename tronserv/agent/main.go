@@ -68,6 +68,15 @@ func quitFromRoundOut(ctx context.Context, g *game.Game, name string, targetPlay
 	return false
 }
 
+func areWeAllBots(ctx context.Context, g *game.Game) bool {
+	for _, p := range g.Players {
+		if !strings.Contains(p.Name, " ") {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
 	ctx := context.Background()
 	flag.Parse()
@@ -161,6 +170,11 @@ func main() {
 				a.CompleteRound(ctx, g)
 				roundDoneCounter = len(g.Rounds)
 			}
+		}
+
+		if areWeAllBots(ctx, g) {
+			log.Print("All bots, quitting to save $$$$$$$")
+			return
 		}
 
 		r := g.CurrentRound(ctx)
