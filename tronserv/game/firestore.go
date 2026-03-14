@@ -157,14 +157,16 @@ func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 }
 func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 	open := len(game.Rounds) == 0 && len(game.Players) < 6
-
+	expectedVersion := game.Version
 	game.Version++
 	gameData, err := json.Marshal(game)
 	if err != nil {
+		game.Version--
 		return fmt.Errorf("could not marshal: %v", err)
 	}
 	c := s.games(ctx)
-	if _, err := c.Doc(game.Code).Set(ctx, map[string]any{
+	docRef := c.Doc(game.Code)
+	payload := map[string]any{
 		"created":     game.Created,
 		"code_prefix": game.Code[:6],
 		"open":        open,
@@ -172,7 +174,29 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		"done":        game.Done,
 		"game_json":   string(gameData),
 		"version":     game.Version,
-	}); err != nil {
+	}
+	err = s.storeClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+		doc, err := tx.Get(docRef)
+		if err != nil && status.Code(err) != codes.NotFound {
+			return err
+		}
+		if doc != nil && doc.Exists() {
+			data := doc.Data()
+			storedVersion, ok := data["version"].(int64)
+			if !ok {
+				log.Printf("unexpected version type: %T", data["version"])
+			}
+			if ok && storedVersion != expectedVersion {
+				return ErrVersionConflict
+			}
+		}
+		return tx.Set(docRef, payload)
+	})
+	if err != nil {
+		game.Version--
+		if err == ErrVersionConflict {
+			return err
+		}
 		return fmt.Errorf("could not write: %v", err)
 	}
 	return nil

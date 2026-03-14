@@ -51,4 +51,5 @@ var (
 	ErrPlayerInitialsReserved   = errors.New("you cannot make a player with those initials")
 	ErrBadCode                  = errors.New("code must be exactly 6 capital letters")
 	ErrYouAreNotABot            = errors.New("you are not a bot")
+	ErrVersionConflict          = errors.New("game was updated by someone else")
 )

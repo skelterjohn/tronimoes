@@ -32,6 +32,9 @@ func init() {
 }
 
 func writeErr(w http.ResponseWriter, err error, code int) {
+	if errors.Is(err, ErrVersionConflict) {
+		code = http.StatusConflict
+	}
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 }
