@@ -15,6 +15,7 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/go-chi/chi/v5"
+	"google.golang.org/api/idtoken"
 )
 
 var fbApp *firebase.App
@@ -63,7 +64,7 @@ func RandomString(n int) string {
 
 var reservedInitials = map[string]bool{
 	"RC": true,
-	"RL": true,
+	"GP": true,
 }
 
 func isBotName(name string) bool {
@@ -98,9 +99,53 @@ type GameOptions struct {
 	GibbsPlanner bool `json:"gibbsPlanner"`
 }
 
+// BotTokenAudience is the required audience claim for bot (service account) ID tokens.
+const BotTokenAudience = "https://games.tronimoes.com"
+
 type GameServer struct {
-	Store        Store
-	AgentSpawner AgentSpawner
+	Store                     Store
+	AgentSpawner              AgentSpawner
+	CheckBotTokens            bool
+	AllowedBotServiceAccounts []string // if non-empty, token's email must be in this list
+}
+
+// validateBotServiceAccountToken checks the request for a Bearer token, validates it as a
+// Google-issued ID token with audience BotTokenAudience, and optionally requires the token's
+// service account email to be in AllowedBotServiceAccounts. Call when registering a bot player.
+func (s *GameServer) validateBotServiceAccountToken(ctx context.Context, r *http.Request) error {
+	token := r.Header.Get("Authorization")
+	if token == "" {
+		return ErrYouAreNotABot
+	}
+	if len(token) > 7 && token[:7] == "Bearer " {
+		token = token[7:]
+	}
+	token = strings.TrimSpace(token)
+	if token == "" {
+		return ErrYouAreNotABot
+	}
+
+	payload, err := idtoken.Validate(ctx, token, BotTokenAudience)
+	if err != nil {
+		return fmt.Errorf("%w: %v", ErrInvalidToken, err)
+	}
+
+	if len(s.AllowedBotServiceAccounts) > 0 {
+		email, _ := payload.Claims["email"].(string)
+		allowed := false
+		for _, a := range s.AllowedBotServiceAccounts {
+			if a == email {
+				allowed = true
+				break
+			}
+		}
+		if !allowed {
+			Log(ctx, "Bot service account not allowed: %s", email)
+			return ErrYouAreNotABot
+		}
+	}
+
+	return nil
 }
 
 func (s *GameServer) validateToken(ctx context.Context, r *http.Request) error {
@@ -719,6 +764,16 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	player := &Player{Name: name}
+
+	if isBotName(name) {
+		if s.CheckBotTokens {
+			if err := s.validateBotServiceAccountToken(ctx, r); err != nil {
+				writeErr(w, err, http.StatusUnauthorized)
+				return
+			}
+		}
+		player.Bot = true
+	}
 
 	if !inGame {
 		if err := g.AddPlayer(ctx, player); err != nil {

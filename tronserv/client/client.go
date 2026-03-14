@@ -82,6 +82,7 @@ func (c *TronimoesClient) GetPlayer(ctx context.Context, name string) (*game.Pla
 func (c *TronimoesClient) JoinGame(ctx context.Context, code string) (*game.Game, error) {
 	p := game.Player{
 		Name: c.Name,
+		Bot:  true,
 	}
 	var g game.Game
 	if err := c.Do(ctx, "PUT", fmt.Sprintf("game/%s", code), p, &g); err != nil {

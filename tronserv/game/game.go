@@ -607,6 +607,7 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 
 type Player struct {
 	Name             string     `json:"name"`
+	Bot              bool       `json:"bot"`
 	Ready            bool       `json:"ready"`
 	Score            int        `json:"score"`
 	Hand             []Tile     `json:"hand"`

@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
+	"cloud.google.com/go/compute/metadata"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -14,12 +16,24 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
+// defaultServiceAccountEmail returns the email of the default service account
+// for the current GCE/Cloud Run instance via the metadata server. Returns empty
+// string and nil when not running on GCE or when the metadata is unavailable.
+func defaultServiceAccountEmail(ctx context.Context) string {
+	email, err := metadata.GetWithContext(ctx, "instance/service-accounts/default/email")
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(email)
+}
+
 var (
-	addr         = flag.String("addr", "0.0.0.0", "address to listen on")
-	port         = flag.Int("port", 8080, "port to listen on")
-	env          = flag.String("env", "", "firestore env (unset to use MemoryStore)")
-	noCors       = flag.Bool("no-cors", false, "disable cors")
-	agentSpawner = flag.String("agent-spawner", "local", "agent spawner to use: local, gcr, gcr-dev")
+	addr           = flag.String("addr", "0.0.0.0", "address to listen on")
+	port           = flag.Int("port", 8080, "port to listen on")
+	env            = flag.String("env", "", "firestore env (unset to use MemoryStore)")
+	noCors         = flag.Bool("no-cors", false, "disable cors")
+	agentSpawner   = flag.String("agent-spawner", "local", "agent spawner to use: local, gcr, gcr-dev")
+	checkBotTokens = flag.Bool("check-bot-tokens", false, "check bot tokens for reserved names")
 )
 
 func main() {
@@ -97,9 +111,16 @@ func main() {
 		log.Fatalf("Unknown agent spawner: %s", *agentSpawner)
 	}
 
+	allowedBotSAs := []string{}
+	if sa := defaultServiceAccountEmail(ctx); sa != "" {
+		allowedBotSAs = []string{sa}
+		log.Printf("Bot token check: allowing service account %s", sa)
+	}
 	gs := &game.GameServer{
-		Store:        store,
-		AgentSpawner: spawner,
+		Store:                    store,
+		AgentSpawner:             spawner,
+		CheckBotTokens:           *checkBotTokens,
+		AllowedBotServiceAccounts: allowedBotSAs,
 	}
 	game.RegisterHandlers(r, gs)
 
