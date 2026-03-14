@@ -1,5 +1,7 @@
-// One-off: go run ./cmd/prettify testdata/no_draw_btbrjx.json
-// Reads JSON (strips BOM), unmarshals into game.Game, writes back with tab indent.
+// Prettify game JSON: reads a file, unmarshals into game.Game, writes back with tab indent.
+//
+// Usage (from tronserv): go run ./prettify <file.json>
+// Example: go run ./prettify game/testdata/footturn.json
 package main
 
 import (
@@ -12,7 +14,7 @@ import (
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "usage: go run ./cmd/prettify <file.json>\n")
+		fmt.Fprintf(os.Stderr, "usage: go run ./prettify <file.json>\n")
 		os.Exit(1)
 	}
 	path := os.Args[1]

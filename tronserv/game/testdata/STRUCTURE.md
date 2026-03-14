@@ -93,3 +93,5 @@ Board coordinates; origin and axes are defined by the game (e.g. round leader of
 - Tests typically use `game.CurrentRound(ctx)`, `round.FindLegalMoves(...)`, etc., and assert on moves or state.
 
 When adding new testdata, keep `player_lines` and `laid_tiles` consistent, and ensure `turn` indexes the correct player in `players`.
+
+**Prettify:** After editing JSON testdata (or when a file is minified), run from `tronserv`: `go run ./prettify game/testdata/<filename>.json` to rewrite the file with tab-indented formatting.
