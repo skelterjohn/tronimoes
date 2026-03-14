@@ -8,7 +8,7 @@ steps:
   - '.'
   waitFor: ['-']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv']
+  args: ['push', '-a', 'us-east4-docker.pkg.dev/tronimoes/tronimoes/tronserv']
 - name: 'gcr.io/cloud-builders/gcloud'
   args: 
   - '-q'
