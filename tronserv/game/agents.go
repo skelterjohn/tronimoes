@@ -160,7 +160,7 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 	if runErr != nil {
 		return fmt.Errorf("run job %q: %w", s.JobResourceName, runErr)
 	}
+	log.Printf("Job %q submitted for code %s", op.Name(), code)
 	// Optionally wait for execution: op.Wait(ctx). For fire-and-forget we don't wait.
-	_ = op
 	return nil
 }
