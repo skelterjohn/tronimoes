@@ -2,7 +2,7 @@
 FROM cgr.dev/chainguard/go:latest AS builder
 WORKDIR /app
 COPY . .
-RUN CGO_ENABLED=0 go install . ./agent
+RUN CGO_ENABLED=0 go install . ./agent ./replicant
 RUN CGO_ENABLED=0 go test ./game
 RUN mkdir /app/bin
 RUN cp $HOME/go/bin/* /app/bin

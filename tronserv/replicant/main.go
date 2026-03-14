@@ -68,10 +68,13 @@ func main() {
 	}
 	args := os.Args[2:]
 
+	log.Printf("Starting %d replicants via %v", count, args)
+
 	var wg sync.WaitGroup
 	for i := int64(0); i < count; i++ {
 		wg.Add(1)
 		go replicate(ctx, fmt.Sprintf("replicant-%d", i), args, &wg)
 	}
 	wg.Wait()
+	log.Println("All replicants have finished")
 }

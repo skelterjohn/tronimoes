@@ -49,20 +49,7 @@ const Options = ({ isOpen, onClose }) => {
 			<Space orientation="vertical" size="middle" style={{ width: '100%', padding: '20px 0' }}>
 				<div>
 					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-						<span>random choice</span>
-						<Checkbox
-							checked={randomChoice}
-							onChange={handleRandomChoiceChange}
-							className="font-game"
-						/>
-					</div>
-					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
-						Add a player based on random choice.
-					</div>
-				</div>
-				<div>
-					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-						<span>gibbs planner</span>
+						<span>install agents</span>
 						<Checkbox
 							checked={gibbsPlanner}
 							onChange={handleGibbsPlannerChange}
@@ -70,7 +57,7 @@ const Options = ({ isOpen, onClose }) => {
 						/>
 					</div>
 					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
-						Add a player based on the Gibbs planner.
+						Round out a 4-player game with bots.
 					</div>
 				</div>
 			</Space>

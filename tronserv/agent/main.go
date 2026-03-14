@@ -166,6 +166,10 @@ func main() {
 		r := g.CurrentRound(ctx)
 		if r == nil || r.Done {
 			p := g.GetPlayer(ctx, name)
+			if p == nil {
+				log.Printf("Player %s not found (am I alive or am I dancer?)", name)
+				return
+			}
 			if !p.Ready {
 				a.Ready(ctx)
 				log.Print("Ready to begin a new round.")

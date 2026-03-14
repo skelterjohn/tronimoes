@@ -5,4 +5,6 @@ go build -o tronserv.exe .
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 go build -o tronagent.exe ./agent
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+go build -o replicant.exe ./replicant
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 .\tronserv.exe $args
