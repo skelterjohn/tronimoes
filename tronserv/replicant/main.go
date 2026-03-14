@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strconv"
 	"sync"
+	"time"
 )
 
 func prefixLines(prefix string, r io.Reader, w io.Writer, mu *sync.Mutex) {
@@ -74,6 +75,7 @@ func main() {
 	for i := int64(0); i < count; i++ {
 		wg.Add(1)
 		go replicate(ctx, fmt.Sprintf("replicant-%d", i), args, &wg)
+		time.Sleep(1 * time.Second)
 	}
 	wg.Wait()
 	log.Println("All replicants have finished")
