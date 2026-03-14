@@ -58,7 +58,7 @@ func (n *PlanNode) Next(ctx context.Context, move types.Move, turn, count int) *
 	return nextNode
 }
 
-func (n *PlanNode) ChooseBestMove(ctx context.Context) (types.Move, error) {
+func (n *PlanNode) ChooseBestMove(ctx context.Context) types.Move {
 	var bestMove types.Move
 	bestV := -math.MaxFloat64
 	for move, next := range n.Moves {
@@ -68,7 +68,7 @@ func (n *PlanNode) ChooseBestMove(ctx context.Context) (types.Move, error) {
 			bestMove = move
 		}
 	}
-	return bestMove, nil
+	return bestMove
 }
 
 func (n *PlanNode) Cull(ctx context.Context, moves map[types.Move]bool) {
@@ -190,6 +190,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 				game.Debug(ctx, "player=%+v", p)
 				return fmt.Errorf("laying: %w", err)
 			}
+			move.Dead = false // this screws up the hashmap since FindLegalMoves doesn't set this.
 			bestMove = types.Move{LayTile: true, LaidTile: move}
 		} else if whichMove < tileAndSpacerMoves {
 			spacer := legalSpacers[whichMove-tileMoves]
@@ -257,12 +258,10 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	// This is myopic to the round, missing outcomes that might win the game. Alas.
 	for i := len(nodesInSimulation) - 1; i >= 0; i-- {
 		cur := nodesInSimulation[i]
-		bestMove, err := cur.ChooseBestMove(ctx)
-		if err != nil {
-			return fmt.Errorf("choosing best move: %w", err)
-		}
+		bestMove := cur.ChooseBestMove(ctx)
 		bestNode := cur.Moves[bestMove]
 		if bestNode == nil {
+			// This is the last node in the simulation, so we just copy the reward.
 			copy(cur.V, cur.R)
 			continue
 		}
@@ -280,5 +279,6 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		game.Debug(ctx, "   R: %v", n.R)
 		game.Debug(ctx, "   H: %v", n.H)
 	}
+
 	return nil
 }
