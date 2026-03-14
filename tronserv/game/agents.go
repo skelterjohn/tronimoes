@@ -146,9 +146,12 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 				{
 					Name: s.ContainerName,
 					Args: []string{
+						"4",
+						"/app/agent",
 						"--addr", s.TronservAddr,
 						"--which", which,
 						"--code", code,
+						"--round-out", "4",
 						// "--gce",
 					},
 				},
