@@ -36,7 +36,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	runCtx := context.WithoutCancel(ctx)
 	cmd := exec.CommandContext(runCtx,
 		replicantExe,
-		"4",
+		"3",
 		agentExe,
 		"--which", which,
 		"--code", code,
