@@ -211,6 +211,7 @@ func (gp *GibbsPlanner) React(ctx context.Context, query string) {
 
 func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {
 	game.Log(ctx, "reacting: %s", query)
+	time.Sleep(time.Duration(rand.Intn(500)+500) * time.Millisecond)
 	url, err := reacts.FindImageURL(ctx, query)
 	if err != nil {
 		game.Log(ctx, "Error getting image URL: %v", err)
