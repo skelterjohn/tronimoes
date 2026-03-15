@@ -17,13 +17,13 @@ import (
 )
 
 type AgentSpawner interface {
-	NewAgent(ctx context.Context, which string, code string) error
+	NewAgent(ctx context.Context, which string, code string, roundOut int) error
 }
 
 type LocalAgentSpawner struct {
 }
 
-func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code string) error {
+func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code string, roundOut int) error {
 	log.Printf("Spawning %s agent for game %s", which, code)
 	exeDir := ""
 	if exe, err := os.Executable(); err == nil {
@@ -36,11 +36,11 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	runCtx := context.WithoutCancel(ctx)
 	cmd := exec.CommandContext(runCtx,
 		replicantExe,
-		"3",
+		fmt.Sprintf("%d", roundOut-1),
 		agentExe,
 		"--which", which,
 		"--code", code,
-		"--round-out", "4",
+		"--round-out", fmt.Sprintf("%d", roundOut),
 	)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -125,7 +125,7 @@ func (s *GCRAgentSpawner) Initialize(ctx context.Context) error {
 	return nil
 }
 
-func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code string) error {
+func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code string, roundOut int) error {
 	if s.Code != "" {
 		code = s.Code
 	}
@@ -136,12 +136,12 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 			ContainerOverrides: []*runpb.RunJobRequest_Overrides_ContainerOverride{
 				{
 					Args: []string{
-						"3",
+						fmt.Sprintf("%d", roundOut-1),
 						"/app/agent",
 						"--addr", s.TronservAddr,
 						"--which", which,
 						"--code", code,
-						"--round-out", "4",
+						"--round-out", fmt.Sprintf("%d", roundOut),
 						"--gce",
 					},
 				},

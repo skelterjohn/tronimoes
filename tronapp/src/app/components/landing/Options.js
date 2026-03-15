@@ -1,30 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Space, Select, Checkbox } from 'antd';
+import { Modal, Space, Select } from 'antd';
 import Button from '@/app/components/Button';
 import { useGameState } from '../GameState';
-	
+
+const AGENT_OPTIONS = [0, 2, 3, 4, 5, 6];
+
 const Options = ({ isOpen, onClose }) => {
-	const [randomChoice, setRandomChoice] = useState(false);
-	const [gibbsPlanner, setGibbsPlanner] = useState(false);
+	const [roundOut, setRoundOut] = useState(0);
 	const { options, setOptions } = useGameState();
 
 	useEffect(() => {
 		if (isOpen) {
-			setRandomChoice(!!options.randomChoice);
-			setGibbsPlanner(!!options.gibbsPlanner);
+			setRoundOut(options.agent_round_out ?? 0);
 		}
-	}, [isOpen, options.randomChoice, options.gibbsPlanner]);
+	}, [isOpen, options.agent_round_out]);
 
-	const handleRandomChoiceChange = (e) => {
-		const value = e.target.checked;
-		setRandomChoice(value);
-		setOptions((prev) => ({ ...prev, randomChoice: value }));
-	};
-
-	const handleGibbsPlannerChange = (e) => {
-		const value = e.target.checked;
-		setGibbsPlanner(value);
-		setOptions((prev) => ({ ...prev, gibbsPlanner: value }));
+	const handleAgentRoundOutChange = (value) => {
+		setRoundOut(value);
+		setOptions((prev) => ({ ...prev, agent_round_out: value }));
 	};
 
 	return (
@@ -50,14 +43,16 @@ const Options = ({ isOpen, onClose }) => {
 				<div>
 					<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 						<span>install agents</span>
-						<Checkbox
-							checked={gibbsPlanner}
-							onChange={handleGibbsPlannerChange}
+						<Select
+							value={roundOut}
+							onChange={handleAgentRoundOutChange}
+							options={AGENT_OPTIONS.map((n) => ({ value: n, label: String(n) }))}
 							className="font-game"
+							style={{ width: 72 }}
 						/>
 					</div>
 					<div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
-						Round out a 4-player game with bots.
+						Round out a game with bots to reach this many players.
 					</div>
 				</div>
 			</Space>

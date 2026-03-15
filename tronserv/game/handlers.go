@@ -98,8 +98,7 @@ func validatePlayerName(name string) error {
 }
 
 type GameOptions struct {
-	RandomChoice bool `json:"randomChoice"`
-	GibbsPlanner bool `json:"gibbsPlanner"`
+	AgentRoundOut int `json:"agent_round_out"`
 }
 
 // BotTokenAudience is the required audience claim for bot (service account) ID tokens.
@@ -806,20 +805,9 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	s.encodeFilteredGame(ctx, w, name, g)
 
-	if createdNewGame {
-		if s.AgentSpawner != nil {
-			whichAgent := ""
-			if options.RandomChoice {
-				whichAgent = "random"
-			}
-			if options.GibbsPlanner {
-				whichAgent = "gibbs"
-			}
-			if whichAgent != "" {
-				if err := s.AgentSpawner.NewAgent(ctx, whichAgent, code); err != nil {
-					log.Printf("Error spawning agent %q for %q: %v", whichAgent, code, err)
-				}
-			}
+	if createdNewGame && options.AgentRoundOut > 1 && s.AgentSpawner != nil {
+		if err := s.AgentSpawner.NewAgent(ctx, "gibbs", code, options.AgentRoundOut); err != nil {
+			log.Printf("Error spawning agent for %q: %v", code, err)
 		}
 	}
 }

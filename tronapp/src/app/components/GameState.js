@@ -13,8 +13,7 @@ const defaultConfig = {
 };
 
 const defaultOptions = {
-	randomChoice: false,
-	gibbsPlanner: false,
+	agent_round_out: 0,
 };
 
 export function GameProvider({ children }) {
