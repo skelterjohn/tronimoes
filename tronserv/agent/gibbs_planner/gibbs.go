@@ -157,7 +157,11 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	game.Log(ctx, "simulated %d games", simulations)
 	bestMove := root.ChooseBestMove(ctx)
 	game.Debug(ctx, "hand: %v", g.Players[g.Turn].Hand)
-	game.Debug(ctx, "best move: %s %v", bestMove, root.Moves[bestMove].V)
+	vstr := ""
+	if root.Moves[bestMove] != nil {
+		vstr = fmt.Sprintf(" %v", root.Moves[bestMove].V)
+	}
+	game.Debug(ctx, "best move: %s%s", bestMove, vstr)
 
 	if bestMove.Pass {
 		gp.React(ctx, "frustration")
