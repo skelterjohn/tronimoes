@@ -151,9 +151,10 @@ func main() {
 	if err != nil {
 		log.Printf("Could not get image URL: %v", err)
 	} else {
-		g, err = tc.ChooseFoot(ctx, footURL)
-		if err != nil {
+		if ng, err := tc.ChooseFoot(ctx, footURL); err != nil {
 			log.Printf("Could not choose foot: %v", err)
+		} else {
+			g = ng
 		}
 	}
 
@@ -236,37 +237,41 @@ func main() {
 				}
 				lastMoveTime = time.Now()
 				if m.Draw {
-					g, err = tc.Draw(ctx)
-					if err != nil {
+					if ng, err := tc.Draw(ctx); err != nil {
 						log.Printf("Could not draw: %v", err)
 						continue
+					} else {
+						g = ng
 					}
 					log.Println("I just drew")
 					continue
 				}
 				if m.Pass {
-					g, err = tc.Pass(ctx, m.Selected.X, m.Selected.Y)
-					if err != nil {
+					if ng, err := tc.Pass(ctx, m.Selected.X, m.Selected.Y); err != nil {
 						log.Printf("Could not pass: %v", err)
 						continue
+					} else {
+						g = ng
 					}
 					log.Println("I passed")
 					continue
 				}
 				if m.LayTile {
-					g, err = tc.LayTile(ctx, &m.LaidTile)
-					if err != nil {
+					if ng, err := tc.LayTile(ctx, &m.LaidTile); err != nil {
 						log.Printf("Could not lay tile: %v", err)
 						continue
+					} else {
+						g = ng
 					}
 					log.Printf("I laid %v", m.LaidTile)
 					continue
 				}
 				if m.PlaceSpacer {
-					g, err = tc.LaySpacer(ctx, &m.Spacer)
-					if err != nil {
+					if ng, err := tc.LaySpacer(ctx, &m.Spacer); err != nil {
 						log.Printf("Could not lay spacer: %v", err)
 						continue
+					} else {
+						g = ng
 					}
 					log.Printf("I placed a spacer: %v", m.Spacer)
 					continue

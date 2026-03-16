@@ -30,7 +30,7 @@ func (c *TronimoesClient) WriteHeaders(req *http.Request) {
 }
 
 func (c *TronimoesClient) Do(ctx context.Context, method, path string, vin, vout any) error {
-	return c.DoRetry(ctx, method, path, vin, vout, 3)
+	return c.DoRetry(ctx, method, path, vin, vout, 10)
 }
 
 func (c *TronimoesClient) DoRetry(ctx context.Context, method, path string, vin, vout any, retry int) error {
