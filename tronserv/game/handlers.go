@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -28,7 +27,7 @@ func init() {
 		ProjectID: "tronimoes",
 	})
 	if err != nil {
-		log.Fatalf("Error initializing Firebase app: %v", err)
+		clog.Fatal(ctx, "Error initializing Firebase app", "error", err.Error())
 	}
 }
 
@@ -284,7 +283,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !g.LeaveOrQuit(ctx, name) {
-		log.Printf("Player %q cannot leave game %q", name, code)
+		clog.Info(ctx, "Player cannot leave game", "name", name, "code", code)
 		writeErr(w, ErrNotYourGame, http.StatusBadRequest)
 		return
 	}
@@ -322,25 +321,25 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
-		log.Printf("Player %q is not in turn for game %q", name, code)
+		clog.Info(ctx, "Player not in turn for game", "name", name, "code", code)
 		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
 		return
 	}
 
 	if len(g.Rounds) == 0 {
-		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		clog.Info(ctx, "Player tried to play but game not started", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 	round := g.Rounds[len(g.Rounds)-1]
 	if round.Done {
-		log.Printf("Player %q tried to play game %q but the round is done", name, code)
+		clog.Info(ctx, "Player tried to play but round is done", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 
 	if !g.DrawTile(ctx, name) {
-		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		clog.Info(ctx, "Player tried to play but game not started", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
@@ -391,19 +390,19 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
-		log.Printf("Player %q is not in turn for game %q", name, code)
+		clog.Info(ctx, "Player not in turn for game", "name", name, "code", code)
 		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
 		return
 	}
 
 	if len(g.Rounds) == 0 {
-		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		clog.Info(ctx, "Player tried to play but game not started", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 	round := g.Rounds[len(g.Rounds)-1]
 	if round.Done {
-		log.Printf("Player %q tried to play game %q but the round is done", name, code)
+		clog.Info(ctx, "Player tried to play but round is done", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
@@ -448,19 +447,19 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
-		log.Printf("Player %q is not in turn for game %q", name, code)
+		clog.Info(ctx, "Player not in turn for game", "name", name, "code", code)
 		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
 		return
 	}
 
 	if len(g.Rounds) == 0 {
-		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		clog.Info(ctx, "Player tried to play but game not started", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 	round := g.Rounds[len(g.Rounds)-1]
 	if round.Done {
-		log.Printf("Player %q tried to play game %q but the round is done", name, code)
+		clog.Info(ctx, "Player tried to play but round is done", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
@@ -515,19 +514,19 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 
 	player := g.Players[g.Turn]
 	if player.Name != name {
-		log.Printf("Player %q is not in turn for game %q", name, code)
+		clog.Info(ctx, "Player not in turn for game", "name", name, "code", code)
 		writeErr(w, ErrNotYourTurn, http.StatusBadRequest)
 		return
 	}
 
 	if len(g.Rounds) == 0 {
-		log.Printf("Player %q tried to play game %q but it isn't started", name, code)
+		clog.Info(ctx, "Player tried to play but game not started", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
 	round := g.Rounds[len(g.Rounds)-1]
 	if round.Done {
-		log.Printf("Player %q tried to play game %q but the round is done", name, code)
+		clog.Info(ctx, "Player tried to play but round is done", "name", name, "code", code)
 		writeErr(w, ErrRoundNotStarted, http.StatusBadRequest)
 		return
 	}
@@ -605,7 +604,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	if len(g.Rounds) == 0 {
 		now := time.Now().Unix()
 		if now-g.Created > 1800 {
-			log.Printf("Culling game %q because it's been waiting too long", code)
+			clog.Info(ctx, "Culling game (waiting too long)", "code", code)
 			if err := s.Store.DeleteGame(ctx, code); err != nil {
 				clog.Error(ctx, "Error deleting game", "error", err.Error(), "code", code)
 			}
@@ -625,16 +624,16 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			}
 			idleSeconds := now - lastActive
 			if idleSeconds > 300 {
-				log.Printf("last active for %q / %q: %d (%d seconds ago)", p.Name, code, lastActive, idleSeconds)
+				clog.Info(ctx, "last active", "player", p.Name, "code", code, "lastActive", fmt.Sprint(lastActive), "idleSeconds", fmt.Sprint(idleSeconds))
 				if !g.LeaveOrQuit(ctx, p.Name) {
-					log.Printf("Could not boot inactive player %s from %q", p.Name, code)
+					clog.Info(ctx, "Could not boot inactive player", "player", p.Name, "code", code)
 				} else {
 					anyBooted = true
 				}
 			}
 		}
 		if anyBooted {
-			log.Printf("Booted players from %q %v", code, g.Players)
+			clog.Info(ctx, "Booted players", "code", code)
 			if err := s.Store.WriteGame(ctx, g); err != nil {
 				clog.Error(ctx, "Could not store game after booting players", "error", err.Error())
 			}
@@ -660,7 +659,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			clog.Error(ctx, "Error setting player inactive", "error", err.Error(), "name", name, "code", code)
 		}
 		if !g.LeaveOrQuit(ctx, name) {
-			log.Printf("Could not boot %s from %q when the connection broke", name, code)
+			clog.Info(ctx, "Could not boot when connection broke", "name", name, "code", code)
 		}
 		return
 	case g := <-s.Store.WatchGame(ctx, code, version):
@@ -686,7 +685,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
-	log.Printf("Game options for %q / %q: %v", name, code, options)
+	clog.Info(ctx, "Game options", "name", name, "code", code)
 
 	var g *Game
 
@@ -699,7 +698,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if g != nil {
-			log.Printf("Found a pickup game: %s", g.Code)
+			clog.Info(ctx, "Found a pickup game", "code", g.Code)
 		}
 	} else {
 		prefix := code
@@ -721,12 +720,12 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 				writeErr(w, err, http.StatusInternalServerError)
 				return
 			}
-			log.Printf("Found open game with prefix %q", prefix)
+			clog.Info(ctx, "Found open game with prefix", "prefix", prefix)
 		}
 
 		if g != nil {
 			if len(code) > 6 && code != g.Code {
-				log.Printf("Player %q joined game %q but it already exists as %q", name, code, g.Code)
+				clog.Info(ctx, "Player joined game but it already exists", "name", name, "code", code, "existingCode", g.Code)
 				writeErr(w, ErrGameOver, http.StatusConflict)
 				return
 			}
@@ -739,13 +738,13 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			code = fmt.Sprintf("%s-%s", RandomString(6), RandomString(6))
 		} else {
 			if len(code) != 6 {
-				log.Printf("Code %q is the wrong length", code)
+				clog.Info(ctx, "Code is the wrong length", "code", code)
 				writeErr(w, ErrBadCode, http.StatusBadRequest)
 				return
 			}
 			for _, c := range code {
 				if !unicode.IsLetter(c) || !unicode.IsUpper(c) {
-					log.Printf("Code %q is not a capital letter", code)
+					clog.Info(ctx, "Code is not a capital letter", "code", code)
 					writeErr(w, ErrBadCode, http.StatusBadRequest)
 					return
 				}
@@ -756,13 +755,13 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		g.Pickup = pickup
 	}
 
-	log.Printf("Attempting to add player %q to %q", name, code)
+	clog.Info(ctx, "Attempting to add player", "name", name, "code", code)
 
 	inGame := false
 	for _, p := range g.Players {
 		if p.Name == name {
 			inGame = true
-			log.Printf("Player %q already in game %q", name, code)
+			clog.Info(ctx, "Player already in game", "name", name, "code", code)
 		}
 	}
 
@@ -873,14 +872,14 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 
 	url, ok := reqBody["url"]
 	if !ok {
-		log.Printf("No url provided for %q / %q", name, code)
+		clog.Info(ctx, "No url provided", "name", name, "code", code)
 		writeErr(w, ErrNoURL, http.StatusBadRequest)
 		return
 	}
 
 	player := g.GetPlayer(ctx, name)
 	if player == nil {
-		log.Printf("Player %q not found in game %q", name, code)
+		clog.Info(ctx, "Player not found in game", "name", name, "code", code)
 		writeErr(w, ErrPlayerNotFound, http.StatusNotFound)
 		return
 	}
@@ -923,14 +922,14 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 
 	url, ok := reqBody["url"]
 	if !ok {
-		log.Printf("No url provided for %q / %q", name, code)
+		clog.Info(ctx, "No url provided", "name", name, "code", code)
 		writeErr(w, ErrNoURL, http.StatusBadRequest)
 		return
 	}
 
 	player := g.GetPlayer(ctx, name)
 	if player == nil {
-		log.Printf("Player %q not found in game %q", name, code)
+		clog.Info(ctx, "Player not found in game", "name", name, "code", code)
 		writeErr(w, ErrPlayerNotFound, http.StatusNotFound)
 		return
 	}
@@ -965,14 +964,14 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 	}
 
 	if isBotName(pi.Name) {
-		log.Printf("Error trying to register name with reserved initials %q", pi.Name)
+		clog.Info(ctx, "Error trying to register name with reserved initials", "name", pi.Name)
 		writeErr(w, ErrPlayerInitialsReserved, http.StatusForbidden)
 		return
 	}
 
 	if rpi, err := s.Store.GetPlayerByName(r.Context(), pi.Name); err == nil {
 		if rpi.Id != playerID {
-			log.Printf("Player %q already registered to %q", pi.Name, rpi.Id)
+			clog.Info(ctx, "Player already registered", "name", pi.Name, "id", rpi.Id)
 			writeErr(w, ErrPlayerAlreadyRegistered, http.StatusConflict)
 			return
 		}
@@ -984,9 +983,9 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
-		log.Printf("Registered player %q for %s", pi, playerID)
+		clog.Info(ctx, "Registered player", "playerID", playerID)
 	} else {
-		log.Printf("Anonymous player %q", pi.Name)
+		clog.Info(ctx, "Anonymous player", "name", pi.Name)
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(pi)

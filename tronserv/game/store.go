@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 )
 
 type PlayerConfig struct {
@@ -281,7 +282,7 @@ func (s *MemoryStore) UpdatePlayerConfig(ctx context.Context, playerID string, c
 var filenameSafeRE = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
 
 func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error {
-	log.Printf("reporting issue for game: %s", game.Code)
+	clog.Info(ctx, "reporting issue for game", "code", game.Code)
 	data, err := json.MarshalIndent(game, "", "\t")
 	if err != nil {
 		return fmt.Errorf("marshaling game: %w", err)
@@ -304,6 +305,6 @@ func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *
 	if err := os.WriteFile(path, data, 0644); err != nil {
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
-	log.Printf("wrote issue to %s", path)
+	clog.Info(ctx, "wrote issue", "path", path)
 	return nil
 }

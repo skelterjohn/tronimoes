@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -89,9 +90,17 @@ func Debug(ctx context.Context, message string, addTags ...string) {
 	_log(ctx, "DEBUG", message, tagsFromList(addTags...))
 }
 
+func Fatal(ctx context.Context, message string, addTags ...string) {
+	_log(ctx, "FATAL", message, tagsFromList(addTags...))
+	os.Exit(1)
+}
+
 func tagsFromList(addTags ...string) map[string]string {
 	tags := make(map[string]string)
 	for i, key := range addTags {
+		if i%2 == 1 {
+			continue
+		}
 		value := ""
 		if len(addTags) > i+1 {
 			value = addTags[i+1]
@@ -135,12 +144,16 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		fmt.Fprintln(textOutput, strb.String())
 	}
 	if structuredOutput, ok := ctx.Value(structuredOutputKey).(io.Writer); ok {
-		if err := json.NewEncoder(structuredOutput).Encode(map[string]any{
+		allTags := map[string]any{
 			"severity": severity,
 			"message":  message,
-			"tags":     existingTags,
 			"fileline": fileline(),
-		}); err != nil {
+		}
+		for key, value := range existingTags {
+			allTags[key] = value
+		}
+		allTags["fileline"] = fileline()
+		if err := json.NewEncoder(structuredOutput).Encode(allTags); err != nil {
 			log.Printf("could not marshal to structured output: %v", err)
 		}
 	}

@@ -7,11 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"math/rand"
 	"net/http"
 	"time"
 
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -58,7 +58,7 @@ func (c *TronimoesClient) DoRetry(ctx context.Context, method, path string, vin,
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		d, _ := io.ReadAll(resp.Body)
-		log.Printf("Got an error with the request: %s", d)
+		clog.Info(ctx, "Got an error with the request", "body", string(d))
 		if resp.StatusCode == http.StatusNotFound {
 			return game.ErrNoSuchGame
 		}

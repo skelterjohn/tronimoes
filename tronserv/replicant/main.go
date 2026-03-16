@@ -5,12 +5,13 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 )
 
 func prefixLines(prefix string, r io.Reader, w io.Writer, mu *sync.Mutex) {
@@ -29,16 +30,16 @@ func replicate(ctx context.Context, prefix string, args []string, wg *sync.WaitG
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Printf("[%s] Could not create stdout pipe: %v", prefix, err)
+		clog.Info(ctx, "Could not create stdout pipe", "error", err.Error(), "prefix", prefix)
 		return
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		log.Printf("[%s] Could not create stderr pipe: %v", prefix, err)
+		clog.Info(ctx, "Could not create stderr pipe", "error", err.Error(), "prefix", prefix)
 		return
 	}
 	if err := cmd.Start(); err != nil {
-		log.Printf("[%s] Could not start command: %v", prefix, err)
+		clog.Info(ctx, "Could not start command", "error", err.Error(), "prefix", prefix)
 		return
 	}
 
@@ -56,20 +57,22 @@ func replicate(ctx context.Context, prefix string, args []string, wg *sync.WaitG
 
 	streamWg.Wait()
 	if err := cmd.Wait(); err != nil {
-		log.Printf("[%s] Command exited with error: %v", prefix, err)
+		clog.Info(ctx, "Command exited with error", "error", err.Error(), "prefix", prefix)
 	}
 }
 
 func main() {
 	ctx := context.Background()
+	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	ctx = clog.WithSeverities(ctx, "info")
 
 	count, err := strconv.ParseInt(os.Args[1], 10, 64)
 	if err != nil {
-		log.Fatalf("Could not parse count: %v", err)
+		clog.Fatal(ctx, "Could not parse count", "error", err.Error())
 	}
 	args := os.Args[2:]
 
-	log.Printf("Starting %d replicants via %v", count, args)
+	clog.Info(ctx, "Starting replicants", "count", fmt.Sprint(count))
 
 	var wg sync.WaitGroup
 	for i := int64(0); i < count; i++ {
@@ -78,5 +81,5 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}
 	wg.Wait()
-	log.Println("All replicants have finished")
+	clog.Info(ctx, "All replicants have finished")
 }

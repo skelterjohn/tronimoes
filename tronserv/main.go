@@ -4,8 +4,8 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"cloud.google.com/go/compute/metadata"
@@ -39,6 +39,8 @@ var (
 func main() {
 	ctx := context.Background()
 	flag.Parse()
+	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	ctx = clog.WithSeverities(ctx, "info", "error")
 
 	r := chi.NewRouter()
 	r.Use(clog.ChiLogger)
@@ -56,7 +58,7 @@ func main() {
 			if allowedOrigins[origin] {
 				return true
 			}
-			log.Printf("CORS rejected origin: %q (allowed: %v)", origin, allowedOriginsList)
+			clog.Info(ctx, "CORS rejected origin", "origin", origin)
 			return false
 		},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -77,7 +79,7 @@ func main() {
 		var err error
 		store, err = game.NewFirestore(ctx, "tronimoes", *env)
 		if err != nil {
-			log.Fatalf("Could not connect to firestore: %v", err)
+			clog.Fatal(ctx, "Could not connect to firestore", "error", err.Error())
 		}
 	}
 
@@ -94,7 +96,7 @@ func main() {
 			Code:      "BDIKED-BNHJXU",
 		}
 		if err := gcr.Initialize(ctx); err != nil {
-			log.Printf("Could not infer GCR agent spawner config: %v", err)
+			clog.Error(ctx, "Could not infer GCR agent spawner config", "error", err.Error())
 			spawner = nil
 		} else {
 			spawner = gcr
@@ -102,19 +104,19 @@ func main() {
 	case "gcr":
 		gcr := &game.GCRAgentSpawner{}
 		if err := gcr.Initialize(ctx); err != nil {
-			log.Printf("Could not infer GCR agent spawner config: %v", err)
+			clog.Error(ctx, "Could not infer GCR agent spawner config", "error", err.Error())
 			spawner = nil
 		} else {
 			spawner = gcr
 		}
 	default:
-		log.Fatalf("Unknown agent spawner: %s", *agentSpawner)
+		clog.Fatal(ctx, "Unknown agent spawner", "agentSpawner", *agentSpawner)
 	}
 
 	allowedBotSAs := []string{}
 	if sa := defaultServiceAccountEmail(ctx); sa != "" {
 		allowedBotSAs = []string{sa}
-		log.Printf("Bot token check: allowing service account %s", sa)
+		clog.Info(ctx, "Bot token check: allowing service account", "serviceAccount", sa)
 	}
 	gs := &game.GameServer{
 		Store:                     store,
@@ -125,8 +127,8 @@ func main() {
 	game.RegisterHandlers(r, gs)
 
 	listenAddr := fmt.Sprintf("%s:%d", *addr, *port)
-	log.Printf("Server starting on %s", listenAddr)
+	clog.Info(ctx, "Server starting", "listenAddr", listenAddr)
 	if err := http.ListenAndServe(listenAddr, r); err != nil {
-		log.Fatal(err)
+		clog.Fatal(ctx, "Server failed", "error", err.Error())
 	}
 }

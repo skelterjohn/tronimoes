@@ -3,7 +3,6 @@ package game
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -25,7 +24,7 @@ type LocalAgentSpawner struct {
 }
 
 func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code string, roundOut int) error {
-	log.Printf("Spawning %s agent for game %s", which, code)
+	clog.Info(ctx, "Spawning agent for game", "which", which, "code", code)
 	exeDir := ""
 	if exe, err := os.Executable(); err == nil {
 		exeDir = filepath.Dir(exe)
@@ -47,7 +46,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	cmd.Stderr = os.Stderr
 	cmd.Dir = exeDir
 	if exeDir != "" {
-		log.Printf("Running agent in %s", exeDir)
+		clog.Info(ctx, "Running agent in", "exeDir", exeDir)
 	}
 
 	if err := cmd.Start(); err != nil {
@@ -130,7 +129,7 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 	if s.Code != "" {
 		code = s.Code
 	}
-	log.Printf("Spawning agent %q for %q via %q", which, code, s.JobResourceName)
+	clog.Info(ctx, "Spawning agent via", "which", which, "code", code, "job", s.JobResourceName)
 	req := &runpb.RunJobRequest{
 		Name: s.JobResourceName,
 		Overrides: &runpb.RunJobRequest_Overrides{
@@ -154,7 +153,7 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 	if runErr != nil {
 		return fmt.Errorf("run job %q: %w", s.JobResourceName, runErr)
 	}
-	log.Printf("Job %q submitted for code %s", op.Name(), code)
+	clog.Info(ctx, "Job submitted", "job", op.Name(), "code", code)
 	// Optionally wait for execution: op.Wait(ctx). For fire-and-forget we don't wait.
 	return nil
 }

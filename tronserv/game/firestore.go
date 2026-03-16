@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 
 	"cloud.google.com/go/firestore"
@@ -185,7 +184,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 			data := doc.Data()
 			storedVersion, ok := data["version"].(int64)
 			if !ok {
-				log.Printf("unexpected version type: %T", data["version"])
+					clog.Info(ctx, "unexpected version type", "type", fmt.Sprintf("%T", data["version"]))
 			}
 			if ok && storedVersion != expectedVersion {
 				return ErrVersionConflict
@@ -228,7 +227,7 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 
 			docVersion, ok := data["version"].(int64)
 			if !ok {
-				log.Printf("bad data type for version: %T", data["version"])
+				clog.Info(ctx, "bad data type for version", "type", fmt.Sprintf("%T", data["version"]))
 				continue
 			}
 			if docVersion <= version {
@@ -352,7 +351,7 @@ func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerName strin
 }
 
 func (s *FireStore) UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error {
-	log.Printf("updating player config for %q: %+v", playerID, config)
+	clog.Info(ctx, "updating player config", "playerID", playerID)
 	_, err := s.players(ctx).Doc(playerID).Update(ctx, []firestore.Update{{
 		Path:  "config",
 		Value: config,
