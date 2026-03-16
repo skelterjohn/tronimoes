@@ -15,6 +15,7 @@ import (
 
 	firebase "firebase.google.com/go/v4"
 	"github.com/go-chi/chi/v5"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"google.golang.org/api/idtoken"
 )
 
@@ -142,7 +143,7 @@ func (s *GameServer) validateBotServiceAccountToken(ctx context.Context, r *http
 			}
 		}
 		if !allowed {
-			Log(ctx, "Bot service account not allowed: %s", email)
+			clog.Info(ctx, fmt.Sprintf("Bot service account not allowed: %s", email))
 			return ErrYouAreNotABot
 		}
 	}

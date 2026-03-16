@@ -2,8 +2,10 @@ package gibbs_planner
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -54,9 +56,9 @@ func (gp *GibbsPlanner) createInitialGuesses(ctx context.Context, g *game.Game) 
 		}
 		gp.bag = gp.bag[len(p.Hand):]
 	}
-	game.Debug(ctx, "initial bag (%d): %v", len(gp.bag), gp.bag)
+	clog.Debug(ctx, fmt.Sprintf("initial bag (%d): %v", len(gp.bag), gp.bag))
 	for i, hs := range gp.hands {
-		game.Debug(ctx, "initial hand[%d]: %v", i, hs.tiles)
+		clog.Debug(ctx, fmt.Sprintf("initial hand[%d]: %v", i, hs.tiles))
 	}
 }
 
@@ -106,7 +108,7 @@ func (gp *GibbsPlanner) fixBadGuesses(ctx context.Context, g *game.Game) {
 				gp.hands[i].tiles = append(gp.hands[i].tiles, gp.bag[:extraTiles]...)
 				gp.bag = gp.bag[extraTiles:]
 			} else {
-				game.Log(ctx, "no tiles in the bag to add to hand %d", i)
+				clog.Info(ctx, fmt.Sprintf("no tiles in the bag to add to hand %d", i))
 			}
 		}
 		if extraTiles < 0 {
@@ -205,7 +207,7 @@ func (gp *GibbsPlanner) addOpportunities(ctx context.Context, previousGame, g *g
 		if len(r.LaidTiles) > len(pr.LaidTiles) {
 			lastPlayerHS.justLaid = r.LaidTiles[len(r.LaidTiles)-1]
 		}
-		game.Debug(ctx, "inference[%d]: %s", pi, lastPlayerHS)
-		game.Debug(ctx, "In the bag: %d", len(gp.bag))
+		clog.Debug(ctx, fmt.Sprintf("inference[%d]: %s", pi, lastPlayerHS))
+		clog.Debug(ctx, fmt.Sprintf("In the bag: %d", len(gp.bag)))
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -80,7 +81,7 @@ func (n *PlanNode) Cull(ctx context.Context, moves map[types.Move]bool) {
 		}
 	}
 	if delCount > 0 {
-		game.Debug(ctx, "culled %d moves, %d remain", delCount, len(n.Moves))
+		clog.Debug(ctx, fmt.Sprintf("culled %d moves, %d remain", delCount, len(n.Moves)))
 	}
 }
 
@@ -94,7 +95,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 	for i := range root.Eval {
 		root.Eval[i] = float64(g.Players[i].Score)
 	}
-	game.Debug(ctx, "Simulating game at depth %d", maxDepth)
+	clog.Debug(ctx, fmt.Sprintf("Simulating game at depth %d", maxDepth))
 
 	for !r.Done && maxDepth > 0 {
 		select {
@@ -104,7 +105,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			maxDepth--
 		}
 
-		game.Debug(ctx, "curNode.depth=%d", curNode.Depth)
+		clog.Debug(ctx, fmt.Sprintf("curNode.depth=%d", curNode.Depth))
 		cachedTileCount := 0
 		cachedSpacerCount := 0
 		for m := range curNode.Moves {
@@ -114,7 +115,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 				cachedSpacerCount++
 			}
 		}
-		game.Debug(ctx, "cachedTileCount=%d, cachedSpacerCount=%d", cachedTileCount, cachedSpacerCount)
+		clog.Debug(ctx, fmt.Sprintf("cachedTileCount=%d, cachedSpacerCount=%d", cachedTileCount, cachedSpacerCount))
 
 		p := g.Players[g.Turn]
 		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
@@ -142,7 +143,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		curNode.Cull(ctx, allMoves)
 
-		game.Debug(ctx, "%s has %d tiles, %d spacers", p.Name, len(legalMoves), len(legalSpacers))
+		clog.Debug(ctx, fmt.Sprintf("%s has %d tiles, %d spacers", p.Name, len(legalMoves), len(legalSpacers)))
 		moveCount := len(legalMoves) + len(legalSpacers)
 
 		passOrDrawOptions := 1
@@ -185,9 +186,9 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		if whichMove < tileMoves {
 			move := legalMoves[whichMove]
-			game.Debug(ctx, "p%d lays %s", g.Turn, move)
+			clog.Debug(ctx, fmt.Sprintf("p%d lays %s", g.Turn, move))
 			if err := g.LayTile(ctx, p.Name, &move); err != nil {
-				game.Debug(ctx, "player=%+v", p)
+				clog.Debug(ctx, fmt.Sprintf("player=%+v", p))
 				return fmt.Errorf("laying: %w", err)
 			}
 			move.Dead = false // this screws up the hashmap since FindLegalMoves doesn't set this.
@@ -220,7 +221,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			}
 		}
 
-		game.Debug(ctx, "p%d -> %s", curNode.Turn, bestMove)
+		clog.Debug(ctx, fmt.Sprintf("p%d -> %s", curNode.Turn, bestMove))
 
 		nextNode = curNode.Next(ctx, bestMove, g.Turn, len(gp.hands))
 		nextNode.Eval = make([]float64, len(gp.hands))
@@ -231,14 +232,14 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		for i := range nextNode.R {
 			nextNode.R[i] = nextNode.Eval[i] - curNode.Eval[i]
 		}
-		game.Debug(ctx, " R <- %v from %v-%v", nextNode.R, nextNode.Eval, curNode.Eval)
+		clog.Debug(ctx, fmt.Sprintf(" R <- %v from %v-%v", nextNode.R, nextNode.Eval, curNode.Eval))
 		nodesInSimulation = append(nodesInSimulation, nextNode)
 		curNode = nextNode
 	}
 
 	if !r.Done {
 		curNode.H = gp.Heuristic(ctx, g, root)
-		game.Debug(ctx, "Heuristic: %v @ %d", curNode.H, curNode.Depth)
+		clog.Debug(ctx, fmt.Sprintf("Heuristic: %v @ %d", curNode.H, curNode.Depth))
 	}
 	// The rest is fast so we still do it if we ran out of time.
 
@@ -265,7 +266,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			copy(cur.V, cur.R)
 			continue
 		}
-		game.Debug(ctx, "best from %d +1 H: %v V: %v", cur.Depth, bestNode.H, bestNode.V)
+		clog.Debug(ctx, fmt.Sprintf("best from %d +1 H: %v V: %v", cur.Depth, bestNode.H, bestNode.V))
 		for i, bv := range bestNode.V {
 			vh := bestNode.H[i] + bv
 			cur.V[i] = gp.ValueDecay*vh + cur.R[i]
@@ -274,10 +275,10 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 	for i, n := range nodesInSimulation {
 		n.Visited++
-		game.Debug(ctx, "%d: p%d @ %d / %d", i, n.Turn, n.Depth, n.Visited)
-		game.Debug(ctx, "   V: %v", n.V)
-		game.Debug(ctx, "   R: %v", n.R)
-		game.Debug(ctx, "   H: %v", n.H)
+		clog.Debug(ctx, fmt.Sprintf("%d: p%d @ %d / %d", i, n.Turn, n.Depth, n.Visited))
+		clog.Debug(ctx, fmt.Sprintf("   V: %v", n.V))
+		clog.Debug(ctx, fmt.Sprintf("   R: %v", n.R))
+		clog.Debug(ctx, fmt.Sprintf("   H: %v", n.H))
 	}
 
 	return nil

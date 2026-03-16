@@ -11,6 +11,7 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/agent/reacts"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/client"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -85,7 +86,7 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 		if i == gp.myPlayerIndex {
 			continue
 		}
-		game.Debug(ctx, "sampled hand[%d]: %v", i, gp.hands[i].tiles)
+		clog.Debug(ctx, fmt.Sprintf("sampled hand[%d]: %v", i, gp.hands[i].tiles))
 	}
 }
 
@@ -98,13 +99,13 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 	// improved with planning. Otherwise, just pass/draw without planning.
 	if !playingOffRoundLeader && len(legalMoves) == 0 && len(legalSpacers) == 0 {
 		if p.JustDrew || len(g.Bag) == 0 {
-			game.Log(ctx, "no legal moves or spacers, and just drew; passing")
+			clog.Info(ctx, "no legal moves or spacers, and just drew; passing")
 			return types.Move{
 				Pass:     true,
 				Selected: types.RandomInitialFoot(g),
 			}
 		}
-		game.Log(ctx, "no legal moves or spacers, and haven't drawn yet; drawing")
+		clog.Info(ctx, "no legal moves or spacers, and haven't drawn yet; drawing")
 		return types.Move{
 			Draw: true,
 		}
@@ -131,7 +132,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 
 	gdata, err := json.Marshal(g)
 	if err != nil {
-		game.Debug(ctx, "error marshalling game: %v", err)
+		clog.Debug(ctx, fmt.Sprintf("error marshalling game: %v", err))
 	}
 
 	simulating := true
@@ -144,24 +145,24 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 		var sg game.Game
 		if err := json.Unmarshal(gdata, &sg); err != nil {
-			game.Debug(ctx, "error unmarshalling game: %v", err)
+			clog.Debug(ctx, fmt.Sprintf("error unmarshalling game: %v", err))
 		}
 		if err := gp.SimulateGame(ctx, &sg, root, gp.MaxSimulationDepth); err != nil {
-			game.Debug(ctx, "error simulating game: %v", err)
+			clog.Debug(ctx, fmt.Sprintf("error simulating game: %v", err))
 		}
 		simulations++
 		if gp.MaxSimulationsPerMove > 0 && simulations >= gp.MaxSimulationsPerMove {
 			simulating = false
 		}
 	}
-	game.Log(ctx, "simulated %d games", simulations)
+	clog.Info(ctx, fmt.Sprintf("simulated %d games", simulations))
 	bestMove := root.ChooseBestMove(ctx)
-	game.Debug(ctx, "hand: %v", g.Players[g.Turn].Hand)
+	clog.Debug(ctx, fmt.Sprintf("hand: %v", g.Players[g.Turn].Hand))
 	vstr := ""
 	if root.Moves[bestMove] != nil {
 		vstr = fmt.Sprintf(" %v", root.Moves[bestMove].V)
 	}
-	game.Debug(ctx, "best move: %s%s", bestMove, vstr)
+	clog.Debug(ctx, fmt.Sprintf("best move: %s%s", bestMove, vstr))
 
 	if bestMove.Pass {
 		gp.React(ctx, "frustration")
@@ -214,15 +215,15 @@ func (gp *GibbsPlanner) React(ctx context.Context, query string) {
 }
 
 func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {
-	game.Log(ctx, "reacting: %s", query)
+	clog.Info(ctx, fmt.Sprintf("reacting: %s", query))
 	time.Sleep(time.Duration(rand.Intn(500)+500) * time.Millisecond)
 	url, err := reacts.FindImageURL(ctx, query)
 	if err != nil {
-		game.Log(ctx, "Error getting image URL: %v", err)
+		clog.Error(ctx, fmt.Sprintf("Error getting image URL: %v", err))
 		return
 	}
 	if _, err := gp.Client.React(ctx, url); err != nil {
-		game.Log(ctx, "Error reacting: %v", err)
+		clog.Error(ctx, fmt.Sprintf("Error reacting: %v", err))
 	}
 }
 

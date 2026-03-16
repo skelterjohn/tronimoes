@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +17,7 @@ import (
 	"github.com/skelterjohn/tronimoes/tronserv/agent/reacts"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
 	"github.com/skelterjohn/tronimoes/tronserv/client"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -81,6 +81,9 @@ func main() {
 	ctx := context.Background()
 	flag.Parse()
 
+	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	ctx = clog.WithSeverities(ctx, "info", "error")
+
 	c := http.DefaultClient
 	if *useGCEToken {
 		c = &http.Client{
@@ -117,31 +120,33 @@ func main() {
 		gp.SetDefaults()
 		a = gp
 	default:
-		log.Fatalf("Unknown agent: %s", *which)
+		clog.Error(ctx, fmt.Sprintf("Unknown agent: %s", *which))
+		os.Exit(1)
 	}
 
 	tc.Name = name
 
-	log.Printf("Starting %s agent %s, connecting to %s for game %s", *which, name, *tronserv_addr, *gamecode)
+	clog.Info(ctx, fmt.Sprintf("Starting %s agent %s, connecting to %s for game %s", *which, name, *tronserv_addr, *gamecode))
 	if *archive != "" {
 		if err := os.MkdirAll(*archive, 0755); err != nil {
-			log.Fatalf("save-dir: %v", err)
+			clog.Error(ctx, fmt.Sprintf("save-dir: %v", err))
+			os.Exit(1)
 		}
 	}
 
 	g, err := tc.JoinGame(ctx, *gamecode)
 	if err != nil {
-		log.Printf("Could not join game: %v", err)
+		clog.Error(ctx, fmt.Sprintf("Could not join game: %v", err))
 		return
 	}
 
 	defer func() {
 		if _, err := tc.LeaveOrQuit(ctx); err != nil {
-			log.Printf("Could not leave game: %v", err)
+			clog.Error(ctx, fmt.Sprintf("Could not leave game: %v", err))
 		}
 	}()
 
-	log.Printf("Joined game %s", g.Code)
+	clog.Info(ctx, fmt.Sprintf("Joined game %s", g.Code))
 
 	lastUpdateGame := g
 
@@ -149,10 +154,10 @@ func main() {
 
 	footURL, err := reacts.FindImageURL(ctx, "bot")
 	if err != nil {
-		log.Printf("Could not get image URL: %v", err)
+		clog.Error(ctx, fmt.Sprintf("Could not get image URL: %v", err))
 	} else {
 		if ng, err := tc.ChooseFoot(ctx, footURL); err != nil {
-			log.Printf("Could not choose foot: %v", err)
+			clog.Error(ctx, fmt.Sprintf("Could not choose foot: %v", err))
 		} else {
 			g = ng
 		}
@@ -161,25 +166,25 @@ func main() {
 	roundDoneCounter := -1
 
 	if len(g.Rounds) == 0 {
-		log.Print("New game beginning")
+		clog.Info(ctx, "New game beginning")
 	}
 
 	for !g.Done {
 		if len(g.Rounds) == 0 {
 			if quitFromRoundOut(ctx, g, name, *roundOut) {
-				log.Print("Round out reached, quitting to leave room")
+				clog.Info(ctx, "Round out reached, quitting to leave room")
 				return
 			}
 		} else if g.Rounds[len(g.Rounds)-1].Done {
 			if roundDoneCounter < len(g.Rounds) {
-				log.Print("Round done")
+				clog.Info(ctx, "Round done")
 				a.CompleteRound(ctx, g)
 				roundDoneCounter = len(g.Rounds)
 			}
 		}
 
 		if areWeAllBots(ctx, g) {
-			log.Print("All bots, quitting to save $$$$$$$")
+			clog.Info(ctx, "All bots, quitting to save $$$$$$$")
 			return
 		}
 
@@ -187,15 +192,15 @@ func main() {
 		if r == nil || r.Done {
 			p := g.GetPlayer(ctx, name)
 			if p == nil {
-				log.Printf("Player %s not found (am I alive or am I dancer?)", name)
+				clog.Error(ctx, fmt.Sprintf("Player %s not found (am I alive or am I dancer?)", name))
 				return
 			}
 			if !p.Ready {
 				a.Ready(ctx)
-				log.Print("Ready to begin a new round.")
+				clog.Info(ctx, "Ready to begin a new round.")
 				g, err = tc.Start(ctx)
 				if err != nil {
-					log.Printf("Error starting game: %v", err)
+					clog.Error(ctx, fmt.Sprintf("Error starting game: %v", err))
 					return
 				}
 			}
@@ -209,15 +214,15 @@ func main() {
 		}
 		if len(g.Rounds) > 0 && !g.Rounds[len(g.Rounds)-1].Done {
 			if g.Players[g.Turn].Name == name {
-				log.Printf("It's my turn")
-				log.Printf(" %v", g.Players[g.Turn].Hand)
+				clog.Info(ctx, "It's my turn")
+				clog.Info(ctx, fmt.Sprintf(" %v", g.Players[g.Turn].Hand))
 			} else {
-				log.Printf("It's %s's turn", g.Players[g.Turn].Name)
+				clog.Info(ctx, fmt.Sprintf("It's %s's turn", g.Players[g.Turn].Name))
 			}
 			if g.Players[g.Turn].Name == name {
 				p := g.GetPlayer(ctx, name)
 				m := a.GetMove(ctx, g, p)
-				log.Printf("Move: %+v", m)
+				clog.Info(ctx, fmt.Sprintf("Move: %+v", m))
 				if *archive != "" {
 					path := filepath.Join(*archive, fmt.Sprintf("%s_%d.json", g.Code, g.Version))
 					blob, err := json.MarshalIndent(struct {
@@ -225,9 +230,9 @@ func main() {
 						Move types.Move `json:"move"`
 					}{Game: g, Move: m}, "", "\t")
 					if err != nil {
-						log.Printf("save marshal: %v", err)
+						clog.Error(ctx, fmt.Sprintf("save marshal: %v", err))
 					} else if err := os.WriteFile(path, blob, 0644); err != nil {
-						log.Printf("save %s: %v", path, err)
+						clog.Error(ctx, fmt.Sprintf("save %s: %v", path, err))
 					}
 				}
 				if time.Since(lastMoveTime) < *minMoveTime {
@@ -238,45 +243,45 @@ func main() {
 				lastMoveTime = time.Now()
 				if m.Draw {
 					if ng, err := tc.Draw(ctx); err != nil {
-						log.Printf("Could not draw: %v", err)
+						clog.Error(ctx, fmt.Sprintf("Could not draw: %v", err))
 						continue
 					} else {
 						g = ng
 					}
-					log.Println("I just drew")
+					clog.Info(ctx, "I just drew")
 					continue
 				}
 				if m.Pass {
 					if ng, err := tc.Pass(ctx, m.Selected.X, m.Selected.Y); err != nil {
-						log.Printf("Could not pass: %v", err)
+						clog.Error(ctx, fmt.Sprintf("Could not pass: %v", err))
 						continue
 					} else {
 						g = ng
 					}
-					log.Println("I passed")
+					clog.Info(ctx, "I passed")
 					continue
 				}
 				if m.LayTile {
 					if ng, err := tc.LayTile(ctx, &m.LaidTile); err != nil {
-						log.Printf("Could not lay tile: %v", err)
+						clog.Error(ctx, fmt.Sprintf("Could not lay tile: %v", err))
 						continue
 					} else {
 						g = ng
 					}
-					log.Printf("I laid %v", m.LaidTile)
+					clog.Info(ctx, fmt.Sprintf("I laid %v", m.LaidTile))
 					continue
 				}
 				if m.PlaceSpacer {
 					if ng, err := tc.LaySpacer(ctx, &m.Spacer); err != nil {
-						log.Printf("Could not lay spacer: %v", err)
+						clog.Error(ctx, fmt.Sprintf("Could not lay spacer: %v", err))
 						continue
 					} else {
 						g = ng
 					}
-					log.Printf("I placed a spacer: %v", m.Spacer)
+					clog.Info(ctx, fmt.Sprintf("I placed a spacer: %v", m.Spacer))
 					continue
 				}
-				log.Println("I did not make a move")
+				clog.Info(ctx, "I did not make a move")
 			}
 		}
 
@@ -284,7 +289,7 @@ func main() {
 		g, err = tc.GetGame(ctx, previousGame.Version)
 		for err != nil || g.Version == previousGame.Version {
 			if err != nil && err != client.ErrTimeout {
-				log.Printf("Game fetch error: %v", err)
+				clog.Error(ctx, fmt.Sprintf("Game fetch error: %v", err))
 				return
 			}
 			time.Sleep(5 * time.Second)
@@ -300,10 +305,10 @@ func main() {
 		move, ok := types.InferMove(ctx, previousGame, g)
 		if ok {
 			pp := previousGame.Players[previousGame.Turn]
-			log.Printf("%s played: %s", pp.Name, move)
+			clog.Info(ctx, fmt.Sprintf("%s played: %s", pp.Name, move))
 		}
 
 	}
 	a.CompleteGame(ctx, g)
-	log.Println("Game over")
+	clog.Info(ctx, "Game over")
 }

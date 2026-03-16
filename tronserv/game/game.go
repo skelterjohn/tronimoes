@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 )
 
 var Verbose = false
@@ -102,7 +104,7 @@ func (g *Game) AdjustBoardAndPips(ctx context.Context) {
 		g.BoardHeight = 17
 		g.MaxPips = 12
 	}
-	Log(ctx, "Resizing game for %d players: %dx%d up to %d pips", len(g.Players), g.BoardWidth, g.BoardHeight, g.MaxPips)
+	clog.Info(ctx, fmt.Sprintf("Resizing game for %d players: %dx%d up to %d pips", len(g.Players), g.BoardWidth, g.BoardHeight, g.MaxPips))
 }
 
 func (g *Game) AddPlayer(ctx context.Context, player *Player) error {
@@ -423,7 +425,7 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 }
 
 func (g *Game) Note(ctx context.Context, n string) {
-	Debug(ctx, n)
+	clog.Debug(ctx, n)
 	g.History = append(g.History, n)
 	dbg(n)
 }
@@ -788,7 +790,7 @@ type Round struct {
 }
 
 func (r *Round) Note(ctx context.Context, n string) {
-	Debug(ctx, n)
+	clog.Debug(ctx, n)
 	if r == nil {
 		return
 	}

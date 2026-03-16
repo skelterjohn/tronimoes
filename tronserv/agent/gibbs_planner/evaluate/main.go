@@ -17,6 +17,7 @@ import (
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/gibbs_planner"
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -57,7 +58,7 @@ func runCase(ctx context.Context, testdataDir string, tc TestCase, maxSimulation
 	defer func() {
 		if r := recover(); r != nil {
 			message = fmt.Sprintf("panic: %v", r)
-			game.Debug(ctx, "panic: %v\n%s", r, string(debug.Stack()))
+			clog.Debug(ctx, fmt.Sprintf("panic: %v\n%s", r, string(debug.Stack())))
 		}
 	}()
 	g, err := loadGame(testdataDir, tc.Label)
@@ -255,9 +256,8 @@ func main() {
 			defer wg.Done()
 			defer func() { <-sem }()
 			var logBuf bytes.Buffer
-			startTime := time.Now()
-			runCtx := game.WithLogBuffer(ctx, &logBuf)
-			runCtx = game.WithLogStart(runCtx, startTime)
+			runCtx := clog.WithTextOutput(ctx, &logBuf)
+			runCtx = clog.WithSeverities(runCtx, "info", "error", "debug")
 			ok, msg := runCase(runCtx, testdataDir, j.tc, *maxSimFlag)
 			verdict := "OK"
 			if !ok {
