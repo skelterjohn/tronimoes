@@ -135,6 +135,13 @@ func main() {
 		return
 	}
 
+	defer func() {
+		g, err = tc.LeaveOrQuit(ctx)
+		if err != nil {
+			log.Printf("Could not leave game: %v", err)
+		}
+	}()
+
 	log.Printf("Joined game %s", g.Code)
 
 	lastUpdateGame := g
@@ -161,10 +168,6 @@ func main() {
 		if len(g.Rounds) == 0 {
 			if quitFromRoundOut(ctx, g, name, *roundOut) {
 				log.Print("Round out reached, quitting to leave room")
-				g, err = tc.LeaveOrQuit(ctx)
-				if err != nil {
-					log.Printf("Could not leave game: %v", err)
-				}
 				return
 			}
 		} else if g.Rounds[len(g.Rounds)-1].Done {
@@ -237,7 +240,7 @@ func main() {
 					g, err = tc.Draw(ctx)
 					if err != nil {
 						log.Printf("Could not draw: %v", err)
-						return
+						continue
 					}
 					log.Println("I just drew")
 					continue
@@ -246,7 +249,7 @@ func main() {
 					g, err = tc.Pass(ctx, m.Selected.X, m.Selected.Y)
 					if err != nil {
 						log.Printf("Could not pass: %v", err)
-						return
+						continue
 					}
 					log.Println("I passed")
 					continue
@@ -255,7 +258,7 @@ func main() {
 					g, err = tc.LayTile(ctx, &m.LaidTile)
 					if err != nil {
 						log.Printf("Could not lay tile: %v", err)
-						return
+						continue
 					}
 					log.Printf("I laid %v", m.LaidTile)
 					continue
@@ -264,7 +267,7 @@ func main() {
 					g, err = tc.LaySpacer(ctx, &m.Spacer)
 					if err != nil {
 						log.Printf("Could not lay spacer: %v", err)
-						return
+						continue
 					}
 					log.Printf("I placed a spacer: %v", m.Spacer)
 					continue

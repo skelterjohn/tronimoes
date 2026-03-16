@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
@@ -28,6 +30,10 @@ func (c *TronimoesClient) WriteHeaders(req *http.Request) {
 }
 
 func (c *TronimoesClient) Do(ctx context.Context, method, path string, vin, vout any) error {
+	return c.DoRetry(ctx, method, path, vin, vout, 3)
+}
+
+func (c *TronimoesClient) DoRetry(ctx context.Context, method, path string, vin, vout any, retry int) error {
 	var body io.Reader
 	if vin == nil {
 		body = http.NoBody
@@ -58,6 +64,10 @@ func (c *TronimoesClient) Do(ctx context.Context, method, path string, vin, vout
 		}
 		if resp.StatusCode == http.StatusRequestTimeout {
 			return ErrTimeout
+		}
+		if resp.StatusCode == http.StatusConflict && retry > 0 {
+			time.Sleep(time.Duration(rand.Intn(1000)) * time.Millisecond)
+			return c.DoRetry(ctx, method, path, vin, vout, retry-1)
 		}
 		return fmt.Errorf("request had status code %d", resp.StatusCode)
 	}
