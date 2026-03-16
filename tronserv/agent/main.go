@@ -81,7 +81,8 @@ func main() {
 	ctx := context.Background()
 	flag.Parse()
 
-	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	ctx = clog.WithCloudLoggingOutput(ctx, "tronagent")
+	defer clog.CloseCloudLogging(ctx)
 	ctx = clog.WithSeverities(ctx, "info", "error")
 
 	c := http.DefaultClient
@@ -123,13 +124,17 @@ func main() {
 		clog.Error(ctx, "Unknown agent", nil, "agent", *which)
 		os.Exit(1)
 	}
+	ctx = clog.WithKeyword(ctx, "which", *which)
 
 	tc.Name = name
+	ctx = clog.WithKeyword(ctx, "name", name)
 
-	clog.Info(ctx, fmt.Sprintf("Starting %s agent %s, connecting to %s for game %s", *which, name, *tronserv_addr, *gamecode))
+	ctx = clog.WithKeyword(ctx, "code", *gamecode)
+
+	clog.Info(ctx, fmt.Sprintf("Starting agent and connecting to game server", "addr", *tronserv_addr))
 	if *archive != "" {
 		if err := os.MkdirAll(*archive, 0755); err != nil {
-			clog.Error(ctx, "save-dir", err)
+			clog.Error(ctx, "Could not create archive directory", err)
 			os.Exit(1)
 		}
 	}
@@ -146,7 +151,7 @@ func main() {
 		}
 	}()
 
-	clog.Info(ctx, fmt.Sprintf("Joined game %s", g.Code))
+	clog.Info(ctx, "Joined game")
 
 	lastUpdateGame := g
 
@@ -172,7 +177,7 @@ func main() {
 	for !g.Done {
 		if len(g.Rounds) == 0 {
 			if quitFromRoundOut(ctx, g, name, *roundOut) {
-				clog.Info(ctx, "Round out reached, quitting to leave room")
+				clog.Info(ctx, "Round out reached, quitting to leave room", "AgentRoundOut", *roundOut)
 				return
 			}
 		} else if g.Rounds[len(g.Rounds)-1].Done {
@@ -232,7 +237,7 @@ func main() {
 					if err != nil {
 						clog.Error(ctx, "save marshal", err)
 					} else if err := os.WriteFile(path, blob, 0644); err != nil {
-						clog.Error(ctx, "save", err, "path", path)
+						clog.Error(ctx, "Could not write to archive", err, "path", path)
 					}
 				}
 				if time.Since(lastMoveTime) < *minMoveTime {
