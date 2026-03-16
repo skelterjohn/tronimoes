@@ -136,8 +136,7 @@ func main() {
 	}
 
 	defer func() {
-		g, err = tc.LeaveOrQuit(ctx)
-		if err != nil {
+		if _, err := tc.LeaveOrQuit(ctx); err != nil {
 			log.Printf("Could not leave game: %v", err)
 		}
 	}()
