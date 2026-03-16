@@ -1,7 +1,6 @@
 package clog
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -21,19 +20,19 @@ type chiLogEntry struct {
 }
 
 func (e *chiLogEntry) Write(status, bytes int, _ http.Header, elapsed time.Duration, _ interface{}) {
-	Log(e.request.Context(), "INFO", "served request", map[string]string{
+	Log(e.request.Context(), "INFO", "served request", map[string]any{
 		"method":   e.request.Method,
 		"path":     e.request.URL.RequestURI(),
-		"status":   fmt.Sprint(status),
-		"bytes":    fmt.Sprint(bytes),
-		"duration": elapsed.String(),
+		"status":   status,
+		"bytes":    bytes,
+		"duration": elapsed,
 	})
 }
 
 func (e *chiLogEntry) Panic(v interface{}, _ []byte) {
 	Log(e.request.Context(), "ERROR", "request panic",
-		map[string]string{
-			"panic": fmt.Sprintf("%v", v),
+		map[string]any{
+			"panic": v,
 		})
 }
 
@@ -67,7 +66,7 @@ func ChiLoggerDev(next http.Handler) http.Handler {
 	inject := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := WithTextOutput(r.Context(), os.Stdout)
-			ctx = WithSeverities(ctx, "info", "error", "debug")
+			ctx = WithSeverities(ctx, "info", "error")
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

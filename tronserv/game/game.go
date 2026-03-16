@@ -104,7 +104,7 @@ func (g *Game) AdjustBoardAndPips(ctx context.Context) {
 		g.BoardHeight = 17
 		g.MaxPips = 12
 	}
-	clog.Info(ctx, fmt.Sprintf("Resizing game for %d players: %dx%d up to %d pips", len(g.Players), g.BoardWidth, g.BoardHeight, g.MaxPips))
+	clog.Info(ctx, "Resizing game", "players", len(g.Players), "width", g.BoardWidth, "height", g.BoardHeight, "pips", g.MaxPips)
 }
 
 func (g *Game) AddPlayer(ctx context.Context, player *Player) error {

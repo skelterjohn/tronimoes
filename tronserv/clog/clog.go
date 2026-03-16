@@ -69,14 +69,14 @@ func severityEnabled(ctx context.Context, key any) bool {
 	return v
 }
 
-func Info(ctx context.Context, message string, addTags ...string) {
+func Info(ctx context.Context, message string, addTags ...any) {
 	if !severityEnabled(ctx, infoKey) {
 		return
 	}
 	_log(ctx, "INFO", message, tagsFromList(addTags...))
 }
 
-func Error(ctx context.Context, message string, err error, addTags ...string) {
+func Error(ctx context.Context, message string, err error, addTags ...any) {
 	if !severityEnabled(ctx, errorKey) {
 		return
 	}
@@ -87,14 +87,14 @@ func Error(ctx context.Context, message string, err error, addTags ...string) {
 	_log(ctx, "ERROR", message, tags)
 }
 
-func Debug(ctx context.Context, message string, addTags ...string) {
+func Debug(ctx context.Context, message string, addTags ...any) {
 	if !severityEnabled(ctx, debugKey) {
 		return
 	}
 	_log(ctx, "DEBUG", message, tagsFromList(addTags...))
 }
 
-func Fatal(ctx context.Context, message string, err error, addTags ...string) {
+func Fatal(ctx context.Context, message string, err error, addTags ...any) {
 	tags := tagsFromList(addTags...)
 	if err != nil {
 		tags["error"] = err.Error()
@@ -103,25 +103,46 @@ func Fatal(ctx context.Context, message string, err error, addTags ...string) {
 	os.Exit(1)
 }
 
-func tagsFromList(addTags ...string) map[string]string {
+func valueString(value any) string {
+	switch value.(type) {
+	case string:
+		return value.(string)
+	case int:
+		return fmt.Sprintf("%d", value.(int))
+	case bool:
+		return fmt.Sprintf("%t", value.(bool))
+	}
+	return fmt.Sprint(value)
+}
+
+func tagsFromList(addTags ...any) map[string]string {
 	tags := make(map[string]string)
 	for i, key := range addTags {
 		if i%2 == 1 {
 			continue
 		}
-		value := ""
+		keyStr, ok := key.(string)
+		if !ok {
+			log.Printf("tag %v is not a string", key)
+			continue
+		}
+		var value any
 		if len(addTags) > i+1 {
 			value = addTags[i+1]
 		} else {
 			value = "UNKNOWN"
 		}
-		tags[key] = value
+		tags[keyStr] = valueString(value)
 	}
 	return tags
 }
 
-func Log(ctx context.Context, severity, message string, addTags map[string]string) {
-	_log(ctx, severity, message, addTags)
+func Log(ctx context.Context, severity, message string, addTags map[string]any) {
+	tags := make(map[string]string)
+	for key, value := range addTags {
+		tags[key] = valueString(value)
+	}
+	_log(ctx, severity, message, tags)
 }
 func _log(ctx context.Context, severity, message string, addTags map[string]string) {
 	existingTags, ok := ctx.Value(keywordsKey).(map[string]string)
