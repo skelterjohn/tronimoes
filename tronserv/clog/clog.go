@@ -6,16 +6,20 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/logging"
 )
 
 type keywordsKeyType string
 type textOutputKeyType string
 type structuredOutputKeyType string
+type cloudLoggingKeyType string
 type infoKeyType string
 type errorKeyType string
 type debugKeyType string
@@ -24,6 +28,7 @@ type durationsKeyType string
 var keywordsKey keywordsKeyType = "keywords"
 var textOutputKey textOutputKeyType = "textOutput"
 var structuredOutputKey structuredOutputKeyType = "structuredOutput"
+var cloudLoggingKey cloudLoggingKeyType = "cloudLogging"
 var infoKey infoKeyType = "info"
 var errorKey errorKeyType = "error"
 var debugKey debugKeyType = "debug"
@@ -35,6 +40,39 @@ func WithTextOutput(ctx context.Context, w io.Writer) context.Context {
 
 func WithStructuredOutput(ctx context.Context, w io.Writer) context.Context {
 	return context.WithValue(ctx, structuredOutputKey, w)
+}
+
+// cloudLoggingValue holds the Cloud Logging client and logger created by WithCloudLoggingOutput.
+type cloudLoggingValue struct {
+	Logger *logging.Logger
+	Client *logging.Client
+}
+
+// WithCloudLoggingOutput creates a Cloud Logging client and logger using logID (project ID
+// is auto-detected on GCP) and stores them in the context. When set, _log writes entries
+// to the Google Cloud Logging API. Call CloseCloudLogging before exit to flush buffered entries.
+func WithCloudLoggingOutput(ctx context.Context, logID string) context.Context {
+	if logID == "" {
+		logID = "app"
+	}
+	client, err := logging.NewClient(ctx, logging.DetectProjectID)
+	if err != nil {
+		log.Fatalf("Could not create Cloud Logging client: %v", err)
+	}
+	return context.WithValue(ctx, cloudLoggingKey, &cloudLoggingValue{
+		Logger: client.Logger(logID),
+		Client: client,
+	})
+}
+
+// CloseCloudLogging closes the Cloud Logging client stored in the context, flushing
+// any buffered entries. Call before process exit when using WithCloudLoggingOutput.
+func CloseCloudLogging(ctx context.Context) {
+	if v, ok := ctx.Value(cloudLoggingKey).(*cloudLoggingValue); ok && v != nil && v.Client != nil {
+		if err := v.Client.Close(); err != nil {
+			log.Printf("Could not close Cloud Logging client: %v", err)
+		}
+	}
 }
 
 func WithSeverities(ctx context.Context, severities ...string) context.Context {
@@ -104,13 +142,13 @@ func Fatal(ctx context.Context, message string, err error, addTags ...any) {
 }
 
 func valueString(value any) string {
-	switch value.(type) {
+	switch v := value.(type) {
 	case string:
-		return value.(string)
+		return v
 	case int:
-		return fmt.Sprintf("%d", value.(int))
+		return fmt.Sprintf("%d", v)
 	case bool:
-		return fmt.Sprintf("%t", value.(bool))
+		return fmt.Sprintf("%t", v)
 	}
 	return fmt.Sprint(value)
 }
@@ -144,6 +182,7 @@ func Log(ctx context.Context, severity, message string, addTags map[string]any) 
 	}
 	_log(ctx, severity, message, tags)
 }
+
 func _log(ctx context.Context, severity, message string, addTags map[string]string) {
 	existingTags, ok := ctx.Value(keywordsKey).(map[string]string)
 	if !ok {
@@ -181,10 +220,47 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		for key, value := range existingTags {
 			allTags[key] = value
 		}
-		allTags["fileline"] = fileline()
 		if err := json.NewEncoder(structuredOutput).Encode(allTags); err != nil {
 			log.Printf("could not marshal to structured output: %v", err)
 		}
+	}
+	if v, ok := ctx.Value(cloudLoggingKey).(*cloudLoggingValue); ok && v != nil && v.Logger != nil {
+		allTags := map[string]string{
+			"severity": severity,
+			"message":  message,
+			"fileline": fileline(),
+		}
+		maps.Copy(allTags, existingTags)
+		v.Logger.Log(logging.Entry{
+			Severity: severityFromString(severity),
+			Labels:   allTags,
+			Payload:  message,
+		})
+	}
+}
+
+func severityFromString(s string) logging.Severity {
+	switch strings.ToUpper(s) {
+	case "DEBUG":
+		return logging.Debug
+	case "INFO":
+		return logging.Info
+	case "NOTICE":
+		return logging.Notice
+	case "WARNING":
+		return logging.Warning
+	case "ERROR":
+		return logging.Error
+	case "CRITICAL":
+		return logging.Critical
+	case "ALERT":
+		return logging.Alert
+	case "EMERGENCY":
+		return logging.Emergency
+	case "FATAL":
+		return logging.Critical
+	default:
+		return logging.Default
 	}
 }
 

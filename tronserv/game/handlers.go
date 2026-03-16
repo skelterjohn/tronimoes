@@ -574,6 +574,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	code := chi.URLParam(r, "code")
 	ctx = clog.WithKeyword(ctx, "code", code)
 	versionStr := r.URL.Query().Get("version")
+	ctx = clog.WithKeyword(ctx, "version", versionStr)
 	var version int64
 	if versionStr != "" {
 		var err error

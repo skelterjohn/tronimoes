@@ -49,7 +49,8 @@ func main() {
 		ctx = clog.WithTextOutput(ctx, os.Stdout)
 		r.Use(clog.ChiLoggerDev)
 	} else {
-		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+		ctx = clog.WithCloudLoggingOutput(ctx, "tronimoes")
+		defer clog.CloseCloudLogging(ctx)
 		r.Use(clog.ChiLogger)
 	}
 
