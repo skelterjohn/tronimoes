@@ -50,7 +50,7 @@ func main() {
 		r.Use(clog.ChiLoggerDev)
 		clog.Info(ctx, "Running in development mode")
 	} else {
-		ctx = clog.WithCloudLoggingOutput(ctx, "tronimoes")
+		ctx = clog.WithCloudLoggingOutput(ctx, "tronserv")
 		defer clog.CloseCloudLogging(ctx)
 		r.Use(clog.ChiLogger)
 		clog.Info(ctx, "Running in production mode")
