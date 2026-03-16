@@ -8,6 +8,7 @@ import (
 	"math/rand"
 
 	"cloud.google.com/go/firestore"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	firebase "firebase.google.com/go"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -237,7 +238,7 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 			if gameData, ok := data["game_json"].(string); ok {
 				g := &Game{}
 				if err := json.Unmarshal([]byte(gameData), g); err != nil {
-					log.Printf("could not unmarshal: %v", err)
+					clog.Error(ctx, "could not unmarshal game", "error", err.Error())
 					continue
 				}
 				updates <- g

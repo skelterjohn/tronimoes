@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/compute/metadata"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
 	"golang.org/x/oauth2/google"
@@ -55,7 +56,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			log.Printf("Agent %q for %q exited: %v", which, code, err)
+			clog.Error(ctx, "Agent exited", "error", err.Error(), "which", which, "code", code)
 		}
 	}()
 	return nil
