@@ -134,12 +134,12 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		strb.WriteString(fl)
 		strb.WriteString("\t")
 		strb.WriteString(message)
-		strb.WriteString("\t|")
+		strb.WriteString("\t| ")
 		for key, value := range existingTags {
+			strb.WriteString(" ")
 			strb.WriteString(key)
 			strb.WriteString("=")
 			strb.WriteString(value)
-			strb.WriteString(" ")
 		}
 		fmt.Fprintln(textOutput, strb.String())
 	}

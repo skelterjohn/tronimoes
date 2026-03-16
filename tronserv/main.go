@@ -34,16 +34,25 @@ var (
 	noCors         = flag.Bool("no-cors", false, "disable cors")
 	agentSpawner   = flag.String("agent-spawner", "local", "agent spawner to use: local, gcr, gcr-dev")
 	checkBotTokens = flag.Bool("check-bot-tokens", false, "check bot tokens for reserved names")
+	dev            = flag.Bool("dev", false, "run in development mode")
 )
 
 func main() {
 	ctx := context.Background()
 	flag.Parse()
-	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
-	ctx = clog.WithSeverities(ctx, "info", "error")
 
 	r := chi.NewRouter()
-	r.Use(clog.ChiLogger)
+
+	ctx = clog.WithSeverities(ctx, "info", "error")
+	if *dev {
+		ctx = clog.WithSeverities(ctx, "debug")
+		ctx = clog.WithTextOutput(ctx, os.Stdout)
+		r.Use(clog.ChiLoggerDev)
+	} else {
+		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+		r.Use(clog.ChiLogger)
+	}
+
 	allowedOriginsList := []string{"http://localhost:3000", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"}
 	allowedOrigins := make(map[string]bool)
 	for _, o := range allowedOriginsList {
