@@ -48,10 +48,12 @@ func main() {
 		ctx = clog.WithSeverities(ctx, "debug")
 		ctx = clog.WithTextOutput(ctx, os.Stdout)
 		r.Use(clog.ChiLoggerDev)
+		clog.Info(ctx, "Running in development mode")
 	} else {
 		ctx = clog.WithCloudLoggingOutput(ctx, "tronimoes")
 		defer clog.CloseCloudLogging(ctx)
 		r.Use(clog.ChiLogger)
+		clog.Info(ctx, "Running in production mode")
 	}
 
 	allowedOriginsList := []string{"http://localhost:3000", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"}
