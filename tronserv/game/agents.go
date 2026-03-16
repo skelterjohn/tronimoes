@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	run "cloud.google.com/go/run/apiv2"
 	"cloud.google.com/go/run/apiv2/runpb"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
@@ -24,7 +24,9 @@ type LocalAgentSpawner struct {
 }
 
 func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code string, roundOut int) error {
-	clog.Info(ctx, "Spawning agent for game", "which", which, "code", code)
+	ctx = clog.WithKeyword(ctx, "which", which)
+	ctx = clog.WithKeyword(ctx, "code", code)
+	clog.Info(ctx, "Spawning agent for game")
 	exeDir := ""
 	if exe, err := os.Executable(); err == nil {
 		exeDir = filepath.Dir(exe)
@@ -55,7 +57,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			clog.Error(ctx, "Agent exited", err, "which", which, "code", code)
+			clog.Error(ctx, "Agent exited", err)
 		}
 	}()
 	return nil

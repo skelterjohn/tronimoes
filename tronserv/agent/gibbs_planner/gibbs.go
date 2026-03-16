@@ -155,14 +155,14 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 			simulating = false
 		}
 	}
-	clog.Info(ctx, fmt.Sprintf("simulated %d games", simulations))
+	clog.Info(ctx, "simulated games", "count", simulations)
 	bestMove := root.ChooseBestMove(ctx)
 	clog.Debug(ctx, fmt.Sprintf("hand: %v", g.Players[g.Turn].Hand))
 	vstr := ""
 	if root.Moves[bestMove] != nil {
-		vstr = fmt.Sprintf(" %v", root.Moves[bestMove].V)
+		vstr = fmt.Sprint(root.Moves[bestMove].V)
 	}
-	clog.Debug(ctx, fmt.Sprintf("best move: %s%s", bestMove, vstr))
+	clog.Debug(ctx, "best move", "move", bestMove, "value", vstr)
 
 	if bestMove.Pass {
 		gp.React(ctx, "frustration")
@@ -215,7 +215,7 @@ func (gp *GibbsPlanner) React(ctx context.Context, query string) {
 }
 
 func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {
-	clog.Info(ctx, fmt.Sprintf("reacting: %s", query))
+	clog.Info(ctx, "reacting", "query", query)
 	time.Sleep(time.Duration(rand.Intn(500)+500) * time.Millisecond)
 	url, err := reacts.FindImageURL(ctx, query)
 	if err != nil {

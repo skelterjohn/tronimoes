@@ -142,7 +142,7 @@ func (s *GameServer) validateBotServiceAccountToken(ctx context.Context, r *http
 			}
 		}
 		if !allowed {
-			clog.Info(ctx, fmt.Sprintf("Bot service account not allowed: %s", email))
+			clog.Info(ctx, "Bot service account not allowed", "email", email)
 			return ErrYouAreNotABot
 		}
 	}
@@ -700,7 +700,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
-	clog.Info(ctx, "Game options")
+	clog.Info(ctx, "Game options", "AgentRoundOut", options.AgentRoundOut)
 
 	var g *Game
 
@@ -720,10 +720,11 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		if len(code) > 6 {
 			prefix = code[:6]
 		}
+		ctx = clog.WithKeyword(ctx, "prefix", prefix)
 
 		g, err = s.Store.FindGameAlreadyPlaying(ctx, prefix, name)
 		if err != nil && err != ErrNoSuchGame {
-			clog.Error(ctx, "Error reading game", err, "prefix", prefix)
+			clog.Error(ctx, "Error reading game", err)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
@@ -731,11 +732,11 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		if g == nil {
 			g, err = s.Store.FindOpenGame(ctx, prefix)
 			if err != nil && err != ErrNoSuchGame {
-				clog.Error(ctx, "Error reading game", err, "prefix", prefix)
+				clog.Error(ctx, "Error reading game", err)
 				writeErr(w, err, http.StatusInternalServerError)
 				return
 			}
-			clog.Info(ctx, "Found open game with prefix", "prefix", prefix)
+			clog.Info(ctx, "Found open game with prefix")
 		}
 
 		if g != nil {
@@ -979,22 +980,24 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 		return
 	}
 	pi.Id = playerID
+	ctx = clog.WithKeyword(ctx, "playerID", playerID)
+	ctx = clog.WithKeyword(ctx, "name", pi.Name)
 
 	if err := validatePlayerName(pi.Name); err != nil {
-		clog.Error(ctx, "Error validating player name", err, "name", pi.Name)
+		clog.Error(ctx, "Error validating player name", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if isBotName(pi.Name) {
-		clog.Info(ctx, "Error trying to register name with reserved initials", "name", pi.Name)
+		clog.Info(ctx, "Error trying to register name with reserved initials")
 		writeErr(w, ErrPlayerInitialsReserved, http.StatusForbidden)
 		return
 	}
 
 	if rpi, err := s.Store.GetPlayerByName(r.Context(), pi.Name); err == nil {
 		if rpi.Id != playerID {
-			clog.Info(ctx, "Player already registered", "name", pi.Name, "id", rpi.Id)
+			clog.Info(ctx, "Player already registered", "existing-id", rpi.Id)
 			writeErr(w, ErrPlayerAlreadyRegistered, http.StatusConflict)
 			return
 		}
@@ -1002,13 +1005,13 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 
 	if playerID != "" {
 		if err := s.Store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
-			clog.Error(ctx, "Error registering player", err, "name", pi.Name)
+			clog.Error(ctx, "Error registering player", err)
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
-		clog.Info(ctx, "Registered player", "playerID", playerID)
+		clog.Info(ctx, "Registered player")
 	} else {
-		clog.Info(ctx, "Anonymous player", "name", pi.Name)
+		clog.Info(ctx, "Anonymous player")
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(pi)

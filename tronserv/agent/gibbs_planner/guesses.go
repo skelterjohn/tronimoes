@@ -108,7 +108,7 @@ func (gp *GibbsPlanner) fixBadGuesses(ctx context.Context, g *game.Game) {
 				gp.hands[i].tiles = append(gp.hands[i].tiles, gp.bag[:extraTiles]...)
 				gp.bag = gp.bag[extraTiles:]
 			} else {
-				clog.Info(ctx, fmt.Sprintf("no tiles in the bag to add to hand %d", i))
+				clog.Info(ctx, "no tiles in the bag to add to hand", "playerIndex", i)
 			}
 		}
 		if extraTiles < 0 {
