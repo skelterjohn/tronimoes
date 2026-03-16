@@ -72,36 +72,49 @@ func Info(ctx context.Context, message string, addTags ...string) {
 	if !severityEnabled(ctx, infoKey) {
 		return
 	}
-	Log(ctx, "INFO", message, addTags...)
+	_log(ctx, "INFO", message, tagsFromList(addTags...))
 }
 
 func Error(ctx context.Context, message string, addTags ...string) {
 	if !severityEnabled(ctx, errorKey) {
 		return
 	}
-	Log(ctx, "ERROR", message, addTags...)
+	_log(ctx, "ERROR", message, tagsFromList(addTags...))
 }
 
 func Debug(ctx context.Context, message string, addTags ...string) {
 	if !severityEnabled(ctx, debugKey) {
 		return
 	}
-	Log(ctx, "DEBUG", message, addTags...)
+	_log(ctx, "DEBUG", message, tagsFromList(addTags...))
 }
 
-func Log(ctx context.Context, severity, message string, addTags ...string) {
+func tagsFromList(addTags ...string) map[string]string {
+	tags := make(map[string]string)
+	for i, key := range addTags {
+		value := ""
+		if len(addTags) > i+1 {
+			value = addTags[i+1]
+		} else {
+			value = "UNKNOWN"
+		}
+		tags[key] = value
+	}
+	return tags
+}
+
+func Log(ctx context.Context, severity, message string, addTags map[string]string) {
+	_log(ctx, severity, message, addTags)
+}
+func _log(ctx context.Context, severity, message string, addTags map[string]string) {
 	existingTags, ok := ctx.Value(keywordsKey).(map[string]string)
 	if !ok {
 		existingTags = make(map[string]string)
 	}
-	for i, key := range addTags {
-		value := ""
-		if len(addTags) > i {
-			value = addTags[i+1]
-		}
+	fl := fileline()
+	for key, value := range addTags {
 		existingTags[key] = value
 	}
-	fl := fileline()
 	if durationSince, ok := ctx.Value(durationsKey).(time.Time); ok {
 		duration := time.Since(durationSince)
 		existingTags["duration"] = fmt.Sprintf("%6dms", duration.Milliseconds())
@@ -111,15 +124,14 @@ func Log(ctx context.Context, severity, message string, addTags ...string) {
 		strb := strings.Builder{}
 		strb.WriteString(fl)
 		strb.WriteString("\t")
-		strb.WriteString("| ")
+		strb.WriteString(message)
+		strb.WriteString("\t|")
 		for key, value := range existingTags {
 			strb.WriteString(key)
 			strb.WriteString("=")
 			strb.WriteString(value)
 			strb.WriteString(" ")
 		}
-		strb.WriteString("|\t")
-		strb.WriteString(message)
 		fmt.Fprintln(textOutput, strb.String())
 	}
 	if structuredOutput, ok := ctx.Value(structuredOutputKey).(io.Writer); ok {

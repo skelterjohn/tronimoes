@@ -10,9 +10,9 @@ import (
 
 	"cloud.google.com/go/compute/metadata"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"github.com/skelterjohn/tronimoes/tronserv/game"
 )
 
@@ -41,7 +41,7 @@ func main() {
 	flag.Parse()
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(clog.ChiLogger)
 	allowedOriginsList := []string{"http://localhost:3000", "https://tronapp-1010961884428.us-east4.run.app", "https://tronimoes.com"}
 	allowedOrigins := make(map[string]bool)
 	for _, o := range allowedOriginsList {
