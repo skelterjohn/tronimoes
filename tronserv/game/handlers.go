@@ -233,15 +233,15 @@ func (s *GameServer) encodeFilteredGame(ctx context.Context, w http.ResponseWrit
 			continue
 		}
 		// Hide the hands of other players, though we still send the tile counts.
-		for _, t := range p.Hand {
-			t.PipsA = 0
-			t.PipsB = 0
+		for i := range p.Hand {
+			p.Hand[i].PipsA = 0
+			p.Hand[i].PipsB = 0
 		}
 	}
 	// Hide the bag from everyone.
-	for _, t := range g.Bag {
-		t.PipsA = 0
-		t.PipsB = 0
+	for i := range g.Bag {
+		g.Bag[i].PipsA = 0
+		g.Bag[i].PipsB = 0
 	}
 
 	// Add legal moves for this player to see.
