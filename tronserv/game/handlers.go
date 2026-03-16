@@ -27,7 +27,7 @@ func init() {
 		ProjectID: "tronimoes",
 	})
 	if err != nil {
-		clog.Fatal(ctx, "Error initializing Firebase app", "error", err.Error())
+		clog.Fatal(ctx, "Error initializing Firebase app", err)
 	}
 }
 
@@ -255,7 +255,7 @@ func (s *GameServer) encodeFilteredGame(ctx context.Context, w http.ResponseWrit
 
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(g); err != nil {
-		clog.Error(ctx, "Error encoding game", "error", err.Error())
+		clog.Error(ctx, "Error encoding game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 	}
 }
@@ -268,7 +268,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -276,7 +276,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -292,7 +292,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -307,7 +307,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -315,7 +315,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -350,7 +350,7 @@ func (s *GameServer) HandleDrawTile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -371,7 +371,7 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -379,14 +379,14 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 
 	chickenFoot := &ChickenFoot{}
 	if err := json.NewDecoder(r.Body).Decode(chickenFoot); err != nil {
-		clog.Error(ctx, "Error decoding chicken-foot placement", "error", err.Error())
+		clog.Error(ctx, "Error decoding chicken-foot placement", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -415,13 +415,13 @@ func (s *GameServer) HandlePass(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := g.Pass(ctx, name, chickenFoot.SelectedX, chickenFoot.SelectedY); err != nil {
-		clog.Error(ctx, "Could not pass", "error", err.Error())
+		clog.Error(ctx, "Could not pass", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -437,7 +437,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -445,7 +445,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -475,7 +475,7 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 
 	lt := &LaidTile{}
 	if err := json.NewDecoder(r.Body).Decode(lt); err != nil {
-		clog.Error(ctx, "Error decoding tile", "error", err.Error())
+		clog.Error(ctx, "Error decoding tile", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
@@ -483,14 +483,14 @@ func (s *GameServer) HandleLayTile(w http.ResponseWriter, r *http.Request) {
 	lt.PlayerName = player.Name
 
 	if err := g.LayTile(ctx, name, lt); err != nil {
-		clog.Error(ctx, "Error laying tile", "error", err.Error())
+		clog.Error(ctx, "Error laying tile", err)
 		tileErr := fmt.Errorf("%s %v", lt, err)
 		writeErr(w, tileErr, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -506,7 +506,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -514,7 +514,7 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -544,19 +544,19 @@ func (s *GameServer) HandleLaySpacer(w http.ResponseWriter, r *http.Request) {
 
 	sp := &Spacer{}
 	if err := json.NewDecoder(r.Body).Decode(sp); err != nil {
-		clog.Error(ctx, "Error decoding spacer", "error", err.Error())
+		clog.Error(ctx, "Error decoding spacer", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := g.LaySpacer(ctx, name, sp); err != nil {
-		clog.Error(ctx, "Error laying spacer", "error", err.Error())
+		clog.Error(ctx, "Error laying spacer", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -579,14 +579,14 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		var err error
 		version, err = strconv.ParseInt(versionStr, 10, 64)
 		if err != nil {
-			clog.Error(ctx, "Error parsing version", "error", err.Error(), "version", versionStr)
+			clog.Error(ctx, "Error parsing version", err, "version", versionStr)
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
 	}
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -594,7 +594,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		if err == ErrNoSuchGame {
 			writeErr(w, err, http.StatusNotFound)
 			return
@@ -608,7 +608,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		if err := s.Store.RecordPlayerActive(ctx, code, name, time.Now().Unix()); err != nil {
-			clog.Error(ctx, "Error setting player active", "error", err.Error())
+			clog.Error(ctx, "Error setting player active", err)
 		}
 	}
 
@@ -619,7 +619,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		if now-g.Created > 1800 {
 			clog.Info(ctx, "Culling game (waiting too long)")
 			if err := s.Store.DeleteGame(ctx, code); err != nil {
-				clog.Error(ctx, "Error deleting game", "error", err.Error())
+				clog.Error(ctx, "Error deleting game", err)
 			}
 			writeErr(w, errors.New("this game took too long to start"), http.StatusNotFound)
 			return
@@ -632,7 +632,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			}
 			lastActive, err := s.Store.PlayerLastActive(ctx, code, p.Name)
 			if err != nil {
-				clog.Error(ctx, "Error getting last active", "error", err.Error(), "player", p.Name)
+				clog.Error(ctx, "Error getting last active", err, "player", p.Name)
 				continue
 			}
 			idleSeconds := now - lastActive
@@ -648,7 +648,7 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 		if anyBooted {
 			clog.Info(ctx, "Booted players")
 			if err := s.Store.WriteGame(ctx, g); err != nil {
-				clog.Error(ctx, "Could not store game after booting players", "error", err.Error())
+				clog.Error(ctx, "Could not store game after booting players", err)
 			}
 		}
 	}
@@ -667,9 +667,9 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, err, http.StatusRequestTimeout)
 			return
 		}
-		clog.Error(ctx, "broke connection", "error", err.Error())
+		clog.Error(ctx, "broke connection", err)
 		if err := s.Store.RecordPlayerActive(ctx, code, name, 0); err != nil {
-			clog.Error(ctx, "Error setting player inactive", "error", err.Error())
+			clog.Error(ctx, "Error setting player inactive", err)
 		}
 		if !g.LeaveOrQuit(ctx, name) {
 			clog.Info(ctx, "Could not boot when connection broke")
@@ -688,7 +688,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -696,7 +696,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	options := &GameOptions{}
 	if err := json.NewDecoder(r.Body).Decode(options); err != nil {
-		clog.Error(ctx, "Error decoding game options", "error", err.Error())
+		clog.Error(ctx, "Error decoding game options", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
@@ -708,7 +708,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	if pickup {
 		g, err = s.Store.FindPickupGame(ctx)
 		if err != nil && err != ErrNoSuchGame {
-			clog.Error(ctx, "Error finding pickup game", "error", err.Error())
+			clog.Error(ctx, "Error finding pickup game", err)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
@@ -723,7 +723,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 		g, err = s.Store.FindGameAlreadyPlaying(ctx, prefix, name)
 		if err != nil && err != ErrNoSuchGame {
-			clog.Error(ctx, "Error reading game", "error", err.Error(), "prefix", prefix)
+			clog.Error(ctx, "Error reading game", err, "prefix", prefix)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
@@ -731,7 +731,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		if g == nil {
 			g, err = s.Store.FindOpenGame(ctx, prefix)
 			if err != nil && err != ErrNoSuchGame {
-				clog.Error(ctx, "Error reading game", "error", err.Error(), "prefix", prefix)
+				clog.Error(ctx, "Error reading game", err, "prefix", prefix)
 				writeErr(w, err, http.StatusInternalServerError)
 				return
 			}
@@ -796,7 +796,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	if !inGame {
 		if err := g.AddPlayer(ctx, player); err != nil {
-			clog.Error(ctx, "Error adding player to game", "error", err.Error())
+			clog.Error(ctx, "Error adding player to game", err)
 			if err == ErrGameTooManyPlayers {
 				writeErr(w, err, http.StatusUnprocessableEntity)
 				return
@@ -814,7 +814,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := s.Store.WriteGame(ctx, g); err != nil {
-			clog.Error(ctx, "Error writing game", "error", err.Error())
+			clog.Error(ctx, "Error writing game", err)
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
@@ -824,7 +824,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 
 	if createdNewGame && options.AgentRoundOut > 1 && s.AgentSpawner != nil {
 		if err := s.AgentSpawner.NewAgent(ctx, "gibbs", code, options.AgentRoundOut); err != nil {
-			clog.Error(ctx, "Error spawning agent", "error", err.Error())
+			clog.Error(ctx, "Error spawning agent", err)
 		}
 	}
 }
@@ -836,7 +836,7 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -844,19 +844,19 @@ func (s *GameServer) HandleStartRound(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	if err := g.Start(ctx, name); err != nil {
-		clog.Error(ctx, "Error starting round for game", "error", err.Error())
+		clog.Error(ctx, "Error starting round for game", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -871,7 +871,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -879,14 +879,14 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	reqBody := map[string]string{}
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		clog.Error(ctx, "Error decoding chickenfoot", "error", err.Error())
+		clog.Error(ctx, "Error decoding chickenfoot", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
@@ -908,7 +908,7 @@ func (s *GameServer) HandleChickenFoot(w http.ResponseWriter, r *http.Request) {
 	player.ChickenFootURL = url
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -923,7 +923,7 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -931,14 +931,14 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 
 	reqBody := map[string]string{}
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		clog.Error(ctx, "Error decoding chickenfoot", "error", err.Error())
+		clog.Error(ctx, "Error decoding chickenfoot", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
@@ -960,7 +960,7 @@ func (s *GameServer) HandleReact(w http.ResponseWriter, r *http.Request) {
 	player.ReactURL = url
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
-		clog.Error(ctx, "Error writing game", "error", err.Error())
+		clog.Error(ctx, "Error writing game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -974,14 +974,14 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 
 	pi := &PlayerInfo{}
 	if err := json.NewDecoder(r.Body).Decode(pi); err != nil {
-		clog.Error(ctx, "Error decoding player info", "error", err.Error())
+		clog.Error(ctx, "Error decoding player info", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 	pi.Id = playerID
 
 	if err := validatePlayerName(pi.Name); err != nil {
-		clog.Error(ctx, "Error validating player name", "error", err.Error(), "name", pi.Name)
+		clog.Error(ctx, "Error validating player name", err, "name", pi.Name)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
@@ -1002,7 +1002,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 
 	if playerID != "" {
 		if err := s.Store.RegisterPlayerName(r.Context(), playerID, pi.Name); err != nil {
-			clog.Error(ctx, "Error registering player", "error", err.Error(), "name", pi.Name)
+			clog.Error(ctx, "Error registering player", err, "name", pi.Name)
 			writeErr(w, err, http.StatusBadRequest)
 			return
 		}
@@ -1030,7 +1030,7 @@ func (s *GameServer) HandleGetPlayer(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, err, http.StatusNotFound)
 			return
 		}
-		clog.Error(ctx, "Error getting player name", "error", err.Error(), "playerID", playerID)
+		clog.Error(ctx, "Error getting player name", err, "playerID", playerID)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -1043,20 +1043,20 @@ func (s *GameServer) HandleUpdatePlayerConfig(w http.ResponseWriter, r *http.Req
 	defer r.Body.Close()
 	playerID := chi.URLParam(r, "playerID")
 	if err := s.validatePlayerID(ctx, playerID, r); err != nil {
-		clog.Error(ctx, "Error validating player ID", "error", err.Error())
+		clog.Error(ctx, "Error validating player ID", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
 
 	cfg := PlayerConfig{}
 	if err := json.NewDecoder(r.Body).Decode(&cfg); err != nil {
-		clog.Error(ctx, "Error decoding player info", "error", err.Error())
+		clog.Error(ctx, "Error decoding player info", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	if err := s.Store.UpdatePlayerConfig(ctx, playerID, cfg); err != nil {
-		clog.Error(ctx, "Error updating player config", "error", err.Error())
+		clog.Error(ctx, "Error updating player config", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -1080,7 +1080,7 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 	ctx = clog.WithKeyword(ctx, "code", code)
 	name, err := s.getName(ctx, r)
 	if err != nil {
-		clog.Error(ctx, "Error getting name", "error", err.Error())
+		clog.Error(ctx, "Error getting name", err)
 		writeErr(w, err, http.StatusForbidden)
 		return
 	}
@@ -1088,14 +1088,14 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 
 	reqBody := ReportIssueRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		clog.Error(ctx, "Error decoding report issue request", "error", err.Error())
+		clog.Error(ctx, "Error decoding report issue request", err)
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
-		clog.Error(ctx, "Error reading game", "error", err.Error())
+		clog.Error(ctx, "Error reading game", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}

@@ -68,7 +68,7 @@ func main() {
 
 	count, err := strconv.ParseInt(os.Args[1], 10, 64)
 	if err != nil {
-		clog.Fatal(ctx, "Could not parse count", "error", err.Error())
+		clog.Fatal(ctx, "Could not parse count", err)
 	}
 	args := os.Args[2:]
 

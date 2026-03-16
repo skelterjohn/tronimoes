@@ -237,7 +237,7 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 			if gameData, ok := data["game_json"].(string); ok {
 				g := &Game{}
 				if err := json.Unmarshal([]byte(gameData), g); err != nil {
-					clog.Error(ctx, "could not unmarshal game", "error", err.Error())
+					clog.Error(ctx, "could not unmarshal game", err)
 					continue
 				}
 				updates <- g

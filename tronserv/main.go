@@ -88,7 +88,7 @@ func main() {
 		var err error
 		store, err = game.NewFirestore(ctx, "tronimoes", *env)
 		if err != nil {
-			clog.Fatal(ctx, "Could not connect to firestore", "error", err.Error())
+			clog.Fatal(ctx, "Could not connect to firestore", err)
 		}
 	}
 
@@ -105,7 +105,7 @@ func main() {
 			Code:      "BDIKED-BNHJXU",
 		}
 		if err := gcr.Initialize(ctx); err != nil {
-			clog.Error(ctx, "Could not infer GCR agent spawner config", "error", err.Error())
+			clog.Error(ctx, "Could not infer GCR agent spawner config", err)
 			spawner = nil
 		} else {
 			spawner = gcr
@@ -113,13 +113,13 @@ func main() {
 	case "gcr":
 		gcr := &game.GCRAgentSpawner{}
 		if err := gcr.Initialize(ctx); err != nil {
-			clog.Error(ctx, "Could not infer GCR agent spawner config", "error", err.Error())
+			clog.Error(ctx, "Could not infer GCR agent spawner config", err)
 			spawner = nil
 		} else {
 			spawner = gcr
 		}
 	default:
-		clog.Fatal(ctx, "Unknown agent spawner", "agentSpawner", *agentSpawner)
+		clog.Fatal(ctx, "Unknown agent spawner", nil, "agentSpawner", *agentSpawner)
 	}
 
 	allowedBotSAs := []string{}
@@ -138,6 +138,6 @@ func main() {
 	listenAddr := fmt.Sprintf("%s:%d", *addr, *port)
 	clog.Info(ctx, "Server starting", "listenAddr", listenAddr)
 	if err := http.ListenAndServe(listenAddr, r); err != nil {
-		clog.Fatal(ctx, "Server failed", "error", err.Error())
+		clog.Fatal(ctx, "Server failed", err)
 	}
 }

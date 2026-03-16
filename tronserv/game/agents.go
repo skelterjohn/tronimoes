@@ -55,7 +55,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			clog.Error(ctx, "Agent exited", "error", err.Error(), "which", which, "code", code)
+			clog.Error(ctx, "Agent exited", err, "which", which, "code", code)
 		}
 	}()
 	return nil

@@ -132,7 +132,7 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 
 	gdata, err := json.Marshal(g)
 	if err != nil {
-		clog.Error(ctx, "error marshalling game", "error", err.Error())
+		clog.Error(ctx, "error marshalling game", err)
 	}
 
 	simulating := true
@@ -145,10 +145,10 @@ func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Playe
 		}
 		var sg game.Game
 		if err := json.Unmarshal(gdata, &sg); err != nil {
-			clog.Error(ctx, "error unmarshalling game", "error", err.Error())
+			clog.Error(ctx, "error unmarshalling game", err)
 		}
 		if err := gp.SimulateGame(ctx, &sg, root, gp.MaxSimulationDepth); err != nil {
-			clog.Error(ctx, "error simulating game", "error", err.Error())
+			clog.Error(ctx, "error simulating game", err)
 		}
 		simulations++
 		if gp.MaxSimulationsPerMove > 0 && simulations >= gp.MaxSimulationsPerMove {
@@ -219,11 +219,11 @@ func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {
 	time.Sleep(time.Duration(rand.Intn(500)+500) * time.Millisecond)
 	url, err := reacts.FindImageURL(ctx, query)
 	if err != nil {
-		clog.Error(ctx, "Error getting image URL", "error", err.Error())
+		clog.Error(ctx, "Error getting image URL", err)
 		return
 	}
 	if _, err := gp.Client.React(ctx, url); err != nil {
-		clog.Error(ctx, "Error reacting", "error", err.Error())
+		clog.Error(ctx, "Error reacting", err)
 	}
 }
 

@@ -120,7 +120,7 @@ func main() {
 		gp.SetDefaults()
 		a = gp
 	default:
-		clog.Error(ctx, "Unknown agent", "agent", *which)
+		clog.Error(ctx, "Unknown agent", nil, "agent", *which)
 		os.Exit(1)
 	}
 
@@ -129,20 +129,20 @@ func main() {
 	clog.Info(ctx, fmt.Sprintf("Starting %s agent %s, connecting to %s for game %s", *which, name, *tronserv_addr, *gamecode))
 	if *archive != "" {
 		if err := os.MkdirAll(*archive, 0755); err != nil {
-			clog.Error(ctx, "save-dir", "error", err.Error())
+			clog.Error(ctx, "save-dir", err)
 			os.Exit(1)
 		}
 	}
 
 	g, err := tc.JoinGame(ctx, *gamecode)
 	if err != nil {
-		clog.Error(ctx, "Could not join game", "error", err.Error())
+		clog.Error(ctx, "Could not join game", err)
 		return
 	}
 
 	defer func() {
 		if _, err := tc.LeaveOrQuit(ctx); err != nil {
-			clog.Error(ctx, "Could not leave game", "error", err.Error())
+			clog.Error(ctx, "Could not leave game", err)
 		}
 	}()
 
@@ -154,10 +154,10 @@ func main() {
 
 	footURL, err := reacts.FindImageURL(ctx, "bot")
 	if err != nil {
-		clog.Error(ctx, "Could not get image URL", "error", err.Error())
+		clog.Error(ctx, "Could not get image URL", err)
 	} else {
 		if ng, err := tc.ChooseFoot(ctx, footURL); err != nil {
-			clog.Error(ctx, "Could not choose foot", "error", err.Error())
+			clog.Error(ctx, "Could not choose foot", err)
 		} else {
 			g = ng
 		}
@@ -192,7 +192,7 @@ func main() {
 		if r == nil || r.Done {
 			p := g.GetPlayer(ctx, name)
 			if p == nil {
-				clog.Error(ctx, "Player not found", "player", name)
+				clog.Error(ctx, "Player not found", nil, "player", name)
 				return
 			}
 			if !p.Ready {
@@ -200,7 +200,7 @@ func main() {
 				clog.Info(ctx, "Ready to begin a new round.")
 				g, err = tc.Start(ctx)
 				if err != nil {
-					clog.Error(ctx, "Error starting game", "error", err.Error())
+					clog.Error(ctx, "Error starting game", err)
 					return
 				}
 			}
@@ -230,9 +230,9 @@ func main() {
 						Move types.Move `json:"move"`
 					}{Game: g, Move: m}, "", "\t")
 					if err != nil {
-						clog.Error(ctx, "save marshal", "error", err.Error())
+						clog.Error(ctx, "save marshal", err)
 					} else if err := os.WriteFile(path, blob, 0644); err != nil {
-						clog.Error(ctx, "save", "error", err.Error(), "path", path)
+						clog.Error(ctx, "save", err, "path", path)
 					}
 				}
 				if time.Since(lastMoveTime) < *minMoveTime {
@@ -243,7 +243,7 @@ func main() {
 				lastMoveTime = time.Now()
 				if m.Draw {
 					if ng, err := tc.Draw(ctx); err != nil {
-						clog.Error(ctx, "Could not draw", "error", err.Error())
+						clog.Error(ctx, "Could not draw", err)
 						continue
 					} else {
 						g = ng
@@ -253,7 +253,7 @@ func main() {
 				}
 				if m.Pass {
 					if ng, err := tc.Pass(ctx, m.Selected.X, m.Selected.Y); err != nil {
-						clog.Error(ctx, "Could not pass", "error", err.Error())
+						clog.Error(ctx, "Could not pass", err)
 						continue
 					} else {
 						g = ng
@@ -263,7 +263,7 @@ func main() {
 				}
 				if m.LayTile {
 					if ng, err := tc.LayTile(ctx, &m.LaidTile); err != nil {
-						clog.Error(ctx, "Could not lay tile", "error", err.Error())
+						clog.Error(ctx, "Could not lay tile", err)
 						continue
 					} else {
 						g = ng
@@ -273,7 +273,7 @@ func main() {
 				}
 				if m.PlaceSpacer {
 					if ng, err := tc.LaySpacer(ctx, &m.Spacer); err != nil {
-						clog.Error(ctx, "Could not lay spacer", "error", err.Error())
+						clog.Error(ctx, "Could not lay spacer", err)
 						continue
 					} else {
 						g = ng
@@ -289,7 +289,7 @@ func main() {
 		g, err = tc.GetGame(ctx, previousGame.Version)
 		for err != nil || g.Version == previousGame.Version {
 			if err != nil && err != client.ErrTimeout {
-				clog.Error(ctx, "Game fetch error", "error", err.Error())
+				clog.Error(ctx, "Game fetch error", err)
 				return
 			}
 			time.Sleep(5 * time.Second)

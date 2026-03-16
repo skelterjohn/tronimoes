@@ -76,11 +76,15 @@ func Info(ctx context.Context, message string, addTags ...string) {
 	_log(ctx, "INFO", message, tagsFromList(addTags...))
 }
 
-func Error(ctx context.Context, message string, addTags ...string) {
+func Error(ctx context.Context, message string, err error, addTags ...string) {
 	if !severityEnabled(ctx, errorKey) {
 		return
 	}
-	_log(ctx, "ERROR", message, tagsFromList(addTags...))
+	tags := tagsFromList(addTags...)
+	if err != nil {
+		tags["error"] = err.Error()
+	}
+	_log(ctx, "ERROR", message, tags)
 }
 
 func Debug(ctx context.Context, message string, addTags ...string) {
@@ -90,8 +94,12 @@ func Debug(ctx context.Context, message string, addTags ...string) {
 	_log(ctx, "DEBUG", message, tagsFromList(addTags...))
 }
 
-func Fatal(ctx context.Context, message string, addTags ...string) {
-	_log(ctx, "FATAL", message, tagsFromList(addTags...))
+func Fatal(ctx context.Context, message string, err error, addTags ...string) {
+	tags := tagsFromList(addTags...)
+	if err != nil {
+		tags["error"] = err.Error()
+	}
+	_log(ctx, "FATAL", message, tags)
 	os.Exit(1)
 }
 
