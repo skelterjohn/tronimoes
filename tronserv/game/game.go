@@ -1680,7 +1680,21 @@ func (r *Round) killDeadLines(ctx context.Context, g *Game, player *Player, squa
 }
 
 func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]SquarePips, lt LaidTile, name string) bool {
+	clog.Debug(ctx, "BlockingFeet", "lt", lt, "name", name)
+
 	lt.PlayerName = name
+	// Check if this tile is landing on a leader chicken-foot. That's allowed, because you're starting their line.
+	for _, p := range g.Players {
+		if !p.ChickenFoot || len(r.PlayerLines[p.Name]) > 1 {
+			clog.Debug(ctx, "not a leader chicken-foot", "player", p.Name)
+			continue
+		}
+		clog.Debug(ctx, "checking chicken-foot coord", "coord", p.ChickenFootCoord, "lt.Coord", lt.Coord)
+		if p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB() {
+			lt.PlayerName = p.Name
+			clog.Debug(ctx, "found leader chicken-foot", "player", p.Name)
+		}
+	}
 
 	allFrom := func(src Coord, orientations []string) []*LaidTile {
 		lts := []*LaidTile{}
@@ -1708,6 +1722,7 @@ func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]
 		if len(pline) > 1 {
 			continue
 		}
+		clog.Debug(ctx, "considering player", "player", pn, "length", len(pline))
 		p := g.GetPlayer(ctx, pn)
 		if p.ChickenFoot {
 			playerChickenFeetCoords[p.Name] = p.ChickenFootCoord
@@ -1717,6 +1732,7 @@ func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]
 			}
 		}
 		playersToSatisfy = append(playersToSatisfy, p)
+		clog.Debug(ctx, "found player to satisfy", "player", p.Name)
 	}
 
 	// returns true if the player can be satisfied.

@@ -1,11 +1,20 @@
 package game
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 )
+
+func withAllLogging(ctx context.Context) context.Context {
+	ctx = clog.WithSeverities(ctx, "info", "error", "debug")
+	ctx = clog.WithTextOutput(ctx, os.Stdout)
+	return ctx
+}
 
 func decodeGame(t *testing.T, label string) *Game {
 	path := filepath.Join("testdata", label+".json")
@@ -151,5 +160,19 @@ func TestSpacerPlacementRejected(t *testing.T) {
 	})
 	if err != ErrFreeFromSpacer {
 		t.Fatalf("LayTile under spacer: got err %v, want ErrFreeFromSpacer", err)
+	}
+}
+
+func TestMakeroom(t *testing.T) {
+	ctx := withAllLogging(t.Context())
+	game := decodeGame(t, "makeroom")
+	err := game.LayTile(ctx, "Gadfly Pifflepaff", &LaidTile{
+		Tile:        Tile{PipsA: 4, PipsB: 12},
+		Coord:       Coord{X: 7, Y: 7},
+		Orientation: "right",
+		PlayerName:  "Gimcrackery Pandemonium",
+	})
+	if err != ErrNoBlockingFeet {
+		t.Fatalf("Played a foot-blocker, but instead of ErrNoBlockingFeet we got %v", err)
 	}
 }

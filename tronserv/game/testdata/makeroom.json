@@ -1,0 +1,997 @@
+{
+	"created": 1773706984,
+	"version": 48,
+	"pickup": true,
+	"done": false,
+	"code": "MIQHWI-VKYYIR",
+	"players": [
+		{
+			"name": "skelterjohn",
+			"bot": false,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 4,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 9,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 3
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "",
+			"react_url": "",
+			"kills": null
+		},
+		{
+			"name": "Gadfly Pifflepaff",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 7,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 3
+				},
+				{
+					"pips_a": 7,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 9,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 1
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 9,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 12
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/40e5f3c9157feea5d28a6b4ad3880d85/a1/0f/qC2bygZv.gif",
+			"react_url": "https://static.klipy.com/ii/ffd4ac143e6335ac68951b787d3c1902/c7/43/2D4kuRjL.gif",
+			"kills": null
+		},
+		{
+			"name": "Gobbledygook Pomegranate",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 8,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 7,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 11,
+					"pips_b": 11
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/40e5f3c9157feea5d28a6b4ad3880d85/c3/af/THUPnI9p.gif",
+			"react_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/a7/66/RJS796rk.gif",
+			"kills": null
+		},
+		{
+			"name": "Gobstopper Pulicker",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 5,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 8,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 6,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 1
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": true,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 3,
+				"y": 11
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/8b/78/L755mPhn.gif",
+			"react_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/0b/f0/grmXtbqH.gif",
+			"kills": null
+		},
+		{
+			"name": "Gubbins Poppet",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 4,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 10,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 8,
+					"pips_b": 12
+				},
+				{
+					"pips_a": 9,
+					"pips_b": 12
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 0
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": true,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 5,
+				"y": 9
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/4184567b4c2af0d810857689fd514076/e3/f9/t020oaDmH6E3xVMe.gif",
+			"react_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/37/ed/1gZuOXHR.gif",
+			"kills": null
+		},
+		{
+			"name": "Gimcrackery Pandemonium",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 6,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 3
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 6,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 11
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 9
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": true,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 7,
+				"y": 7
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/01/59/iHScnr4h.gif",
+			"react_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/b3/66/3zqjtNj5.gif",
+			"kills": null
+		}
+	],
+	"turn": 1,
+	"rounds": [
+		{
+			"laid_tiles": [
+				{
+					"tile": {
+						"pips_a": 12,
+						"pips_b": 12
+					},
+					"coord": {
+						"x": 7,
+						"y": 8
+					},
+					"orientation": "right",
+					"player_name": "",
+					"next_pips": 12,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gobbledygook Pomegranate"
+				},
+				{
+					"tile": {
+						"pips_a": 0,
+						"pips_b": 12
+					},
+					"coord": {
+						"x": 6,
+						"y": 9
+					},
+					"orientation": "right",
+					"player_name": "Gubbins Poppet",
+					"next_pips": 0,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gubbins Poppet"
+				},
+				{
+					"tile": {
+						"pips_a": 7,
+						"pips_b": 12
+					},
+					"coord": {
+						"x": 8,
+						"y": 10
+					},
+					"orientation": "up",
+					"player_name": "Gobstopper Pulicker",
+					"next_pips": 7,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gimcrackery Pandemonium"
+				},
+				{
+					"tile": {
+						"pips_a": 7,
+						"pips_b": 8
+					},
+					"coord": {
+						"x": 7,
+						"y": 10
+					},
+					"orientation": "left",
+					"player_name": "Gobstopper Pulicker",
+					"next_pips": 8,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 2,
+						"pips_b": 8
+					},
+					"coord": {
+						"x": 5,
+						"y": 11
+					},
+					"orientation": "right",
+					"player_name": "Gobstopper Pulicker",
+					"next_pips": 2,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gadfly Pifflepaff"
+				},
+				{
+					"tile": {
+						"pips_a": 2,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 5,
+						"y": 12
+					},
+					"orientation": "left",
+					"player_name": "Gobstopper Pulicker",
+					"next_pips": 6,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gobbledygook Pomegranate"
+				},
+				{
+					"tile": {
+						"pips_a": 6,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 3,
+						"y": 12
+					},
+					"orientation": "left",
+					"player_name": "Gobstopper Pulicker",
+					"next_pips": 6,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gobstopper Pulicker"
+				},
+				{
+					"tile": {
+						"pips_a": 4,
+						"pips_b": 6
+					},
+					"coord": {
+						"x": 2,
+						"y": 11
+					},
+					"orientation": "right",
+					"player_name": "Gobstopper Pulicker",
+					"next_pips": 4,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gobstopper Pulicker"
+				},
+				{
+					"tile": {
+						"pips_a": 0,
+						"pips_b": 9
+					},
+					"coord": {
+						"x": 5,
+						"y": 9
+					},
+					"orientation": "up",
+					"player_name": "Gubbins Poppet",
+					"next_pips": 9,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gubbins Poppet"
+				},
+				{
+					"tile": {
+						"pips_a": 10,
+						"pips_b": 12
+					},
+					"coord": {
+						"x": 6,
+						"y": 7
+					},
+					"orientation": "down",
+					"player_name": "skelterjohn",
+					"next_pips": 10,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "skelterjohn"
+				}
+			],
+			"spacer": null,
+			"done": false,
+			"history": [
+				"Gobbledygook Pomegranate laid 12:12",
+				"Gobstopper Pulicker passed and is on the foot",
+				"Gubbins Poppet laid 0:12",
+				"Gimcrackery Pandemonium laid 7:12",
+				"skelterjohn laid 7:8",
+				"Gadfly Pifflepaff laid 2:8",
+				"Gobbledygook Pomegranate laid 2:6",
+				"Gobstopper Pulicker laid 6:6 and is off the foot",
+				"Gobstopper Pulicker laid 4:6",
+				"Gubbins Poppet laid 0:9",
+				"Gimcrackery Pandemonium passed and is on the foot",
+				"skelterjohn laid 10:12"
+			],
+			"player_lines": {
+				"Gadfly Pifflepaff": [
+					{
+						"tile": {
+							"pips_a": 12,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 7,
+							"y": 8
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 12,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					}
+				],
+				"Gimcrackery Pandemonium": [
+					{
+						"tile": {
+							"pips_a": 12,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 7,
+							"y": 8
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 12,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					}
+				],
+				"Gobbledygook Pomegranate": [
+					{
+						"tile": {
+							"pips_a": 12,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 7,
+							"y": 8
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 12,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					}
+				],
+				"Gobstopper Pulicker": [
+					{
+						"tile": {
+							"pips_a": 12,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 7,
+							"y": 8
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 12,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					},
+					{
+						"tile": {
+							"pips_a": 7,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 8,
+							"y": 10
+						},
+						"orientation": "up",
+						"player_name": "Gobstopper Pulicker",
+						"next_pips": 7,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gimcrackery Pandemonium"
+					},
+					{
+						"tile": {
+							"pips_a": 7,
+							"pips_b": 8
+						},
+						"coord": {
+							"x": 7,
+							"y": 10
+						},
+						"orientation": "left",
+						"player_name": "Gobstopper Pulicker",
+						"next_pips": 8,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 2,
+							"pips_b": 8
+						},
+						"coord": {
+							"x": 5,
+							"y": 11
+						},
+						"orientation": "right",
+						"player_name": "Gobstopper Pulicker",
+						"next_pips": 2,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gadfly Pifflepaff"
+					},
+					{
+						"tile": {
+							"pips_a": 2,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 5,
+							"y": 12
+						},
+						"orientation": "left",
+						"player_name": "Gobstopper Pulicker",
+						"next_pips": 6,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					},
+					{
+						"tile": {
+							"pips_a": 6,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 3,
+							"y": 12
+						},
+						"orientation": "left",
+						"player_name": "Gobstopper Pulicker",
+						"next_pips": 6,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobstopper Pulicker"
+					},
+					{
+						"tile": {
+							"pips_a": 4,
+							"pips_b": 6
+						},
+						"coord": {
+							"x": 2,
+							"y": 11
+						},
+						"orientation": "right",
+						"player_name": "Gobstopper Pulicker",
+						"next_pips": 4,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobstopper Pulicker"
+					}
+				],
+				"Gubbins Poppet": [
+					{
+						"tile": {
+							"pips_a": 12,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 7,
+							"y": 8
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 12,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					},
+					{
+						"tile": {
+							"pips_a": 0,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 6,
+							"y": 9
+						},
+						"orientation": "right",
+						"player_name": "Gubbins Poppet",
+						"next_pips": 0,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gubbins Poppet"
+					},
+					{
+						"tile": {
+							"pips_a": 0,
+							"pips_b": 9
+						},
+						"coord": {
+							"x": 5,
+							"y": 9
+						},
+						"orientation": "up",
+						"player_name": "Gubbins Poppet",
+						"next_pips": 9,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gubbins Poppet"
+					}
+				],
+				"skelterjohn": [
+					{
+						"tile": {
+							"pips_a": 12,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 7,
+							"y": 8
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 12,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledygook Pomegranate"
+					},
+					{
+						"tile": {
+							"pips_a": 10,
+							"pips_b": 12
+						},
+						"coord": {
+							"x": 6,
+							"y": 7
+						},
+						"orientation": "down",
+						"player_name": "skelterjohn",
+						"next_pips": 10,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				]
+			},
+			"free_lines": [],
+			"bagless_passes": 0,
+			"highest_leader": 12
+		}
+	],
+	"bag": [
+		{
+			"pips_a": 7,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 8,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 10,
+			"pips_b": 11
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 12
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 11
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 11,
+			"pips_b": 12
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 8
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 5,
+			"pips_b": 12
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 10
+		},
+		{
+			"pips_a": 8,
+			"pips_b": 8
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 12
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 12
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 2,
+			"pips_b": 12
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 11
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 2
+		}
+	],
+	"board_width": 16,
+	"board_height": 17,
+	"max_pips": 12,
+	"history": [
+		"Gobbledygook Pomegranate started round 1 - 12:12"
+	]
+}
