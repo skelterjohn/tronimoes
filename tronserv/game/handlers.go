@@ -633,7 +633,9 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 			}
 			lastActive, err := s.Store.PlayerLastActive(ctx, code, p.Name)
 			if err != nil {
-				clog.Error(ctx, "Error getting last active", err, "player", p.Name)
+				if err != ErrNoSuchPlayer {
+					clog.Error(ctx, "Error getting last active", err, "player", p.Name)
+				}
 				continue
 			}
 			idleSeconds := now - lastActive
