@@ -425,7 +425,6 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 }
 
 func (g *Game) Note(ctx context.Context, n string) {
-	clog.Info(ctx, "added game note", "note", n)
 	g.History = append(g.History, n)
 	dbg(n)
 }
@@ -790,7 +789,6 @@ type Round struct {
 }
 
 func (r *Round) Note(ctx context.Context, n string) {
-	clog.Info(ctx, "added round note", "note", n)
 	if r == nil {
 		return
 	}
