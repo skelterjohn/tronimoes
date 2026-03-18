@@ -184,18 +184,15 @@ func Log(ctx context.Context, severity, message string, addTags map[string]any) 
 }
 
 func _log(ctx context.Context, severity, message string, addTags map[string]string) {
-	existingTags, ok := ctx.Value(keywordsKey).(map[string]string)
-	if !ok {
-		existingTags = make(map[string]string)
-	}
+	existingTags, _ := ctx.Value(keywordsKey).(map[string]string)
+	tagsForMessage := make(map[string]string)
+	maps.Copy(tagsForMessage, existingTags)
+	maps.Copy(tagsForMessage, addTags)
 	fl := fileline()
-	for key, value := range addTags {
-		existingTags[key] = value
-	}
 	if durationSince, ok := ctx.Value(durationsKey).(time.Time); ok {
 		duration := time.Since(durationSince)
-		existingTags["duration"] = fmt.Sprintf("%6dms", duration.Milliseconds())
-		existingTags["since"] = durationSince.Format(time.RFC3339)
+		tagsForMessage["duration"] = fmt.Sprintf("%6dms", duration.Milliseconds())
+		tagsForMessage["since"] = durationSince.Format(time.RFC3339)
 	}
 	if textOutput, ok := ctx.Value(textOutputKey).(io.Writer); ok {
 		strb := strings.Builder{}
@@ -203,7 +200,8 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		strb.WriteString("\t")
 		strb.WriteString(message)
 		strb.WriteString("\t| ")
-		for key, value := range existingTags {
+		// Include both tags already on the context (keywords) and tags passed to Log().
+		for key, value := range tagsForMessage {
 			strb.WriteString(" ")
 			strb.WriteString(key)
 			strb.WriteString("=")
@@ -217,7 +215,8 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 			"message":  message,
 			"fileline": fileline(),
 		}
-		for key, value := range existingTags {
+		// Include both tags already on the context (keywords) and tags passed to Log().
+		for key, value := range tagsForMessage {
 			allTags[key] = value
 		}
 		if err := json.NewEncoder(structuredOutput).Encode(allTags); err != nil {
@@ -230,7 +229,8 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 			"message":  message,
 			"fileline": fileline(),
 		}
-		maps.Copy(allTags, existingTags)
+		// Include both tags already on the context (keywords) and tags passed to Log().
+		maps.Copy(allTags, tagsForMessage)
 		v.Logger.Log(logging.Entry{
 			Severity: severityFromString(severity),
 			Labels:   allTags,
