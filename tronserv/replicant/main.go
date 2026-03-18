@@ -24,8 +24,19 @@ func replicate(ctx context.Context, args []string) {
 }
 
 func main() {
+	dev := false
+	for _, arg := range os.Args[1:] {
+		if arg == "--dev" {
+			dev = true
+			break
+		}
+	}
 	ctx := context.Background()
-	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	if dev {
+		ctx = clog.WithTextOutput(ctx, os.Stdout)
+	} else {
+		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	}
 	ctx = clog.WithSeverities(ctx, "info")
 
 	count, err := strconv.Atoi(os.Args[1])

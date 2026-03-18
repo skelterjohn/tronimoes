@@ -30,6 +30,7 @@ var (
 	useGCEToken   = flag.Bool("gce", false, "use the runner's service account to inject access tokens into requests")
 	archive       = flag.String("archive", "", "directory to save JSON game state and chosen move per turn; empty = don't save")
 	roundOut      = flag.Int("round-out", 0, "targeted player count")
+	dev           = flag.Bool("dev", false, "run in development mode")
 )
 
 type GCEMetadataRoundTripper struct {
@@ -81,7 +82,11 @@ func main() {
 	ctx := context.Background()
 	flag.Parse()
 
-	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	if *dev {
+		ctx = clog.WithTextOutput(ctx, os.Stdout)
+	} else {
+		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
+	}
 	ctx = clog.WithSeverities(ctx, "info", "error")
 
 	c := http.DefaultClient
