@@ -199,7 +199,7 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		strb.WriteString(fl)
 		strb.WriteString("\t")
 		strb.WriteString(message)
-		strb.WriteString("\t| ")
+		strb.WriteString(" | ")
 		// Include both tags already on the context (keywords) and tags passed to Log().
 		for key, value := range tagsForMessage {
 			strb.WriteString(" ")
