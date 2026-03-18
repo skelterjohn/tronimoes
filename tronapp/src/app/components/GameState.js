@@ -34,9 +34,19 @@ export function GameProvider({ children }) {
 			console.log("got player config", resp);
 			setConfig(resp.config);
 		}).catch((error) => {
-			console.error(error);
+			// This can legitimately happen the first time a logged-in user opens the app
+			// before they registered their player name in this game server.
+			const serverError = error?.data?.error;
+			if (error?.status === 404 && serverError === 'no registered player') {
+				return;
+			}
+			console.error('GetPlayer failed', {
+				status: error?.status,
+				message: error?.message,
+				data: error?.data,
+			});
 		});
-	}, [client, setPlayerName]);
+	}, [client]);
 
 	useEffect(() => {
 		if (!client?.userInfo) {
@@ -49,7 +59,7 @@ export function GameProvider({ children }) {
 		client?.UpdatePlayerConfig(config).catch((error) => {
 			console.error('update player error', error);
 		});
-	}, [config, playerName]);
+	}, [config, client]);
 
 	useEffect(()=> {
 		if (error !== undefined) {
@@ -62,7 +72,16 @@ export function GameProvider({ children }) {
 		}
 	}, [persistentUser, loading, error]);
 
+	// Avoid recreating the client (and re-triggering effects) while the authenticated
+	// user is typing/changing `playerName`. When `userInfo` exists, the server uses
+	// the Firebase token + X-Player-Id rather than X-Player-Name.
 	useEffect(() => {
+		if (!userInfo) return;
+		setClient(clientFor("", userInfo));
+	}, [userInfo]);
+
+	useEffect(() => {
+		if (userInfo) return;
 		setClient(clientFor(playerName, userInfo));
 	}, [playerName, userInfo]);
 
