@@ -196,6 +196,8 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 	}
 	if textOutput, ok := ctx.Value(textOutputKey).(io.Writer); ok {
 		strb := strings.Builder{}
+		strb.WriteString(time.Now().Format(time.TimeOnly))
+		strb.WriteString(" ")
 		strb.WriteString(severity)
 		strb.WriteString("\t")
 		strb.WriteString(fl)
