@@ -13,8 +13,6 @@ import (
 )
 
 func replicate(ctx context.Context, args []string) {
-	defer wg.Done()
-
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
