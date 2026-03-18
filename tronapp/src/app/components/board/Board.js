@@ -17,6 +17,16 @@ const bgColorMap = {
 	white: "bg-white"
 };
 
+const borderColorMap = {
+	red: "border-red-800",
+	blue: "border-blue-800",
+	green: "border-green-800",
+	yellow: "border-yellow-800",
+	orange: "border-orange-800",
+	fuchsia: "border-fuchsia-800",
+	white: "border-white"
+};
+
 export default function Board({ 
 		width = 10, height = 11,
 		tiles, spacer,
@@ -130,6 +140,15 @@ export default function Board({
 	useEffect(() => {
 		setPlayA(undefined);
 	}, [selectedTile, setPlayA]);
+
+	const [borderColor, setBorderColor] = useState("border-gray-500");
+	useEffect(() => {
+		if (activePlayer !== undefined) {
+			setBorderColor(borderColorMap[activePlayer.color]);
+		} else {
+			setBorderColor("border-gray-500");
+		}
+	}, [activePlayer])
 
 	const [gutterColor, setGutterColor] = useState("bg-gray-900")
 	useEffect(() => {
@@ -357,7 +376,7 @@ export default function Board({
 				cursor: interactive ? (isDragging ? 'grabbing' : (zoom > 1 ? 'grab' : 'default')) : 'default',
 				pointerEvents: interactive ? 'auto' : 'none'
 			}}
-			className={`aspect-square w-full h-full border-8 border-gray-500 flex items-center justify-center overflow-hidden ${gutterColor} ${!interactive ? '[&_*]:pointer-events-none' : ''} [box-shadow:inset_0_2px_4px_rgba(255,255,255,0.15),0_8px_16px_rgba(0,0,0,0.3),0_4px_8px_rgba(0,0,0,0.2)]`}
+			className={`aspect-square w-full h-full border-8 ${borderColor} flex items-center justify-center overflow-hidden ${gutterColor} ${!interactive ? '[&_*]:pointer-events-none' : ''} [box-shadow:inset_0_2px_4px_rgba(255,255,255,0.15),0_8px_16px_rgba(0,0,0,0.3),0_4px_8px_rgba(0,0,0,0.2)]`}
 			>
 			<div 
 				className="aspect-square"
