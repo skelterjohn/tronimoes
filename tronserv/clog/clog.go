@@ -197,7 +197,7 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 	if textOutput, ok := ctx.Value(textOutputKey).(io.Writer); ok {
 		strb := strings.Builder{}
 		strb.WriteString(severity)
-		strb.WriteString(" ")
+		strb.WriteString("\t")
 		strb.WriteString(fl)
 		strb.WriteString("\t")
 		strb.WriteString(message)
