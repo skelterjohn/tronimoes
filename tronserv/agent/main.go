@@ -130,7 +130,7 @@ func main() {
 
 	ctx = clog.WithKeyword(ctx, "code", *gamecode)
 
-	clog.Info(ctx, fmt.Sprintf("Starting agent and connecting to game server", "addr", *tronserv_addr))
+	clog.Info(ctx, "Starting agent and connecting to game server", "addr", *tronserv_addr)
 	if *archive != "" {
 		if err := os.MkdirAll(*archive, 0755); err != nil {
 			clog.Error(ctx, "Could not create archive directory", err)
