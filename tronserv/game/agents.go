@@ -31,9 +31,9 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 	if exe, err := os.Executable(); err == nil {
 		exeDir = filepath.Dir(exe)
 	}
-	// Use absolute path so Windows allows running it (avoids "cannot run executable found relative to current directory").
-	agentExe := filepath.Join(exeDir, "tronagent.exe")
-	replicantExe := filepath.Join(exeDir, "replicant.exe")
+	// Spawn via PATH resolution (works when PATH includes the Go bin dir).
+	agentExe := "tronagent"
+	replicantExe := "replicant"
 	// Use Background so the agent is not killed when the HTTP request context is cancelled.
 	runCtx := context.WithoutCancel(ctx)
 	cmd := exec.CommandContext(runCtx,
