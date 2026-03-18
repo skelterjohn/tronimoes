@@ -81,8 +81,7 @@ func main() {
 	ctx := context.Background()
 	flag.Parse()
 
-	ctx = clog.WithCloudLoggingOutput(ctx, "tronagent")
-	defer clog.CloseCloudLogging(ctx)
+	ctx = clog.WithStructuredOutput(ctx, os.Stdout)
 	ctx = clog.WithSeverities(ctx, "info", "error")
 
 	c := http.DefaultClient
