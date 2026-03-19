@@ -124,10 +124,13 @@ func main() {
 	}
 
 	allowedBotSAs := []string{}
-	if sa := defaultServiceAccountEmail(ctx); sa != "" {
-		allowedBotSAs = []string{sa}
-		clog.Info(ctx, "Bot token check: allowing service account", "serviceAccount", sa)
+	if *checkBotTokens {
+		if sa := defaultServiceAccountEmail(ctx); sa != "" {
+			allowedBotSAs = []string{sa}
+			clog.Info(ctx, "Bot token check: allowing service account", "serviceAccount", sa)
+		}
 	}
+
 	gs := &game.GameServer{
 		Store:                     store,
 		AgentSpawner:              spawner,
