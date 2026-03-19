@@ -57,16 +57,3 @@ func ChiLogger(next http.Handler) http.Handler {
 	}
 	return inject(middleware.RequestLogger(ChiLogFormatter())(next))
 }
-
-// ChiLogger returns chi middleware that injects clog into the request context
-// (structured output to os.Stdout, severities "info" and "error" for handlers)
-// and logs each request via ChiLogFormatter using Log() with "INFO" or "ERROR".
-// Use as r.Use(clog.ChiLogger()).
-func ChiLoggerDev(next http.Handler) http.Handler {
-	inject := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			next.ServeHTTP(w, r)
-		})
-	}
-	return inject(middleware.RequestLogger(ChiLogFormatter())(next))
-}
