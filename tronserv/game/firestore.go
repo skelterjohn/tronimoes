@@ -182,21 +182,9 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		scoreboard[p.Name] = p.Score
 	}
 
-	scoreboardDocRef := s.scoreboards(ctx).Doc(game.Code)
-	scoreboardPayload := map[string]any{
-		"scoreboard": scoreboard,
-		"updated":    time.Now().Unix(),
-		"open":       open,
-		"pickup":     game.Pickup,
-		"done":       game.Done,
-	}
-	_, err = scoreboardDocRef.Set(ctx, scoreboardPayload)
-	if err != nil {
-		return fmt.Errorf("could not set scoreboard: %v", err)
-	}
-
 	c := s.games(ctx)
 	docRef := c.Doc(game.Code)
+	scoreboardDocRef := s.scoreboards(ctx).Doc(game.Code)
 	payload := map[string]any{
 		"created":     game.Created,
 		"code_prefix": game.Code[:6],
@@ -221,7 +209,39 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 				return ErrVersionConflict
 			}
 		}
-		return tx.Set(docRef, payload)
+
+		existingScoreboardDoc, err := tx.Get(scoreboardDocRef)
+		if err != nil && status.Code(err) != codes.NotFound {
+			return err
+		}
+
+		shouldUpdateScoreboard := true
+		if existingScoreboardDoc != nil && existingScoreboardDoc.Exists() {
+			existingData := existingScoreboardDoc.Data()
+			existingDone, doneOK := existingData["done"].(bool)
+			existingOpen, openOK := existingData["open"].(bool)
+			existingScoreboard, scoreboardOK := existingData["scoreboard"].(map[string]any)
+			shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK ||
+				existingDone != game.Done ||
+				existingOpen != open ||
+				!scoreboardMatches(scoreboard, existingScoreboard)
+		}
+		if err := tx.Set(docRef, payload); err != nil {
+			return err
+		}
+
+		if !shouldUpdateScoreboard {
+			return nil
+		}
+
+		scoreboardPayload := map[string]any{
+			"scoreboard": scoreboard,
+			"updated":    time.Now().Unix(),
+			"open":       open,
+			"pickup":     game.Pickup,
+			"done":       game.Done,
+		}
+		return tx.Set(scoreboardDocRef, scoreboardPayload)
 	})
 	if err != nil {
 		game.Version--
@@ -231,6 +251,23 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		return fmt.Errorf("could not write: %v", err)
 	}
 	return nil
+}
+
+func scoreboardMatches(next map[string]int, current map[string]any) bool {
+	if len(next) != len(current) {
+		return false
+	}
+	for name, score := range next {
+		raw, ok := current[name]
+		if !ok {
+			return false
+		}
+		existingScore, ok := raw.(int64)
+		if !ok || int(existingScore) != score {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *FireStore) DeleteGame(ctx context.Context, code string) error {
