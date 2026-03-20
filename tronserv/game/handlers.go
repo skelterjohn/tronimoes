@@ -54,6 +54,9 @@ func RegisterHandlers(r chi.Router, gs *GameServer) {
 	r.Post("/players", gs.HandleRegisterPlayerName)
 	r.Get("/players/{playerID}", gs.HandleGetPlayer)
 	r.Put("/players/{playerID}/config", gs.HandleUpdatePlayerConfig)
+	r.Get("/scoreboards/recent", gs.HandleGetRecentScoreboards)
+	r.Get("/scoreboards/active", gs.HandleGetActiveScoreboards)
+	r.Get("/scoreboards/pickup", gs.HandleGetPickupScoreboards)
 }
 
 func RandomString(n int) string {
@@ -1121,4 +1124,40 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.Store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen, reqBody.ErrorMessage)
+}
+
+func (s *GameServer) HandleGetRecentScoreboards(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	scoreboards, err := s.Store.ListRecentGames(ctx, 10)
+	if err != nil {
+		clog.Error(ctx, "Error getting recent scoreboards", err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(scoreboards)
+}
+
+func (s *GameServer) HandleGetActiveScoreboards(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	scoreboards, err := s.Store.ListActiveGames(ctx, 10)
+	if err != nil {
+		clog.Error(ctx, "Error getting active scoreboards", err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(scoreboards)
+}
+
+func (s *GameServer) HandleGetPickupScoreboards(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	scoreboards, err := s.Store.ListPickupGames(ctx, 10)
+	if err != nil {
+		clog.Error(ctx, "Error getting pickup scoreboards", err)
+		writeErr(w, err, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(scoreboards)
 }

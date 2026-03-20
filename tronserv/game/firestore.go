@@ -177,9 +177,9 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		game.Version--
 		return fmt.Errorf("could not marshal: %v", err)
 	}
-	scoreboard := make(map[string]int)
+	scoreboard := make(map[string]int64)
 	for _, p := range game.Players {
-		scoreboard[p.Name] = p.Score
+		scoreboard[p.Name] = int64(p.Score)
 	}
 
 	c := s.games(ctx)
@@ -253,7 +253,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 	return nil
 }
 
-func scoreboardMatches(next map[string]int, current map[string]any) bool {
+func scoreboardMatches(next map[string]int64, current map[string]any) bool {
 	if len(next) != len(current) {
 		return false
 	}
@@ -263,7 +263,7 @@ func scoreboardMatches(next map[string]int, current map[string]any) bool {
 			return false
 		}
 		existingScore, ok := raw.(int64)
-		if !ok || int(existingScore) != score {
+		if !ok || existingScore != score {
 			return false
 		}
 	}
@@ -446,13 +446,18 @@ func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSum
 	summaries := make([]GameSummary, 0, len(docs))
 	for _, doc := range docs {
 		data := doc.Data()
-		scoreboard, ok := data["scoreboard"].(map[string]int64)
+		scoreboard, ok := data["scoreboard"].(map[string]any)
 		if !ok {
+			fmt.Printf("ZZZ %+v\n", data["scoreboard"])
 			return nil, fmt.Errorf("bad data type for scoreboard: %T", data["scoreboard"])
+		}
+		scoreboard64 := make(map[string]int64)
+		for name, score := range scoreboard {
+			scoreboard64[name] = score.(int64)
 		}
 		summary := GameSummary{
 			Code:       doc.Ref.ID,
-			Scoreboard: scoreboard,
+			Scoreboard: scoreboard64,
 		}
 		summaries = append(summaries, summary)
 	}
