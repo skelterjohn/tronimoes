@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import Joiner from './components/landing/Joiner';
+import Marquis, { MarquisType } from './components/landing/Marquis';
 import SignIn from './components/landing/SignIn';
 import { auth } from "@/config";
 import { signOut } from "firebase/auth";
@@ -30,6 +31,9 @@ export default function Home() {
 			/>
 			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit space-y-4">
 				<Joiner userInfo={userInfo} loading={loading} setErrorMessage={setErrorMessage} />
+			</div>
+			<div className="absolute bottom-4 left-4 w-fit">
+				<Marquis title="recent games" marquisType={MarquisType.RECENT} />
 			</div>
 			<div className="absolute top-4 left-4 w-fit text-white">
 				<Link href="/rules" target="_blank" rel="noopener noreferrer" className="cursor-pointer underline underline-offset-2">
