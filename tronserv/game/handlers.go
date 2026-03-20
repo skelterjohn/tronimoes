@@ -290,6 +290,7 @@ func (s *GameServer) HandleLeaveOrQuit(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, ErrNotYourGame, http.StatusBadRequest)
 		return
 	}
+	clog.Info(ctx, "Player left game")
 
 	if err := s.Store.WriteGame(ctx, g); err != nil {
 		clog.Error(ctx, "Error writing game", err)
@@ -709,6 +710,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	var g *Game
 
 	pickup := code == "PICKUP"
+	clog.Info(ctx, "Join game request")
 	if pickup {
 		g, err = s.Store.FindPickupGame(ctx)
 		if err != nil && err != ErrNoSuchGame {
@@ -775,6 +777,7 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 		}
 		g = NewGame(ctx, code)
 		g.Pickup = pickup
+		clog.Info(ctx, "Created new game")
 	}
 
 	clog.Info(ctx, "Attempting to add player")
@@ -786,12 +789,16 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 			clog.Info(ctx, "Player already in game")
 		}
 	}
+	if inGame {
+		clog.Info(ctx, "Player already in game; skipping add")
+	}
 
 	player := &Player{Name: name}
 
 	if isBotName(name) {
 		if s.CheckBotTokens {
 			if err := s.validateBotServiceAccountToken(ctx, r); err != nil {
+				clog.Error(ctx, "Bot service account token validation failed", err)
 				writeErr(w, err, http.StatusUnauthorized)
 				return
 			}
@@ -800,23 +807,28 @@ func (s *GameServer) HandlePutGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !inGame {
+		clog.Info(ctx, "Adding player to game", "bot", player.Bot)
 		if err := g.AddPlayer(ctx, player); err != nil {
 			clog.Error(ctx, "Error adding player to game", err)
 			if err == ErrGameTooManyPlayers {
+				clog.Info(ctx, "Join rejected: game too many players")
 				writeErr(w, err, http.StatusUnprocessableEntity)
 				return
 			}
 			if err == ErrGameAlreadyStarted {
+				clog.Info(ctx, "Join rejected: game already started")
 				writeErr(w, err, http.StatusUnprocessableEntity)
 				return
 			}
 			if err == ErrPlayerAlreadyInGame {
+				clog.Info(ctx, "Join rejected: player already in game")
 				writeErr(w, err, http.StatusConflict)
 				return
 			}
 			writeErr(w, err, http.StatusInternalServerError)
 			return
 		}
+		clog.Info(ctx, "Player joined game")
 
 		if err := s.Store.WriteGame(ctx, g); err != nil {
 			clog.Error(ctx, "Error writing game", err)
@@ -986,6 +998,7 @@ func (s *GameServer) HandleRegisterPlayerName(w http.ResponseWriter, r *http.Req
 	pi.Id = playerID
 	ctx = clog.WithKeyword(ctx, "playerID", playerID)
 	ctx = clog.WithKeyword(ctx, "name", pi.Name)
+	clog.Info(ctx, "Register player request")
 
 	if err := validatePlayerName(pi.Name); err != nil {
 		clog.Error(ctx, "Error validating player name", err)
@@ -1099,6 +1112,7 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err, http.StatusBadRequest)
 		return
 	}
+	clog.Info(ctx, "Issue reported")
 
 	g, err := s.Store.ReadGame(ctx, code)
 	if err != nil {
