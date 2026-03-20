@@ -69,6 +69,18 @@ class Client {
 		});
 	}
 
+	async GetRecentScoreboards() {
+		return this.get(`/scoreboards/recent`);
+	}
+
+	async GetActiveScoreboards() {
+		return this.get(`/scoreboards/active`);
+	}
+
+	async GetPickupScoreboards() {
+		return this.get(`/scoreboards/pickup`);
+	}
+
     async get(path) {
         return this.doRequest('GET', path);
     }
