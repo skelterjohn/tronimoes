@@ -169,7 +169,8 @@ func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	return g, nil
 }
 func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
-	open := len(game.Rounds) == 0 && len(game.Players) < 6
+	noRounds := len(game.Rounds) == 0
+	open := noRounds && len(game.Players) < 6
 	expectedVersion := game.Version
 	game.Version++
 	gameData, err := json.Marshal(game)
@@ -208,6 +209,10 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 			if ok && storedVersion != expectedVersion {
 				return ErrVersionConflict
 			}
+		}
+
+		if game.Done && noRounds {
+			return tx.Delete(scoreboardDocRef)
 		}
 
 		existingScoreboardDoc, err := tx.Get(scoreboardDocRef)
