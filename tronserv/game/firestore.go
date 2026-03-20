@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
@@ -37,6 +38,18 @@ func NewFirestore(ctx context.Context, project, env string) (*FireStore, error) 
 
 func (s *FireStore) games(ctx context.Context) *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("games")
+}
+
+func (s *FireStore) players(ctx context.Context) *firestore.CollectionRef {
+	return s.storeClient.Collection("envs").Doc(s.env).Collection("players")
+}
+
+func (s *FireStore) issues(ctx context.Context) *firestore.CollectionRef {
+	return s.storeClient.Collection("envs").Doc(s.env).Collection("issues")
+}
+
+func (s *FireStore) scoreboards(ctx context.Context) *firestore.CollectionRef {
+	return s.storeClient.Collection("envs").Doc(s.env).Collection("scoreboards")
 }
 
 func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
@@ -169,6 +182,19 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		scoreboard[p.Name] = p.Score
 	}
 
+	scoreboardDocRef := s.scoreboards(ctx).Doc(game.Code)
+	scoreboardPayload := map[string]any{
+		"scoreboard": scoreboard,
+		"updated":    time.Now().Unix(),
+		"open":       open,
+		"pickup":     game.Pickup,
+		"done":       game.Done,
+	}
+	_, err = scoreboardDocRef.Set(ctx, scoreboardPayload)
+	if err != nil {
+		return fmt.Errorf("could not set scoreboard: %v", err)
+	}
+
 	c := s.games(ctx)
 	docRef := c.Doc(game.Code)
 	payload := map[string]any{
@@ -179,7 +205,6 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		"done":        game.Done,
 		"game_json":   string(gameData),
 		"version":     game.Version,
-		"scoreboard":  scoreboard,
 	}
 	err = s.storeClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
 		doc, err := tx.Get(docRef)
@@ -254,11 +279,6 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 
 	return updates
 }
-
-func (s *FireStore) players(ctx context.Context) *firestore.CollectionRef {
-	return s.storeClient.Collection("envs").Doc(s.env).Collection("players")
-}
-
 func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName string) error {
 	if pi, err := s.GetPlayer(ctx, playerID); err == nil {
 		return fmt.Errorf("already registered as %q", pi.Name)
@@ -365,10 +385,6 @@ func (s *FireStore) UpdatePlayerConfig(ctx context.Context, playerID string, con
 	return err
 }
 
-func (s *FireStore) issues(ctx context.Context) *firestore.CollectionRef {
-	return s.storeClient.Collection("envs").Doc(s.env).Collection("issues")
-}
-
 func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error {
 	gameData, err := json.Marshal(game)
 	if err != nil {
@@ -385,65 +401,56 @@ func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Ga
 	return err
 }
 
-func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator, count int) ([]GameSummary, error) {
-	defer iter.Stop()
-	var games []GameSummary
-	for {
-		doc, err := iter.Next()
-		if err != nil {
-			return nil, fmt.Errorf("could not get next: %v", err)
-		}
-		if doc == nil {
-			break
-		}
+func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSummary, error) {
+	docs, err := iter.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("could not get all: %v", err)
+	}
+	summaries := make([]GameSummary, 0, len(docs))
+	for _, doc := range docs {
 		data := doc.Data()
-		gs := GameSummary{
-			Code: doc.Ref.ID,
-		}
-		if scoreboard, ok := data["scoreboard"].(map[string]int64); ok {
-			gs.Scoreboard = scoreboard
-		} else {
+		scoreboard, ok := data["scoreboard"].(map[string]int64)
+		if !ok {
 			return nil, fmt.Errorf("bad data type for scoreboard: %T", data["scoreboard"])
 		}
-
-		games = append(games, gs)
-		count--
-		if count <= 0 {
-			break
+		summary := GameSummary{
+			Code:       doc.Ref.ID,
+			Scoreboard: scoreboard,
 		}
+		summaries = append(summaries, summary)
 	}
-	return games, nil
+	return summaries, nil
 }
 
 func (s *FireStore) ListPickupGames(ctx context.Context, count int) ([]GameSummary, error) {
-	iter := s.games(ctx).
+	iter := s.scoreboards(ctx).
 		Where("pickup", "==", true).
 		Where("done", "==", false).
 		Where("open", "==", true).
-		OrderBy("created", firestore.Desc).
+		OrderBy("updated", firestore.Desc).
 		Limit(count).
 		Select("scoreboard").
 		Documents(ctx)
-	return s.iterToSummaries(iter, count)
+	return s.iterToSummaries(iter)
 }
 
 func (s *FireStore) ListActiveGames(ctx context.Context, count int) ([]GameSummary, error) {
-	iter := s.games(ctx).
+	iter := s.scoreboards(ctx).
 		Where("done", "==", false).
 		Where("open", "==", false).
-		OrderBy("created", firestore.Desc).
+		OrderBy("updated", firestore.Desc).
 		Limit(count).
 		Select("scoreboard").
 		Documents(ctx)
-	return s.iterToSummaries(iter, count)
+	return s.iterToSummaries(iter)
 }
 
 func (s *FireStore) ListRecentGames(ctx context.Context, count int) ([]GameSummary, error) {
-	iter := s.games(ctx).
+	iter := s.scoreboards(ctx).
 		Where("done", "==", true).
-		OrderBy("created", firestore.Desc).
+		OrderBy("updated", firestore.Desc).
 		Limit(count).
 		Select("scoreboard").
 		Documents(ctx)
-	return s.iterToSummaries(iter, count)
+	return s.iterToSummaries(iter)
 }
