@@ -51,7 +51,18 @@ func ChiLogger(next http.Handler) http.Handler {
 	inject := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := WithStructuredOutput(r.Context(), os.Stdout)
-			ctx = WithSeverities(ctx, "info", "error")
+			ctx = WithSeverities(ctx, INFO, ERROR)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+	return inject(middleware.RequestLogger(ChiLogFormatter())(next))
+}
+
+func ChiLoggerDev(next http.Handler) http.Handler {
+	inject := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := WithTextOutput(r.Context(), os.Stdout)
+			ctx = WithSeverities(ctx, INFO, ERROR, DEBUG)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

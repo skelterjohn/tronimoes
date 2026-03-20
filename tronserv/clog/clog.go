@@ -16,6 +16,14 @@ import (
 	"cloud.google.com/go/logging"
 )
 
+type Severity string
+
+const (
+	INFO  Severity = "INFO"
+	ERROR Severity = "ERROR"
+	DEBUG Severity = "DEBUG"
+)
+
 type keywordsKeyType string
 type textOutputKeyType string
 type structuredOutputKeyType string
@@ -75,14 +83,14 @@ func CloseCloudLogging(ctx context.Context) {
 	}
 }
 
-func WithSeverities(ctx context.Context, severities ...string) context.Context {
+func WithSeverities(ctx context.Context, severities ...Severity) context.Context {
 	for _, severity := range severities {
 		switch severity {
-		case "info":
+		case INFO:
 			ctx = context.WithValue(ctx, infoKey, true)
-		case "error":
+		case ERROR:
 			ctx = context.WithValue(ctx, errorKey, true)
-		case "debug":
+		case DEBUG:
 			ctx = context.WithValue(ctx, debugKey, true)
 		}
 	}

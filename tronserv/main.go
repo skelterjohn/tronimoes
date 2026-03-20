@@ -43,10 +43,11 @@ func main() {
 
 	r := chi.NewRouter()
 
-	ctx = clog.WithSeverities(ctx, "info", "error")
+	ctx = clog.WithSeverities(ctx, clog.INFO, clog.ERROR)
 	if *dev {
-		ctx = clog.WithSeverities(ctx, "debug")
+		ctx = clog.WithSeverities(ctx, clog.DEBUG)
 		ctx = clog.WithTextOutput(ctx, os.Stdout)
+		r.Use(clog.ChiLoggerDev)
 		clog.Info(ctx, "Running in development mode")
 	} else {
 		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
