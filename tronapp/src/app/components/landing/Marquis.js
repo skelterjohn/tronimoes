@@ -22,7 +22,7 @@ function fetchScoreboardsByType(client, marquisType) {
 	}
 }
 
-export default function Marquis({ title, marquisType = MarquisType.RECENT }) {
+export default function Marquis({ title, marquisType = MarquisType.RECENT, refreshCadenceMs = 3000 }) {
 	const { client } = useGameState();
 	const [codes, setCodes] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -38,37 +38,49 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT }) {
 			};
 		}
 
-		setLoading(true);
-		setError(null);
-		fetchScoreboardsByType(client, marquisType).then((games) => {
-			if (cancelled) {
-				return;
+		const refresh = (isInitialLoad = false) => {
+			if (isInitialLoad) {
+				setLoading(true);
 			}
-			const nextCodes = Array.isArray(games) ? games.map((game) => game.code).filter(Boolean) : [];
-			setCodes(nextCodes);
-		}).catch((err) => {
-			if (cancelled) {
-				return;
-			}
-			setError(err?.data?.error || err?.message || "Could not load games");
-			setCodes([]);
-		}).finally(() => {
-			if (!cancelled) {
-				setLoading(false);
-			}
-		});
+			fetchScoreboardsByType(client, marquisType).then((games) => {
+				if (cancelled) {
+					return;
+				}
+				const nextCodes = Array.isArray(games) ? games.map((game) => game.code).filter(Boolean) : [];
+				setCodes(nextCodes);
+				setError(null);
+			}).catch((err) => {
+				if (cancelled) {
+					return;
+				}
+				const nextError = err?.data?.error || err?.message || "Could not load games";
+				setError((prevError) => (prevError === nextError ? prevError : nextError));
+			}).finally(() => {
+				if (!cancelled && isInitialLoad) {
+					setLoading(false);
+				}
+			});
+		};
+
+		refresh(true);
+		const interval = setInterval(() => {
+			refresh(false);
+		}, refreshCadenceMs);
 
 		return () => {
 			cancelled = true;
+			clearInterval(interval);
 		};
-	}, [client, marquisType]);
+	}, [client, marquisType, refreshCadenceMs]);
+
+	if (codes.length === 0) {
+		return null;
+	}
 
 	return (
 		<div className="font-game w-full max-w-sm rounded-lg border border-white bg-black/70 p-4 text-white">
 			<div className="mb-2 text-lg tracking-wider">{title}</div>
-			{loading && <div className="text-sm opacity-80">loading...</div>}
 			{!loading && error && <div className="text-sm text-red-300">{error}</div>}
-			{!loading && !error && codes.length === 0 && <div className="text-sm opacity-80">no games</div>}
 			{!loading && !error && codes.length > 0 && (
 				<ul className="space-y-1 text-sm">
 					{codes.map((code) => (
