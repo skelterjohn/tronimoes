@@ -22,7 +22,7 @@ function fetchScoreboardsByType(client, marquisType) {
 	}
 }
 
-export default function Marquis({ title, marquisType = MarquisType.RECENT, refreshCadenceMs = 3000 }) {
+export default function Marquis({ title, marquisType = MarquisType.RECENT, refreshCadenceMs = 60000 }) {
 	const { client } = useGameState();
 	const [codes, setCodes] = useState([]);
 	const [loading, setLoading] = useState(true);
