@@ -23,6 +23,11 @@ type PlayerInfo struct {
 	Config PlayerConfig `json:"config"`
 }
 
+type GameSummary struct {
+	Code       string           `json:"code"`
+	Scoreboard map[string]int64 `json:"scoreboard"`
+}
+
 type Store interface {
 	FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error)
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
@@ -38,6 +43,9 @@ type Store interface {
 	PlayerLastActive(ctx context.Context, code, playerName string) (int64, error)
 	UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error
 	ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error
+	ListPickupGames(ctx context.Context, count int) ([]GameSummary, error)
+	ListActiveGames(ctx context.Context, count int) ([]GameSummary, error)
+	ListRecentGames(ctx context.Context, count int) ([]GameSummary, error)
 }
 
 type MemoryStore struct {
@@ -307,4 +315,68 @@ func (s *MemoryStore) ReportIssue(ctx context.Context, playerName string, game *
 	}
 	clog.Info(ctx, "wrote issue", "path", path)
 	return nil
+}
+
+func SummarizeGame(g *Game) GameSummary {
+	gs := GameSummary{
+		Code:       g.Code,
+		Scoreboard: make(map[string]int64),
+	}
+	for _, p := range g.Players {
+		gs.Scoreboard[p.Name] = int64(p.Score)
+	}
+	return gs
+}
+
+func (s *MemoryStore) ListPickupGames(ctx context.Context, count int) ([]GameSummary, error) {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+	games := make([]GameSummary, 0, count)
+	for _, g := range s.games {
+		started := len(g.Rounds) > 0
+		if !g.Pickup || started {
+			continue
+		}
+		games = append(games, SummarizeGame(g))
+		count--
+		if count <= 0 {
+			break
+		}
+	}
+	return nil, nil
+}
+
+func (s *MemoryStore) ListActiveGames(ctx context.Context, count int) ([]GameSummary, error) {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+	games := make([]GameSummary, 0, count)
+	for _, g := range s.games {
+		started := len(g.Rounds) > 0
+		if !started {
+			continue
+		}
+		games = append(games, SummarizeGame(g))
+		count--
+		if count <= 0 {
+			break
+		}
+	}
+	return nil, nil
+}
+
+func (s *MemoryStore) ListRecentGames(ctx context.Context, count int) ([]GameSummary, error) {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+	games := make([]GameSummary, 0, count)
+	for _, g := range s.games {
+		if !g.Done {
+			continue
+		}
+		games = append(games, SummarizeGame(g))
+		count--
+		if count <= 0 {
+			break
+		}
+	}
+	return nil, nil
 }

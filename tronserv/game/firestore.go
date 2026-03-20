@@ -7,8 +7,8 @@ import (
 	"math/rand"
 
 	"cloud.google.com/go/firestore"
-	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	firebase "firebase.google.com/go"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -164,6 +164,11 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		game.Version--
 		return fmt.Errorf("could not marshal: %v", err)
 	}
+	scoreboard := make(map[string]int)
+	for _, p := range game.Players {
+		scoreboard[p.Name] = p.Score
+	}
+
 	c := s.games(ctx)
 	docRef := c.Doc(game.Code)
 	payload := map[string]any{
@@ -174,6 +179,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		"done":        game.Done,
 		"game_json":   string(gameData),
 		"version":     game.Version,
+		"scoreboard":  scoreboard,
 	}
 	err = s.storeClient.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
 		doc, err := tx.Get(docRef)
@@ -184,7 +190,7 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 			data := doc.Data()
 			storedVersion, ok := data["version"].(int64)
 			if !ok {
-					clog.Info(ctx, "unexpected version type", "type", fmt.Sprintf("%T", data["version"]))
+				clog.Info(ctx, "unexpected version type", "type", fmt.Sprintf("%T", data["version"]))
 			}
 			if ok && storedVersion != expectedVersion {
 				return ErrVersionConflict
@@ -377,4 +383,67 @@ func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Ga
 		"game_json":        string(gameData),
 	})
 	return err
+}
+
+func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator, count int) ([]GameSummary, error) {
+	defer iter.Stop()
+	var games []GameSummary
+	for {
+		doc, err := iter.Next()
+		if err != nil {
+			return nil, fmt.Errorf("could not get next: %v", err)
+		}
+		if doc == nil {
+			break
+		}
+		data := doc.Data()
+		gs := GameSummary{
+			Code: doc.Ref.ID,
+		}
+		if scoreboard, ok := data["scoreboard"].(map[string]int64); ok {
+			gs.Scoreboard = scoreboard
+		} else {
+			return nil, fmt.Errorf("bad data type for scoreboard: %T", data["scoreboard"])
+		}
+
+		games = append(games, gs)
+		count--
+		if count <= 0 {
+			break
+		}
+	}
+	return games, nil
+}
+
+func (s *FireStore) ListPickupGames(ctx context.Context, count int) ([]GameSummary, error) {
+	iter := s.games(ctx).
+		Where("pickup", "==", true).
+		Where("done", "==", false).
+		Where("open", "==", true).
+		OrderBy("created", firestore.Desc).
+		Limit(count).
+		Select("scoreboard").
+		Documents(ctx)
+	return s.iterToSummaries(iter, count)
+}
+
+func (s *FireStore) ListActiveGames(ctx context.Context, count int) ([]GameSummary, error) {
+	iter := s.games(ctx).
+		Where("done", "==", false).
+		Where("open", "==", false).
+		OrderBy("created", firestore.Desc).
+		Limit(count).
+		Select("scoreboard").
+		Documents(ctx)
+	return s.iterToSummaries(iter, count)
+}
+
+func (s *FireStore) ListRecentGames(ctx context.Context, count int) ([]GameSummary, error) {
+	iter := s.games(ctx).
+		Where("done", "==", true).
+		OrderBy("created", firestore.Desc).
+		Limit(count).
+		Select("scoreboard").
+		Documents(ctx)
+	return s.iterToSummaries(iter, count)
 }
