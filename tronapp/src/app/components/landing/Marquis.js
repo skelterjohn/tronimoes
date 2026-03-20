@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useGameState } from "@/app/components/GameState";
 
 export const MarquisType = Object.freeze({
@@ -71,7 +72,11 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT }) {
 			{!loading && !error && codes.length > 0 && (
 				<ul className="space-y-1 text-sm">
 					{codes.map((code) => (
-						<li key={code}>#{code}</li>
+						<li key={code}>
+							<Link className="underline underline-offset-2 hover:opacity-80" href={`/gameboard/${code}`}>
+								#{code}
+							</Link>
+						</li>
 					))}
 				</ul>
 			)}
