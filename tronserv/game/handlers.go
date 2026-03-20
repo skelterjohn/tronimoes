@@ -1126,38 +1126,70 @@ func (s *GameServer) HandleReportIssue(w http.ResponseWriter, r *http.Request) {
 	s.Store.ReportIssue(ctx, name, g, reqBody.Summary, reqBody.WhatHappened, reqBody.WhatShouldHappen, reqBody.ErrorMessage)
 }
 
+func updatedFromQuery(ctx context.Context, r *http.Request) (int64, error) {
+	updatedStr := r.URL.Query().Get("updated")
+	ctx = clog.WithKeyword(ctx, "updated", updatedStr)
+	var updated int64
+	if updatedStr != "" {
+		var err error
+		updated, err = strconv.ParseInt(updatedStr, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("error parsing updated: %w", err)
+		}
+	}
+	return updated, nil
+}
+
 func (s *GameServer) HandleGetRecentScoreboards(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	scoreboards, err := s.Store.ListRecentGames(ctx, 10)
+	updated, err := updatedFromQuery(ctx, r)
+	if err != nil {
+		clog.Error(ctx, "Error getting updated", err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+	scoreboards, err := s.Store.ListRecentGames(ctx, 10, updated)
 	if err != nil {
 		clog.Error(ctx, "Error getting recent scoreboards", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(scoreboards)
+	json.NewEncoder(w).Encode(<-scoreboards)
 }
 
 func (s *GameServer) HandleGetActiveScoreboards(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	scoreboards, err := s.Store.ListActiveGames(ctx, 10)
+	updated, err := updatedFromQuery(ctx, r)
+	if err != nil {
+		clog.Error(ctx, "Error getting updated", err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+	scoreboards, err := s.Store.ListActiveGames(ctx, 10, updated)
 	if err != nil {
 		clog.Error(ctx, "Error getting active scoreboards", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(scoreboards)
+	json.NewEncoder(w).Encode(<-scoreboards)
 }
 
 func (s *GameServer) HandleGetPickupScoreboards(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	scoreboards, err := s.Store.ListPickupGames(ctx, 10)
+	updated, err := updatedFromQuery(ctx, r)
+	if err != nil {
+		clog.Error(ctx, "Error getting updated", err)
+		writeErr(w, err, http.StatusBadRequest)
+		return
+	}
+	scoreboards, err := s.Store.ListPickupGames(ctx, 10, updated)
 	if err != nil {
 		clog.Error(ctx, "Error getting pickup scoreboards", err)
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(scoreboards)
+	json.NewEncoder(w).Encode(<-scoreboards)
 }

@@ -43,9 +43,9 @@ type Store interface {
 	PlayerLastActive(ctx context.Context, code, playerName string) (int64, error)
 	UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error
 	ReportIssue(ctx context.Context, playerName string, game *Game, summary, whatHappened, whatShouldHappen, errorMessage string) error
-	ListPickupGames(ctx context.Context, count int) ([]GameSummary, error)
-	ListActiveGames(ctx context.Context, count int) ([]GameSummary, error)
-	ListRecentGames(ctx context.Context, count int) ([]GameSummary, error)
+	ListPickupGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error)
+	ListActiveGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error)
+	ListRecentGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error)
 }
 
 type MemoryStore struct {
@@ -328,7 +328,7 @@ func SummarizeGame(g *Game) GameSummary {
 	return gs
 }
 
-func (s *MemoryStore) ListPickupGames(ctx context.Context, count int) ([]GameSummary, error) {
+func (s *MemoryStore) ListPickupGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
 	games := make([]GameSummary, 0, count)
@@ -343,10 +343,12 @@ func (s *MemoryStore) ListPickupGames(ctx context.Context, count int) ([]GameSum
 			break
 		}
 	}
-	return nil, nil
+	ch := make(chan []GameSummary, 1)
+	ch <- games
+	return ch, nil
 }
 
-func (s *MemoryStore) ListActiveGames(ctx context.Context, count int) ([]GameSummary, error) {
+func (s *MemoryStore) ListActiveGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
 	games := make([]GameSummary, 0, count)
@@ -361,10 +363,12 @@ func (s *MemoryStore) ListActiveGames(ctx context.Context, count int) ([]GameSum
 			break
 		}
 	}
-	return nil, nil
+	ch := make(chan []GameSummary, 1)
+	ch <- games
+	return ch, nil
 }
 
-func (s *MemoryStore) ListRecentGames(ctx context.Context, count int) ([]GameSummary, error) {
+func (s *MemoryStore) ListRecentGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
 	games := make([]GameSummary, 0, count)
@@ -378,5 +382,7 @@ func (s *MemoryStore) ListRecentGames(ctx context.Context, count int) ([]GameSum
 			break
 		}
 	}
-	return nil, nil
+	ch := make(chan []GameSummary, 1)
+	ch <- games
+	return ch, nil
 }

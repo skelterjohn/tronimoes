@@ -476,7 +476,7 @@ func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSum
 	return summaries, nil
 }
 
-func (s *FireStore) ListPickupGames(ctx context.Context, count int) ([]GameSummary, error) {
+func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
 	iter := s.scoreboards(ctx).
 		Where("pickup", "==", true).
 		Where("done", "==", false).
@@ -485,10 +485,16 @@ func (s *FireStore) ListPickupGames(ctx context.Context, count int) ([]GameSumma
 		Limit(count).
 		Select("scoreboard").
 		Documents(ctx)
-	return s.iterToSummaries(iter)
+	summaries, err := s.iterToSummaries(iter)
+	if err != nil {
+		return nil, fmt.Errorf("could not get summaries: %v", err)
+	}
+	ch := make(chan []GameSummary, 1)
+	ch <- summaries
+	return ch, nil
 }
 
-func (s *FireStore) ListActiveGames(ctx context.Context, count int) ([]GameSummary, error) {
+func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
 	iter := s.scoreboards(ctx).
 		Where("done", "==", false).
 		Where("open", "==", false).
@@ -496,15 +502,27 @@ func (s *FireStore) ListActiveGames(ctx context.Context, count int) ([]GameSumma
 		Limit(count).
 		Select("scoreboard").
 		Documents(ctx)
-	return s.iterToSummaries(iter)
+	summaries, err := s.iterToSummaries(iter)
+	if err != nil {
+		return nil, fmt.Errorf("could not get summaries: %v", err)
+	}
+	ch := make(chan []GameSummary, 1)
+	ch <- summaries
+	return ch, nil
 }
 
-func (s *FireStore) ListRecentGames(ctx context.Context, count int) ([]GameSummary, error) {
+func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
 	iter := s.scoreboards(ctx).
 		Where("done", "==", true).
 		OrderBy("updated", firestore.Desc).
 		Limit(count).
 		Select("scoreboard").
 		Documents(ctx)
-	return s.iterToSummaries(iter)
+	summaries, err := s.iterToSummaries(iter)
+	if err != nil {
+		return nil, fmt.Errorf("could not get summaries: %v", err)
+	}
+	ch := make(chan []GameSummary, 1)
+	ch <- summaries
+	return ch, nil
 }
