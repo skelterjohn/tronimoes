@@ -32,8 +32,12 @@ export default function Home() {
 			<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-fit space-y-4">
 				<Joiner userInfo={userInfo} loading={loading} setErrorMessage={setErrorMessage} />
 			</div>
-			<div className="absolute bottom-4 left-4 w-fit">
+			<div className="absolute left-3/4 top-1/4 -translate-x-1/2 w-fit">
 				<Marquis title="recent games" marquisType={MarquisType.RECENT} />
+			</div>
+			<div className="absolute left-1/4 top-1/4 -translate-x-1/2 w-fit space-y-4">
+				<Marquis title="pickup games" marquisType={MarquisType.PICKUP} />
+				<Marquis title="active games" marquisType={MarquisType.ACTIVE} />
 			</div>
 			<div className="absolute top-4 left-4 w-fit text-white">
 				<Link href="/rules" target="_blank" rel="noopener noreferrer" className="cursor-pointer underline underline-offset-2">
