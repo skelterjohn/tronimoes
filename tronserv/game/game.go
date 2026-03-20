@@ -1678,7 +1678,16 @@ func (r *Round) killDeadLines(ctx context.Context, g *Game, player *Player, squa
 }
 
 func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]SquarePips, lt LaidTile, name string) bool {
-	clog.Debug(ctx, "BlockingFeet", "lt", lt, "name", name)
+	allLinesStarted := true
+	for _, p := range g.Players {
+		if len(r.PlayerLines[p.Name]) <= 1 {
+			allLinesStarted = false
+			break
+		}
+	}
+	if allLinesStarted {
+		return false
+	}
 
 	lt.PlayerName = name
 	// Check if this tile is landing on a leader chicken-foot. That's allowed, because you're starting their line.
