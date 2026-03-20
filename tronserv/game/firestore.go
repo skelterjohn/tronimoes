@@ -211,7 +211,14 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 			}
 		}
 
-		if game.Done && noRounds {
+		allZeros := true
+		for _, score := range scoreboard {
+			if score != 0 {
+				allZeros = false
+				break
+			}
+		}
+		if game.Done && allZeros {
 			return tx.Delete(scoreboardDocRef)
 		}
 
