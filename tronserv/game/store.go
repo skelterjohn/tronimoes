@@ -29,6 +29,13 @@ type GameSummary struct {
 	Updated    int64            `json:"updated"`
 }
 
+type ScoreboardSummary struct {
+	Active  []GameSummary `json:"active"`
+	Pickup  []GameSummary `json:"pickup"`
+	Recent  []GameSummary `json:"recent"`
+	Updated int64         `json:"updated"`
+}
+
 type Store interface {
 	FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error)
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
@@ -47,6 +54,7 @@ type Store interface {
 	ListPickupGames(ctx context.Context, count int, updated int64) ([]GameSummary, error)
 	ListActiveGames(ctx context.Context, count int, updated int64) ([]GameSummary, error)
 	ListRecentGames(ctx context.Context, count int, updated int64) ([]GameSummary, error)
+	ListScoreboards(ctx context.Context, count int, updated int64) (ScoreboardSummary, error)
 }
 
 type MemoryStore struct {
@@ -380,4 +388,25 @@ func (s *MemoryStore) ListRecentGames(ctx context.Context, count int, updated in
 		}
 	}
 	return games, nil
+}
+func (s *MemoryStore) ListScoreboards(ctx context.Context, count int, updated int64) (ScoreboardSummary, error) {
+	active, err := s.ListActiveGames(ctx, count, updated)
+	if err != nil {
+		return ScoreboardSummary{}, err
+	}
+	pickup, err := s.ListPickupGames(ctx, count, updated)
+	if err != nil {
+		return ScoreboardSummary{}, err
+	}
+	recent, err := s.ListRecentGames(ctx, count, updated)
+	if err != nil {
+		return ScoreboardSummary{}, err
+	}
+
+	return ScoreboardSummary{
+		Active:  active,
+		Pickup:  pickup,
+		Recent:  recent,
+		Updated: updated,
+	}, nil
 }

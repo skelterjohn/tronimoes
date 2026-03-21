@@ -215,46 +215,30 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 			}
 		}
 
-		allZeros := true
-		for _, score := range scoreboard {
-			if score != 0 {
-				allZeros = false
-				break
-			}
-		}
-
 		existingScoreboardDoc, err := tx.Get(scoreboardDocRef)
 		if err != nil && status.Code(err) != codes.NotFound {
 			return err
 		}
 
 		shouldUpdateScoreboard := true
-		if game.Done && allZeros {
-			shouldUpdateScoreboard = false
-			// taking care of it differently.
-			if err := tx.Delete(scoreboardDocRef); err != nil {
-				clog.Error(ctx, "could not delete scoreboard", err)
-			}
-		} else {
-			if existingScoreboardDoc != nil && existingScoreboardDoc.Exists() {
-				existingData := existingScoreboardDoc.Data()
-				existingDone, doneOK := existingData["done"].(bool)
-				existingOpen, openOK := existingData["open"].(bool)
-				existingScoreboard, scoreboardOK := existingData["scoreboard"].(map[string]any)
-				shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK ||
-					existingDone != game.Done ||
-					existingOpen != open ||
-					!scoreboardMatches(scoreboard, existingScoreboard)
-				clog.Info(ctx, "Considering scoreboard update",
-					"shouldUpdateScoreboard", shouldUpdateScoreboard,
-					"existingDone", existingDone,
-					"existingOpen", existingOpen,
-					"existingScoreboard", existingScoreboard,
-					"gameDone", game.Done,
-					"gameOpen", open,
-					"gameScoreboard", scoreboard,
-				)
-			}
+		if existingScoreboardDoc != nil && existingScoreboardDoc.Exists() {
+			existingData := existingScoreboardDoc.Data()
+			existingDone, doneOK := existingData["done"].(bool)
+			existingOpen, openOK := existingData["open"].(bool)
+			existingScoreboard, scoreboardOK := existingData["scoreboard"].(map[string]any)
+			shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK ||
+				existingDone != game.Done ||
+				existingOpen != open ||
+				!scoreboardMatches(scoreboard, existingScoreboard)
+			clog.Info(ctx, "Considering scoreboard update",
+				"shouldUpdateScoreboard", shouldUpdateScoreboard,
+				"existingDone", existingDone,
+				"existingOpen", existingOpen,
+				"existingScoreboard", existingScoreboard,
+				"gameDone", game.Done,
+				"gameOpen", open,
+				"gameScoreboard", scoreboard,
+			)
 		}
 		if err := tx.Set(docRef, payload); err != nil {
 			return err
@@ -511,11 +495,11 @@ func (s *FireStore) queryToSummaries(ctx context.Context, query firestore.Query,
 	for {
 		snap, err := snaps.Next()
 		if err != nil {
-			return nil, fmt.Errorf("could not get next snapshot: %v", err)
+			return nil, fmt.Errorf("could not get next snapshot: %w", err)
 		}
 		summaries, err := s.iterToSummaries(ctx, snap.Documents)
 		if err != nil {
-			return nil, fmt.Errorf("could not get summaries: %v", err)
+			return nil, fmt.Errorf("could not get summaries: %w", err)
 		}
 		isFresh := updated == 0 // always fresh the first time.
 		for _, summary := range summaries {
@@ -558,4 +542,64 @@ func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int6
 		OrderBy("updated", firestore.Desc).
 		Limit(count)
 	return s.queryToSummaries(ctx, query, updated)
+}
+
+func (s *FireStore) waitForUpdatedScoreboards(ctx context.Context, updated int64) error {
+	query := s.scoreboards().Where("updated", ">", updated).Limit(1)
+	snaps := query.Snapshots(ctx)
+	defer snaps.Stop()
+	for {
+		snap, err := snaps.Next()
+		if err != nil {
+			return fmt.Errorf("could not get next snapshot: %w", err)
+		}
+		docs, err := snap.Documents.GetAll()
+		if err != nil {
+			return fmt.Errorf("could not get all: %w", err)
+		}
+		if len(docs) > 0 {
+			return nil
+		}
+	}
+}
+
+func (s *FireStore) ListScoreboards(ctx context.Context, count int, updated int64) (ScoreboardSummary, error) {
+	err := s.waitForUpdatedScoreboards(ctx, updated)
+	if err != nil {
+		return ScoreboardSummary{}, fmt.Errorf("could not wait for updated scoreboards: %w", err)
+	}
+	active, err := s.ListActiveGames(ctx, count, 0)
+	if err != nil {
+		return ScoreboardSummary{}, fmt.Errorf("could not get active games: %w", err)
+	}
+	pickup, err := s.ListPickupGames(ctx, count, 0)
+	if err != nil {
+		return ScoreboardSummary{}, fmt.Errorf("could not get pickup games: %w", err)
+	}
+	recent, err := s.ListRecentGames(ctx, count, 0)
+	if err != nil {
+		return ScoreboardSummary{}, fmt.Errorf("could not get recent games: %w", err)
+	}
+	lastUpdated := updated
+	for _, summary := range active {
+		if summary.Updated > lastUpdated {
+			lastUpdated = summary.Updated
+		}
+	}
+	for _, summary := range pickup {
+		if summary.Updated > lastUpdated {
+			lastUpdated = summary.Updated
+		}
+	}
+	for _, summary := range recent {
+		if summary.Updated > lastUpdated {
+			lastUpdated = summary.Updated
+		}
+	}
+	return ScoreboardSummary{
+		Active:  active,
+		Pickup:  pickup,
+		Recent:  recent,
+		Updated: lastUpdated,
+	}, nil
 }
