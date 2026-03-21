@@ -504,50 +504,60 @@ func (s *FireStore) iterToSummaries(ctx context.Context, iter *firestore.Documen
 	return summaries, nil
 }
 
+func (s *FireStore) queryToSummaries(ctx context.Context, query firestore.Query, updated int64) (<-chan []GameSummary, error) {
+	timesThrough := 0
+	snaps := query.Snapshots(ctx)
+	defer snaps.Stop()
+	for {
+		snap, err := snaps.Next()
+		if err != nil {
+			return nil, fmt.Errorf("could not get next snapshot: %v", err)
+		}
+		summaries, err := s.iterToSummaries(ctx, snap.Documents)
+		if err != nil {
+			return nil, fmt.Errorf("could not get summaries: %v", err)
+		}
+		isFresh := updated == 0 // always fresh the first time.
+		for _, summary := range summaries {
+			if summary.Updated > updated {
+				isFresh = true
+				break
+			}
+		}
+		if !isFresh && timesThrough == 0 {
+			clog.Info(ctx, "not fresh", "timesThrough", timesThrough)
+			timesThrough++
+			continue
+		}
+		ch := make(chan []GameSummary, 1)
+		ch <- summaries
+		return ch, nil
+	}
+}
+
 func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
-	iter := s.scoreboards().
+	query := s.scoreboards().
 		Where("pickup", "==", true).
 		Where("done", "==", false).
 		Where("open", "==", true).
 		OrderBy("updated", firestore.Desc).
-		Limit(count).
-		Documents(ctx)
-	summaries, err := s.iterToSummaries(ctx, iter)
-	if err != nil {
-		return nil, fmt.Errorf("could not get summaries: %v", err)
-	}
-	ch := make(chan []GameSummary, 1)
-	ch <- summaries
-	return ch, nil
+		Limit(count)
+	return s.queryToSummaries(ctx, query, updated)
 }
 
 func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
-	iter := s.scoreboards().
+	query := s.scoreboards().
 		Where("done", "==", false).
 		Where("open", "==", false).
 		OrderBy("updated", firestore.Desc).
-		Limit(count).
-		Documents(ctx)
-	summaries, err := s.iterToSummaries(ctx, iter)
-	if err != nil {
-		return nil, fmt.Errorf("could not get summaries: %v", err)
-	}
-	ch := make(chan []GameSummary, 1)
-	ch <- summaries
-	return ch, nil
+		Limit(count)
+	return s.queryToSummaries(ctx, query, updated)
 }
 
 func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
-	iter := s.scoreboards().
+	query := s.scoreboards().
 		Where("done", "==", true).
 		OrderBy("updated", firestore.Desc).
-		Limit(count).
-		Documents(ctx)
-	summaries, err := s.iterToSummaries(ctx, iter)
-	if err != nil {
-		return nil, fmt.Errorf("could not get summaries: %v", err)
-	}
-	ch := make(chan []GameSummary, 1)
-	ch <- summaries
-	return ch, nil
+		Limit(count)
+	return s.queryToSummaries(ctx, query, updated)
 }

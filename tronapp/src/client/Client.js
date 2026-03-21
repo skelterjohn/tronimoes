@@ -4,6 +4,9 @@ class Client {
         this.name = name;
         this.userInfo = userInfo;
 		this.playerID = userInfo?.uid;
+		this.recentScoreboardsInFlight = null;
+		this.activeScoreboardsInFlight = null;
+		this.pickupScoreboardsInFlight = null;
     }
 
 
@@ -69,16 +72,37 @@ class Client {
 		});
 	}
 
-	async GetRecentScoreboards() {
-		return this.get(`/scoreboards/recent`);
+	async GetRecentScoreboards(updated) {
+		if (this.recentScoreboardsInFlight) {
+			return this.recentScoreboardsInFlight;
+		}
+		this.recentScoreboardsInFlight = this.get(`/scoreboards/recent?updated=${updated}`)
+			.finally(() => {
+				this.recentScoreboardsInFlight = null;
+			});
+		return this.recentScoreboardsInFlight;
 	}
 
-	async GetActiveScoreboards() {
-		return this.get(`/scoreboards/active`);
+	async GetActiveScoreboards(updated) {
+		if (this.activeScoreboardsInFlight) {
+			return this.activeScoreboardsInFlight;
+		}
+		this.activeScoreboardsInFlight = this.get(`/scoreboards/active?updated=${updated}`)
+			.finally(() => {
+				this.activeScoreboardsInFlight = null;
+			});
+		return this.activeScoreboardsInFlight;
 	}
 
-	async GetPickupScoreboards() {
-		return this.get(`/scoreboards/pickup`);
+	async GetPickupScoreboards(updated) {
+		if (this.pickupScoreboardsInFlight) {
+			return this.pickupScoreboardsInFlight;
+		}
+		this.pickupScoreboardsInFlight = this.get(`/scoreboards/pickup?updated=${updated}`)
+			.finally(() => {
+				this.pickupScoreboardsInFlight = null;
+			});
+		return this.pickupScoreboardsInFlight;
 	}
 
     async get(path) {

@@ -10,15 +10,15 @@ export const MarquisType = Object.freeze({
 	PICKUP: "pickup",
 });
 
-function fetchScoreboardsByType(client, marquisType) {
+function fetchScoreboardsByType(client, marquisType, updated) {
 	switch (marquisType) {
 	case MarquisType.ACTIVE:
-		return client.GetActiveScoreboards();
+		return client.GetActiveScoreboards(updated);
 	case MarquisType.PICKUP:
-		return client.GetPickupScoreboards();
+		return client.GetPickupScoreboards(updated);
 	case MarquisType.RECENT:
 	default:
-		return client.GetRecentScoreboards();
+		return client.GetRecentScoreboards(updated);
 	}
 }
 
@@ -38,37 +38,44 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT, refre
 			};
 		}
 
-		const refresh = (isInitialLoad = false) => {
-			if (isInitialLoad) {
-				setLoading(true);
+		async function poll() {
+			let cursor = 0;
+			setLoading(true);
+			while (!cancelled) {
+				try {
+					const games = await fetchScoreboardsByType(client, marquisType, cursor);
+					if (cancelled) {
+						return;
+					}
+					const summariesData = Array.isArray(games) ? games : [];
+					let lastUpdated = cursor + 1;
+					for (const game of summariesData) {
+						if (game?.updated > lastUpdated) {
+							lastUpdated = game.updated;
+						}
+					}
+					cursor = lastUpdated;
+					setSummaries(summariesData);
+					setError(null);
+				} catch (err) {
+					if (cancelled) {
+						return;
+					}
+					const nextError = err?.data?.error || err?.message || "Could not load games";
+					setError((prevError) => (prevError === nextError ? prevError : nextError));
+					// Avoid tight retry loops when the server returns quickly with errors.
+					await new Promise((resolve) => setTimeout(resolve, refreshCadenceMs));
+				} finally {
+					if (!cancelled) {
+						setLoading(false);
+					}
+				}
 			}
-			fetchScoreboardsByType(client, marquisType).then((games) => {
-				if (cancelled) {
-					return;
-				}
-				setSummaries(Array.isArray(games) ? games : []);
-				setError(null);
-			}).catch((err) => {
-				if (cancelled) {
-					return;
-				}
-				const nextError = err?.data?.error || err?.message || "Could not load games";
-				setError((prevError) => (prevError === nextError ? prevError : nextError));
-			}).finally(() => {
-				if (!cancelled && isInitialLoad) {
-					setLoading(false);
-				}
-			});
-		};
-
-		refresh(true);
-		const interval = setInterval(() => {
-			refresh(false);
-		}, refreshCadenceMs);
+		}
+		poll();
 
 		return () => {
 			cancelled = true;
-			clearInterval(interval);
 		};
 	}, [client, marquisType, refreshCadenceMs]);
 
