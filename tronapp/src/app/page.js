@@ -110,19 +110,6 @@ export default function Home() {
 				>
 					<button
 						type="button"
-						aria-pressed={mobilePanel === "recent"}
-						className={`flex flex-1 flex-col items-center rounded px-2 py-1.5 transition-colors ${
-							mobilePanel === "recent" ? "bg-white/25 font-semibold text-white ring-1 ring-inset ring-white/50" : "hover:bg-white/10"
-						}`}
-						onClick={(e) => {
-							e.stopPropagation();
-							setMobilePanel((p) => (p === "recent" ? null : "recent"));
-						}}
-					>
-						recent
-					</button>
-					<button
-						type="button"
 						aria-pressed={mobilePanel === "pickup"}
 						className={`flex flex-1 flex-col items-center rounded px-2 py-1.5 transition-colors ${
 							mobilePanel === "pickup" ? "bg-white/25 font-semibold text-white ring-1 ring-inset ring-white/50" : "hover:bg-white/10"
@@ -146,6 +133,19 @@ export default function Home() {
 						}}
 					>
 						active
+					</button>
+					<button
+						type="button"
+						aria-pressed={mobilePanel === "recent"}
+						className={`flex flex-1 flex-col items-center rounded px-2 py-1.5 transition-colors ${
+							mobilePanel === "recent" ? "bg-white/25 font-semibold text-white ring-1 ring-inset ring-white/50" : "hover:bg-white/10"
+						}`}
+						onClick={(e) => {
+							e.stopPropagation();
+							setMobilePanel((p) => (p === "recent" ? null : "recent"));
+						}}
+					>
+						recent
 					</button>
 				</nav>
 			</div>
