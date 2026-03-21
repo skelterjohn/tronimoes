@@ -1544,9 +1544,16 @@ func (r *Round) findOuroboros(ctx context.Context, g *Game, player *Player, lt *
 			continue
 		}
 
-		if canConsume(head) {
-			consumed = append(consumed, op.Name)
+		if !canConsume(head) {
+			continue
 		}
+		if len(playerLine) == 1 {
+			// ensure it's actually on their foot
+			if lt.CoordA() != op.ChickenFootCoord && lt.CoordB() != op.ChickenFootCoord {
+				continue
+			}
+		}
+		consumed = append(consumed, op.Name)
 	}
 
 	freeLines := 0
