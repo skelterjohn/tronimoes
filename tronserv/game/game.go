@@ -796,7 +796,7 @@ func (r *Round) Note(ctx context.Context, n string) {
 }
 
 func (r *Round) FindHints(ctx context.Context, g *Game, p *Player) {
-	legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, p)
+	legalMoves, legalSpacers, _ := r.FindLegalMoves(ctx, g, p)
 	hintMap := make(map[string][]string)
 	for _, t := range p.Hand {
 		hintMap[t.String()] = []string{}
@@ -817,7 +817,7 @@ func (r *Round) FindHints(ctx context.Context, g *Game, p *Player) {
 	}
 }
 
-func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidTile, []Spacer) {
+func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidTile, []Spacer, []Coord) {
 	dbg("Finding moves for " + p.Name)
 	legalMoves := []LaidTile{}
 	legalSpacers := []Spacer{}
@@ -993,7 +993,33 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 			hintSpacerFromTile(line[len(line)-1])
 		}
 	}
-	return legalMoves, legalSpacers
+
+	passFeet := []Coord{}
+	if len(r.PlayerLines[name]) == 1 && (p.JustDrew || len(g.Bag) == 0) {
+		canUseSquare := func(c Coord) bool {
+			if _, ok := squarePips[c]; ok {
+				return false
+			}
+			for _, n := range c.Neighbors() {
+				if _, ok := squarePips[n]; !ok {
+					return true
+				}
+			}
+			return false
+		}
+		for _, ln := range r.LaidTiles[0].CoordA().Neighbors() {
+			if canUseSquare(ln) {
+				passFeet = append(passFeet, ln)
+			}
+		}
+		for _, ln := range r.LaidTiles[0].CoordB().Neighbors() {
+			if canUseSquare(ln) {
+				passFeet = append(passFeet, ln)
+			}
+		}
+	}
+
+	return legalMoves, legalSpacers, passFeet
 }
 
 func (r *Round) canPlayOnLine(lt *LaidTile, line []*LaidTile) (bool, int, error) {

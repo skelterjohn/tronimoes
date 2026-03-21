@@ -31,7 +31,7 @@ func decodeGame(t *testing.T, label string) *Game {
 
 func testLegalMovesContains(t *testing.T, game *Game, expectedMoves []*LaidTile, expectedSpacers []*Spacer) {
 	r := game.CurrentRound(t.Context())
-	moves, spacers := r.FindLegalMoves(t.Context(), game, game.Players[game.Turn])
+	moves, spacers, _ := r.FindLegalMoves(t.Context(), game, game.Players[game.Turn])
 
 	foundMoveStrings := make(map[string]bool)
 	for _, move := range moves {

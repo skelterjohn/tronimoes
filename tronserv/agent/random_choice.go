@@ -18,7 +18,7 @@ func (RandomChoice) Update(ctx context.Context, previousGame *game.Game, g *game
 
 }
 func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
-	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
+	legalMoves, legalSpacers, legalPassFeet := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
 	if len(legalSpacers) > 0 {
 		return types.Move{
@@ -32,11 +32,15 @@ func (RandomChoice) GetMove(ctx context.Context, g *game.Game, p *game.Player) t
 			LaidTile: legalMoves[rand.Intn(len(legalMoves))],
 		}
 	}
-	if p.JustDrew {
+	if p.JustDrew || len(g.Bag) == 0 {
+		var selected game.Coord
+		if len(legalPassFeet) > 0 {
+			selected = legalPassFeet[rand.Intn(len(legalPassFeet))]
+		}
 		// randomly choose one, so if it's bad we randomly choose again.
 		return types.Move{
 			Pass:     true,
-			Selected: types.RandomInitialFoot(g),
+			Selected: selected,
 		}
 	}
 	return types.Move{

@@ -92,7 +92,7 @@ func (gp *GibbsPlanner) Update(ctx context.Context, previousGame *game.Game, g *
 
 func (gp *GibbsPlanner) GetMove(ctx context.Context, g *game.Game, p *game.Player) types.Move {
 	gp.CheckScore(ctx, gp.lastGame, g)
-	legalMoves, legalSpacers := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
+	legalMoves, legalSpacers, _ := g.CurrentRound(ctx).FindLegalMoves(ctx, g, p)
 
 	playingOffRoundLeader := len(g.CurrentRound(ctx).PlayerLines[p.Name]) == 1
 	// If it's the round leader, we still have a choice to make that can be

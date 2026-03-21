@@ -120,7 +120,8 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 		p := g.Players[g.Turn]
 		playingOffRoundLeader := len(r.PlayerLines[p.Name]) == 1
 
-		legalMoves, legalSpacers := r.FindLegalMoves(ctx, g, p)
+		legalMoves, legalSpacers, legalPassFeet := r.FindLegalMoves(ctx, g, p)
+		clog.Debug(ctx, "got moves", "legalMoves", legalMoves, "legalSpacers", legalSpacers, "legalPassFeet", legalPassFeet)
 
 		allMoves := map[types.Move]bool{}
 		for _, lt := range legalMoves {
@@ -133,8 +134,8 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			allMoves[types.Move{Draw: true}] = true
 		} else {
 			if playingOffRoundLeader {
-				for _, cf := range CFOffsets {
-					allMoves[types.Move{Pass: true, Selected: game.Coord{X: g.BoardWidth/2 + cf.X, Y: g.BoardHeight/2 + cf.Y}}] = true
+				for _, cf := range legalPassFeet {
+					allMoves[types.Move{Pass: true, Selected: cf}] = true
 				}
 			} else {
 				allMoves[types.Move{Pass: true, Selected: game.Coord{X: -1, Y: -1}}] = true
@@ -148,7 +149,7 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 
 		passOrDrawOptions := 1
 		if playingOffRoundLeader && p.JustDrew {
-			passOrDrawOptions = 6 // (all 6 ways to pass)
+			passOrDrawOptions = len(legalPassFeet)
 		}
 		moveCount += passOrDrawOptions
 
@@ -189,14 +190,14 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 			clog.Debug(ctx, fmt.Sprintf("p%d lays %s", g.Turn, move))
 			if err := g.LayTile(ctx, p.Name, &move); err != nil {
 				clog.Debug(ctx, fmt.Sprintf("player=%+v", p))
-				return fmt.Errorf("laying: %w", err)
+				return fmt.Errorf("laying %s: %w", move, err)
 			}
 			move.Dead = false // this screws up the hashmap since FindLegalMoves doesn't set this.
 			bestMove = types.Move{LayTile: true, LaidTile: move}
 		} else if whichMove < tileAndSpacerMoves {
 			spacer := legalSpacers[whichMove-tileMoves]
 			if err := g.LaySpacer(ctx, p.Name, &spacer); err != nil {
-				return fmt.Errorf("spacing: %w", err)
+				return fmt.Errorf("spacing %s: %w", spacer, err)
 			}
 			bestMove = types.Move{PlaceSpacer: true, Spacer: spacer}
 		} else {
@@ -207,15 +208,12 @@ func (gp *GibbsPlanner) SimulateGame(ctx context.Context, g *game.Game, root *Pl
 				bestMove = types.Move{Draw: true}
 			} else {
 				whichOption := whichMove - tileAndSpacerMoves
-				cfSelection := game.Coord{X: -1, Y: -1}
-				if playingOffRoundLeader {
-					cfSelection = game.Coord{
-						X: g.BoardWidth/2 + CFOffsets[whichOption].X,
-						Y: g.BoardHeight/2 + CFOffsets[whichOption].Y,
-					}
+				var cfSelection game.Coord
+				if len(legalPassFeet) != 0 {
+					cfSelection = legalPassFeet[whichOption]
 				}
 				if err := g.Pass(ctx, p.Name, cfSelection.X, cfSelection.Y); err != nil {
-					return fmt.Errorf("passing: %w", err)
+					return fmt.Errorf("passing %s: %w", cfSelection, err)
 				}
 				bestMove = types.Move{Pass: true, Selected: cfSelection}
 			}

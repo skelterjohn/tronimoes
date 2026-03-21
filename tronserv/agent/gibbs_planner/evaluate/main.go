@@ -170,7 +170,7 @@ func main() {
 			Label: "leaderpass",
 			Success: func(ctx context.Context, g *game.Game, move types.Move) (bool, string) {
 				if !move.Pass {
-					return false, "expected agent to pass, not play a tile"
+					return false, fmt.Sprintf("expected agent to pass, not %s", move.String())
 				}
 				return true, ""
 			},
@@ -257,7 +257,7 @@ func main() {
 			defer func() { <-sem }()
 			var logBuf bytes.Buffer
 			runCtx := clog.WithTextOutput(ctx, &logBuf)
-			runCtx = clog.WithSeverities(runCtx, "info", "error", "debug")
+			runCtx = clog.WithSeverities(runCtx, clog.INFO, clog.ERROR, clog.DEBUG)
 			ok, msg := runCase(runCtx, testdataDir, j.tc, *maxSimFlag)
 			verdict := "OK"
 			if !ok {
