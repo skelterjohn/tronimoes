@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 
 function playerScoreLines(summary) {
@@ -34,37 +35,80 @@ export default function Marquis({
 		);
 	}
 
+	const validSummaries = summaries.filter((s) => s?.code);
+
 	return (
 		<div className={shell}>
 			{!hideTitle && <div className="mb-2 text-lg tracking-wider">{title}</div>}
-			<ul className="space-y-2 text-sm">
-				{summaries.map((summary) => {
-					if (!summary?.code) {
-						return null;
-					}
-					const lines = playerScoreLines(summary);
-					return (
-						<li key={summary.code} className="flex items-start justify-between gap-2">
-							<span className="shrink-0">
-								<Link className="underline underline-offset-2 hover:opacity-80" href={`/gameboard/${summary.code}`}>
-									#{summary.code}
-								</Link>
-							</span>
-							<div className="shrink-0 text-right text-xs leading-snug text-white/90">
-								{lines.length === 0 ? (
-									<span className="text-white/50">No players</span>
-								) : (
-									lines.map(({ name, score }) => (
-										<div key={name}>
-											{namesOnly ? name : `${name}: ${score}`}
-										</div>
-									))
-								)}
-							</div>
-						</li>
-					);
-				})}
-			</ul>
+			<table className="w-full border-collapse text-sm">
+				<tbody>
+					{validSummaries.map((summary, idx) => {
+						const lines = playerScoreLines(summary);
+						const link = (
+							<Link className="underline underline-offset-2 hover:opacity-80" href={`/gameboard/${summary.code}`}>
+								#{summary.code}
+							</Link>
+						);
+
+						if (lines.length === 0) {
+							return (
+								<tr key={summary.code} className={idx > 0 ? "border-t border-white/15" : undefined}>
+									<td className="align-top py-1 pr-3">{link}</td>
+									<td className="py-1 text-xs text-white/50" colSpan={namesOnly ? 1 : 3}>
+										No players
+									</td>
+								</tr>
+							);
+						}
+
+						if (namesOnly) {
+							return (
+								<Fragment key={summary.code}>
+									{lines.map(({ name }, i) => (
+										<tr
+											key={name}
+											className={
+												i === 0 && idx > 0 ? "border-t border-white/15" : undefined
+											}
+										>
+											{i === 0 && (
+												<td className="align-top py-1 pr-3" rowSpan={lines.length}>
+													{link}
+												</td>
+											)}
+											<td className="py-1 text-right text-xs leading-snug text-white/90">{name}</td>
+										</tr>
+									))}
+								</Fragment>
+							);
+						}
+
+						return (
+							<Fragment key={summary.code}>
+								{lines.map(({ name, score }, i) => (
+									<tr
+										key={name}
+										className={
+											i === 0 && idx > 0 ? "border-t border-white/15" : undefined
+										}
+									>
+										{i === 0 && (
+											<td className="align-top py-1 pr-3 whitespace-nowrap" rowSpan={lines.length}>
+												{link}
+											</td>
+										)}
+										<td className="py-1 text-right text-xs leading-snug text-white/90">{name}</td>
+										<td className="px-1 py-1 text-center text-xs leading-snug text-white/90" aria-hidden="true">
+											:
+										</td>
+										<td className="py-1 text-left text-xs leading-snug text-white/90">{score}</td>
+									</tr>
+								))}
+							</Fragment>
+						);
+					})}
+				</tbody>
+			</table>
 		</div>
 	);
 }
