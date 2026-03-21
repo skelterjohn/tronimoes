@@ -8,7 +8,17 @@ function playerScoreLines(summary) {
 		return [];
 	}
 	return Object.entries(summary.scoreboard)
-		.sort(([a], [b]) => a.localeCompare(b))
+		.sort(([nameA, scoreA], [nameB, scoreB]) => {
+			const na = Number(scoreA);
+			const nb = Number(scoreB);
+			const a = Number.isFinite(na) ? na : 0;
+			const b = Number.isFinite(nb) ? nb : 0;
+			const d = b - a;
+			if (d !== 0) {
+				return d;
+			}
+			return nameA.localeCompare(nameB);
+		})
 		.map(([name, score]) => ({ name, score }));
 }
 
