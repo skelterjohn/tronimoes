@@ -1155,7 +1155,7 @@ func (s *GameServer) HandleGetRecentScoreboards(w http.ResponseWriter, r *http.R
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(<-scoreboards)
+	json.NewEncoder(w).Encode(scoreboards)
 }
 
 func (s *GameServer) HandleGetActiveScoreboards(w http.ResponseWriter, r *http.Request) {
@@ -1173,7 +1173,7 @@ func (s *GameServer) HandleGetActiveScoreboards(w http.ResponseWriter, r *http.R
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(<-scoreboards)
+	json.NewEncoder(w).Encode(scoreboards)
 }
 
 func (s *GameServer) HandleGetPickupScoreboards(w http.ResponseWriter, r *http.Request) {
@@ -1191,5 +1191,5 @@ func (s *GameServer) HandleGetPickupScoreboards(w http.ResponseWriter, r *http.R
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(<-scoreboards)
+	json.NewEncoder(w).Encode(scoreboards)
 }

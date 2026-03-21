@@ -504,7 +504,7 @@ func (s *FireStore) iterToSummaries(ctx context.Context, iter *firestore.Documen
 	return summaries, nil
 }
 
-func (s *FireStore) queryToSummaries(ctx context.Context, query firestore.Query, updated int64) (<-chan []GameSummary, error) {
+func (s *FireStore) queryToSummaries(ctx context.Context, query firestore.Query, updated int64) ([]GameSummary, error) {
 	timesThrough := 0
 	snaps := query.Snapshots(ctx)
 	defer snaps.Stop()
@@ -529,13 +529,11 @@ func (s *FireStore) queryToSummaries(ctx context.Context, query firestore.Query,
 			timesThrough++
 			continue
 		}
-		ch := make(chan []GameSummary, 1)
-		ch <- summaries
-		return ch, nil
+		return summaries, nil
 	}
 }
 
-func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
+func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int64) ([]GameSummary, error) {
 	query := s.scoreboards().
 		Where("pickup", "==", true).
 		Where("done", "==", false).
@@ -545,7 +543,7 @@ func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int6
 	return s.queryToSummaries(ctx, query, updated)
 }
 
-func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
+func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int64) ([]GameSummary, error) {
 	query := s.scoreboards().
 		Where("done", "==", false).
 		Where("open", "==", false).
@@ -554,7 +552,7 @@ func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int6
 	return s.queryToSummaries(ctx, query, updated)
 }
 
-func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
+func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int64) ([]GameSummary, error) {
 	query := s.scoreboards().
 		Where("done", "==", true).
 		OrderBy("updated", firestore.Desc).
