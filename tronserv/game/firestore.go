@@ -36,24 +36,24 @@ func NewFirestore(ctx context.Context, project, env string) (*FireStore, error) 
 	}, nil
 }
 
-func (s *FireStore) games(ctx context.Context) *firestore.CollectionRef {
+func (s *FireStore) games() *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("games")
 }
 
-func (s *FireStore) players(ctx context.Context) *firestore.CollectionRef {
+func (s *FireStore) players() *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("players")
 }
 
-func (s *FireStore) issues(ctx context.Context) *firestore.CollectionRef {
+func (s *FireStore) issues() *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("issues")
 }
 
-func (s *FireStore) scoreboards(ctx context.Context) *firestore.CollectionRef {
+func (s *FireStore) scoreboards() *firestore.CollectionRef {
 	return s.storeClient.Collection("envs").Doc(s.env).Collection("scoreboards")
 }
 
 func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
-	c := s.games(ctx)
+	c := s.games()
 	iter := c.Where("code_prefix", "==", code).Where("done", "==", false).Documents(ctx)
 	docs, err := iter.GetAll()
 	if err != nil {
@@ -92,7 +92,7 @@ func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name strin
 }
 
 func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error) {
-	c := s.games(ctx)
+	c := s.games()
 	iter := c.Where("code_prefix", "==", code).Where("open", "==", true).Where("done", "==", false).Documents(ctx)
 	docs, err := iter.GetAll()
 	if err != nil {
@@ -119,7 +119,7 @@ func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error
 }
 
 func (s *FireStore) FindPickupGame(ctx context.Context) (*Game, error) {
-	c := s.games(ctx)
+	c := s.games()
 	iter := c.Where("open", "==", true).Where("done", "==", false).Where("pickup", "==", true).Documents(ctx)
 	docs, err := iter.GetAll()
 	if err != nil {
@@ -146,12 +146,12 @@ func (s *FireStore) FindPickupGame(ctx context.Context) (*Game, error) {
 }
 
 func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
-	c := s.games(ctx)
+	c := s.games()
 	doc, err := c.Doc(code).Get(ctx)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
 			// Clear the scoreboard if it exists.
-			if _, err := s.scoreboards(ctx).Doc(code).Delete(ctx); err != nil {
+			if _, err := s.scoreboards().Doc(code).Delete(ctx); err != nil {
 				clog.Error(ctx, "could not delete scoreboard", err)
 			}
 			return nil, ErrNoSuchGame
@@ -187,9 +187,9 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		scoreboard[p.Name] = int64(p.Score)
 	}
 
-	c := s.games(ctx)
+	c := s.games()
 	docRef := c.Doc(game.Code)
-	scoreboardDocRef := s.scoreboards(ctx).Doc(game.Code)
+	scoreboardDocRef := s.scoreboards().Doc(game.Code)
 	payload := map[string]any{
 		"created":     game.Created,
 		"code_prefix": game.Code[:6],
@@ -301,7 +301,7 @@ func scoreboardMatches(next map[string]int64, current map[string]any) bool {
 }
 
 func (s *FireStore) DeleteGame(ctx context.Context, code string) error {
-	_, err := s.games(ctx).Doc(code).Delete(ctx)
+	_, err := s.games().Doc(code).Delete(ctx)
 	return err
 }
 
@@ -311,7 +311,7 @@ func (s *FireStore) WatchGame(ctx context.Context, code string, version int64) <
 	go func(ctx context.Context) {
 		defer close(updates)
 
-		iter := s.games(ctx).Doc(code).Snapshots(ctx)
+		iter := s.games().Doc(code).Snapshots(ctx)
 		for {
 			snap, err := iter.Next()
 			if err != nil {
@@ -350,7 +350,7 @@ func (s *FireStore) RegisterPlayerName(ctx context.Context, playerID, playerName
 	if pi, err := s.GetPlayer(ctx, playerID); err == nil {
 		return fmt.Errorf("already registered as %q", pi.Name)
 	}
-	_, err := s.players(ctx).Doc(playerID).Set(ctx, map[string]any{
+	_, err := s.players().Doc(playerID).Set(ctx, map[string]any{
 		"name": playerName,
 		"id":   playerID,
 	})
@@ -377,7 +377,7 @@ func playerConfigFromData(data map[string]any) (PlayerConfig, error) {
 }
 
 func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo, error) {
-	doc, err := s.players(ctx).Doc(playerID).Get(ctx)
+	doc, err := s.players().Doc(playerID).Get(ctx)
 	if err != nil && status.Code(err) == codes.NotFound {
 		return PlayerInfo{}, ErrNoRegisteredPlayer
 	}
@@ -401,7 +401,7 @@ func (s *FireStore) GetPlayer(ctx context.Context, playerID string) (PlayerInfo,
 }
 
 func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (PlayerInfo, error) {
-	iter := s.players(ctx).Where("name", "==", playerName).Documents(ctx)
+	iter := s.players().Where("name", "==", playerName).Documents(ctx)
 	docs, err := iter.GetAll()
 	if err != nil {
 		return PlayerInfo{}, fmt.Errorf("could not query: %v", err)
@@ -426,14 +426,14 @@ func (s *FireStore) GetPlayerByName(ctx context.Context, playerName string) (Pla
 }
 
 func (s *FireStore) RecordPlayerActive(ctx context.Context, code, playerName string, lastActive int64) error {
-	_, err := s.games(ctx).Doc(code).Collection("active").Doc(playerName).Set(ctx, map[string]any{
+	_, err := s.games().Doc(code).Collection("active").Doc(playerName).Set(ctx, map[string]any{
 		"last_active": lastActive,
 	})
 	return err
 }
 
 func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerName string) (int64, error) {
-	doc, err := s.games(ctx).Doc(code).Collection("active").Doc(playerName).Get(ctx)
+	doc, err := s.games().Doc(code).Collection("active").Doc(playerName).Get(ctx)
 	if err != nil {
 		return 0, fmt.Errorf("could not read: %v", err)
 	}
@@ -445,7 +445,7 @@ func (s *FireStore) PlayerLastActive(ctx context.Context, code, playerName strin
 
 func (s *FireStore) UpdatePlayerConfig(ctx context.Context, playerID string, config PlayerConfig) error {
 	clog.Info(ctx, "updating player config", "playerID", playerID)
-	_, err := s.players(ctx).Doc(playerID).Update(ctx, []firestore.Update{{
+	_, err := s.players().Doc(playerID).Update(ctx, []firestore.Update{{
 		Path:  "config",
 		Value: config,
 	}})
@@ -457,7 +457,7 @@ func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Ga
 	if err != nil {
 		return fmt.Errorf("could not marshal: %v", err)
 	}
-	_, err = s.issues(ctx).NewDoc().Set(ctx, map[string]any{
+	_, err = s.issues().NewDoc().Set(ctx, map[string]any{
 		"reported_by":      playerName,
 		"summary":          summary,
 		"whatHappened":     whatHappened,
@@ -505,7 +505,7 @@ func (s *FireStore) iterToSummaries(ctx context.Context, iter *firestore.Documen
 }
 
 func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
-	iter := s.scoreboards(ctx).
+	iter := s.scoreboards().
 		Where("pickup", "==", true).
 		Where("done", "==", false).
 		Where("open", "==", true).
@@ -522,7 +522,7 @@ func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int6
 }
 
 func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
-	iter := s.scoreboards(ctx).
+	iter := s.scoreboards().
 		Where("done", "==", false).
 		Where("open", "==", false).
 		OrderBy("updated", firestore.Desc).
@@ -538,7 +538,7 @@ func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int6
 }
 
 func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int64) (<-chan []GameSummary, error) {
-	iter := s.scoreboards(ctx).
+	iter := s.scoreboards().
 		Where("done", "==", true).
 		OrderBy("updated", firestore.Desc).
 		Limit(count).
