@@ -19,7 +19,7 @@ export default function Marquis({
 	hideTitle = false,
 	className = "",
 }) {
-	const shell = `font-game w-full md:w-[15vw] rounded-lg border border-white bg-black/70 p-4 text-white ${className}`.trim();
+	const shell = `font-game w-full md:w-max md:min-w-[15vw] rounded-lg border border-white bg-black/70 p-4 text-white ${className}`.trim();
 
 	if (summaries.length === 0 && !showEmpty) {
 		return null;
@@ -44,13 +44,13 @@ export default function Marquis({
 					}
 					const lines = playerScoreLines(summary);
 					return (
-						<li key={summary.code} className="flex gap-2">
+						<li key={summary.code} className="flex items-start justify-between gap-2">
 							<span className="shrink-0">
 								<Link className="underline underline-offset-2 hover:opacity-80" href={`/gameboard/${summary.code}`}>
 									#{summary.code}
 								</Link>
 							</span>
-							<div className="min-w-0 flex-1 text-right text-xs leading-snug text-white/90">
+							<div className="shrink-0 text-right text-xs leading-snug text-white/90">
 								{lines.length === 0 ? (
 									<span className="text-white/50">No players</span>
 								) : (
