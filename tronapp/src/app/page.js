@@ -98,13 +98,13 @@ export default function Home() {
 				{mobilePanel !== null && (
 					<div className="min-h-0 flex-1 overflow-y-auto bg-transparent px-2 pt-2">
 						{mobilePanel === "recent" && (
-							<Marquis title="recent games" summaries={recentSummaries} showEmpty hideTitle inlinePlayerInfo className="max-w-none" />
+							<Marquis title="recent games" summaries={recentSummaries} showEmpty hideTitle className="max-w-none" />
 						)}
 						{mobilePanel === "pickup" && (
-							<Marquis title="pickup games" summaries={pickupSummaries} namesOnly showEmpty hideTitle inlinePlayerInfo className="max-w-none" />
+							<Marquis title="pickup games" summaries={pickupSummaries} namesOnly showEmpty hideTitle className="max-w-none" />
 						)}
 						{mobilePanel === "active" && (
-							<Marquis title="active games" summaries={activeSummaries} showEmpty hideTitle inlinePlayerInfo className="max-w-none" />
+							<Marquis title="active games" summaries={activeSummaries} showEmpty hideTitle className="max-w-none" />
 						)}
 					</div>
 				)}
