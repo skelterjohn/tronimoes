@@ -828,7 +828,7 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 
 	for _, t := range p.Hand {
 		dbg("Considering %s", t)
-		movesOffSquare := func(head LaidTile, src Coord) {
+		movesOffSquare := func(src Coord) {
 			dbg("Considering playing from %s", src)
 			for _, orientation := range []string{"up", "down", "left", "right"} {
 				lt := LaidTile{
@@ -854,10 +854,10 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 			}
 			dbg("Considering playing off %s", head)
 			for _, c := range head.CoordA().Neighbors() {
-				movesOffSquare(head, c)
+				movesOffSquare(c)
 			}
 			for _, c := range head.CoordB().Neighbors() {
-				movesOffSquare(head, c)
+				movesOffSquare(c)
 			}
 		}
 
@@ -996,12 +996,12 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 	return legalMoves, legalSpacers
 }
 
-func (r *Round) canPlayOnLine(ctx context.Context, lt *LaidTile, line []*LaidTile) (bool, int, error) {
+func (r *Round) canPlayOnLine(lt *LaidTile, line []*LaidTile) (bool, int, error) {
 	last := line[len(line)-1]
-	return r.canPlayOnTile(ctx, lt, last)
+	return r.canPlayOnTile(lt, last)
 }
 
-func (r *Round) canPlayOnTile(ctx context.Context, lt, last *LaidTile) (bool, int, error) {
+func (r *Round) canPlayOnTile(lt, last *LaidTile) (bool, int, error) {
 	dbg("canPlayOnTile: %s on %s", lt, last)
 	if lt.Indicating {
 		if last.Tile.PipsA != lt.Indicated.PipsA || last.Tile.PipsB != lt.Indicated.PipsB {
@@ -1009,10 +1009,10 @@ func (r *Round) canPlayOnTile(ctx context.Context, lt, last *LaidTile) (bool, in
 			return false, 0, ErrMustMatchPips
 		}
 	}
-	return r.canPlayOnTileWithoutIndication(ctx, lt, last)
+	return r.canPlayOnTileWithoutIndication(lt, last)
 }
 
-func (r *Round) canPlayOnTileWithoutIndication(ctx context.Context, lt, last *LaidTile) (bool, int, error) {
+func (r *Round) canPlayOnTileWithoutIndication(lt, last *LaidTile) (bool, int, error) {
 	var potentialError error
 	cerr := func(err error) {
 		if err == ErrWrongSide || potentialError == ErrWrongSide {
@@ -1316,7 +1316,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 			return ErrMustPlayOnFoot
 		}
 		if len(mainLine) > 1 || onFoot || !player.ChickenFoot {
-			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, mainLine); ok {
+			if ok, nextPips, err := r.canPlayOnLine(lt, mainLine); ok {
 				playedALine = true
 				lt.PlayerName = player.Name
 				lt.NextPips = nextPips
@@ -1367,7 +1367,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 				}
 				dbg("All good")
 			}
-			if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
+			if ok, nextPips, err := r.canPlayOnLine(lt, line); ok {
 				dbg("We can play it, but...")
 				if op.Dead {
 					dbg("Player is dead")
@@ -1405,7 +1405,7 @@ func (r *Round) LayTile(ctx context.Context, g *Game, name string, lt *LaidTile,
 		}
 		if !playedALine && !player.ChickenFoot {
 			for i, line := range r.FreeLines {
-				if ok, nextPips, err := r.canPlayOnLine(ctx, lt, line); ok {
+				if ok, nextPips, err := r.canPlayOnLine(lt, line); ok {
 					playedALine = true
 					lt.PlayerName = ""
 					lt.NextPips = nextPips
