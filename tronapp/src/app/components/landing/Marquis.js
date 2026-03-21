@@ -19,7 +19,7 @@ export default function Marquis({
 	hideTitle = false,
 	className = "",
 }) {
-	const shell = `font-game w-full max-w-sm rounded-lg border border-white bg-black/70 p-4 text-white ${className}`.trim();
+	const shell = `font-game w-full md:w-[15vw] rounded-lg border border-white bg-black/70 p-4 text-white ${className}`.trim();
 
 	if (summaries.length === 0 && !showEmpty) {
 		return null;
