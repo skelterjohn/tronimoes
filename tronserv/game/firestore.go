@@ -150,6 +150,10 @@ func (s *FireStore) ReadGame(ctx context.Context, code string) (*Game, error) {
 	doc, err := c.Doc(code).Get(ctx)
 	if err != nil {
 		if status.Code(err) == codes.NotFound {
+			// Clear the scoreboard if it exists.
+			if _, err := s.scoreboards(ctx).Doc(code).Delete(ctx); err != nil {
+				clog.Error(ctx, "could not delete scoreboard", err)
+			}
 			return nil, ErrNoSuchGame
 		}
 		return nil, fmt.Errorf("could not read: %v", err)
@@ -218,9 +222,6 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 				break
 			}
 		}
-		if game.Done && allZeros {
-			return tx.Delete(scoreboardDocRef)
-		}
 
 		existingScoreboardDoc, err := tx.Get(scoreboardDocRef)
 		if err != nil && status.Code(err) != codes.NotFound {
@@ -228,15 +229,32 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		}
 
 		shouldUpdateScoreboard := true
-		if existingScoreboardDoc != nil && existingScoreboardDoc.Exists() {
-			existingData := existingScoreboardDoc.Data()
-			existingDone, doneOK := existingData["done"].(bool)
-			existingOpen, openOK := existingData["open"].(bool)
-			existingScoreboard, scoreboardOK := existingData["scoreboard"].(map[string]any)
-			shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK ||
-				existingDone != game.Done ||
-				existingOpen != open ||
-				!scoreboardMatches(scoreboard, existingScoreboard)
+		if game.Done && allZeros {
+			shouldUpdateScoreboard = false
+			// taking care of it differently.
+			if err := tx.Delete(scoreboardDocRef); err != nil {
+				clog.Error(ctx, "could not delete scoreboard", err)
+			}
+		} else {
+			if existingScoreboardDoc != nil && existingScoreboardDoc.Exists() {
+				existingData := existingScoreboardDoc.Data()
+				existingDone, doneOK := existingData["done"].(bool)
+				existingOpen, openOK := existingData["open"].(bool)
+				existingScoreboard, scoreboardOK := existingData["scoreboard"].(map[string]any)
+				shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK ||
+					existingDone != game.Done ||
+					existingOpen != open ||
+					!scoreboardMatches(scoreboard, existingScoreboard)
+				clog.Info(ctx, "Considering scoreboard update",
+					"shouldUpdateScoreboard", shouldUpdateScoreboard,
+					"existingDone", existingDone,
+					"existingOpen", existingOpen,
+					"existingScoreboard", existingScoreboard,
+					"gameDone", game.Done,
+					"gameOpen", open,
+					"gameScoreboard", scoreboard,
+				)
+			}
 		}
 		if err := tx.Set(docRef, payload); err != nil {
 			return err
@@ -450,7 +468,7 @@ func (s *FireStore) ReportIssue(ctx context.Context, playerName string, game *Ga
 	return err
 }
 
-func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSummary, error) {
+func (s *FireStore) iterToSummaries(ctx context.Context, iter *firestore.DocumentIterator) ([]GameSummary, error) {
 	docs, err := iter.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("could not get all: %v", err)
@@ -458,11 +476,13 @@ func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSum
 	summaries := make([]GameSummary, 0, len(docs))
 
 	for _, doc := range docs {
+		ctx = clog.WithKeyword(ctx, "code", doc.Ref.ID)
 		data := doc.Data()
 		scoreboard, ok := data["scoreboard"].(map[string]any)
 		if !ok {
-			fmt.Printf("ZZZ %+v\n", data["scoreboard"])
-			return nil, fmt.Errorf("bad data type for scoreboard: %T", data["scoreboard"])
+			err := fmt.Errorf("bad data type for scoreboard: %T", data["scoreboard"])
+			clog.Error(ctx, "bad data type for scoreboard", err)
+			continue
 		}
 		scoreboard64 := make(map[string]int64)
 		for name, score := range scoreboard {
@@ -470,7 +490,9 @@ func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSum
 		}
 		updated, ok := data["updated"].(int64)
 		if !ok {
-			return nil, fmt.Errorf("bad data type for updated: %T", data["updated"])
+			err := fmt.Errorf("bad data type for updated: %T", data["updated"])
+			clog.Error(ctx, "bad data type for updated", err)
+			continue
 		}
 		summary := GameSummary{
 			Code:       doc.Ref.ID,
@@ -489,9 +511,8 @@ func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int6
 		Where("open", "==", true).
 		OrderBy("updated", firestore.Desc).
 		Limit(count).
-		Select("scoreboard").
 		Documents(ctx)
-	summaries, err := s.iterToSummaries(iter)
+	summaries, err := s.iterToSummaries(ctx, iter)
 	if err != nil {
 		return nil, fmt.Errorf("could not get summaries: %v", err)
 	}
@@ -506,9 +527,8 @@ func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int6
 		Where("open", "==", false).
 		OrderBy("updated", firestore.Desc).
 		Limit(count).
-		Select("scoreboard").
 		Documents(ctx)
-	summaries, err := s.iterToSummaries(iter)
+	summaries, err := s.iterToSummaries(ctx, iter)
 	if err != nil {
 		return nil, fmt.Errorf("could not get summaries: %v", err)
 	}
@@ -522,9 +542,8 @@ func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int6
 		Where("done", "==", true).
 		OrderBy("updated", firestore.Desc).
 		Limit(count).
-		Select("scoreboard").
 		Documents(ctx)
-	summaries, err := s.iterToSummaries(iter)
+	summaries, err := s.iterToSummaries(ctx, iter)
 	if err != nil {
 		return nil, fmt.Errorf("could not get summaries: %v", err)
 	}
