@@ -71,7 +71,7 @@ export default function Marquis({
 					return (
 						<li key={summary.code}>
 							<Tooltip
-								placement="top"
+								placement="right"
 								title={
 									lines.length > 0 ? (
 										<ul className="m-0 max-w-xs list-none p-0">
