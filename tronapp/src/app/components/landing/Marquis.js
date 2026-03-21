@@ -24,7 +24,7 @@ function fetchScoreboardsByType(client, marquisType) {
 
 export default function Marquis({ title, marquisType = MarquisType.RECENT, refreshCadenceMs = 60000 }) {
 	const { client } = useGameState();
-	const [codes, setCodes] = useState([]);
+	const [summaries, setSummaries] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
@@ -46,8 +46,7 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT, refre
 				if (cancelled) {
 					return;
 				}
-				const nextCodes = Array.isArray(games) ? games.map((game) => game.code).filter(Boolean) : [];
-				setCodes(nextCodes);
+				setSummaries(Array.isArray(games) ? games : []);
 				setError(null);
 			}).catch((err) => {
 				if (cancelled) {
@@ -73,7 +72,7 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT, refre
 		};
 	}, [client, marquisType, refreshCadenceMs]);
 
-	if (codes.length === 0) {
+	if (summaries.length === 0) {
 		return null;
 	}
 
@@ -81,14 +80,16 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT, refre
 		<div className="font-game w-full max-w-sm rounded-lg border border-white bg-black/70 p-4 text-white">
 			<div className="mb-2 text-lg tracking-wider">{title}</div>
 			{!loading && error && <div className="text-sm text-red-300">{error}</div>}
-			{!loading && !error && codes.length > 0 && (
+			{!loading && !error && summaries.length > 0 && (
 				<ul className="space-y-1 text-sm">
-					{codes.map((code) => (
-						<li key={code}>
-							<Link className="underline underline-offset-2 hover:opacity-80" href={`/gameboard/${code}`}>
-								#{code}
+					{summaries.map((summary) => (
+						summary?.code ? (
+						<li key={summary.code}>
+							<Link className="underline underline-offset-2 hover:opacity-80" href={`/gameboard/${summary.code}`}>
+								#{summary.code}
 							</Link>
 						</li>
+						) : null
 					))}
 				</ul>
 			)}
