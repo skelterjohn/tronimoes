@@ -226,9 +226,12 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 			existingDone, doneOK := existingData["done"].(bool)
 			existingOpen, openOK := existingData["open"].(bool)
 			existingScoreboard, scoreboardOK := existingData["scoreboard"].(map[string]any)
-			shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK ||
+			existingHasNonZero, hasNonZeroOK := existingData["has_nonzero_score"].(bool)
+			newHasNonZero := hasNonZeroScoreboard(scoreboard)
+			shouldUpdateScoreboard = !doneOK || !openOK || !scoreboardOK || !hasNonZeroOK ||
 				existingDone != game.Done ||
 				existingOpen != open ||
+				existingHasNonZero != newHasNonZero ||
 				!scoreboardMatches(scoreboard, existingScoreboard)
 			clog.Info(ctx, "Considering scoreboard update",
 				"shouldUpdateScoreboard", shouldUpdateScoreboard,
@@ -249,11 +252,12 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 		}
 
 		scoreboardPayload := map[string]any{
-			"scoreboard": scoreboard,
-			"updated":    time.Now().Unix(),
-			"open":       open,
-			"pickup":     game.Pickup,
-			"done":       game.Done,
+			"scoreboard":        scoreboard,
+			"has_nonzero_score": hasNonZeroScoreboard(scoreboard),
+			"updated":           time.Now().Unix(),
+			"open":              open,
+			"pickup":            game.Pickup,
+			"done":              game.Done,
 		}
 		return tx.Set(scoreboardDocRef, scoreboardPayload)
 	})
@@ -539,32 +543,41 @@ func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int6
 func (s *FireStore) ListRecentGames(ctx context.Context, count int, updated int64) ([]GameSummary, error) {
 	query := s.scoreboards().
 		Where("done", "==", true).
+		Where("has_nonzero_score", "==", true).
 		OrderBy("updated", firestore.Desc).
 		Limit(count)
 	return s.queryToSummaries(ctx, query, updated)
 }
 
-func (s *FireStore) waitForUpdatedScoreboards(ctx context.Context, updated int64) error {
+func (s *FireStore) waitForUpdatedScoreboards(ctx context.Context, updated int64) (int64, error) {
 	query := s.scoreboards().Where("updated", ">", updated).Limit(1)
 	snaps := query.Snapshots(ctx)
 	defer snaps.Stop()
 	for {
 		snap, err := snaps.Next()
 		if err != nil {
-			return fmt.Errorf("could not get next snapshot: %w", err)
+			return 0, fmt.Errorf("could not get next snapshot: %w", err)
 		}
 		docs, err := snap.Documents.GetAll()
 		if err != nil {
-			return fmt.Errorf("could not get all: %w", err)
+			return 0, fmt.Errorf("could not get all: %w", err)
 		}
+		lastUpdate := updated
 		if len(docs) > 0 {
-			return nil
+			docUpdated, ok := docs[0].Data()["updated"].(int64)
+			if !ok {
+				return 0, fmt.Errorf("bad data type for updated: %T", docs[0].Data()["updated"])
+			}
+			if docUpdated > lastUpdate {
+				lastUpdate = docUpdated
+			}
+			return lastUpdate, nil
 		}
 	}
 }
 
 func (s *FireStore) ListScoreboards(ctx context.Context, count int, updated int64) (ScoreboardSummary, error) {
-	err := s.waitForUpdatedScoreboards(ctx, updated)
+	lastUpdate, err := s.waitForUpdatedScoreboards(ctx, updated)
 	if err != nil {
 		return ScoreboardSummary{}, fmt.Errorf("could not wait for updated scoreboards: %w", err)
 	}
@@ -580,7 +593,8 @@ func (s *FireStore) ListScoreboards(ctx context.Context, count int, updated int6
 	if err != nil {
 		return ScoreboardSummary{}, fmt.Errorf("could not get recent games: %w", err)
 	}
-	lastUpdated := updated
+
+	lastUpdated := lastUpdate
 	for _, summary := range active {
 		if summary.Updated > lastUpdated {
 			lastUpdated = summary.Updated
@@ -596,6 +610,11 @@ func (s *FireStore) ListScoreboards(ctx context.Context, count int, updated int6
 			lastUpdated = summary.Updated
 		}
 	}
+	// Usually we'll have at least some recent games, but this bootstraps.
+	if lastUpdated == 0 {
+		lastUpdated = time.Now().Unix()
+	}
+
 	return ScoreboardSummary{
 		Active:  active,
 		Pickup:  pickup,

@@ -20,7 +20,7 @@ type chiLogEntry struct {
 }
 
 func (e *chiLogEntry) Write(status, bytes int, _ http.Header, elapsed time.Duration, _ interface{}) {
-	Log(e.request.Context(), "INFO", "served request", map[string]any{
+	Log(e.request.Context(), "INFO", "serving request", map[string]any{
 		"method":   e.request.Method,
 		"path":     e.request.URL.RequestURI(),
 		"status":   status,

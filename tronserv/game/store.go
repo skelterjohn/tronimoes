@@ -334,6 +334,15 @@ func SummarizeGame(g *Game) GameSummary {
 	return gs
 }
 
+func hasNonZeroScoreboard(m map[string]int64) bool {
+	for _, v := range m {
+		if v != 0 {
+			return true
+		}
+	}
+	return false
+}
+
 func (s *MemoryStore) ListPickupGames(ctx context.Context, count int, updated int64) ([]GameSummary, error) {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
@@ -378,7 +387,11 @@ func (s *MemoryStore) ListRecentGames(ctx context.Context, count int, updated in
 		if !g.Done {
 			continue
 		}
-		games = append(games, SummarizeGame(g))
+		summary := SummarizeGame(g)
+		if !hasNonZeroScoreboard(summary.Scoreboard) {
+			continue
+		}
+		games = append(games, summary)
 		count--
 		if count <= 0 {
 			break
