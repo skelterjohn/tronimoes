@@ -12,7 +12,7 @@ function playerScoreLines(summary) {
 		.map(([name, score]) => ({ name, score }));
 }
 
-export default function Marquis({ title, summaries = [] }) {
+export default function Marquis({ title, summaries = [], namesOnly = false }) {
 	if (summaries.length === 0) {
 		return null;
 	}
@@ -35,7 +35,7 @@ export default function Marquis({ title, summaries = [] }) {
 										<ul className="m-0 max-w-xs list-none p-0">
 											{lines.map(({ name, score }) => (
 												<li key={name}>
-													{name}: {score}
+													{namesOnly ? name : `${name}: ${score}`}
 												</li>
 											))}
 										</ul>

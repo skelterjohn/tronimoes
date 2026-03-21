@@ -78,7 +78,7 @@ export default function Home() {
 				<Marquis title="recent games" summaries={recentSummaries} />
 			</div>
 			<div className="absolute left-1/4 top-1/4 -translate-x-1/2 w-fit space-y-4">
-				<Marquis title="pickup games" summaries={pickupSummaries} />
+				<Marquis title="pickup games" summaries={pickupSummaries} namesOnly />
 				<Marquis title="active games" summaries={activeSummaries} />
 			</div>
 			<div className="absolute top-4 left-4 w-fit text-white">
