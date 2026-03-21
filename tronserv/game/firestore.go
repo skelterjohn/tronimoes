@@ -456,6 +456,7 @@ func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSum
 		return nil, fmt.Errorf("could not get all: %v", err)
 	}
 	summaries := make([]GameSummary, 0, len(docs))
+
 	for _, doc := range docs {
 		data := doc.Data()
 		scoreboard, ok := data["scoreboard"].(map[string]any)
@@ -467,9 +468,14 @@ func (s *FireStore) iterToSummaries(iter *firestore.DocumentIterator) ([]GameSum
 		for name, score := range scoreboard {
 			scoreboard64[name] = score.(int64)
 		}
+		updated, ok := data["updated"].(int64)
+		if !ok {
+			return nil, fmt.Errorf("bad data type for updated: %T", data["updated"])
+		}
 		summary := GameSummary{
 			Code:       doc.Ref.ID,
 			Scoreboard: scoreboard64,
+			Updated:    updated,
 		}
 		summaries = append(summaries, summary)
 	}

@@ -26,6 +26,7 @@ type PlayerInfo struct {
 type GameSummary struct {
 	Code       string           `json:"code"`
 	Scoreboard map[string]int64 `json:"scoreboard"`
+	Updated    int64            `json:"updated"`
 }
 
 type Store interface {
