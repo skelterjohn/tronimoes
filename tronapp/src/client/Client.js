@@ -72,39 +72,10 @@ class Client {
 		});
 	}
 
-	async GetRecentScoreboards(updated) {
-		if (this.recentScoreboardsInFlight) {
-			return this.recentScoreboardsInFlight;
-		}
-		this.recentScoreboardsInFlight = this.get(`/scoreboards/recent?updated=${updated}`)
-			.finally(() => {
-				this.recentScoreboardsInFlight = null;
-			});
-		return this.recentScoreboardsInFlight;
+	async ListScoreboards(updated) {
+		return this.get(`/scoreboards?updated=${updated}`);
 	}
-
-	async GetActiveScoreboards(updated) {
-		if (this.activeScoreboardsInFlight) {
-			return this.activeScoreboardsInFlight;
-		}
-		this.activeScoreboardsInFlight = this.get(`/scoreboards/active?updated=${updated}`)
-			.finally(() => {
-				this.activeScoreboardsInFlight = null;
-			});
-		return this.activeScoreboardsInFlight;
-	}
-
-	async GetPickupScoreboards(updated) {
-		if (this.pickupScoreboardsInFlight) {
-			return this.pickupScoreboardsInFlight;
-		}
-		this.pickupScoreboardsInFlight = this.get(`/scoreboards/pickup?updated=${updated}`)
-			.finally(() => {
-				this.pickupScoreboardsInFlight = null;
-			});
-		return this.pickupScoreboardsInFlight;
-	}
-
+	
     async get(path) {
         return this.doRequest('GET', path);
     }

@@ -11,14 +11,15 @@ export const MarquisType = Object.freeze({
 });
 
 function fetchScoreboardsByType(client, marquisType, updated) {
+	var scoreboards = client.ListScoreboards(updated);
 	switch (marquisType) {
 	case MarquisType.ACTIVE:
-		return client.GetActiveScoreboards(updated);
+		return scoreboards.Active;
 	case MarquisType.PICKUP:
-		return client.GetPickupScoreboards(updated);
+		return scoreboards.Pickup;
 	case MarquisType.RECENT:
 	default:
-		return client.GetRecentScoreboards(updated);
+		return scoreboards.Recent;
 	}
 }
 
@@ -43,19 +44,25 @@ export default function Marquis({ title, marquisType = MarquisType.RECENT, refre
 			setLoading(true);
 			while (!cancelled) {
 				try {
-					const games = await fetchScoreboardsByType(client, marquisType, cursor);
+					const scoreboards = await client.ListScoreboards(cursor);
+					console.log("scoreboards", scoreboards);
 					if (cancelled) {
 						return;
 					}
-					const summariesData = Array.isArray(games) ? games : [];
-					let lastUpdated = cursor + 1;
-					for (const game of summariesData) {
-						if (game?.updated > lastUpdated) {
-							lastUpdated = game.updated;
-						}
+					var summaries = [];
+					switch (marquisType) {
+					case MarquisType.ACTIVE:
+						summaries = scoreboards.active;
+						break;
+					case MarquisType.PICKUP:
+						summaries = scoreboards.pickup;
+						break;
+					case MarquisType.RECENT:
+						summaries = scoreboards.recent;
+						break;
 					}
-					cursor = lastUpdated;
-					setSummaries(summariesData);
+					cursor = scoreboards.updated;
+					setSummaries(summaries);
 					setError(null);
 				} catch (err) {
 					if (cancelled) {
