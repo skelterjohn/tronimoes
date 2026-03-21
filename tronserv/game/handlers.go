@@ -1152,6 +1152,18 @@ func (s *GameServer) HandleListScoreboards(w http.ResponseWriter, r *http.Reques
 		writeErr(w, err, http.StatusInternalServerError)
 		return
 	}
+
+	for i, summary := range scoreboards.Active {
+		if len(summary.Code) > 6 {
+			scoreboards.Active[i].Code = summary.Code[:6]
+		}
+	}
+	for i, summary := range scoreboards.Pickup {
+		if len(summary.Code) > 6 {
+			scoreboards.Pickup[i].Code = summary.Code[:6]
+		}
+	}
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(scoreboards)
 }
