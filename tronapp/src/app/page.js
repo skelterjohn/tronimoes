@@ -66,7 +66,11 @@ export default function Home() {
 	return (
 		<main
 			onClick={() => setErrorMessage(null)}
-			className={`font-game relative min-h-screen w-screen bg-slate-800 md:pb-0 ${mobilePanel === null ? "pb-14" : "pb-[25vh]"}`}
+			className={`font-game relative min-h-screen w-screen bg-slate-800 ${
+				mobilePanel === null
+					? "pb-14 md:pb-0"
+					: "pb-[calc(100dvh-max(50vh,12rem))] md:pb-0"
+			}`}
 		>
 			<Image 
 				src="/trondude.png"
@@ -87,8 +91,8 @@ export default function Home() {
 			</div>
 
 			<div
-				className={`fixed bottom-0 left-0 right-0 z-40 box-border flex flex-col bg-transparent pb-[env(safe-area-inset-bottom)] md:hidden ${
-					mobilePanel === null ? "h-auto" : "h-[25vh]"
+				className={`fixed bottom-0 left-0 right-0 z-40 box-border flex min-h-0 flex-col bg-transparent pb-[env(safe-area-inset-bottom)] md:hidden ${
+					mobilePanel === null ? "h-auto" : "max-h-[calc(100dvh-max(50vh,12rem))]"
 				}`}
 			>
 				{mobilePanel !== null && (
