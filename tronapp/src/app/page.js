@@ -12,6 +12,7 @@ import { useGameState } from './components/GameState';
 import Link from 'next/link';
 
 const SCOREBOARD_POLL_ERROR_BACKOFF_MS = 60000;
+const SCOREBOARD_IDLE_HALT_MS = 5 * 60 * 1000;
 
 export default function Home() {
 	const [errorMessage, setErrorMessage] = useState(null);
@@ -36,9 +37,65 @@ export default function Home() {
 			};
 		}
 
+		const lastActivityRef = { current: Date.now() };
+		let idleWake = null;
+		let visibleWake = null;
+
+		function noteActivity() {
+			lastActivityRef.current = Date.now();
+			if (idleWake) {
+				const wake = idleWake;
+				idleWake = null;
+				wake();
+			}
+		}
+
+		const activityOpts = { passive: true };
+		const activityEvents = ["pointerdown", "keydown", "touchstart", "scroll", "wheel"];
+		for (const type of activityEvents) {
+			window.addEventListener(type, noteActivity, activityOpts);
+		}
+		function onVisibility() {
+			if (!document.hidden) {
+				noteActivity();
+				if (visibleWake) {
+					const wake = visibleWake;
+					visibleWake = null;
+					wake();
+				}
+			}
+		}
+		document.addEventListener("visibilitychange", onVisibility);
+
 		async function poll() {
 			let cursor = 0;
 			while (!cancelled) {
+				if (document.hidden) {
+					await new Promise((resolve) => {
+						if (cancelled) {
+							resolve();
+							return;
+						}
+						visibleWake = resolve;
+					});
+					if (cancelled) {
+						return;
+					}
+					continue;
+				}
+				if (Date.now() - lastActivityRef.current >= SCOREBOARD_IDLE_HALT_MS) {
+					await new Promise((resolve) => {
+						if (cancelled) {
+							resolve();
+							return;
+						}
+						idleWake = resolve;
+					});
+					if (cancelled) {
+						return;
+					}
+					continue;
+				}
 				try {
 					const scoreboards = await client.ListScoreboards(cursor);
 					if (cancelled) {
@@ -60,6 +117,20 @@ export default function Home() {
 
 		return () => {
 			cancelled = true;
+			if (idleWake) {
+				const wake = idleWake;
+				idleWake = null;
+				wake();
+			}
+			if (visibleWake) {
+				const wake = visibleWake;
+				visibleWake = null;
+				wake();
+			}
+			for (const type of activityEvents) {
+				window.removeEventListener(type, noteActivity, activityOpts);
+			}
+			document.removeEventListener("visibilitychange", onVisibility);
 		};
 	}, [client]);
 
