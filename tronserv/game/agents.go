@@ -32,7 +32,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 		exeDir = filepath.Dir(exe)
 	}
 	// Spawn via PATH resolution (works when PATH includes the Go bin dir).
-	agentExe := "tronagent"
+	agentExe := "agent"
 	replicantExe := "replicant"
 	// Use Background so the agent is not killed when the HTTP request context is cancelled.
 	runCtx := context.WithoutCancel(ctx)
