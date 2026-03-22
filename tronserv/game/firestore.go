@@ -233,15 +233,6 @@ func (s *FireStore) WriteGame(ctx context.Context, game *Game) error {
 				existingOpen != open ||
 				existingHasNonZero != newHasNonZero ||
 				!scoreboardMatches(scoreboard, existingScoreboard)
-			clog.Info(ctx, "Considering scoreboard update",
-				"shouldUpdateScoreboard", shouldUpdateScoreboard,
-				"existingDone", existingDone,
-				"existingOpen", existingOpen,
-				"existingScoreboard", existingScoreboard,
-				"gameDone", game.Done,
-				"gameOpen", open,
-				"gameScoreboard", scoreboard,
-			)
 		}
 		if err := tx.Set(docRef, payload); err != nil {
 			return err
@@ -532,9 +523,11 @@ func (s *FireStore) ListPickupGames(ctx context.Context, count int, updated int6
 }
 
 func (s *FireStore) ListActiveGames(ctx context.Context, count int, updated int64) ([]GameSummary, error) {
+	cutoff := time.Now().Add(-20 * time.Minute).Unix()
 	query := s.scoreboards().
 		Where("done", "==", false).
 		Where("open", "==", false).
+		Where("updated", ">", cutoff).
 		OrderBy("updated", firestore.Desc).
 		Limit(count)
 	return s.queryToSummaries(ctx, query, updated)
