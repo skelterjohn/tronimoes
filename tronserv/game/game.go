@@ -1726,13 +1726,10 @@ func (r *Round) BlockingFeet(ctx context.Context, g *Game, squarePips map[Coord]
 	// Check if this tile is landing on a leader chicken-foot. That's allowed, because you're starting their line.
 	for _, p := range g.Players {
 		if !p.ChickenFoot || len(r.PlayerLines[p.Name]) > 1 {
-			clog.Debug(ctx, "not a leader chicken-foot", "player", p.Name)
 			continue
 		}
-		clog.Debug(ctx, "checking chicken-foot coord", "coord", p.ChickenFootCoord, "lt.Coord", lt.Coord)
 		if p.ChickenFootCoord == lt.CoordA() || p.ChickenFootCoord == lt.CoordB() {
 			lt.PlayerName = p.Name
-			clog.Debug(ctx, "found leader chicken-foot", "player", p.Name)
 		}
 	}
 
