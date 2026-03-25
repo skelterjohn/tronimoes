@@ -1,0 +1,13 @@
+players:
+  - name: Alpha
+    which: gibbs
+    max_inference_time_ms: 1000
+    max_simulation_time_ms: 5000
+    max_simulation_depth: 15
+    value_decay: 0.9
+  - name: Beta
+    which: gibbs
+    max_inference_time_ms: 800
+    max_simulation_time_ms: 4000
+    max_simulation_depth: 12
+    value_decay: 0.85

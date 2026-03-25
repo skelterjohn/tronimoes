@@ -5,6 +5,7 @@ go 1.24.11
 require (
 	cloud.google.com/go/compute/metadata v0.9.0
 	cloud.google.com/go/firestore v1.21.0
+	cloud.google.com/go/logging v1.13.2
 	cloud.google.com/go/run v1.15.0
 	firebase.google.com/go v3.13.0+incompatible
 	firebase.google.com/go/v4 v4.19.0
@@ -13,6 +14,7 @@ require (
 	golang.org/x/oauth2 v0.35.0
 	google.golang.org/api v0.266.0
 	google.golang.org/grpc v1.79.1
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -21,7 +23,6 @@ require (
 	cloud.google.com/go/auth v0.18.2 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/iam v1.5.3 // indirect
-	cloud.google.com/go/logging v1.13.2 // indirect
 	cloud.google.com/go/longrunning v0.8.0 // indirect
 	cloud.google.com/go/monitoring v1.24.3 // indirect
 	cloud.google.com/go/storage v1.60.0 // indirect
