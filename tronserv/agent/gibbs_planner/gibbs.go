@@ -34,6 +34,8 @@ type GibbsPlanner struct {
 	MaxSimulationDepth    int
 	MaxSimulationsPerMove int
 	ValueDecay            float64
+	// NoReact skips reaction image lookup and client React calls (bow, victory, etc.).
+	NoReact bool
 
 	lastGame      *game.Game
 	bag           []game.Tile
@@ -215,6 +217,9 @@ func (gp *GibbsPlanner) React(ctx context.Context, query string) {
 }
 
 func (gp *GibbsPlanner) ReactWait(ctx context.Context, query string) {
+	if gp.NoReact {
+		return
+	}
 	clog.Info(ctx, "reacting", "query", query)
 	time.Sleep(time.Duration(rand.Intn(500)+500) * time.Millisecond)
 	url, err := reacts.FindImageURL(ctx, query)

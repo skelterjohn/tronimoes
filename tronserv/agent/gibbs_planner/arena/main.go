@@ -103,6 +103,7 @@ func main() {
 			"-name", name,
 			"-code", gameCode,
 			"-which", which,
+			"-no-react",
 			"-dev",
 			"-min-move-time", "0",
 		)

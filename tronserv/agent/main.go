@@ -31,6 +31,7 @@ var (
 	archive       = flag.String("archive", "", "directory to save JSON game state and chosen move per turn; empty = don't save")
 	roundOut      = flag.Int("round-out", 0, "targeted player count")
 	dev           = flag.Bool("dev", false, "run in development mode")
+	noReact       = flag.Bool("no-react", false, "suppress reaction images and React API calls")
 )
 
 type GCEMetadataRoundTripper struct {
@@ -119,8 +120,9 @@ func main() {
 			name = CreateName("GP")
 		}
 		gp := &gibbs_planner.GibbsPlanner{
-			Name:   name,
-			Client: tc,
+			Name:    name,
+			Client:  tc,
+			NoReact: *noReact,
 		}
 		gp.SetDefaults()
 		a = gp
@@ -161,14 +163,16 @@ func main() {
 
 	lastMoveTime := time.Now()
 
-	footURL, err := reacts.FindImageURL(ctx, "bot")
-	if err != nil {
-		clog.Error(ctx, "Could not get image URL", err)
-	} else {
-		if ng, err := tc.ChooseFoot(ctx, footURL); err != nil {
-			clog.Error(ctx, "Could not choose foot", err)
+	if !*noReact {
+		footURL, err := reacts.FindImageURL(ctx, "bot")
+		if err != nil {
+			clog.Error(ctx, "Could not get image URL", err)
 		} else {
-			g = ng
+			if ng, err := tc.ChooseFoot(ctx, footURL); err != nil {
+				clog.Error(ctx, "Could not choose foot", err)
+			} else {
+				g = ng
+			}
 		}
 	}
 
