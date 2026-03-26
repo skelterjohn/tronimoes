@@ -290,7 +290,7 @@ function Game({ code }) {
 
 	const [gameInProgress, setGameInProgress] = useState(false);
 	useEffect(() => {
-		setGameInProgress(game?.rounds !== undefined && game?.rounds?.length > 0);
+		setGameInProgress(game?.rounds !== undefined && game?.rounds?.length > 0 && !game?.done);
 	}, [game]);
 
 	const [chickenFeet, setChickenFeet] = useState({});
@@ -758,7 +758,7 @@ function Game({ code }) {
 							className="game-btn w-20"
 							onClick={() => leaveOrQuit()}
 						>
-							{(gameInProgress && !game?.done && amInGame) && (<div>quit</div>) || (<div>leave</div>)}
+							{(gameInProgress && amInGame) && (<div>quit</div>) || (<div>leave</div>)}
 						</Button>
 						<FontAwesomeIcon 
 							icon={faGear} 
