@@ -144,6 +144,23 @@ function Game({ code }) {
 		};
 	}, [code, version, client, router, playerName]);
 
+	const [amInGame, setAmInGame] = useState(false);
+	useEffect(() => {
+		if (playerName === undefined) {
+			setAmInGame(false);
+			return;
+		}
+		if (game === undefined) {
+			setAmInGame(false);
+			return;
+		}
+		if (game.players.find(p => p.name === playerName) === undefined) {
+			setAmInGame(false);
+			return;
+		}
+		setAmInGame(true);
+	}, [game]);
+
 	useEffect(() => {
 		if (game === undefined) {
 			return;
@@ -741,7 +758,7 @@ function Game({ code }) {
 							className="game-btn w-20"
 							onClick={() => leaveOrQuit()}
 						>
-							{(gameInProgress && !game?.done) && (<div>quit</div>) || (<div>leave</div>)}
+							{(gameInProgress && !game?.done && amInGame) && (<div>quit</div>) || (<div>leave</div>)}
 						</Button>
 						<FontAwesomeIcon 
 							icon={faGear} 
