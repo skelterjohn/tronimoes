@@ -5,27 +5,19 @@ import (
 	"os"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/skelterjohn/tronimoes/tronserv/agent/gibbs_planner"
 )
 
 // ArenaConfig is the on-disk YAML shape for arena.
 type ArenaConfig struct {
-	Players []PlayerSlot `yaml:"players"`
+	Players []PlayerConfig `yaml:"players"`
 }
 
 // PlayerSlot is one player in list order; name is the agent / player name.
-type PlayerSlot struct {
-	Name          string `yaml:"name"`
-	PlannerConfig `yaml:",inline"`
-}
-
-// PlannerConfig is tuning for an agent; pass-through to the agent binary over time.
-type PlannerConfig struct {
-	Which                 string  `yaml:"which"` // agent -which, e.g. gibbs, random
-	MaxInferenceTimeMs    int     `yaml:"max_inference_time_ms"`
-	MaxSimulationTimeMs   int     `yaml:"max_simulation_time_ms"`
-	MaxSimulationDepth    int     `yaml:"max_simulation_depth"`
-	MaxSimulationsPerMove int     `yaml:"max_simulations_per_move"`
-	ValueDecay            float64 `yaml:"value_decay"`
+type PlayerConfig struct {
+	Name   string               `yaml:"name"`
+	Config gibbs_planner.Config `yaml:",inline"`
 }
 
 // LoadArenaConfig reads and validates arena YAML from path.

@@ -3,6 +3,7 @@ package types
 import (
 	"context"
 	"fmt"
+	"io"
 	"math/rand"
 
 	"github.com/skelterjohn/tronimoes/tronserv/game"
@@ -80,6 +81,7 @@ func InferMove(ctx context.Context, pg *game.Game, g *game.Game) (Move, bool) {
 }
 
 type Agent interface {
+	Configure(ctx context.Context, r io.Reader) error
 	Ready(ctx context.Context)
 	Update(ctx context.Context, previousGame *game.Game, g *game.Game)
 	GetMove(ctx context.Context, g *game.Game, p *game.Player) Move

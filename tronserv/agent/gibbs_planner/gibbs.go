@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"math/rand"
 	"time"
@@ -51,6 +52,30 @@ func (gp *GibbsPlanner) SetDefaults() {
 	gp.MaxSimulationDepth = 15
 	gp.ValueDecay = 0.9
 	gp.MaxSimulationsPerMove = 0
+}
+
+type Config struct {
+	MaxInferenceTimeMs    int     `yaml:"max_inference_time_ms"`
+	MaxSimulationTimeMs   int     `yaml:"max_simulation_time_ms"`
+	MaxSimulationDepth    int     `yaml:"max_simulation_depth"`
+	MaxSimulationsPerMove int     `yaml:"max_simulations_per_move"`
+	ValueDecay            float64 `yaml:"value_decay"`
+}
+
+func (gp *GibbsPlanner) Configure(ctx context.Context, r io.Reader) error {
+	var c Config
+	if err := json.NewDecoder(r).Decode(&c); err != nil {
+		return err
+	}
+	gp.MaxInferenceTime = time.Duration(c.MaxInferenceTimeMs) * time.Millisecond
+	gp.MaxSimulationTime = time.Duration(c.MaxSimulationTimeMs) * time.Millisecond
+	gp.MaxSimulationDepth = c.MaxSimulationDepth
+	gp.MaxSimulationsPerMove = c.MaxSimulationsPerMove
+	gp.ValueDecay = c.ValueDecay
+
+	clog.Info(ctx, "Configured GibbsPlanner", "maxInferenceTime", gp.MaxInferenceTime, "maxSimulationTime", gp.MaxSimulationTime, "maxSimulationDepth", gp.MaxSimulationDepth, "maxSimulationsPerMove", gp.MaxSimulationsPerMove, "valueDecay", gp.ValueDecay)
+
+	return nil
 }
 
 func (gp *GibbsPlanner) Ready(ctx context.Context) {

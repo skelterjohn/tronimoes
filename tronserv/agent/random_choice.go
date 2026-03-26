@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"math/rand"
 
 	"github.com/skelterjohn/tronimoes/tronserv/agent/types"
@@ -9,6 +10,10 @@ import (
 )
 
 type RandomChoice struct {
+}
+
+func (RandomChoice) Configure(ctx context.Context, r io.Reader) error {
+	return nil
 }
 
 func (RandomChoice) Ready(ctx context.Context) {

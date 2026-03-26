@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -32,13 +34,6 @@ func safeFilename(name string) string {
 		}
 		return '_'
 	}, name)
-}
-
-func agentWhich(pc PlannerConfig) string {
-	if pc.Which != "" {
-		return pc.Which
-	}
-	return "gibbs"
 }
 
 func randomGameCodeAZ6() string {
@@ -111,8 +106,8 @@ func main() {
 
 	fmt.Println("spawning agents, connecting to", *addr)
 
-	for _, slot := range ac.Players {
-		name := slot.Name
+	for _, pcfg := range ac.Players {
+		name := pcfg.Name
 		logPath := filepath.Join(runDir, safeFilename(name))
 		logF, err := os.Create(logPath)
 		if err != nil {
@@ -122,19 +117,29 @@ func main() {
 		}
 		defer logF.Close()
 
-		which := agentWhich(slot.PlannerConfig)
+		cfgBuf := &bytes.Buffer{}
+		if err := json.NewEncoder(cfgBuf).Encode(pcfg.Config); err != nil {
+			fmt.Fprintf(os.Stderr, "encode agent config: %v\n", err)
+			exitCode = 1
+			return
+		}
+
+		fmt.Printf("%s config: %s\n", name, cfgBuf.String())
+
 		cmd := exec.Command(*agentExe,
 			"--addr", *addr,
 			"--name", name,
 			"--code", gameCode,
-			"--which", which,
+			"--which", "gibbs",
 			"--no-react",
 			"--dev",
 			"--ready-with", fmt.Sprintf("%d", len(ac.Players)),
 			"--min-move-time", "0",
+			"--config", "-",
 		)
 		cmd.Stdout = logF
 		cmd.Stderr = os.Stderr
+		cmd.Stdin = cfgBuf
 		if err := cmd.Start(); err != nil {
 			fmt.Fprintf(os.Stderr, "start agent %s: %v\n", name, err)
 			exitCode = 1

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -33,6 +34,7 @@ var (
 	dev           = flag.Bool("dev", false, "run in development mode")
 	noReact       = flag.Bool("no-react", false, "suppress reaction images and React API calls")
 	readyWith     = flag.Int("ready-with", 0, "number of players to be ready with")
+	config        = flag.String("config", "", "path to the agent config file")
 )
 
 type GCEMetadataRoundTripper struct {
@@ -137,6 +139,22 @@ func main() {
 	ctx = clog.WithKeyword(ctx, "name", name)
 
 	ctx = clog.WithKeyword(ctx, "code", *gamecode)
+
+	if *config != "" {
+		var f io.ReadCloser
+		if *config == "-" {
+			f = os.Stdin
+		} else {
+			var err error
+			f, err = os.Open(*config)
+			if err != nil {
+				clog.Error(ctx, "Could not open config file", err)
+				os.Exit(1)
+			}
+			defer f.Close()
+		}
+		a.Configure(ctx, f)
+	}
 
 	clog.Info(ctx, "Starting agent and connecting to game server", "addr", *tronserv_addr)
 	if *archive != "" {
