@@ -16,12 +16,14 @@ import (
 	"cloud.google.com/go/logging"
 )
 
-type Severity string
+type Severity struct {
+	level string
+}
 
-const (
-	INFO  Severity = "INFO"
-	ERROR Severity = "ERROR"
-	DEBUG Severity = "DEBUG"
+var (
+	INFO  Severity = Severity{level: "INFO"}
+	ERROR Severity = Severity{level: "ERROR"}
+	DEBUG Severity = Severity{level: "DEBUG"}
 )
 
 type keywordsKeyType string
