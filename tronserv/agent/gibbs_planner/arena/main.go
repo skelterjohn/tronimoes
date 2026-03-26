@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,6 +13,9 @@ import (
 	"sync"
 	"time"
 	"unicode"
+
+	"github.com/skelterjohn/tronimoes/tronserv/client"
+	"github.com/skelterjohn/tronimoes/tronserv/clog"
 )
 
 var (
@@ -45,7 +50,27 @@ func randomGameCodeAZ6() string {
 	return string(b)
 }
 
+func expandCode(ctx context.Context, code string) string {
+	if len(code) > 6 {
+		return code
+	}
+
+	tc := &client.TronimoesClient{
+		TronservAddr: *addr,
+		Client:       http.DefaultClient,
+		Code:         code,
+	}
+	g, err := tc.GetGame(ctx, 0)
+	if err != nil {
+		return code
+	}
+	clog.Info(ctx, "Expanded code", "code", code, "new code", g.Code)
+	return g.Code
+}
+
 func main() {
+	ctx := context.Background()
+
 	exitCode := 0
 	defer func() { os.Exit(exitCode) }()
 
@@ -82,9 +107,9 @@ func main() {
 		exitCode = 1
 		return
 	}
-	fmt.Println("agent stdout logs", runDir)
+	fmt.Println("agent stdout logs written to", runDir)
 
-	fmt.Println("spawning agents", *addr)
+	fmt.Println("spawning agents, connecting to", *addr)
 
 	for _, slot := range ac.Players {
 		name := slot.Name
@@ -99,13 +124,14 @@ func main() {
 
 		which := agentWhich(slot.PlannerConfig)
 		cmd := exec.Command(*agentExe,
-			"-addr", *addr,
-			"-name", name,
-			"-code", gameCode,
-			"-which", which,
-			"-no-react",
-			"-dev",
-			"-min-move-time", "0",
+			"--addr", *addr,
+			"--name", name,
+			"--code", gameCode,
+			"--which", which,
+			"--no-react",
+			"--dev",
+			"--ready-with", fmt.Sprintf("%d", len(ac.Players)),
+			"--min-move-time", "0",
 		)
 		cmd.Stdout = logF
 		cmd.Stderr = os.Stderr
@@ -116,7 +142,13 @@ func main() {
 		}
 		defer cmd.Process.Kill()
 		started = append(started, cmd)
-		time.Sleep(1 * time.Second)
+		for len(gameCode) == 6 {
+			time.Sleep(1 * time.Second)
+			gameCode = expandCode(ctx, gameCode)
+			if len(gameCode) != 6 {
+				fmt.Println("expanded game code to", gameCode)
+			}
+		}
 	}
 
 	fmt.Println("game board", fmt.Sprintf("http://localhost:3000/gameboard/%s", gameCode))
