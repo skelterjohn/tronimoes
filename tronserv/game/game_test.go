@@ -11,7 +11,7 @@ import (
 )
 
 func withAllLogging(ctx context.Context) context.Context {
-	ctx = clog.WithSeverities(ctx, "info", "error", "debug")
+	ctx = clog.WithSeverities(ctx, clog.INFO, clog.ERROR, clog.DEBUG)
 	ctx = clog.WithTextOutput(ctx, os.Stdout)
 	return ctx
 }

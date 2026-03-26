@@ -44,7 +44,7 @@ func ChiLogFormatter() middleware.LogFormatter {
 }
 
 // ChiLogger returns chi middleware that injects clog into the request context
-// (structured output to os.Stdout, severities "info" and "error" for handlers)
+// (structured output to os.Stdout, severities INFO and ERROR for handlers)
 // and logs each request via ChiLogFormatter using Log() with "INFO" or "ERROR".
 // Use as r.Use(clog.ChiLogger()).
 func ChiLogger(next http.Handler) http.Handler {

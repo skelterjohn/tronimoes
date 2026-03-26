@@ -26,7 +26,7 @@ func loadGameFromTestdata(t *testing.T, label string) *game.Game {
 func TestOneshot(t *testing.T) {
 	t.Parallel()
 	g := loadGameFromTestdata(t, "oneshot")
-	ctx := clog.WithSeverities(t.Context(), "info", "error", "debug")
+	ctx := clog.WithSeverities(t.Context(), clog.INFO, clog.ERROR, clog.DEBUG)
 
 	// Agent plays as the current player.
 	currentPlayer := g.Players[g.Turn]
@@ -62,7 +62,7 @@ func TestOneshot(t *testing.T) {
 func TestNoSelfKill(t *testing.T) {
 	t.Parallel()
 	g := loadGameFromTestdata(t, "noselfkill")
-	ctx := clog.WithSeverities(t.Context(), "info", "error", "debug")
+	ctx := clog.WithSeverities(t.Context(), clog.INFO, clog.ERROR, clog.DEBUG)
 
 	currentPlayer := g.Players[g.Turn]
 	gp := &GibbsPlanner{

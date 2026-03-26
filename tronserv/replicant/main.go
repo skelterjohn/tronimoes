@@ -37,7 +37,7 @@ func main() {
 	} else {
 		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
 	}
-	ctx = clog.WithSeverities(ctx, "info")
+	ctx = clog.WithSeverities(ctx, clog.INFO)
 
 	count, err := strconv.Atoi(os.Args[1])
 	if err != nil {
