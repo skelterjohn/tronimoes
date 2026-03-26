@@ -91,6 +91,17 @@ func (s *FireStore) FindGameAlreadyPlaying(ctx context.Context, code, name strin
 	return nil, nil
 }
 
+func (s *FireStore) FindActiveCodeFromPrefix(ctx context.Context, prefix string) (string, error) {
+	c := s.games()
+	iter := c.Where("code_prefix", "==", prefix).Where("done", "==", false).Limit(1).Select("code_prefix").Documents(ctx)
+	doc, err := iter.Next()
+	if err != nil {
+		return "", fmt.Errorf("could not get next: %w", err)
+	}
+	defer iter.Stop()
+	return doc.Ref.ID, nil
+}
+
 func (s *FireStore) FindOpenGame(ctx context.Context, code string) (*Game, error) {
 	c := s.games()
 	iter := c.Where("code_prefix", "==", code).Where("open", "==", true).Where("done", "==", false).Documents(ctx)

@@ -144,6 +144,14 @@ function Game({ code }) {
 		};
 	}, [code, version, client, router, playerName]);
 
+	useEffect(() => {
+		if (game === undefined) {
+			return;
+		}
+		if (game.code !== code) {
+			window.location.assign(`/gameboard/${encodeURIComponent(game.code)}`);
+		}
+	}, [code, game]);
 
 	useEffect(() => {
 		// we got a new client, so let's totally refresh the game.

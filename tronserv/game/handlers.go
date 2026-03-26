@@ -574,6 +574,18 @@ func (s *GameServer) HandleGetGame(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	code := chi.URLParam(r, "code")
+
+	if len(code) == 6 {
+		activeCode, err := s.Store.FindActiveCodeFromPrefix(ctx, code)
+		if err != nil {
+			clog.Error(ctx, "Error finding active code", err, "prefix", code)
+			writeErr(w, err, http.StatusInternalServerError)
+			return
+		}
+		clog.Info(ctx, "Found active code from prefix", "prefix", code, "code", activeCode)
+		code = activeCode
+	}
+
 	ctx = clog.WithKeyword(ctx, "code", code)
 	versionStr := r.URL.Query().Get("version")
 	ctx = clog.WithKeyword(ctx, "version", versionStr)

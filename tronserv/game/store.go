@@ -37,6 +37,7 @@ type ScoreboardSummary struct {
 }
 
 type Store interface {
+	FindActiveCodeFromPrefix(ctx context.Context, code string) (string, error)
 	FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error)
 	FindOpenGame(ctx context.Context, code string) (*Game, error)
 	FindPickupGame(ctx context.Context) (*Game, error)
@@ -99,6 +100,21 @@ func (s *MemoryStore) FindOpenGame(ctx context.Context, code string) (*Game, err
 	}
 
 	return s.ReadGame(ctx, fullCode)
+}
+
+func (s *MemoryStore) FindActiveCodeFromPrefix(ctx context.Context, code string) (string, error) {
+	s.gamesMu.Lock()
+	defer s.gamesMu.Unlock()
+	for _, g := range s.games {
+		if g.Done {
+			continue
+		}
+		if !strings.HasPrefix(g.Code, code) {
+			continue
+		}
+		return g.Code, nil
+	}
+	return "", ErrNoSuchGame
 }
 
 func (s *MemoryStore) FindGameAlreadyPlaying(ctx context.Context, code, name string) (*Game, error) {
