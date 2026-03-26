@@ -32,6 +32,7 @@ var (
 	roundOut      = flag.Int("round-out", 0, "targeted player count")
 	dev           = flag.Bool("dev", false, "run in development mode")
 	noReact       = flag.Bool("no-react", false, "suppress reaction images and React API calls")
+	readyWith     = flag.Int("ready-with", 0, "number of players to be ready with")
 )
 
 type GCEMetadataRoundTripper struct {
@@ -88,7 +89,7 @@ func main() {
 	} else {
 		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
 	}
-	ctx = clog.WithSeverities(ctx, "info", "error")
+	ctx = clog.WithSeverities(ctx, clog.INFO, clog.ERROR)
 
 	c := http.DefaultClient
 	if *useGCEToken {
@@ -209,12 +210,17 @@ func main() {
 				return
 			}
 			if !p.Ready {
-				a.Ready(ctx)
-				clog.Info(ctx, "Ready to begin a new round.")
-				g, err = tc.Start(ctx)
-				if err != nil {
-					clog.Error(ctx, "Error starting game", err)
-					return
+				if *readyWith > 0 && len(g.Players) >= *readyWith {
+					a.Ready(ctx)
+					clog.Info(ctx, "Ready to begin a new round.")
+					g, err = tc.Start(ctx)
+					if err != nil {
+						clog.Error(ctx, "Error starting game", err)
+						return
+					}
+				} else {
+					clog.Info(ctx, "Not ready to begin a new round, waiting for more players", "readyWith", *readyWith, "players", len(g.Players))
+					time.Sleep(5 * time.Second)
 				}
 			}
 			if g.CurrentRound(ctx) != nil {
