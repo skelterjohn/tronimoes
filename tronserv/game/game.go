@@ -411,11 +411,29 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 		return ErrTileOccluded
 	}
 
+	for _, p := range g.Players {
+		if p.Name == player.Name {
+			continue
+		}
+		if p.ChickenFoot && p.ChickenFootCoord == coord {
+			return ErrBadChickenFoot
+		}
+	}
+
 	for _, n := range coord.Neighbors() {
 		if !g.InBounds(ctx, n) {
 			continue
 		}
 		if _, ok := squarePips[n]; ok {
+			continue
+		}
+		imaginaryTile := LaidTile{
+			Tile:        Tile{PipsA: leader.Tile.PipsA, PipsB: leader.Tile.PipsB},
+			Coord:       coord,
+			Orientation: coord.OrientationTo(n),
+			PlayerName:  player.Name,
+		}
+		if r.BlockingFeet(ctx, g, squarePips, imaginaryTile, player.Name) {
 			continue
 		}
 		player.ChickenFootCoord = coord

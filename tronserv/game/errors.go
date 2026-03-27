@@ -24,6 +24,7 @@ var (
 	ErrTileOutOfBounds          = errors.New("tile out of bounds")
 	ErrGameOver                 = errors.New("game is over")
 	ErrMustPickChickenFoot      = errors.New("must pick chicken foot next to round leader")
+	ErrBadChickenFoot           = errors.New("the selected chicken foot is not valid")
 	ErrMustDrawTile             = errors.New("must draw tile")
 	ErrNoSuchPlayer             = errors.New("no such player... who are you")
 	ErrNoBlockingFeet           = errors.New("you must let all players lay at least one tile on their own line")

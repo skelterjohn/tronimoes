@@ -13,6 +13,7 @@ import Link from 'next/link';
 
 const SCOREBOARD_POLL_ERROR_BACKOFF_MS = 60000;
 const SCOREBOARD_IDLE_HALT_MS = 5 * 60 * 1000;
+const SCOREBOARD_MIN_POLL_INTERVAL_MS = 1000;
 
 export default function Home() {
 	const [errorMessage, setErrorMessage] = useState(null);
@@ -69,6 +70,7 @@ export default function Home() {
 
 		async function poll() {
 			let cursor = 0;
+			let lastScoreboardRequestAt = 0;
 			while (!cancelled) {
 				if (document.hidden) {
 					await new Promise((resolve) => {
@@ -96,7 +98,18 @@ export default function Home() {
 					}
 					continue;
 				}
+				const elapsedSinceLastRequest = Date.now() - lastScoreboardRequestAt;
+				if (lastScoreboardRequestAt !== 0 && elapsedSinceLastRequest < SCOREBOARD_MIN_POLL_INTERVAL_MS) {
+					await new Promise((resolve) =>
+						setTimeout(resolve, SCOREBOARD_MIN_POLL_INTERVAL_MS - elapsedSinceLastRequest)
+					);
+					if (cancelled) {
+						return;
+					}
+					continue;
+				}
 				try {
+					lastScoreboardRequestAt = Date.now();
 					const scoreboards = await client.ListScoreboards(cursor);
 					if (cancelled) {
 						return;
