@@ -200,7 +200,16 @@ func (s *MemoryStore) ReadGame(ctx context.Context, code string) (*Game, error) 
 
 func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	s.gamesMu.Lock()
-	defer s.gamesMu.Unlock()
+	defer func() {
+		close(s.gamesChan)
+		s.gamesChan = make(chan bool)
+		s.gamesMu.Unlock()
+	}()
+
+	if len(game.Rounds) == 0 && len(game.Players) == 0 {
+		delete(s.games, game.Code)
+		return nil
+	}
 
 	s.gamesUpdated = time.Now().Unix()
 
@@ -232,9 +241,6 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	}
 	s.watchChans[gameCopy.Code] = nil
 	s.watchMu.Unlock()
-
-	close(s.gamesChan)
-	s.gamesChan = make(chan bool)
 
 	return nil
 }
