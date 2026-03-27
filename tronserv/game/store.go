@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/skelterjohn/tronimoes/tronserv/clog"
 )
@@ -56,18 +57,21 @@ type Store interface {
 }
 
 type MemoryStore struct {
-	games      map[string]*Game
-	gamesMu    sync.Mutex
-	watchChans map[string][]chan *Game
-	watchMu    sync.Mutex
-	players    map[string]PlayerInfo
-	playersMu  sync.Mutex
-	active     map[string]map[string]int64
+	games        map[string]*Game
+	gamesUpdated int64
+	gamesChan    chan bool
+	gamesMu      sync.Mutex
+	watchChans   map[string][]chan *Game
+	watchMu      sync.Mutex
+	players      map[string]PlayerInfo
+	playersMu    sync.Mutex
+	active       map[string]map[string]int64
 }
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
 		games:      make(map[string]*Game),
+		gamesChan:  make(chan bool),
 		watchChans: make(map[string][]chan *Game),
 		players:    make(map[string]PlayerInfo),
 		active:     make(map[string]map[string]int64),
@@ -198,6 +202,8 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	s.gamesMu.Lock()
 	defer s.gamesMu.Unlock()
 
+	s.gamesUpdated = time.Now().Unix()
+
 	game.Version++
 
 	// Deep copy using JSON marshal/unmarshal so that changes (like filtering)
@@ -226,6 +232,9 @@ func (s *MemoryStore) WriteGame(ctx context.Context, game *Game) error {
 	}
 	s.watchChans[gameCopy.Code] = nil
 	s.watchMu.Unlock()
+
+	close(s.gamesChan)
+	s.gamesChan = make(chan bool)
 
 	return nil
 }
@@ -416,6 +425,17 @@ func (s *MemoryStore) ListRecentGames(ctx context.Context, count int, updated in
 	return games, nil
 }
 func (s *MemoryStore) ListScoreboards(ctx context.Context, count int, updated int64) (ScoreboardSummary, error) {
+	s.gamesMu.Lock()
+	lastUpdated := s.gamesUpdated
+	ch := s.gamesChan
+	s.gamesMu.Unlock()
+	if updated >= lastUpdated {
+		<-ch
+		s.gamesMu.Lock()
+		lastUpdated = s.gamesUpdated
+		s.gamesMu.Unlock()
+	}
+
 	active, err := s.ListActiveGames(ctx, count, updated)
 	if err != nil {
 		return ScoreboardSummary{}, err
@@ -433,6 +453,6 @@ func (s *MemoryStore) ListScoreboards(ctx context.Context, count int, updated in
 		Active:  active,
 		Pickup:  pickup,
 		Recent:  recent,
-		Updated: updated,
+		Updated: lastUpdated,
 	}, nil
 }
