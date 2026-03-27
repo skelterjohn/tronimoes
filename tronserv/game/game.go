@@ -394,6 +394,14 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 }
 
 func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coord Coord) error {
+	if err := r.CanSetChickenFoot(ctx, g, player, coord); err != nil {
+		return err
+	}
+	player.ChickenFootCoord = coord
+	return nil
+}
+
+func (r *Round) CanSetChickenFoot(ctx context.Context, g *Game, player *Player, coord Coord) error {
 	// we have to pick a viable spot left around the round leader
 	if coord.X == -1 || coord.Y == -1 {
 		return ErrMustPickChickenFoot
@@ -401,6 +409,9 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 
 	leader := r.PlayerLines[player.Name][0]
 
+	if leader.CoordA() == coord || leader.CoordB() == coord {
+		return ErrMustPickChickenFoot
+	}
 	if !leader.CoordA().Adj(coord) && !leader.CoordB().Adj(coord) {
 		return ErrMustPickChickenFoot
 	}
@@ -436,7 +447,6 @@ func (r *Round) SetChickenFoot(ctx context.Context, g *Game, player *Player, coo
 		if r.BlockingFeet(ctx, g, squarePips, imaginaryTile, player.Name) {
 			continue
 		}
-		player.ChickenFootCoord = coord
 		return nil
 	}
 	return ErrNoOpenAdjacent
@@ -1015,13 +1025,8 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 	passFeet := []Coord{}
 	if len(r.PlayerLines[name]) == 1 && (p.JustDrew || len(g.Bag) == 0) {
 		canUseSquare := func(c Coord) bool {
-			if _, ok := squarePips[c]; ok {
-				return false
-			}
-			for _, n := range c.Neighbors() {
-				if _, ok := squarePips[n]; !ok {
-					return true
-				}
+			if err := r.CanSetChickenFoot(ctx, g, p, c); err != nil {
+				return true
 			}
 			return false
 		}
