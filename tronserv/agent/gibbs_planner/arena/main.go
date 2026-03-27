@@ -65,23 +65,20 @@ func expandCode(ctx context.Context, code string) string {
 
 func main() {
 	ctx := context.Background()
-
-	exitCode := 0
-	defer func() { os.Exit(exitCode) }()
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Minute)
+	defer cancel()
 
 	flag.Parse()
 	args := flag.Args()
 	if len(args) != 1 {
 		fmt.Println("usage: arena [options] config.yaml")
 		flag.PrintDefaults()
-		exitCode = 2
 		return
 	}
 
 	ac, err := LoadArenaConfig(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "config: %v\n", err)
-		exitCode = 1
 		return
 	}
 
@@ -93,13 +90,11 @@ func main() {
 	runDir := filepath.Join(*logDir, time.Now().Format("20060102_150405")+"_"+gameCode)
 	if err := os.MkdirAll(runDir, 0755); err != nil {
 		fmt.Fprintf(os.Stderr, "mkdir run log dir %s: %v\n", runDir, err)
-		exitCode = 1
 		return
 	}
 	runDir, err = filepath.Abs(runDir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "abs run log dir %s: %v\n", runDir, err)
-		exitCode = 1
 		return
 	}
 	fmt.Println("agent stdout logs written to", runDir)
@@ -112,7 +107,6 @@ func main() {
 		logF, err := os.Create(logPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "create agent log file %s: %v\n", logPath, err)
-			exitCode = 1
 			return
 		}
 		defer logF.Close()
@@ -120,7 +114,6 @@ func main() {
 		cfgBuf := &bytes.Buffer{}
 		if err := json.NewEncoder(cfgBuf).Encode(pcfg.Config); err != nil {
 			fmt.Fprintf(os.Stderr, "encode agent config: %v\n", err)
-			exitCode = 1
 			return
 		}
 
@@ -142,7 +135,6 @@ func main() {
 		cmd.Stdin = cfgBuf
 		if err := cmd.Start(); err != nil {
 			fmt.Fprintf(os.Stderr, "start agent %s: %v\n", name, err)
-			exitCode = 1
 			return
 		}
 		defer cmd.Process.Kill()
@@ -178,7 +170,6 @@ func main() {
 
 	if runErr != nil {
 		fmt.Fprintf(os.Stderr, "agent exited with error: %v\n", runErr)
-		exitCode = 1
 		return
 	}
 }
