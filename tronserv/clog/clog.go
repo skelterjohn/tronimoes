@@ -113,6 +113,37 @@ func WithDurationSince(ctx context.Context, start time.Time) context.Context {
 	return context.WithValue(ctx, durationsKey, start)
 }
 
+// mergeClogContext layers clog settings from clogCtx onto base without replacing base.
+// Use base = r.Context() so chi and other middleware keys (e.g. *chi.Context) stay intact.
+func mergeClogContext(base, clogCtx context.Context) context.Context {
+	ctx := base
+	if v := clogCtx.Value(keywordsKey); v != nil {
+		ctx = context.WithValue(ctx, keywordsKey, v)
+	}
+	if v := clogCtx.Value(textOutputKey); v != nil {
+		ctx = context.WithValue(ctx, textOutputKey, v)
+	}
+	if v := clogCtx.Value(structuredOutputKey); v != nil {
+		ctx = context.WithValue(ctx, structuredOutputKey, v)
+	}
+	if v := clogCtx.Value(cloudLoggingKey); v != nil {
+		ctx = context.WithValue(ctx, cloudLoggingKey, v)
+	}
+	if v := clogCtx.Value(infoKey); v != nil {
+		ctx = context.WithValue(ctx, infoKey, v)
+	}
+	if v := clogCtx.Value(errorKey); v != nil {
+		ctx = context.WithValue(ctx, errorKey, v)
+	}
+	if v := clogCtx.Value(debugKey); v != nil {
+		ctx = context.WithValue(ctx, debugKey, v)
+	}
+	if v := clogCtx.Value(durationsKey); v != nil {
+		ctx = context.WithValue(ctx, durationsKey, v)
+	}
+	return ctx
+}
+
 func severityEnabled(ctx context.Context, key any) bool {
 	v, _ := ctx.Value(key).(bool)
 	return v
@@ -212,9 +243,9 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		strb.WriteString(severity)
 		strb.WriteString("\t")
 		strb.WriteString(fl)
-		strb.WriteString("\t")
+		strb.WriteString("\n| ")
 		strb.WriteString(message)
-		strb.WriteString(" | ")
+		strb.WriteString("\n|")
 		// Include both tags already on the context (keywords) and tags passed to Log().
 		tagKeys := []string{}
 		for key := range tagsForMessage {

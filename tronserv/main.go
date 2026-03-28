@@ -47,11 +47,11 @@ func main() {
 	if *dev {
 		ctx = clog.WithSeverities(ctx, clog.DEBUG)
 		ctx = clog.WithTextOutput(ctx, os.Stdout)
-		r.Use(clog.ChiLoggerDev)
+		r.Use(clog.ChiLogger(ctx, false))
 		clog.Info(ctx, "Running in development mode")
 	} else {
 		ctx = clog.WithStructuredOutput(ctx, os.Stdout)
-		r.Use(clog.ChiLogger)
+		r.Use(clog.ChiLogger(ctx, true))
 		clog.Info(ctx, "Running in production mode")
 	}
 

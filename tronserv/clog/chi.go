@@ -1,8 +1,8 @@
 package clog
 
 import (
+	"context"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/go-chi/chi/v5/middleware"
@@ -47,24 +47,19 @@ func ChiLogFormatter() middleware.LogFormatter {
 // (structured output to os.Stdout, severities INFO and ERROR for handlers)
 // and logs each request via ChiLogFormatter using Log() with "INFO" or "ERROR".
 // Use as r.Use(clog.ChiLogger()).
-func ChiLogger(next http.Handler) http.Handler {
-	inject := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := WithStructuredOutput(r.Context(), os.Stdout)
-			ctx = WithSeverities(ctx, INFO, ERROR)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
+func ChiLogger(ctx context.Context, withServerLogs bool) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		inject := func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Merge clog into the request context; replacing r.Context() drops chi's
+				// route context and panics inside chi.Mux.routeHTTP.
+				next.ServeHTTP(w, r.WithContext(mergeClogContext(r.Context(), ctx)))
+			})
+		}
+		if withServerLogs {
+			return inject(middleware.RequestLogger(ChiLogFormatter())(next))
+		} else {
+			return inject(next)
+		}
 	}
-	return inject(middleware.RequestLogger(ChiLogFormatter())(next))
-}
-
-func ChiLoggerDev(next http.Handler) http.Handler {
-	inject := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := WithTextOutput(r.Context(), os.Stdout)
-			ctx = WithSeverities(ctx, INFO, ERROR, DEBUG)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		})
-	}
-	return inject(middleware.RequestLogger(ChiLogFormatter())(next))
 }
