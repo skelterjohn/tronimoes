@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -215,11 +216,16 @@ func _log(ctx context.Context, severity, message string, addTags map[string]stri
 		strb.WriteString(message)
 		strb.WriteString(" | ")
 		// Include both tags already on the context (keywords) and tags passed to Log().
-		for key, value := range tagsForMessage {
+		tagKeys := []string{}
+		for key := range tagsForMessage {
+			tagKeys = append(tagKeys, key)
+		}
+		sort.Strings(tagKeys)
+		for _, key := range tagKeys {
 			strb.WriteString(" ")
 			strb.WriteString(key)
 			strb.WriteString("=")
-			strb.WriteString(value)
+			strb.WriteString(tagsForMessage[key])
 		}
 		fmt.Fprintln(textOutput, strb.String())
 	}
