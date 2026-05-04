@@ -416,6 +416,22 @@ export default function Board({
 														<Hint />
 													</div>
 												)}
+												{playA === undefined &&
+													Object.entries(spacerHintSuffix).map(([keyCoord, valCoord]) => {
+														if (valCoord !== `${x},${y}`) return null;
+														const parts = keyCoord.split(",");
+														if (parts.length !== 2) return null;
+														const kx = +parts[0];
+														const ky = +parts[1];
+														return (
+															<div
+																key={`spacer-suffix-${keyCoord}`}
+																className="w-full h-full z-20 absolute pointer-events-none"
+															>
+																<Hint spacerOffset={{ x: kx - x, y: ky - y }} />
+															</div>
+														);
+													})}
 												{playA !== undefined && spacerHintSuffix[`${x},${y}`] === `${playA.x},${playA.y}` && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint spacerOffset={{x: playA.x - x, y: playA.y - y}} />
