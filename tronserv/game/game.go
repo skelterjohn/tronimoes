@@ -643,20 +643,20 @@ func (g *Game) LayTile(ctx context.Context, name string, tile *LaidTile) error {
 }
 
 type Player struct {
-	Name             string     `json:"name"`
-	Bot              bool       `json:"bot"`
-	Ready            bool       `json:"ready"`
-	Score            int        `json:"score"`
-	Hand             []Tile     `json:"hand"`
-	Hints            [][]string `json:"hints"`
-	SpacerHints      []string   `json:"spacer_hints"`
-	ChickenFoot      bool       `json:"chicken_foot"`
-	Dead             bool       `json:"dead"`
-	JustDrew         bool       `json:"just_drew"`
-	ChickenFootCoord Coord      `json:"chicken_foot_coord"`
-	ChickenFootURL   string     `json:"chicken_foot_url"`
-	ReactURL         string     `json:"react_url"`
-	Kills            []string   `json:"kills"`
+	Name             string    `json:"name"`
+	Bot              bool      `json:"bot"`
+	Ready            bool      `json:"ready"`
+	Score            int       `json:"score"`
+	Hand             []Tile    `json:"hand"`
+	Hints            [][]Coord `json:"hints"`
+	SpacerHints      []Spacer  `json:"spacer_hints"`
+	ChickenFoot      bool      `json:"chicken_foot"`
+	Dead             bool      `json:"dead"`
+	JustDrew         bool      `json:"just_drew"`
+	ChickenFootCoord Coord     `json:"chicken_foot_coord"`
+	ChickenFootURL   string    `json:"chicken_foot_url"`
+	ReactURL         string    `json:"react_url"`
+	Kills            []string  `json:"kills"`
 }
 
 func (p *Player) HasRoundLeader(leader int) bool {
@@ -825,23 +825,24 @@ func (r *Round) Note(ctx context.Context, n string) {
 
 func (r *Round) FindHints(ctx context.Context, g *Game, p *Player) {
 	legalMoves, legalSpacers, _ := r.FindLegalMoves(ctx, g, p)
-	hintMap := make(map[string][]string)
+	hintMap := make(map[string][]Coord)
 	for _, t := range p.Hand {
-		hintMap[t.String()] = []string{}
+		hintMap[t.String()] = []Coord{}
 	}
 	for _, lt := range legalMoves {
-		hintMap[lt.Tile.String()] = append(hintMap[lt.Tile.String()], lt.CoordA().String())
-		hintMap[lt.Tile.String()] = append(hintMap[lt.Tile.String()], lt.CoordB().String())
+		hintMap[lt.Tile.String()] = append(hintMap[lt.Tile.String()], lt.CoordA())
+		hintMap[lt.Tile.String()] = append(hintMap[lt.Tile.String()], lt.CoordB())
 	}
-	p.Hints = make([][]string, len(p.Hand))
+	p.Hints = make([][]Coord, len(p.Hand))
 	for i, t := range p.Hand {
 		for _, coord := range hintMap[t.String()] {
 			p.Hints[i] = append(p.Hints[i], coord)
 		}
 	}
 
+	p.SpacerHints = []Spacer{}
 	for _, spacer := range legalSpacers {
-		p.SpacerHints = append(p.SpacerHints, spacer.String())
+		p.SpacerHints = append(p.SpacerHints, spacer)
 	}
 }
 
@@ -962,8 +963,6 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 		}
 		tryToCoord(r.Spacer.B)
 	}
-
-	p.SpacerHints = []string{}
 
 	highestLeaderPips := r.PlayerLines[name][0].Tile.PipsA
 	for _, line := range r.FreeLines {

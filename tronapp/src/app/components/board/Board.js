@@ -213,19 +213,24 @@ export default function Board({
 
 	const [spacerHintPrefix, setSpacerHintPrefix] = useState({});
 	useEffect(() => {
-		let prefix = {};
-		if (selectedTile?.a == -1 && selectedTile?.b == -1 && spacerHints) {
-			spacerHints.forEach(hint => {
-				const [first, second] = hint.split("-");
-			prefix[first] = second;
-			prefix[second] = first;
-			});
+		const prefix = {};
+		if (
+			selectedTile?.a == -1 &&
+			selectedTile?.b == -1 &&
+			spacerHints &&
+			typeof spacerHints === "object" &&
+			!Array.isArray(spacerHints)
+		) {
+			for (const [k, v] of Object.entries(spacerHints)) {
+				prefix[k] = v;
+				prefix[v] = k;
+			}
 		}
 		setSpacerHintPrefix(prefix);
 	}, [spacerHints, selectedTile, hints]);
 
 	function clickForSpacer(x, y) {
-		if (!(`(${x},${y})` in spacerHintPrefix)) {
+		if (!(`${x},${y}` in spacerHintPrefix)) {
 			setPlayA(undefined);
 			return;
 		}
@@ -398,12 +403,12 @@ export default function Board({
 									{Array.from({ length: width }, (_, x) => (
 										<td key={y * width + x} className="p-0 border-0 bg-[#34495E]" style={{ height: cellSpan, width: cellSpan }}>
 											<div className="w-full pb-[100%] relative">
-												{hints[`(${x},${y})`] && (
+												{hints[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint />
 													</div>
 												)}
-												{spacerHintPrefix[`(${x},${y})`] && (
+												{spacerHintPrefix[`${x},${y}`] && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
 														<Hint />
 													</div>

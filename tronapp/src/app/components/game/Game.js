@@ -197,8 +197,13 @@ function Game({ code }) {
 
 		let playerColors = {}
 
+
 		setPlayers(game.players.map((p, i) => {
 			playerColors[p.name] = availableColors[i];
+			let spacerHintMap = {};
+			p.spacer_hints?.forEach((spacer) => {
+				spacerHintMap[`${spacer.a.x},${spacer.a.y}`] = `${spacer.b.x},${spacer.b.y}`;
+			});
 			return {
 				name: p.name,
 				color: availableColors[i],
@@ -207,7 +212,7 @@ function Game({ code }) {
 					b: t.pips_b,
 				})),
 				hints: p.hints,
-				spacer_hints: p.spacer_hints,
+				spacer_hints: spacerHintMap,
 				score: p.score,
 				dead: p.dead,
 				chickenFoot: p.chicken_foot,
@@ -335,7 +340,7 @@ function Game({ code }) {
 			}
 			let hintSet = {};
 			player.hints[i].forEach((coord) => {
-				hintSet[coord] = true;
+				hintSet[`${coord.x},${coord.y}`] = true;
 			})
 			setHints(hintSet);
 		})
