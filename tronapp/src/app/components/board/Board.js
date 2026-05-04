@@ -418,7 +418,7 @@ export default function Board({
 												)}
 												{playA !== undefined && spacerHintSuffix[`${x},${y}`] === `${playA.x},${playA.y}` && (
 													<div className="w-full h-full z-20 absolute pointer-events-none">
-														<Hint />
+														<Hint spacerOffset={{x: playA.x - x, y: playA.y - y}} />
 													</div>
 												)}
 												{spacerA === `${x},${y}` && (
