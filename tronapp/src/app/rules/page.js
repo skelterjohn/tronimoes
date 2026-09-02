@@ -43,7 +43,7 @@ const SECTIONS = [
 			<>
 				<p>
 					In tronimoes, players take turns laying tiles on the board. They start
-					from the central tile, known as the "round leader". Lines are built by
+					from the central tile, known as the &quot;round leader&quot;. Lines are built by
 					matching pips from tile to tile.
 				</p>
 				<p>
@@ -82,7 +82,7 @@ const SECTIONS = [
 					is chosen and placed automatically.
 				</p>
 				<p>
-					It is the highest double available from a player's hand that
+					It is the highest double available from a player&apos;s hand that
 					is lower than all previous round leaders.
 				</p>
 				<p>
@@ -111,7 +111,7 @@ const SECTIONS = [
 					If you are killed, you lose 1 point.
 				</p>
 				<p>
-					(If you kill your own line, it's net zero points.)
+					(If you kill your own line, it&apos;s net zero points.)
 				</p>
 				<p>
 					After the last round is played, the player with the most points wins.
@@ -125,7 +125,7 @@ const SECTIONS = [
 			<>
 				<p>
 					If a player lays a tile that makes it impossible for another player to
-					continue their line, that player is "killed", and their line is "dead".
+					continue their line, that player is &quot;killed&quot;, and their line is &quot;dead&quot;.
 				</p>
 				<p>
 					Their tiles remain on the board, blocking others.
@@ -146,13 +146,13 @@ const SECTIONS = [
 					activePlayer={{ color: "blue" }}
 				/>
 				<p>
-					That's right (probably): blue can place their next tile blocking
+					That&apos;s right (probably): blue can place their next tile blocking
 					red from continuing.
 				</p>
 				<p>
 					Unfortunately for red, the edges of the board block them on one side,
-					and blue's tiles block the other. There is no way to play more tiles
-					on that line, so it's dead.
+					and blue&apos;s tiles block the other. There is no way to play more tiles
+					on that line, so it&apos;s dead.
 				</p>
 				<RulesBoard
 					height={7}
@@ -177,10 +177,10 @@ const SECTIONS = [
 		content: (
 			<>
 				<p>
-					On your turn, you may opt to draw a tile, if you haven't already.
+					On your turn, you may opt to draw a tile, if you haven&apos;t already.
 				</p>
 				<p>
-					Once you've drawn a tile, you may opt to pass your turn.
+					Once you&apos;ve drawn a tile, you may opt to pass your turn.
 				</p>
 				<p>
 					You can do this draw/pass maneuver whether or not you have a tile
@@ -194,7 +194,7 @@ const SECTIONS = [
 		content: (
 			<>
 				<p>
-					If you pass, and you weren't chicken-footed already, you become
+					If you pass, and you weren&apos;t chicken-footed already, you become
 					chicken-footed.
 				</p>
 				<p>
@@ -203,8 +203,8 @@ const SECTIONS = [
 				</p>
 				<p>
 					Other players are likely to do bad things to you. If they have your
-					line box itself in, you're dead and they get the credit (it's the
-					player who laid the tile that made it so you couldn't continue who
+					line box itself in, you&apos;re dead and they get the credit (it&apos;s the
+					player who laid the tile that made it so you couldn&apos;t continue who
 					gets points for the kill).
 				</p>
 				<p>
@@ -223,7 +223,7 @@ const SECTIONS = [
 				</p>
 				<p>
 					On tronimoes.com, that means doing a quick image search for something that
-					makes you feel like you're chicken-footed. The resulting image is your chicken-foot.
+					makes you feel like you&apos;re chicken-footed. The resulting image is your chicken-foot.
 				</p>
 				<p>
 					When you are chicken-footed, your chicken-foot is displayed on the end of your
@@ -238,7 +238,7 @@ const SECTIONS = [
 						Go on a vision quest
 					</button>
 				</p>
-				<p>You're red, and it's blue's turn. What do you think they might do?</p>
+				<p>You&apos;re red, and it&apos;s blue&apos;s turn. What do you think they might do?</p>
 				<RulesBoard
 					height={7}
 					tiles={{
@@ -426,7 +426,7 @@ const SECTIONS = [
 			<>
 				<p>
 					If you have a double that is higher than any leader on the board, you
-					can use it to start a "free line".
+					can use it to start a &quot;free line&quot;.
 				</p>
 				<p>
 					The free-line spacer is a special non-played tile that helps determine
@@ -498,11 +498,11 @@ const SECTIONS = [
 			<>
 				<p>
 					Sometimes the line you play on may be ambiguous. Tronimoes will guess, but if
-					you don't want to depend on its guess, you can "indicate" the tile you want to
+					you don&apos;t want to depend on its guess, you can &quot;indicate&quot; the tile you want to
 					play off by clicking it before making your move.
 				</p>
 				<p>
-					In this example, it's red's turn and they want to kill blue's line. However,
+					In this example, it&apos;s red&apos;s turn and they want to kill blue&apos;s line. However,
 					because both lines have a next-pips of 4, a tile played there would be legal
 					on both.
 				</p>
@@ -524,7 +524,7 @@ const SECTIONS = [
 					chickenFeetURLs={{ "4,3": chickenFoot }}
 				/>
 				<p>
-					It would be disastrous if red played their tile on blue's line, dooming themselves
+					It would be disastrous if red played their tile on blue&apos;s line, dooming themselves
 					to line-death in the near future rather than winning the round.
 				</p>
 				<RulesBoard
@@ -546,7 +546,7 @@ const SECTIONS = [
 					chickenFeetURLs={{ "5,2": chickenFoot }}
 				/>
 				<p>
-					So, red may "indicate" their own line by clicking on it before playing.
+					So, red may &quot;indicate&quot; their own line by clicking on it before playing.
 				</p>
 				<p>
 					You can clear an indication by right-clicking.
@@ -596,14 +596,14 @@ const SECTIONS = [
 			<>
 				<p>
 					To play a tile, you first select it from your hand, which is next to
-					the board. Your hand's background color is the same as your player color.
+					the board. Your hand&apos;s background color is the same as your player color.
 				</p>
 				<p>
 					There are two methods to move it to the board.
 				</p>
 				<p>
 					First, you can click a tile to select it, then click the board square for
-					the tile's "upper" pips, and click the board square for the tile's "lower" pips.
+					the tile&apos;s &quot;upper&quot; pips, and click the board square for the tile&apos;s &quot;lower&quot; pips.
 				</p>
 				<p>
 					Second, once a tile is selected, you can click it again to change its orientation.
@@ -624,7 +624,7 @@ const SECTIONS = [
 					Playable tiles are raised slightly in your hand.
 				</p>
 				<p>
-					Once you've selected a tile, playable squares are indicated on the board
+					Once you&apos;ve selected a tile, playable squares are indicated on the board
 					by a small white outline. Not all ways to place a tile on those squares are
 					legal. But all legal ways to place a tile will fall within those squares.
 				</p>
@@ -675,12 +675,12 @@ const SECTIONS = [
 		content: (
 			<>
 				<p>
-					If you have so many tiles that they don't all appear on the screen at once,
+					If you have so many tiles that they don&apos;t all appear on the screen at once,
 					you can scroll through them by clicking/touching the colored field behind the
 					tiles and dragging.
 				</p>
 				<p>
-					Alternatively, there are small up and down arrows to the right of the "react"
+					Alternatively, there are small up and down arrows to the right of the &quot;react&quot;
 					button, which will scroll the hand up or down one row.
 				</p>
 			</>
@@ -694,7 +694,7 @@ const SECTIONS = [
 					No one ever wants to read chat text written by their opponents in an online game.
 				</p>
 				<p>
-					Instead, you can "react" by clicking the "react" button, and doing a quick
+					Instead, you can &quot;react&quot; by clicking the &quot;react&quot; button, and doing a quick
 					image search for something that gets the message across.
 				</p>
 				<p>
@@ -714,8 +714,8 @@ const SECTIONS = [
 					be able to rejoin.
 				</p>
 				<p>
-					You can also sign in and choose "Anonymous", which will store your username and
-					session in the current browser's cookies.
+					You can also sign in and choose &quot;Anonymous&quot;, which will store your username and
+					session in the current browser&apos;s cookies.
 				</p>
 				<p>
 					Or, you can use Google or Facebook to manage your log-in.
@@ -732,7 +732,7 @@ const SECTIONS = [
 			<>
 				<p>
 					If you want to play a game against the first-available opponents, you can
-					click "pick-up game". If there are no pick-up games available, this will
+					click &quot;pick-up game&quot;. If there are no pick-up games available, this will
 					create one.
 				</p>
 				<p>
@@ -740,7 +740,7 @@ const SECTIONS = [
 					Other players that use this same 6-character code will join your game.
 				</p>
 				<p>
-					Once a game is created, players can click the "ready" button. Once all players
+					Once a game is created, players can click the &quot;ready&quot; button. Once all players
 					are ready, the game begins and no others may join.
 				</p>
 			</>
