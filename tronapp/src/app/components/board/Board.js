@@ -269,7 +269,7 @@ export default function Board({
 		return () => {
 			spanObserver.disconnect();
 		}
-	}, [playableBoardRef.current, setSquareSpan, height, zoom]);
+	}, [setSquareSpan, height, zoom]);
 
 	function getDistance(touch1, touch2) {
 		return Math.hypot(

@@ -10,7 +10,7 @@ export default function Square({
 	const [hovered, setHovered] = useState(false);
 	useEffect(() => {
 		setHovered(hoveredSquares.has(`${x},${y}`));
-	}, [hoveredSquares]);
+	}, [hoveredSquares, x, y]);
 
 	const [bgColor, setBgColor] = useState("");
 	useEffect(() => {

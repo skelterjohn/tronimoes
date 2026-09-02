@@ -159,7 +159,7 @@ function Game({ code }) {
 			return;
 		}
 		setAmInGame(true);
-	}, [game]);
+	}, [game, playerName]);
 
 	useEffect(() => {
 		if (game === undefined) {
@@ -379,7 +379,7 @@ function Game({ code }) {
 			console.error("error", error);
 			setPlayErrorMessage(error.data.error);
 		});
-	}, [client, code, player, playerName]);
+	}, [client, code, player, playerName, options]);
 
 	const [inFlight, setInFlight] = useState(undefined);
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
@@ -456,7 +456,7 @@ function Game({ code }) {
 		});
 	}
 
-	function drawTile() {
+	const drawTile = useCallback(() => {
 		setSelectedTile(undefined);
 		setInFlight("drawing tile");
 		client.DrawTile(code).then((resp) => {
@@ -468,7 +468,7 @@ function Game({ code }) {
 		}).finally(() => {
 			setInFlight(undefined);
 		});
-	}
+	}, [client, code, setSelectedTile, setInFlight, setPlayA, setPlayErrorMessage]);
 
 	const [showVisionQuestModal, setShowVisionQuestModal] = useState(false);
 	const [chickenFootURL, setChickenFootURL] = useState(undefined);
@@ -518,7 +518,7 @@ function Game({ code }) {
 		}).finally(() => {
 			setInFlight(undefined);
 		});
-	}, [client, code, playA, setPlayA, setSelectedTile, setIndicated, setPlayErrorMessage, chickenFootURL, setShowVisionQuestModal]);
+	}, [client, code, playA, setPlayA, setSelectedTile, setPlayErrorMessage, chickenFootURL, setShowVisionQuestModal]);
 
 	const leaveOrQuit = useCallback(() => {
 		client.LeaveOrQuit(code).catch((error) => {
@@ -578,7 +578,7 @@ function Game({ code }) {
 	}, [roundInProgress, game]);
 
 	const [tilesInBag, setTilesInBag] = useState(0);
-	const [prevTilesInBag, setPrevTilesInBag] = useState(0);
+	const prevTilesInBagRef = useRef(0);
 	const [lastRoundHistoryItem, setLastRoundHistoryItem] = useState(undefined);
 	useEffect(() => {
 		const round = game?.rounds?.[game?.rounds?.length - 1];
@@ -603,12 +603,12 @@ function Game({ code }) {
 	}, [lastRoundHistoryItem]);
 
 	useEffect(() => {
-		if (prevTilesInBag === tilesInBag+1) {
+		if (prevTilesInBagRef.current === tilesInBag+1) {
 		drawAudio.play().catch(error => {
 			console.log('Audio playback failed:', error);
 			});
 		}
-		setPrevTilesInBag(tilesInBag);
+		prevTilesInBagRef.current = tilesInBag;
 	}, [tilesInBag]);
 
 	const [lastPlayerCount, setLastPlayerCount] = useState(0);
