@@ -101,22 +101,36 @@ function Hand({
 			setHandOrder([]);
 			return;
 		}
-		const oldTileKeys = new Set(handOrder.map(t => `${t.a}:${t.b}`));
-		const newTileKeys = new Set(player.hand.map(t => `${t.a}:${t.b}`));
-
-		let newHandOrder = []
-		// old tiles in the order they were, if they're in the new hand.
-		handOrder.forEach(t => {
-			const key = `${t.a}:${t.b}`;
-			if (newTileKeys.has(key)) {
-				newHandOrder.push(t);
-			}
-		});
-		// new tiles at the end.
+		// Count occurrences rather than just tracking key presence: a plain
+		// Set of "a:b" keys can't tell "1 copy" from "N copies" of the same
+		// tile, so if handOrder ever ends up with stale duplicate entries
+		// (e.g. from a placeholder/redacted hand snapshot before the real
+		// data arrives), a Set-based reconciliation preserves all of them
+		// forever instead of self-correcting. This version converges back
+		// to the real hand's exact tile counts on the very next sync.
+		const remaining = new Map();
 		player.hand.forEach(t => {
 			const key = `${t.a}:${t.b}`;
-			if (!oldTileKeys.has(key)) {
+			remaining.set(key, (remaining.get(key) || 0) + 1);
+		});
+
+		let newHandOrder = []
+		// old tiles in the order they were, one copy per remaining count.
+		handOrder.forEach(t => {
+			const key = `${t.a}:${t.b}`;
+			const count = remaining.get(key) || 0;
+			if (count > 0) {
 				newHandOrder.push(t);
+				remaining.set(key, count - 1);
+			}
+		});
+		// any tiles from the new hand not already accounted for above.
+		player.hand.forEach(t => {
+			const key = `${t.a}:${t.b}`;
+			const count = remaining.get(key) || 0;
+			if (count > 0) {
+				newHandOrder.push(t);
+				remaining.set(key, count - 1);
 			}
 		});
 
