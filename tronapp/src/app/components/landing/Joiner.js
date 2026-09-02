@@ -43,7 +43,7 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 	useEffect(() => {
 		console.log('unsetting game code');
 		setGameCode(undefined);
-	}, []);
+	}, [setGameCode]);
 
 	function register() {
 		if (isRegistered) return Promise.resolve();

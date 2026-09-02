@@ -4,6 +4,12 @@ import ChickenFoot from '../board/ChickenFoot';
 import Button from "@/app/components/Button";
 import Image from "next/image";
 import Reaction from "./Reaction";
+
+function stripRotationClasses(el) {
+	el.classList.remove('rotate-0', '-rotate-90', 'rotate-90', 'rotate-180');
+	el.querySelectorAll('*').forEach(stripRotationClasses);
+}
+
 function Hand({
 		player, players,
 		dead = false,
@@ -21,6 +27,7 @@ function Hand({
 	const [handOrder, setHandOrder] = useState([]);
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
+	const [touchOverBoard, setTouchOverBoard] = useState(false);
 	const [spacerAvailable, setSpacerAvailable] = useState(false);
 	const [spacerColor, setSpacerColor] = useState("white");
 	const [myTurn, setMyTurn] = useState(false);
@@ -146,7 +153,7 @@ function Hand({
 			setDragOrientation("down");
 		}
 		setSelectedTile(tile);
-	}, [toggleOrientation, setDragOrientation, selectedTile, setSelectedTile]);
+	}, [toggleOrientation, setDragOrientation, selectedTile, setSelectedTile, setHoveredSquares]);
 
 	const spacerClicked = useCallback(() => {
 		setHoveredSquares(new Set([]));
@@ -158,7 +165,7 @@ function Hand({
 			setDragOrientation("down");
 		}
 		setHoveredSquares(new Set([]));
-	}, [selectedTile, setDragOrientation]);
+	}, [selectedTile, setDragOrientation, setHoveredSquares]);
 
 	const [isDragging, setIsDragging] = useState(false);
 
@@ -225,7 +232,7 @@ function Hand({
 		requestAnimationFrame(() => {
 			document.body.removeChild(ghost);
 		});
-	}, [dragOrientation, selectedTile, squareSpan]);
+	}, [dragOrientation, selectedTile, squareSpan, setSelectedTile]);
 
 	const handleDrop = useCallback((targetTile, e) => {
 		setIsDragging(false);
@@ -236,12 +243,37 @@ function Hand({
 		moveTile(sourceTile, targetTile);
 	}, [moveTile, setIsDragging, setHoveredSquares]);
 
+	const hoverTile = useCallback((x, y) => {
+		if (!selectedTile) {
+			return;
+		}
+		if (setHoveredSquares === undefined) {
+			return;
+		}
+		let hs = new Set([`${x},${y}`]);
+		switch (dragOrientation) {
+		case "down":
+			hs.add(`${x},${y + 1}`);
+			break;
+		case "right":
+			hs.add(`${x + 1},${y}`);
+			break;
+		case "up":
+			hs.add(`${x},${y - 1}`);
+			break;
+		case "left":
+			hs.add(`${x - 1},${y}`);
+			break;
+		}
+		setHoveredSquares(hs);
+	}, [selectedTile, dragOrientation, setHoveredSquares]);
+
 	useEffect(() => {
 		if (!isDragging || mouseIsOver === undefined || mouseIsOver[0] === -1 || mouseIsOver[1] === -1) {
 			return;
 		}
 		hoverTile(mouseIsOver[0], mouseIsOver[1]);
-	}, [mouseIsOver]);
+	}, [mouseIsOver, hoverTile, isDragging]);
 
 	function handleDragOver(e) {
 		e.preventDefault();
@@ -283,13 +315,6 @@ function Hand({
 		
 	}
 
-	const [touchOverBoard, setTouchOverBoard] = useState(false);
-
-	function stripRotationClasses(el) {
-		el.classList.remove('rotate-0', '-rotate-90', 'rotate-90', 'rotate-180');
-		el.querySelectorAll('*').forEach(stripRotationClasses);
-	}
-
 	const handleTouchStart = useCallback((tile, e) => {
 		// Clone the same tile container as mouse drag (currentTarget), not the touch target
 		const ghost = e.currentTarget.cloneNode(true);
@@ -323,7 +348,7 @@ function Hand({
 		setTouchStartPos(sp);
 		setDraggedTile(tile);
 		setTouchOverBoard(false);
-	}, [dragOrientation, selectedTile, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard, squareSpan]);
+	}, [dragOrientation, setSelectedTile, setTouchStartPos, setDraggedTile, setTouchOverBoard, squareSpan]);
 
 	const dropTile = useCallback((x, y) => {
 		if (!selectedTile || x === undefined || y === undefined) {
@@ -338,7 +363,7 @@ function Hand({
 			orientation: dragOrientation,
 			dead: false,
 		});
-	}, [selectedTile, dragOrientation]);
+	}, [selectedTile, dragOrientation, playTile]);
 
 	const handleTouchEnd = useCallback((targetTile, e) => {
 		// Remove the ghost element and ensure cleanup
@@ -372,10 +397,10 @@ function Hand({
 		
 		setDraggedTile(null);
 		setTouchOverBoard(false);
-	}, [setTouchStartPos, setDraggedTile, touchOverBoard, setTouchOverBoard, draggedTile, touchStartPos, moveTile, dropTile]);
+	}, [setDraggedTile, touchOverBoard, setTouchOverBoard, draggedTile, touchStartPos, moveTile, dropTile, setHoveredSquares]);
 
 	// Update cleanup function to be more aggressive
-	const cleanupGhostElement = () => {
+	function cleanupGhostElement() {
 		// Find all elements with id starting with 'touch-ghost'
 		const ghosts = document.querySelectorAll('[id^="touch-ghost"]');
 		ghosts.forEach(ghost => {
@@ -388,7 +413,7 @@ function Hand({
 				}
 			}
 		});
-	};
+	}
 
 	// Add cleanup to component unmount
 	useEffect(() => {
@@ -402,32 +427,7 @@ function Hand({
 		setHoveredSquares(new Set([]));
 		cleanupGhostElement();
 		setDraggedTile(null);
-	}, [setHoveredSquares, setTouchStartPos, setDraggedTile]);
-
-	const hoverTile = useCallback((x, y) => {
-		if (!selectedTile) {
-			return;
-		}
-		if (setHoveredSquares === undefined) {
-			return;
-		}
-		let hs = new Set([`${x},${y}`]);
-		switch (dragOrientation) {
-		case "down":
-			hs.add(`${x},${y + 1}`);
-			break;
-		case "right":
-			hs.add(`${x + 1},${y}`);
-			break;
-		case "up":
-			hs.add(`${x},${y - 1}`);
-			break;
-		case "left":
-			hs.add(`${x - 1},${y}`);
-			break;
-		}
-		setHoveredSquares(hs);
-	}, [selectedTile, dragOrientation, setHoveredSquares]);
+	}, [setHoveredSquares, setDraggedTile]);
 
 	const handleTouchMove = useCallback((e) => {
 		if (!touchStartPos) {
@@ -456,7 +456,7 @@ function Hand({
 		orientGhost(ghost, x, y, dragOrientation);
 
 		hoverTile(parseInt(elementUnderTouch?.dataset?.tron_x), parseInt(elementUnderTouch?.dataset?.tron_y));
-	}, [dragOrientation, hoverTile, touchOverBoard, setTouchOverBoard, boardRef]);
+	}, [dragOrientation, hoverTile, touchOverBoard, setTouchOverBoard, boardRef, touchStartPos]);
 
 	useEffect(() => {
 		if (draggedTile) {
@@ -492,13 +492,13 @@ function Hand({
 	const scrollToTop = useCallback(() => {
 		setSelectedTile(undefined);
 		scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-	}, []);
-	
+	}, [setSelectedTile]);
+
 	const scrollToBottom = useCallback(() => {
 		setSelectedTile(undefined);
 		const container = scrollContainerRef.current;
 		container?.scrollTo({ top: container?.scrollHeight, behavior: 'smooth' });
-	}, []);
+	}, [setSelectedTile]);
 	
 	return (
 		<div className={`h-full flex flex-col items-center ${myTurn ? "border-2 border-black " : ""} ${handBackground}`}>
