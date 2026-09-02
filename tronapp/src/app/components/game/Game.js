@@ -166,9 +166,9 @@ function Game({ code }) {
 			return;
 		}
 		if (game.code !== code) {
-			window.location.assign(`/gameboard/${encodeURIComponent(game.code)}`);
+			router.push(`/gameboard/${encodeURIComponent(game.code)}`);
 		}
-	}, [code, game]);
+	}, [code, game, router]);
 
 	useEffect(() => {
 		// we got a new client, so let's totally refresh the game.
@@ -361,6 +361,8 @@ function Game({ code }) {
 		setHintedTiles(ht);
 	}, [game, player]);
 
+	const [playErrorMessage, setPlayErrorMessage] = useState("");
+
 	const readyToPlay = useCallback(() => {
 		if (player === undefined && playerName !== undefined) {
 			client.JoinGame(code, playerName, options).then((resp) => {
@@ -380,7 +382,6 @@ function Game({ code }) {
 	}, [client, code, player, playerName]);
 
 	const [inFlight, setInFlight] = useState(undefined);
-	const [playErrorMessage, setPlayErrorMessage] = useState("");
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
 	useEffect(() => {
 		setHoveredSquares(new Set([]));

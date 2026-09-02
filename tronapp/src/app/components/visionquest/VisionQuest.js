@@ -1,5 +1,6 @@
 import { Modal, Input, Spin } from 'antd';
-import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const KLIPY_API_KEY = 'lJodCdaswwEpTPg5Lhix66aIcaFsXBTrKKGlAzX1rPSQvagQHDNczRi42lNJ6x56';
 const KLIPY_CLIENT_KEY = 'tronimoes-js';
@@ -11,18 +12,7 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 
 	const inputRef = useRef(null);
 
-	// Debounced search function
-	useEffect(() => {
-		const searchTimer = setTimeout(() => {
-			if (path.trim()) {
-				searchGifs(path);
-			}
-		}, 500);
-
-		return () => clearTimeout(searchTimer);
-	}, [path]);
-
-	const searchGifs = async (searchTerm) => {
+	const searchGifs = useCallback(async (searchTerm) => {
 		setLoading(true);
 		try {
 			const response = await fetch(
@@ -35,7 +25,18 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
+
+	// Debounced search function
+	useEffect(() => {
+		const searchTimer = setTimeout(() => {
+			if (path.trim()) {
+				searchGifs(path);
+			}
+		}, 500);
+
+		return () => clearTimeout(searchTimer);
+	}, [path, searchGifs]);
 
 	return (
 		<Modal
@@ -72,10 +73,12 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 			        className="w-[80%] min-w-0"
 			    />
 			    <div className="flex-shrink-0 relative h-8 flex items-center">
-			        <img 
+			        <Image
 			            src="/klipy_powered.png"
 			            alt="Powered by KLIPY"
-			            className="max-h-full w-auto object-contain object-center block" 
+			            width={640}
+			            height={137}
+			            className="max-h-full w-auto object-contain object-center block"
 			        />
 			        {loading && (
 			            <span className="absolute -top-1 -right-1">
@@ -95,7 +98,8 @@ function VisionQuest({ title = "Vision Quest", isOpen, onClose, setURL }) {
 							onClose();
 						}}
 					>
-						<img 
+						{/* eslint-disable-next-line @next/next/no-img-element -- remote Klipy search results, arbitrary hostnames not covered by next/image's remotePatterns config */}
+						<img
 							src={gif.media_formats.tinygif_transparent.url}
 							alt={gif.content_description}
 							className="w-full h-auto rounded-sm"

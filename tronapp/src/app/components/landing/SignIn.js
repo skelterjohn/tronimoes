@@ -1,4 +1,5 @@
 import { Modal } from "antd";
+import Image from "next/image";
 import { signInAnonymously, GoogleAuthProvider, FacebookAuthProvider, signInWithPopup, linkWithCredential } from "firebase/auth";
 import Button from "@/app/components/Button";
 import { auth } from "@/config";
@@ -77,11 +78,13 @@ export default function SignIn({setErrorMessage, setUserInfo, isOpen, onClose}) 
 	return (
 		<Modal open={isOpen} title="sign in to tronimoes" onCancel={onClose} footer={null} centered width={800} className="font-game">
 			<div className="flex font-game">
-				<div className="hidden md:block w-1/2">
-					<img 
-						src="/fallingtiles.png" 
-						alt="Falling Tiles" 
-						className="object-cover w-full h-full"
+				<div className="hidden md:block w-1/2 relative">
+					<Image
+						src="/fallingtiles.png"
+						alt="Falling Tiles"
+						fill
+						sizes="400px"
+						className="object-cover"
 					/>
 				</div>
 				<div className="w-full flex flex-col items-center gap-4 p-4">

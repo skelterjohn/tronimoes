@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Image from "next/image";
 
 export default function Reaction({
 	setShow, url
@@ -13,12 +14,15 @@ export default function Reaction({
 		onClick={() => setShow(false)}
 		className="absolute z-50 pointer-events-none"
 	>
+		{/* eslint-disable-next-line @next/next/no-img-element -- remote Klipy CDN URL, not covered by next/image's remotePatterns config */}
 		<img src={url} alt="react" className="pointer-events-auto origin-top translate-y-[30px]"/>
-		<img 
-	        src="/klipy_watermark.png" 
-	        alt="KLIPY" 
-	        className="absolute bottom-0 left-0 right-4 w-20 h-auto translate-y-[30px] p-2 pointer-events-none"
-	    />
+		<Image
+			src="/klipy_watermark.png"
+			alt="KLIPY"
+			width={390}
+			height={134}
+			className="absolute bottom-0 left-0 right-4 w-20 h-auto translate-y-[30px] p-2 pointer-events-none"
+		/>
 	</div>;
 }
 

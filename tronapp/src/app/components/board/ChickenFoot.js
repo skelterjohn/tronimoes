@@ -16,6 +16,7 @@ export default function ChickenFoot({ url, color }) {
             <div className={`w-3/4 h-3/4 rounded-lg ${colorMap[color]} border border-black relative`}>
             </div>
             {url && <div className="w-3/4 h-3/4 absolute">
+                {/* eslint-disable-next-line @next/next/no-img-element -- remote Klipy CDN URL, not covered by next/image's remotePatterns config */}
                 <img src={url} alt="Chicken Foot" className="w-full h-full object-contain" />
             </div>}
         </div>
