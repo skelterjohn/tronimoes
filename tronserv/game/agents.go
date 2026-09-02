@@ -43,6 +43,7 @@ func (s LocalAgentSpawner) NewAgent(ctx context.Context, which string, code stri
 		"--which", which,
 		"--code", code,
 		"--round-out", fmt.Sprintf("%d", roundOut),
+		"--ready-with", fmt.Sprintf("%d", roundOut),
 		"--dev",
 	)
 	cmd.Stdout = os.Stdout
@@ -145,6 +146,7 @@ func (s *GCRAgentSpawner) NewAgent(ctx context.Context, which string, code strin
 						"--which", which,
 						"--code", code,
 						"--round-out", fmt.Sprintf("%d", roundOut),
+						"--ready-with", fmt.Sprintf("%d", roundOut),
 						"--gce",
 					},
 				},
