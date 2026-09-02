@@ -163,26 +163,20 @@ func TestDrawTile(t *testing.T) {
 	}
 }
 
-// TestPassWithNoCurrentRoundPanics pins down a real bug: Pass() fetches the
-// current round and unconditionally increments/resets round.BaglessPasses
-// before it ever checks the round for nil (the nil check exists, but only
-// guards the later round.Spacer assignment). Calling Pass when there is no
-// active round -- e.g. between rounds, or after the game is done -- crashes
-// instead of returning ErrRoundNotStarted. This test documents today's
-// actual behavior so it isn't silently changed by unrelated refactoring;
-// flagged separately as a bug worth fixing (return ErrRoundNotStarted as
-// soon as CurrentRound is nil, before touching round.BaglessPasses).
-func TestPassWithNoCurrentRoundPanics(t *testing.T) {
+// TestPassWithNoCurrentRound guards against a regression of a real bug:
+// Pass() used to fetch the current round and unconditionally touch
+// round.BaglessPasses before ever checking the round for nil, so calling
+// Pass with no active round (e.g. between rounds) crashed instead of
+// returning ErrRoundNotStarted. Fixed by checking round == nil immediately
+// after fetching it.
+func TestPassWithNoCurrentRound(t *testing.T) {
 	ctx := t.Context()
 	g := NewGame(ctx, "ZZZZZZ")
 	g.AddPlayer(ctx, &Player{Name: "alice"})
 	// No rounds at all, so CurrentRound(ctx) is nil.
-	defer func() {
-		if r := recover(); r == nil {
-			t.Fatal("expected Pass() with no current round to panic (known bug); if this now passes cleanly, replace this test with one asserting ErrRoundNotStarted")
-		}
-	}()
-	g.Pass(ctx, "alice", 0, 0)
+	if err := g.Pass(ctx, "alice", 0, 0); err != ErrRoundNotStarted {
+		t.Fatalf("Pass() with no current round = %v, want ErrRoundNotStarted", err)
+	}
 }
 
 func TestDrawTileEmptyBag(t *testing.T) {

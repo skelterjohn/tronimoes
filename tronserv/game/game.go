@@ -335,6 +335,9 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 	}
 
 	round := g.CurrentRound(ctx)
+	if round == nil {
+		return ErrRoundNotStarted
+	}
 
 	if !player.JustDrew && len(g.Bag) == 0 {
 		round.BaglessPasses++
@@ -342,15 +345,10 @@ func (g *Game) Pass(ctx context.Context, name string, chickenFootX, chickenFootY
 		round.BaglessPasses = 0
 	}
 
-	if round != nil {
-		round.Spacer = nil
-	}
+	round.Spacer = nil
 	g.Turn = (g.Turn + 1) % len(g.Players)
 	player.JustDrew = false
-	r := g.CurrentRound(ctx)
-	if r == nil {
-		return ErrRoundNotStarted
-	}
+	r := round
 
 	chickenFootMessage := ""
 	if !player.ChickenFoot && !player.Dead {
