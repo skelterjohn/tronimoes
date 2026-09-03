@@ -176,3 +176,45 @@ func TestMakeroom(t *testing.T) {
 		t.Fatalf("Played a foot-blocker, but instead of ErrNoBlockingFeet we got %v", err)
 	}
 }
+
+func TestLeaderstall(t *testing.T) {
+	game := decodeGame(t, "leaderstall")
+	name := game.Players[game.Turn].Name
+	if name != "Gonk Pomegranate" {
+		t.Fatalf("leaderstall testdata: expected turn player Gonk Pomegranate, got %s", name)
+	}
+
+	r := game.CurrentRound(t.Context())
+	p := game.Players[game.Turn]
+	moves, spacers, passFeet := r.FindLegalMoves(t.Context(), game, p)
+
+	if len(moves) != 0 {
+		t.Errorf("expected no legal tile moves for %s (no matching pips in hand), got %v", name, moves)
+	}
+	if len(spacers) != 0 {
+		t.Errorf("expected no legal spacers for %s, got %v", name, spacers)
+	}
+
+	foundCoords := make(map[string]bool)
+	for _, c := range passFeet {
+		foundCoords[c.String()] = true
+	}
+
+	// Squares adjacent to the round leader (5,6)-(6,6) where a chicken foot can
+	// actually be set: open (not occluded by a tile) and not the leader's own
+	// squares.
+	for _, c := range []Coord{{X: 5, Y: 5}, {X: 5, Y: 7}, {X: 6, Y: 5}, {X: 6, Y: 7}, {X: 7, Y: 6}} {
+		if !foundCoords[c.String()] {
+			t.Errorf("passFeet missing valid chicken-foot square %s", c)
+		}
+	}
+
+	// (4,6) is occluded by another player's tile, and (5,6)/(6,6) are the round
+	// leader's own squares -- CanSetChickenFoot rejects all three, so they must
+	// not be offered as hints.
+	for _, c := range []Coord{{X: 4, Y: 6}, {X: 5, Y: 6}, {X: 6, Y: 6}} {
+		if foundCoords[c.String()] {
+			t.Errorf("passFeet contains invalid chicken-foot square %s", c)
+		}
+	}
+}

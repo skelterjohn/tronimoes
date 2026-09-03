@@ -1,0 +1,519 @@
+{
+	"created": 1788377681,
+	"version": 16,
+	"pickup": true,
+	"done": false,
+	"code": "ISYVNK-BYIQRJ",
+	"players": [
+		{
+			"name": "skelterjohn",
+			"bot": false,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 7,
+					"pips_b": 7
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 1
+				},
+				{
+					"pips_a": 6,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 7
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "",
+			"react_url": "",
+			"kills": null
+		},
+		{
+			"name": "Gobbledy Pifflepaffle",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 6,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 0
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 1
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 2
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/4bbcf901ea0d5dec489bd8c608d7f1fd/90/1d/eE6b350btFwvl.gif",
+			"react_url": "https://static.klipy.com/ii/4bbcf901ea0d5dec489bd8c608d7f1fd/26/dc/I9YKTlBwK9BHFrKamb.gif",
+			"kills": null
+		},
+		{
+			"name": "Gonk Pomegranate",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 2,
+					"pips_b": 2
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 7,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 3
+				},
+				{
+					"pips_a": 0,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 10
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 7
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": true,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/4bbcf901ea0d5dec489bd8c608d7f1fd/8c/1b/tutfFR8Wk6Tfa.gif",
+			"react_url": "https://static.klipy.com/ii/c98c4a4935d23b95805f0befee091d8a/a9/96/lmutpvT8.gif",
+			"kills": null
+		},
+		{
+			"name": "Gimlet Presto",
+			"bot": true,
+			"ready": false,
+			"score": 0,
+			"hand": [
+				{
+					"pips_a": 7,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 2,
+					"pips_b": 4
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 8
+				},
+				{
+					"pips_a": 1,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 5,
+					"pips_b": 6
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 9
+				},
+				{
+					"pips_a": 4,
+					"pips_b": 5
+				},
+				{
+					"pips_a": 3,
+					"pips_b": 3
+				}
+			],
+			"hints": null,
+			"spacer_hints": null,
+			"chicken_foot": false,
+			"dead": false,
+			"just_drew": false,
+			"chicken_foot_coord": {
+				"x": 0,
+				"y": 0
+			},
+			"chicken_foot_url": "https://static.klipy.com/ii/a5166a66b33e26d783bf95ac62ea3cdb/db/03/C6D6l8Oq.gif",
+			"react_url": "https://static.klipy.com/ii/4bbcf901ea0d5dec489bd8c608d7f1fd/9b/18/awPWbp7K9KkJ9.gif",
+			"kills": null
+		}
+	],
+	"turn": 2,
+	"rounds": [
+		{
+			"laid_tiles": [
+				{
+					"tile": {
+						"pips_a": 9,
+						"pips_b": 9
+					},
+					"coord": {
+						"x": 5,
+						"y": 6
+					},
+					"orientation": "right",
+					"player_name": "",
+					"next_pips": 9,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "skelterjohn"
+				},
+				{
+					"tile": {
+						"pips_a": 1,
+						"pips_b": 9
+					},
+					"coord": {
+						"x": 3,
+						"y": 6
+					},
+					"orientation": "right",
+					"player_name": "Gobbledy Pifflepaffle",
+					"next_pips": 1,
+					"dead": false,
+					"indicating": false,
+					"indicated": {
+						"pips_a": 0,
+						"pips_b": 0
+					},
+					"who_laid_it": "Gobbledy Pifflepaffle"
+				}
+			],
+			"spacer": null,
+			"done": false,
+			"history": [
+				"skelterjohn laid 9:9",
+				"Gobbledy Pifflepaffle laid 1:9"
+			],
+			"player_lines": {
+				"Gimlet Presto": [
+					{
+						"tile": {
+							"pips_a": 9,
+							"pips_b": 9
+						},
+						"coord": {
+							"x": 5,
+							"y": 6
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 9,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				],
+				"Gobbledy Pifflepaffle": [
+					{
+						"tile": {
+							"pips_a": 9,
+							"pips_b": 9
+						},
+						"coord": {
+							"x": 5,
+							"y": 6
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 9,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "skelterjohn"
+					},
+					{
+						"tile": {
+							"pips_a": 1,
+							"pips_b": 9
+						},
+						"coord": {
+							"x": 3,
+							"y": 6
+						},
+						"orientation": "right",
+						"player_name": "Gobbledy Pifflepaffle",
+						"next_pips": 1,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "Gobbledy Pifflepaffle"
+					}
+				],
+				"Gonk Pomegranate": [
+					{
+						"tile": {
+							"pips_a": 9,
+							"pips_b": 9
+						},
+						"coord": {
+							"x": 5,
+							"y": 6
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 9,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				],
+				"skelterjohn": [
+					{
+						"tile": {
+							"pips_a": 9,
+							"pips_b": 9
+						},
+						"coord": {
+							"x": 5,
+							"y": 6
+						},
+						"orientation": "right",
+						"player_name": "",
+						"next_pips": 9,
+						"dead": false,
+						"indicating": false,
+						"indicated": {
+							"pips_a": 0,
+							"pips_b": 0
+						},
+						"who_laid_it": "skelterjohn"
+					}
+				]
+			},
+			"free_lines": [],
+			"bagless_passes": 0,
+			"highest_leader": 9
+		}
+	],
+	"bag": [
+		{
+			"pips_a": 5,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 9,
+			"pips_b": 10
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 4
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 2
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 5,
+			"pips_b": 10
+		},
+		{
+			"pips_a": 8,
+			"pips_b": 10
+		},
+		{
+			"pips_a": 3,
+			"pips_b": 6
+		},
+		{
+			"pips_a": 6,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 7,
+			"pips_b": 10
+		},
+		{
+			"pips_a": 4,
+			"pips_b": 7
+		},
+		{
+			"pips_a": 5,
+			"pips_b": 5
+		},
+		{
+			"pips_a": 0,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 5,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 10,
+			"pips_b": 10
+		},
+		{
+			"pips_a": 1,
+			"pips_b": 3
+		},
+		{
+			"pips_a": 8,
+			"pips_b": 9
+		},
+		{
+			"pips_a": 8,
+			"pips_b": 8
+		}
+	],
+	"board_width": 12,
+	"board_height": 13,
+	"max_pips": 10,
+	"history": [
+		"skelterjohn started round 1 - 9:9"
+	]
+}
