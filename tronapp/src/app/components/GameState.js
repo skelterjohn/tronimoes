@@ -31,7 +31,6 @@ export function GameProvider({ children }) {
 	if (persistentUser !== prevAuthState.persistentUser || loading !== prevAuthState.loading || error !== prevAuthState.error) {
 		setPrevAuthState({ persistentUser, loading, error });
 		if (error !== undefined) {
-			setErrorMessage(error.message);
 			setUserInfo(undefined);
 		} else if (!loading) {
 			setUserInfo(persistentUser);
