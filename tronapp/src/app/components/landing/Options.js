@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Space, Select } from 'antd';
 import Button from '@/app/components/Button';
 import { useGameState } from '../GameState';
@@ -9,11 +9,17 @@ const Options = ({ isOpen, onClose }) => {
 	const [roundOut, setRoundOut] = useState(0);
 	const { options, setOptions } = useGameState();
 
-	useEffect(() => {
+	// Re-initialize the local draft value from the shared options each time
+	// the modal opens, so edits made while it was closed elsewhere aren't
+	// stale. Adjusting state during render (rather than in an effect) avoids
+	// an extra post-open render.
+	const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+	if (isOpen !== prevIsOpen) {
+		setPrevIsOpen(isOpen);
 		if (isOpen) {
 			setRoundOut(options.agent_round_out ?? 0);
 		}
-	}, [isOpen, options.agent_round_out]);
+	}
 
 	const handleAgentRoundOutChange = (value) => {
 		setRoundOut(value);
