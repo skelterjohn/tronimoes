@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import clientFor from '../../client/Client';
 import { auth } from "@/config";
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -19,12 +19,37 @@ const defaultOptions = {
 export function GameProvider({ children }) {
 	const [gameCode, setGameCode] = useState("");
 	const [playerName, setPlayerName] = useState("");
-	const [client, setClient] = useState(undefined);
 	const [persistentUser, loading, error] = useAuthState(auth);
 	const [userInfo, setUserInfo] = useState(null);
 	const [config, setConfig] = useState(defaultConfig);
 	const [options, setOptions] = useState(defaultOptions);
-	
+
+	// userInfo is also set directly by sign-in/sign-out flows (SignIn.js, page.js),
+	// so this is a sync-then-diverge pattern: adjust it during render (rather than
+	// in an effect) when the underlying auth state actually changes.
+	const [prevAuthState, setPrevAuthState] = useState({ persistentUser, loading, error });
+	if (persistentUser !== prevAuthState.persistentUser || loading !== prevAuthState.loading || error !== prevAuthState.error) {
+		setPrevAuthState({ persistentUser, loading, error });
+		if (error !== undefined) {
+			setErrorMessage(error.message);
+			setUserInfo(undefined);
+		} else if (!loading) {
+			setUserInfo(persistentUser);
+		}
+	}
+
+	// client is a pure derivation of playerName/userInfo. When userInfo exists, the
+	// server uses the Firebase token + X-Player-Id rather than X-Player-Name, so we
+	// avoid recreating the client (and re-triggering effects below) while the
+	// authenticated user is typing/changing `playerName`. clientFor() reads
+	// window.location, so it can only run client-side.
+	const client = useMemo(() => {
+		if (typeof window === 'undefined') {
+			return undefined;
+		}
+		return userInfo ? clientFor("", userInfo) : clientFor(playerName, userInfo);
+	}, [playerName, userInfo]);
+
 	useEffect(() => {
 		if (!client?.userInfo) {
 			return;
@@ -61,35 +86,11 @@ export function GameProvider({ children }) {
 		});
 	}, [config, client]);
 
-	useEffect(()=> {
-		if (error !== undefined) {
-			setErrorMessage(error.message);
-			setUserInfo(undefined);
-			return;
-		}
-		if (!loading) {
-			setUserInfo(persistentUser);
-		}
-	}, [persistentUser, loading, error]);
-
-	// Avoid recreating the client (and re-triggering effects) while the authenticated
-	// user is typing/changing `playerName`. When `userInfo` exists, the server uses
-	// the Firebase token + X-Player-Id rather than X-Player-Name.
-	useEffect(() => {
-		if (!userInfo) return;
-		setClient(clientFor("", userInfo));
-	}, [userInfo]);
-
-	useEffect(() => {
-		if (userInfo) return;
-		setClient(clientFor(playerName, userInfo));
-	}, [playerName, userInfo]);
-
 	return (
 		<GameContext.Provider value={{
 			gameCode, setGameCode,
 			playerName, setPlayerName,
-			client, setClient,
+			client,
 			userInfo, setUserInfo,
 			persistentUser, loading, error,
 			config, setConfig,
