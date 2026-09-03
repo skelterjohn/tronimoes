@@ -25,9 +25,15 @@ export default function Home() {
 	const [activeSummaries, setActiveSummaries] = useState([]);
 	const [mobilePanel, setMobilePanel] = useState(null);
 
-	useEffect(()=> {
+	// Surface context auth errors as the error banner. Adjusting state
+	// during render (rather than in an effect) avoids an extra render each
+	// time an error comes in; dismissing the banner (see onClick below)
+	// still works since that doesn't change `error` itself.
+	const [prevError, setPrevError] = useState(error);
+	if (error !== prevError) {
+		setPrevError(error);
 		setErrorMessage(error?.message);
-	}, [error]);
+	}
 
 	useEffect(() => {
 		let cancelled = false;
