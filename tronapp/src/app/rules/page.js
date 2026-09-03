@@ -806,7 +806,9 @@ export default function RulesPage() {
 	}, []);
 
 	useEffect(() => {
-		syncIndicatedFromHash();
+		// indicatedSectionId's initial value is already read from the hash
+		// (see the useState initializer above), so we only need to listen
+		// for subsequent changes here.
 		window.addEventListener("hashchange", syncIndicatedFromHash);
 		return () => window.removeEventListener("hashchange", syncIndicatedFromHash);
 	}, [syncIndicatedFromHash]);
