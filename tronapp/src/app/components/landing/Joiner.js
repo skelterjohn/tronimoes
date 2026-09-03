@@ -28,17 +28,24 @@ export default function Joiner({userInfo, loading, setErrorMessage}) {
 		}
 	}, [isRegistered]);
 
-	useEffect(() => {
+	// isRegistered/nameInput are also set directly by register()/joinCode() (see
+	// below), so syncing them from userInfo/playerName is adjusted during render
+	// (rather than in effects) when those actually change.
+	const [prevUserInfo, setPrevUserInfo] = useState(userInfo);
+	if (userInfo !== prevUserInfo) {
+		setPrevUserInfo(userInfo);
 		if (userInfo === undefined || userInfo === null) {
 			setIsRegistered(false);
 			setPlayerName('');
 		}
-	}, [userInfo, setPlayerKey, setPlayerName]);
+	}
 
-	useEffect(() => {
-		setIsRegistered(playerName !== '')
+	const [prevPlayerName, setPrevPlayerName] = useState(playerName);
+	if (playerName !== prevPlayerName) {
+		setPrevPlayerName(playerName);
+		setIsRegistered(playerName !== '');
 		setNameInput(playerName);
-	}, [playerName]);
+	}
 
 	useEffect(() => {
 		console.log('unsetting game code');
