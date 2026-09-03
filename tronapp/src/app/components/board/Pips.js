@@ -1,15 +1,10 @@
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
 import { useGameState } from '@/app/components/GameState';
 
 export default function Pips({pips, parentRotation = 0}) {
 
 	const { config } = useGameState();
-	const [isNumbers, setIsNumbers] = useState(false);
-
-	useEffect(() => {
-		setIsNumbers(config?.tileset === 'numbers' || config?.tileset === 'numbers-mono');
-	}, [config]);
+	const isNumbers = config?.tileset === 'numbers' || config?.tileset === 'numbers-mono';
 
 	if (pips === -1) {
 		return (
