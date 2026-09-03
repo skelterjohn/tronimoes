@@ -141,34 +141,16 @@ export default function Board({
 		setPlayA(undefined);
 	}, [selectedTile, setPlayA]);
 
-	const [borderColor, setBorderColor] = useState("border-gray-500");
-	useEffect(() => {
-		if (activePlayer !== undefined) {
-			setBorderColor(borderColorMap[activePlayer.color]);
-		} else {
-			setBorderColor("border-gray-500");
-		}
-	}, [activePlayer])
+	const borderColor = activePlayer !== undefined
+		? borderColorMap[activePlayer.color]
+		: "border-gray-500";
 
-	const [gutterColor, setGutterColor] = useState("bg-gray-900")
-	useEffect(() => {
-		if (activePlayer !== undefined) {
-			if (!activePlayer) {
-				setGutterColor("bg-black");
-			} else {
-				setGutterColor(bgColorMap[activePlayer.color]);
-			}
-		} else {
-			setGutterColor("bg-[#34495E]");
-		}
-	}, [activePlayer])
+	const gutterColor = activePlayer !== undefined
+		? (!activePlayer ? "bg-black" : bgColorMap[activePlayer.color])
+		: "bg-[#34495E]";
 
-	const [cellSpan, setCellSpan] = useState("");
-	const [gutterSpan, setGutterSpan] = useState("");
-	useEffect(() => {
-		setCellSpan(`${100 / width + 1}%`);
-		setGutterSpan(`${50 / width + 1}%`);
-	}, [width]);
+	const cellSpan = `${100 / width + 1}%`;
+	const gutterSpan = `${50 / width + 1}%`;
 
 	function clickSquare(x, y) {
 		// useful for choosing your chicken-foot
@@ -211,26 +193,20 @@ export default function Board({
 		setPlayA(undefined);
 	}
 
-	const [spacerHintPrefix, setSpacerHintPrefix] = useState({});
-	const [spacerHintSuffix, setSpacerHintSuffix] = useState({});
-	useEffect(() => {
-		const prefix = {};
-		const suffix = {};
-		if (
-			selectedTile?.a == -1 &&
-			selectedTile?.b == -1 &&
-			spacerHints &&
-			typeof spacerHints === "object" &&
-			!Array.isArray(spacerHints)
-		) {
-			for (const [k, v] of Object.entries(spacerHints)) {
-				prefix[k] = v;
-				suffix[v] = k;
-			}
+	const spacerHintPrefix = {};
+	const spacerHintSuffix = {};
+	if (
+		selectedTile?.a == -1 &&
+		selectedTile?.b == -1 &&
+		spacerHints &&
+		typeof spacerHints === "object" &&
+		!Array.isArray(spacerHints)
+	) {
+		for (const [k, v] of Object.entries(spacerHints)) {
+			spacerHintPrefix[k] = v;
+			spacerHintSuffix[v] = k;
 		}
-		setSpacerHintPrefix(prefix);
-		setSpacerHintSuffix(suffix);
-	}, [spacerHints, selectedTile, hints, playA]);
+	}
 
 	function clickForSpacer(x, y) {
 		if (spacerHintSuffix[`${x},${y}`] !== `${playA.x},${playA.y}`) {
@@ -244,10 +220,7 @@ export default function Board({
 		setPlayA(undefined);
 	}
 
-	const [spacerA, setSpacerA] = useState(undefined);
-	useEffect(() => {
-		setSpacerA(`${spacer?.a.x},${spacer?.a.y}`);
-	}, [spacer]);
+	const spacerA = `${spacer?.a.x},${spacer?.a.y}`;
 
 	const playableBoardRef = useRef(null);
 	useEffect(() => {
