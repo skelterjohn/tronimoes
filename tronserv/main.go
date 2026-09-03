@@ -35,6 +35,7 @@ var (
 	agentSpawner   = flag.String("agent-spawner", "local", "agent spawner to use: local, gcr, gcr-dev")
 	checkBotTokens = flag.Bool("check-bot-tokens", false, "check bot tokens for reserved names")
 	dev            = flag.Bool("dev", false, "run in development mode")
+	trustIdentity  = flag.Bool("trust-identity", false, "skip token validation and trust X-Player-Id headers as-is (DEV/TEST ONLY, insecure)")
 )
 
 func main() {
@@ -132,11 +133,16 @@ func main() {
 		}
 	}
 
+	if *trustIdentity {
+		clog.Info(ctx, "WARNING: --trust-identity is set, X-Player-Id headers are trusted without verification")
+	}
+
 	gs := &game.GameServer{
 		Store:                     store,
 		AgentSpawner:              spawner,
 		CheckBotTokens:            *checkBotTokens,
 		AllowedBotServiceAccounts: allowedBotSAs,
+		TrustIdentity:             *trustIdentity,
 	}
 	game.RegisterHandlers(r, gs)
 
