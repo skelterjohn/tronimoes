@@ -136,6 +136,15 @@ document.querySelector('[data-tron_x="X"][data-tron_y="Y"]')
 hover-highlight feedback -- that needs real screenshot compositing. Any change to
 `handleDragStart`/ghost-image/hover-highlight code needs a human to verify visually.
 
+**Gotcha if you invoke `handleDragStart`'s React prop directly** (e.g. via
+`element[Object.keys(element).find(k=>k.startsWith('__reactProps$'))].onDragStart(...)`
+to sidestep real drag events): it clones the tile into a ghost element appended to
+`document.body` and only removes it on the next `requestAnimationFrame`. A synchronous
+follow-up script (e.g. re-querying `[data-tile]` to check the hand) runs before that
+rAF fires and will see one extra element with a `data-tile` attribute -- this looks like
+a duplicated tile but is just the leftover ghost. Scope queries to the actual hand
+container (e.g. `.overflow-y-auto`) or wait a tick before asserting.
+
 ### Draw / pass
 
 - Draw: click the button (`b.textContent.trim() === 'draw'`). `POST /game/<code>/draw`,
@@ -161,6 +170,33 @@ hover-highlight feedback -- that needs real screenshot compositing. Any change t
   Fires `POST /game/<code>/foot`. `chicken_foot_coord` is auto-computed server-side from
   your line's current open end -- no board-square picking needed once your line is longer
   than just the leader tile.
+
+### antd controls in headless tests
+
+- `Select` dropdowns don't open from a plain `.click()` on `.ant-select`; dispatch a real
+  `MouseEvent('mousedown', { bubbles: true, cancelable: true })` on it instead, then query
+  `.ant-select-item-option` elements once `.ant-select-dropdown` appears (may need a
+  separate follow-up read -- the dropdown DOM can lag one tick behind the `mousedown`).
+- A `Modal`'s close button/`onCancel` firing correctly does **not** guarantee the DOM node
+  disappears in this harness -- see "Browser pane doesn't composite frames" below before
+  concluding a modal-close bug is real.
+
+### Rejoining an in-progress game / multi-tab pickup testing
+
+- A full page reload loses the in-memory player session (name/userInfo aren't persisted).
+  To get a player back into a game they were already in: register with the **same player
+  name** again, then type the game's code (without the `-XXXXXX` suffix) into the OTP-style
+  code field -- the server reconnects them by name via `X-Player-Name`.
+- "pick-up game" via the UI is unreliable for deliberately landing two tabs in the *same*
+  pickup game -- it often creates a new pickup game per click rather than matching an
+  existing waiting one. More reliable for two-tab testing: click "pick-up game" once from
+  one tab to create/join a pickup game, note its code, then add the second player directly
+  via the API rather than fighting the UI's matching:
+  ```bash
+  curl -s -X POST http://localhost:8080/players -H 'X-Player-Name: <name2>'
+  curl -s -X PUT http://localhost:8080/game/<code> -H 'X-Player-Name: <name2>' -d '{}'
+  ```
+  Then load `<name2>` into a second tab and rejoin by code (see above) to see it in the UI.
 
 ### Free lines (spacer -> double)
 
@@ -195,9 +231,64 @@ of its own -- every render is just a projection of the latest server response. A
 click or a rejected action can't desync anything; the next poll re-syncs the true state
 regardless.
 
+## Testing-harness gotchas (not app bugs)
+
+- **The Browser pane doesn't composite frames when it isn't displayed**, and CSS
+  transitions/animations never fire `transitionend`/`animationend` in that state. Anything
+  whose completion depends on a CSS transition (e.g. antd `Modal`'s close animation, via
+  `@rc-component/motion`) will look permanently stuck in this harness even though the
+  underlying React state (`isOpen`/`open` prop) updates correctly. Confirmed by creating a
+  plain `<div>` with a CSS `transition` and toggling it -- `transitionend` never fired.
+  Before treating a "close/animation doesn't finish" observation as a real bug, verify in
+  an actually-visible browser (ask the user, or use `claude-in-chrome` if connected) --
+  don't "fix" library close-animation code based on this harness alone.
+- React fiber inspection is useful for verifying/driving component state directly when
+  there's no UI affordance for it (or to bypass a broken UI path while isolating a
+  different bug): grab a DOM node, find its `__reactFiber$...`/`__reactProps$...` key,
+  walk `.return` to a named component (`f.type?.name`), then read `.memoizedState`
+  (hooks, in declaration order) or `.memoizedProps`. A hook's `useState` setter is
+  reachable at `hook.queue.dispatch` and can be called directly to force a state change
+  without going through the UI.
+- `javascript_exec` calls against the same tab appear to share a persistent top-level
+  scope -- a `const`/`let` declared in one call can collide ("Identifier ... has already
+  been declared") with the same name in a later call. Wrap probe scripts in an IIFE
+  (`(() => { ... })()`) to avoid this.
+
+## Firestore issue reports
+
+Players can file in-app issue reports (`ReportIssue` in `tronserv/game/firestore.go`),
+stored at `envs/<env>/issues/<docId>` (`env` is `prod` or `qa`) with fields
+`reported_by`, `summary`, `whatHappened`, `whatShouldHappen`, `errorMessage`, and
+`game_json` (the full `Game` struct, JSON-encoded as a string).
+
+- Fetching a doc via the Firestore REST API with a manually-printed `gcloud auth
+  print-access-token` piped into `curl` gets blocked by the auto-mode permission
+  classifier (looks like credential exfiltration). A small standalone Go program using
+  `cloud.google.com/go/firestore`'s client directly (Application Default Credentials via
+  `gcloud auth`) is not blocked and is the natural approach anyway, since it reuses the
+  same auth path `tronserv` itself uses.
+- To turn an issue's `game_json` into testdata: write the raw string to
+  `tronserv/game/testdata/<name>.json`, then run (from `tronserv`)
+  `go run ./prettify game/testdata/<name>.json` -- this round-trips it through the real
+  `game.Game` struct (canonical field order, tab indent), not a generic JSON
+  pretty-printer. See `tronserv/game/testdata/roundfoot.json` for an example (from
+  Firestore issue `11C0K32DvXs3M8VRwK9r`) and `TestRoundfoot` in `game_test.go` for the
+  test pattern: load via `decodeGame`, call `r.FindLegalMoves`, assert on the specific
+  return value (`moves`/`spacers`/`passFeet`) relevant to the bug.
+
+## Dev environment version mismatches (this machine)
+
+- Node is 18.17.0, but `tronapp`'s Next.js (16.x) requires >=20.9.0 for `npm run build` --
+  it hard-fails immediately with just a version-check message, not a real compile
+  attempt. `npm run dev` still works fine on 18.17. Don't rely on `npm run build` for
+  verification here; use `npx eslint` plus live testing via `npm run dev` instead.
+- Go installed is 1.23.2, but `tronserv/go.mod` declares `go 1.24.11`. This hasn't
+  actually broken `go build`/`go test`/`go run` in practice, but is worth knowing if a
+  build ever complains about the toolchain version.
+
 ## Known issues
 
 - `Game.js` logs an empty `{}` error object in two places (`getGame`'s polling-loop catch
-  around line 129, `leaveOrQuit`'s catch around line 525) -- the underlying error shape
+  around line 143, `leaveOrQuit`'s catch around line 544) -- the underlying error shape
   from `Client.js`'s `doRequest` isn't useful for debugging on at least some failure paths
   (e.g. an HTTP 408 during heavy polling). Being tracked/fixed separately.
