@@ -110,9 +110,6 @@ type GameServer struct {
 	AgentSpawner              AgentSpawner
 	CheckBotTokens            bool
 	AllowedBotServiceAccounts []string // if non-empty, token's email must be in this list
-	// TrustIdentity skips Firebase token verification in validateToken,
-	// trusting the X-Player-Id header as-is. For local testing only.
-	TrustIdentity bool
 }
 
 // validateBotServiceAccountToken checks the request for a Bearer token, validates it as a
@@ -155,9 +152,6 @@ func (s *GameServer) validateBotServiceAccountToken(ctx context.Context, r *http
 }
 
 func (s *GameServer) validateToken(ctx context.Context, r *http.Request) error {
-	if s.TrustIdentity {
-		return nil
-	}
 	token := r.Header.Get("Authorization")
 	if token == "" {
 		return ErrMissingToken
