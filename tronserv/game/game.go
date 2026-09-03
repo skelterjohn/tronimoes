@@ -1022,10 +1022,7 @@ func (r *Round) FindLegalMoves(ctx context.Context, g *Game, p *Player) ([]LaidT
 	passFeet := []Coord{}
 	if len(r.PlayerLines[name]) == 1 && (p.JustDrew || len(g.Bag) == 0) {
 		canUseSquare := func(c Coord) bool {
-			if err := r.CanSetChickenFoot(ctx, g, p, c); err != nil {
-				return true
-			}
-			return false
+			return r.CanSetChickenFoot(ctx, g, p, c) == nil
 		}
 		for _, ln := range r.LaidTiles[0].CoordA().Neighbors() {
 			if canUseSquare(ln) {
