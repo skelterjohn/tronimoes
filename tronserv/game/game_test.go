@@ -177,11 +177,11 @@ func TestMakeroom(t *testing.T) {
 	}
 }
 
-func TestLeaderstall(t *testing.T) {
-	game := decodeGame(t, "leaderstall")
+func TestRoundfoot(t *testing.T) {
+	game := decodeGame(t, "roundfoot")
 	name := game.Players[game.Turn].Name
 	if name != "Gonk Pomegranate" {
-		t.Fatalf("leaderstall testdata: expected turn player Gonk Pomegranate, got %s", name)
+		t.Fatalf("roundfoot testdata: expected turn player Gonk Pomegranate, got %s", name)
 	}
 
 	r := game.CurrentRound(t.Context())
