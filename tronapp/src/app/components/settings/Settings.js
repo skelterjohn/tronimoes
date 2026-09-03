@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Modal, Space, Select, Checkbox } from 'antd';
 import Button from "@/app/components/Button";
 import { useGameState } from '../GameState';
@@ -17,15 +17,20 @@ const Settings = ({ isOpen, onClose, setShowReportIssueModal }) => {
 		"numbers-mono",
 	]);
 
-	useEffect(() => {
+	// Re-sync local draft values whenever the shared config changes.
+	// Adjusting state during render (rather than in an effect) avoids an
+	// extra render after config updates.
+	const [prevConfig, setPrevConfig] = useState(config);
+	if (config !== prevConfig) {
+		setPrevConfig(config);
 		if (config?.tileset) {
 			setTileSet(config.tileset);
 		}
 		if (config?.soundEffects !== undefined) {
 			setSoundEffects(config.soundEffects);
 		}
-	}, [config]);
-	
+	}
+
 	const handleSave = () => {
 		setConfig({ ...config, tileset: tileSet, soundEffects });
 		onClose();
