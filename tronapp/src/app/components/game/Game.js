@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameState } from '../GameState';
 import Board from '../board/Board';
@@ -44,6 +44,12 @@ const footedAudio = loadAudio('/sfx/footed.mp3');
 const chimeDownAudio = loadAudio('/sfx/chime_down.mp3');
 const chimeUpAudio = loadAudio('/sfx/chime_up.mp3');
 
+// Sentinel that no real prop/state value can ever equal, so the "adjust
+// state during render" blocks below always run at least once on mount
+// (this component typically mounts with data already loaded, unlike an
+// effect which always fires once regardless of previous state).
+const NEVER_SYNCED = Symbol('never-synced');
+
 function Game({ code }) {
 	const router = useRouter();
 	const { playerName, client, config, options } = useGameState();
@@ -70,10 +76,18 @@ function Game({ code }) {
 
 	// here we query the server
 	const [game, setGame] = useState(undefined);
+
+	// code is a required URL path segment, so this is effectively unreachable
+	// in practice, but kept as a defensive redirect.
 	useEffect(() => {
 		if (code === "") {
-			setGame(undefined);
 			router.push('/');
+		}
+	}, [code, router]);
+
+	useEffect(() => {
+		if (code === "") {
+			return;
 		}
 
 		// Add cleanup flag
@@ -144,22 +158,16 @@ function Game({ code }) {
 		};
 	}, [code, version, client, router, playerName]);
 
-	const [amInGame, setAmInGame] = useState(false);
-	useEffect(() => {
-		if (playerName === undefined) {
-			setAmInGame(false);
-			return;
-		}
-		if (game === undefined) {
-			setAmInGame(false);
-			return;
-		}
-		if (game.players.find(p => p.name === playerName) === undefined) {
-			setAmInGame(false);
-			return;
-		}
-		setAmInGame(true);
-	}, [game, playerName]);
+	let amInGame;
+	if (playerName === undefined) {
+		amInGame = false;
+	} else if (game === undefined) {
+		amInGame = false;
+	} else if (game.players.find(p => p.name === playerName) === undefined) {
+		amInGame = false;
+	} else {
+		amInGame = true;
+	}
 
 	useEffect(() => {
 		if (game === undefined) {
@@ -170,196 +178,199 @@ function Game({ code }) {
 		}
 	}, [code, game, router]);
 
-	useEffect(() => {
-		// we got a new client, so let's totally refresh the game.
-		// if we weren't logged in with the last client, we may have
-		// a game with the right version that has been filtered.
+	// we got a new client, so let's totally refresh the game.
+	// if we weren't logged in with the last client, we may have
+	// a game with the right version that has been filtered.
+	const [prevClientForVersion, setPrevClientForVersion] = useState(NEVER_SYNCED);
+	const [prevPlayerNameForVersionA, setPrevPlayerNameForVersionA] = useState(NEVER_SYNCED);
+	if (client !== prevClientForVersion || playerName !== prevPlayerNameForVersionA) {
+		setPrevClientForVersion(client);
+		setPrevPlayerNameForVersionA(playerName);
 		setVersion(-1);
-	}, [client, playerName]);
+	}
 
-	useEffect(() => {
+	const [prevPlayerNameForVersionB, setPrevPlayerNameForVersionB] = useState(NEVER_SYNCED);
+	if (playerName !== prevPlayerNameForVersionB) {
+		setPrevPlayerNameForVersionB(playerName);
 		if (!playerName) {
 			// this is definitely lower than the version on the server,
 			// so we get this loop started.
 			setVersion(-10);
 		}
-	}, [playerName]);
+	}
 
 	const [bagCount, setBagCount] = useState(0);
 
-	useEffect(() => {
+	// All of these are pure derivations of `game`, but only updated when
+	// `game` actually changes (and only the round-specific ones when there's
+	// an actual round) -- otherwise they intentionally keep their last valid
+	// values instead of resetting, so this is adjusted during render (with
+	// prevGame tracking) rather than in an effect.
+	const [prevGameForProcessing, setPrevGameForProcessing] = useState(NEVER_SYNCED);
+	if (game !== prevGameForProcessing) {
+		setPrevGameForProcessing(game);
 		console.log('game', game);
 
-		if (game === undefined) {
-			return;
-		}
-		setVersion(game.version);
+		if (game !== undefined) {
+			setVersion(game.version);
 
-		let playerColors = {}
+			let playerColors = {}
 
 
-		setPlayers(game.players.map((p, i) => {
-			playerColors[p.name] = availableColors[i];
-			let spacerHintMap = {};
-			p.spacer_hints?.forEach((spacer) => {
-				spacerHintMap[`${spacer.a.x},${spacer.a.y}`] = `${spacer.b.x},${spacer.b.y}`;
-			});
-			return {
-				name: p.name,
-				color: availableColors[i],
-				hand: p.hand?.map((t) => ({
-					a: t.pips_a,
-					b: t.pips_b,
-				})),
-				hints: p.hints,
-				spacer_hints: spacerHintMap,
-				score: p.score,
-				dead: p.dead,
-				chickenFoot: p.chicken_foot,
-				chickenFootX: p.chicken_foot_coord.x,
-				chickenFootY: p.chicken_foot_coord.y,
-				chickenFootURL: p.chicken_foot_url || undefined,
-				reactURL: p.react_url || undefined,
-				just_drew: p.just_drew,
-				kills: p.kills,
-				ready: p.ready,
-			}
-		}));
-
-		let allLaidTiles = {}
-		if (game.rounds?.length > 0) {
-			const lastRound = game.rounds[game.rounds.length - 1]
-			setRoundLeader(lastRound?.laid_tiles?.[0]?.tile);
-			setFreeLeaders(new Set(lastRound?.free_lines?.map((fl) => fl[0]?.tile)));
-			const laidTilesList = lastRound?.laid_tiles ?? [];
-			laidTilesList.forEach((lt, i) => {
-				allLaidTiles[`${lt.coord.x},${lt.coord.y}`] = {
-					a: lt.tile.pips_a,
-					b: lt.tile.pips_b,
-					orientation: lt.orientation,
-					color: playerColors[lt.player_name],
-					playedColor: playerColors[lt.who_laid_it],
-					dead: lt.dead,
-					last: i === laidTilesList.length - 1,
+			setPlayers(game.players.map((p, i) => {
+				playerColors[p.name] = availableColors[i];
+				let spacerHintMap = {};
+				p.spacer_hints?.forEach((spacer) => {
+					spacerHintMap[`${spacer.a.x},${spacer.a.y}`] = `${spacer.b.x},${spacer.b.y}`;
+				});
+				return {
+					name: p.name,
+					color: availableColors[i],
+					hand: p.hand?.map((t) => ({
+						a: t.pips_a,
+						b: t.pips_b,
+					})),
+					hints: p.hints,
+					spacer_hints: spacerHintMap,
+					score: p.score,
+					dead: p.dead,
+					chickenFoot: p.chicken_foot,
+					chickenFootX: p.chicken_foot_coord.x,
+					chickenFootY: p.chicken_foot_coord.y,
+					chickenFootURL: p.chicken_foot_url || undefined,
+					reactURL: p.react_url || undefined,
+					just_drew: p.just_drew,
+					kills: p.kills,
+					ready: p.ready,
 				}
-			});
-			setLineHeads(Object.values(lastRound?.player_lines).map((line) => {
-				return line[line.length - 1];
-			}))
-			setRoundHistory(lastRound.history || []);
-			setSpacer(lastRound.spacer);
+			}));
+
+			let allLaidTiles = {}
+			if (game.rounds?.length > 0) {
+				const lastRound = game.rounds[game.rounds.length - 1]
+				setRoundLeader(lastRound?.laid_tiles?.[0]?.tile);
+				setFreeLeaders(new Set(lastRound?.free_lines?.map((fl) => fl[0]?.tile)));
+				const laidTilesList = lastRound?.laid_tiles ?? [];
+				laidTilesList.forEach((lt, i) => {
+					allLaidTiles[`${lt.coord.x},${lt.coord.y}`] = {
+						a: lt.tile.pips_a,
+						b: lt.tile.pips_b,
+						orientation: lt.orientation,
+						color: playerColors[lt.player_name],
+						playedColor: playerColors[lt.who_laid_it],
+						dead: lt.dead,
+						last: i === laidTilesList.length - 1,
+					}
+				});
+				setLineHeads(Object.values(lastRound?.player_lines).map((line) => {
+					return line[line.length - 1];
+				}))
+				setRoundHistory(lastRound.history || []);
+				setSpacer(lastRound.spacer);
+			}
+			setGameHistory(game.history || []);
+			setTurnIndex(game.turn);
+			setLaidTiles(allLaidTiles);
+			setBoardWidth(game.board_width);
+			setBoardHeight(game.board_height);
+			setBagCount(game.bag?.length || 0);
 		}
-		setGameHistory(game.history || []);
-		setTurnIndex(game.turn);
-		setLaidTiles(allLaidTiles);
-		setBoardWidth(game.board_width);
-		setBoardHeight(game.board_height);
-		setBagCount(game.bag?.length || 0);
-	}, [game]);
+	}
 
 
 	// The remaining states are derived.
 
-	const [opponents, setOpponents] = useState([]);
-	const [player, setPlayer] = useState(undefined);
-	useEffect(() => {
-		var playerIndex = players.findIndex(p => p.name === playerName);
-		if (playerIndex === -1) {
-			setOpponents(players);
-			return;
-		}
-		var oppList = [];
+	var playerIndex = players.findIndex(p => p.name === playerName);
+	let opponents;
+	if (playerIndex === -1) {
+		opponents = players;
+	} else {
+		opponents = [];
 		for (let offset = 1; offset < players.length; offset++) {
-			const opp = players[(playerIndex + offset) % players.length];
-			oppList.push(opp);
+			opponents.push(players[(playerIndex + offset) % players.length]);
 		}
-		setOpponents(oppList);
+	}
 
-		if (playerIndex === -1) {
-			return;
+	// player intentionally keeps its last value when playerIndex is -1
+	// (player not found in the list), rather than resetting, so this is
+	// adjusted during render (with prevPlayers/prevPlayerName tracking)
+	// rather than in an effect.
+	const [player, setPlayer] = useState(undefined);
+	const [prevPlayersForPlayer, setPrevPlayersForPlayer] = useState(NEVER_SYNCED);
+	const [prevPlayerNameForPlayer, setPrevPlayerNameForPlayer] = useState(NEVER_SYNCED);
+	if (players !== prevPlayersForPlayer || playerName !== prevPlayerNameForPlayer) {
+		setPrevPlayersForPlayer(players);
+		setPrevPlayerNameForPlayer(playerName);
+		if (playerIndex !== -1) {
+			setPlayer(players[playerIndex]);
 		}
-		setPlayer(players[playerIndex]);
-	}, [players, playerName]);
+	}
 
 	const [selectedTile, setSelectedTile] = useState(undefined);
 
-	const [roundInProgress, setRoundInProgress] = useState(false);
-	useEffect(() => {
-		const round = game?.rounds?.[game?.rounds?.length - 1];
-		if (round === undefined) {
-			setRoundInProgress(false);
-		} else {
-			setRoundInProgress(!round.done);
+	const lastRound = game?.rounds?.[game?.rounds?.length - 1];
+	const roundInProgress = lastRound === undefined ? false : !lastRound.done;
+
+	const gameInProgress = game?.rounds !== undefined && game?.rounds?.length > 0 && !game?.done;
+
+	let chickenFeet = {};
+	let chickenFeetURLs = {};
+	players.forEach((p) => {
+		if (!p.chickenFoot) {
+			return;
 		}
-	}, [game]);
-
-	const [gameInProgress, setGameInProgress] = useState(false);
-	useEffect(() => {
-		setGameInProgress(game?.rounds !== undefined && game?.rounds?.length > 0 && !game?.done);
-	}, [game]);
-
-	const [chickenFeet, setChickenFeet] = useState({});
-	const [chickenFeetURLs, setChickenFeetURLs] = useState({});
-	useEffect(() => {
-		let allFeet = {};
-		let allURLs = {};
-		players.forEach((p) => {
-			if (!p.chickenFoot) {
-				return;
-			}
-			allFeet[`${p.chickenFootX},${p.chickenFootY}`] = p.color;
-			allURLs[`${p.chickenFootX},${p.chickenFootY}`] = p.chickenFootURL;
-		});
-		setChickenFeet(allFeet);
-		setChickenFeetURLs(allURLs);
-	}, [players]);
+		chickenFeet[`${p.chickenFootX},${p.chickenFootY}`] = p.color;
+		chickenFeetURLs[`${p.chickenFootX},${p.chickenFootY}`] = p.chickenFootURL;
+	});
 
 	const [indicated, setIndicated] = useState(undefined);
 
+	// hints is also cleared directly on a successful play/spacer (see
+	// playTile/playSpacer/clearSpacer below), and the loop below doesn't
+	// always call setHints (e.g. no matching tile), so this is adjusted
+	// during render (with prevSelectedTile/prevPlayer tracking) rather than
+	// in an effect.
 	const [hints, setHints] = useState({});
-	useEffect(() => {
+	const [prevSelectedTileForHints, setPrevSelectedTileForHints] = useState(NEVER_SYNCED);
+	const [prevPlayerForHints, setPrevPlayerForHints] = useState(NEVER_SYNCED);
+	if (selectedTile !== prevSelectedTileForHints || player !== prevPlayerForHints) {
+		setPrevSelectedTileForHints(selectedTile);
+		setPrevPlayerForHints(player);
 		if (!selectedTile) {
 			setHints({});
-			return;
-		}
-		if (selectedTile.a == -1 && selectedTile.b == -1) {
+		} else if (selectedTile.a == -1 && selectedTile.b == -1) {
 			setHints({});
-			return;
-		}
-		if (player?.hints === null || player?.hints === undefined) {
+		} else if (player?.hints === null || player?.hints === undefined) {
 			setHints({});
-			return;
-		}
-		player.hand.forEach((t, i) => {
-			if (t?.a !== selectedTile?.a || t?.b != selectedTile?.b) {
-				return;
-			}
-			if (player.hints[i] === null) {
-				setHints({});
-				return;
-			}
-			let hintSet = {};
-			player.hints[i].forEach((coord) => {
-				hintSet[`${coord.x},${coord.y}`] = true;
+		} else {
+			player.hand.forEach((t, i) => {
+				if (t?.a !== selectedTile?.a || t?.b != selectedTile?.b) {
+					return;
+				}
+				if (player.hints[i] === null) {
+					setHints({});
+					return;
+				}
+				let hintSet = {};
+				player.hints[i].forEach((coord) => {
+					hintSet[`${coord.x},${coord.y}`] = true;
+				})
+				setHints(hintSet);
 			})
-			setHints(hintSet);
-		})
-	}, [selectedTile, player]);
-
-	const [hintedTiles, setHintedTiles] = useState([]);
-	useEffect(() => {
-		if (player?.hints === null || player?.hints === undefined) {
-			setHintedTiles([]);
-			return;
 		}
+	}
+
+	const hintedTiles = useMemo(() => {
 		let ht = [];
-		player.hand.forEach((t, i) => {
-			if (player.hints[i] !== null && player.hints[i].length > 0) {
-				ht.push(t);
-			}
-		})
-		setHintedTiles(ht);
-	}, [game, player]);
+		if (player?.hints !== null && player?.hints !== undefined) {
+			player.hand.forEach((t, i) => {
+				if (player.hints[i] !== null && player.hints[i].length > 0) {
+					ht.push(t);
+				}
+			});
+		}
+		return ht;
+	}, [player]);
 
 	const [playErrorMessage, setPlayErrorMessage] = useState("");
 
@@ -383,10 +394,12 @@ function Game({ code }) {
 
 	const [inFlight, setInFlight] = useState(undefined);
 	const [hoveredSquares, setHoveredSquares] = useState(new Set([]));
-	useEffect(() => {
+	const [prevGameForClear, setPrevGameForClear] = useState(NEVER_SYNCED);
+	if (game !== prevGameForClear) {
+		setPrevGameForClear(game);
 		setHoveredSquares(new Set([]));
 		setPlayErrorMessage("");
-	}, [game]);
+	}
 	const [mouseIsOver, setMouseIsOver] = useState([-1, -1]);
 
 	const [playA, setPlayA] = useState(undefined);
@@ -488,9 +501,15 @@ function Game({ code }) {
 		});
 	}, [reactURL, client, code]);
 
-	useEffect(() => {
+	// chickenFootURL is also set directly by the vision-quest modal (see
+	// setURL={setChickenFootURL} below), so it's a sync-then-diverge
+	// pattern: adjust it during render (rather than in an effect) only
+	// when `player` itself changes.
+	const [prevPlayerForChickenFootURL, setPrevPlayerForChickenFootURL] = useState(NEVER_SYNCED);
+	if (player !== prevPlayerForChickenFootURL) {
+		setPrevPlayerForChickenFootURL(player);
 		setChickenFootURL(player?.chickenFootURL);
-	}, [player]);
+	}
 
 	useEffect(() => {
 		if (chickenFootURL === undefined) {
@@ -529,17 +548,23 @@ function Game({ code }) {
 		});
 	}, [client, code, router]);
 
-	const [playerTurn, setPlayerTurn] = useState(undefined);
-	useEffect(() => {
-		setPlayerTurn(players[turnIndex]);
-	}, [players, turnIndex]);
+	const playerTurn = players[turnIndex];
 
+	// myTurn intentionally keeps its last value when playerTurn is
+	// undefined, rather than resetting, so this is adjusted during render
+	// rather than in an effect.
 	const [myTurn, setMyTurn] = useState(false);
-	useEffect(() => {
+	const [prevPlayersForMyTurn, setPrevPlayersForMyTurn] = useState(NEVER_SYNCED);
+	const [prevPlayerTurnForMyTurn, setPrevPlayerTurnForMyTurn] = useState(NEVER_SYNCED);
+	const [prevPlayerNameForMyTurn, setPrevPlayerNameForMyTurn] = useState(NEVER_SYNCED);
+	if (players !== prevPlayersForMyTurn || playerTurn !== prevPlayerTurnForMyTurn || playerName !== prevPlayerNameForMyTurn) {
+		setPrevPlayersForMyTurn(players);
+		setPrevPlayerTurnForMyTurn(playerTurn);
+		setPrevPlayerNameForMyTurn(playerName);
 		if (playerTurn !== undefined) {
 			setMyTurn(players.length > 0 && playerTurn.name === playerName);
 		}
-	}, [players, playerTurn, playerName])
+	}
 
 	const [dragOrientation, setDragOrientation] = useState("down");
 	
@@ -577,14 +602,9 @@ function Game({ code }) {
 		}
 	}, [roundInProgress, game]);
 
-	const [tilesInBag, setTilesInBag] = useState(0);
 	const prevTilesInBagRef = useRef(0);
-	const [lastRoundHistoryItem, setLastRoundHistoryItem] = useState(undefined);
-	useEffect(() => {
-		const round = game?.rounds?.[game?.rounds?.length - 1];
-		setTilesInBag(game?.bag?.length || 0);
-		setLastRoundHistoryItem(round?.history?.[round?.history?.length - 1]);
-	}, [game]);
+	const tilesInBag = game?.bag?.length || 0;
+	const lastRoundHistoryItem = lastRound?.history?.[lastRound?.history?.length - 1];
 
 	useEffect(() => {
 		if (lastRoundHistoryItem?.includes("laid")) {
@@ -611,21 +631,21 @@ function Game({ code }) {
 		prevTilesInBagRef.current = tilesInBag;
 	}, [tilesInBag]);
 
-	const [lastPlayerCount, setLastPlayerCount] = useState(0);
+	const lastPlayerCountRef = useRef(0);
 	useEffect(() => {
 		const numPlayers = players.length;
-		if (numPlayers > lastPlayerCount) {
+		if (numPlayers > lastPlayerCountRef.current) {
 			chimeUpAudio.play().catch(error => {
 				console.log('Audio playback failed:', error);
 			});
 		}
-		if (numPlayers < lastPlayerCount) {
+		if (numPlayers < lastPlayerCountRef.current) {
 			chimeDownAudio.play().catch(error => {
 				console.log('Audio playback failed:', error);
 			});
 		}
-		setLastPlayerCount(numPlayers);
-	}, [players, lastPlayerCount]);
+		lastPlayerCountRef.current = numPlayers;
+	}, [players]);
 
 	const rightGutterDiv = useRef(null);
 	const [rightGutterWidth, setRightGutterWidth] = useState(0);
@@ -651,17 +671,7 @@ function Game({ code }) {
 		}
 	}, [rightGutterDiv, setRightGutterWidth]);
 
-	const [handOnRight, setHandOnRight] = useState(false);
-	useEffect(() => {
-		if (rightGutterWidth < 400) {
-			setHandOnRight(false);
-			return;
-		}
-		if (rightGutterWidth >= 200) {
-			setHandOnRight(true);
-			return;
-		}
-	}, [rightGutterWidth, setHandOnRight]);
+	const handOnRight = rightGutterWidth >= 400;
 
 	const boardRef = useRef(null);
 	const [squareSpan, setSquareSpan] = useState(0);
