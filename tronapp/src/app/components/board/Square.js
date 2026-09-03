@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import Pips from "./Pips";
 
 export default function Square({
@@ -7,27 +6,18 @@ export default function Square({
 		pips,
 		hoveredSquares, setMouseIsOver, dropCallback,
 		interactive = true }) {
-	const [hovered, setHovered] = useState(false);
-	useEffect(() => {
-		setHovered(hoveredSquares.has(`${x},${y}`));
-	}, [hoveredSquares, x, y]);
+	const hovered = hoveredSquares.has(`${x},${y}`);
 
-	const [bgColor, setBgColor] = useState("");
-	useEffect(() => {
-		if (center) {
-			setBgColor("bg-gray-400");
-			return;
-		}
-		if (hovered) {
-			setBgColor("bg-white");
-			return;
-		}
-		if ((x + y) % 2 == 0) {
-			setBgColor("bg-[#18222b]");
-		} else {
-			setBgColor("bg-[#34495E]");
-		}
-	}, [center, x, y,hovered]);
+	let bgColor;
+	if (center) {
+		bgColor = "bg-gray-400";
+	} else if (hovered) {
+		bgColor = "bg-white";
+	} else if ((x + y) % 2 == 0) {
+		bgColor = "bg-[#18222b]";
+	} else {
+		bgColor = "bg-[#34495E]";
+	}
 
 	function onDragOver(e) {
 		e.preventDefault();
