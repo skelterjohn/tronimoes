@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Tile from '../board/Tile';
 import ChickenFoot from '../board/ChickenFoot';
 import Reaction from "./Reaction";
@@ -7,41 +7,32 @@ function Opponent({
 		player, players,
 		dead = false, turnIndex
 	}) {
-	const [myTurn, setMyTurn] = useState(false);
-	const [handBackground, setHandBackground] = useState("bg-white");
+	const myTurn = player?.name === players[turnIndex]?.name;
 
-	useEffect(() => {
-		const colorMap = {
-			red: "bg-red-600",
-			blue: "bg-blue-600",
-			green: "bg-green-600",
-			yellow: "bg-yellow-600",
-			orange: "bg-orange-600",
-			fuchsia: "bg-fuchsia-600",
-			white: "bg-white"
-		};
-		setHandBackground(colorMap[player?.color]);
-	}, [player]);
+	const colorMap = {
+		red: "bg-red-600",
+		blue: "bg-blue-600",
+		green: "bg-green-600",
+		yellow: "bg-yellow-600",
+		orange: "bg-orange-600",
+		fuchsia: "bg-fuchsia-600",
+		white: "bg-white"
+	};
+	const handBackground = colorMap[player?.color];
 
-	useEffect(() => {
-		setMyTurn(player?.name === players[turnIndex]?.name);
-	}, [turnIndex, player, players]);
-
-	const [reactURL, setReactURL] = useState(undefined);
-	const [showReaction, setShowReaction] = useState(false);
-	useEffect(() => {
-		setReactURL(player?.reactURL);
-	}, [player]);
-
-	useEffect(() => {
+	const reactURL = player?.reactURL;
+	// showReaction is also dismissed independently (auto-hide timeout / click,
+	// see Reaction.js's setShow), so adjust it during render (rather than in an
+	// effect) only when reactURL itself actually changes.
+	const [showReaction, setShowReaction] = useState(reactURL !== undefined);
+	const [prevReactURL, setPrevReactURL] = useState(reactURL);
+	if (reactURL !== prevReactURL) {
+		setPrevReactURL(reactURL);
 		setShowReaction(reactURL !== undefined);
-	}, [reactURL]);
-	
-	const [killedPlayers, setKilledPlayers] = useState([]);
-	useEffect(() => {
-		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
-	}, [player, players]);
-	
+	}
+
+	const killedPlayers = player?.kills?.map(k => players.find(p => p.name === k));
+
 
 	return (
 		<div className={`h-full flex flex-col items-center ${handBackground}`}>
