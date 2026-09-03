@@ -10,6 +10,12 @@ function stripRotationClasses(el) {
 	el.querySelectorAll('*').forEach(stripRotationClasses);
 }
 
+// Sentinel that no real `player` value can ever equal, so the handOrder sync
+// below always runs at least once on mount (Hand.js typically mounts with an
+// already-populated player.hand, unlike an effect which always fires once
+// regardless of previous state).
+const NEVER_SYNCED = Symbol('never-synced');
+
 function Hand({
 		player, players,
 		dead = false,
@@ -28,55 +34,43 @@ function Hand({
 	const [touchStartPos, setTouchStartPos] = useState(null);
 	const [draggedTile, setDraggedTile] = useState(null);
 	const [touchOverBoard, setTouchOverBoard] = useState(false);
-	const [spacerAvailable, setSpacerAvailable] = useState(false);
-	const [spacerColor, setSpacerColor] = useState("white");
-	const [myTurn, setMyTurn] = useState(false);
-	const [handBackground, setHandBackground] = useState("bg-white");
 	const scrollContainerRef = useRef(null);
 
-	useEffect(() => {
-		const colorMap = {
-			red: "bg-red-900",
-			blue: "bg-blue-900",
-			green: "bg-green-900",
-			yellow: "bg-yellow-900",
-			orange: "bg-orange-900",
-			fuchsia: "bg-fuchsia-900",
-			white: "bg-white"
-		};
-		setHandBackground(colorMap[player?.color]);
-	}, [player]);
+	const myTurn = player?.name === players[turnIndex]?.name;
 
-	useEffect(() => {
-		setMyTurn(player?.name === players[turnIndex]?.name);
-	}, [turnIndex, player, players]);
+	const colorMap = {
+		red: "bg-red-900",
+		blue: "bg-blue-900",
+		green: "bg-green-900",
+		yellow: "bg-yellow-900",
+		orange: "bg-orange-900",
+		fuchsia: "bg-fuchsia-900",
+		white: "bg-white"
+	};
+	const handBackground = colorMap[player?.color];
 
-	useEffect(() => {
-		setSpacerAvailable(hintedSpacer && hintedSpacer.length !== 0);
-	}, [hintedSpacer]);
+	const spacerAvailable = hintedSpacer && hintedSpacer.length !== 0;
 
-	useEffect(() => {
-		if (selectedTile?.a == -1 && selectedTile?.b == -1) {
-			setSpacerColor("bg-white");
-			return;
-		}
-		if (spacerAvailable) {
-			setSpacerColor("bg-gray-200");
-		} else {
-			setSpacerColor("bg-gray-500");
-		}
-	}, [spacerAvailable, selectedTile]);
+	let spacerColor;
+	if (selectedTile?.a == -1 && selectedTile?.b == -1) {
+		spacerColor = "bg-white";
+	} else if (spacerAvailable) {
+		spacerColor = "bg-gray-200";
+	} else {
+		spacerColor = "bg-gray-500";
+	}
 
-	const [reactURL, setReactURL] = useState(undefined);
-	const [showReaction, setShowReaction] = useState(false);
-	useEffect(() => {
-		setReactURL(player?.reactURL);
-	}, [player]);
-
-	useEffect(() => {
+	const reactURL = player?.reactURL;
+	// showReaction is also dismissed independently (auto-hide timeout / click,
+	// see Reaction.js's setShow), so adjust it during render (rather than in an
+	// effect) only when reactURL itself actually changes.
+	const [showReaction, setShowReaction] = useState(reactURL !== undefined);
+	const [prevReactURL, setPrevReactURL] = useState(reactURL);
+	if (reactURL !== prevReactURL) {
+		setPrevReactURL(reactURL);
 		setShowReaction(reactURL !== undefined);
-	}, [reactURL]);
-	
+	}
+
 	const moveTile = useCallback((tile, toTile) => {
 		if (tile.a === toTile.a && tile.b === toTile.b) {
 			return;
@@ -103,46 +97,51 @@ function Hand({
 		setHandOrder(newOrder);
 	}, [handOrder, setHandOrder]);
 
-	useEffect(() => {
+	// handOrder is also reordered directly by the user via drag/drop (see
+	// moveTile above), so it's a sync-then-diverge pattern: adjust it during
+	// render (rather than in an effect) only when `player` itself changes.
+	const [prevPlayerForHandOrder, setPrevPlayerForHandOrder] = useState(NEVER_SYNCED);
+	if (player !== prevPlayerForHandOrder) {
+		setPrevPlayerForHandOrder(player);
 		if (!player?.hand) {
 			setHandOrder([]);
-			return;
+		} else {
+			// Count occurrences rather than just tracking key presence: a plain
+			// Set of "a:b" keys can't tell "1 copy" from "N copies" of the same
+			// tile, so if handOrder ever ends up with stale duplicate entries
+			// (e.g. from a placeholder/redacted hand snapshot before the real
+			// data arrives), a Set-based reconciliation preserves all of them
+			// forever instead of self-correcting. This version converges back
+			// to the real hand's exact tile counts on the very next sync.
+			const remaining = new Map();
+			player.hand.forEach(t => {
+				const key = `${t.a}:${t.b}`;
+				remaining.set(key, (remaining.get(key) || 0) + 1);
+			});
+
+			let newHandOrder = []
+			// old tiles in the order they were, one copy per remaining count.
+			handOrder.forEach(t => {
+				const key = `${t.a}:${t.b}`;
+				const count = remaining.get(key) || 0;
+				if (count > 0) {
+					newHandOrder.push(t);
+					remaining.set(key, count - 1);
+				}
+			});
+			// any tiles from the new hand not already accounted for above.
+			player.hand.forEach(t => {
+				const key = `${t.a}:${t.b}`;
+				const count = remaining.get(key) || 0;
+				if (count > 0) {
+					newHandOrder.push(t);
+					remaining.set(key, count - 1);
+				}
+			});
+
+			setHandOrder(newHandOrder);
 		}
-		// Count occurrences rather than just tracking key presence: a plain
-		// Set of "a:b" keys can't tell "1 copy" from "N copies" of the same
-		// tile, so if handOrder ever ends up with stale duplicate entries
-		// (e.g. from a placeholder/redacted hand snapshot before the real
-		// data arrives), a Set-based reconciliation preserves all of them
-		// forever instead of self-correcting. This version converges back
-		// to the real hand's exact tile counts on the very next sync.
-		const remaining = new Map();
-		player.hand.forEach(t => {
-			const key = `${t.a}:${t.b}`;
-			remaining.set(key, (remaining.get(key) || 0) + 1);
-		});
-
-		let newHandOrder = []
-		// old tiles in the order they were, one copy per remaining count.
-		handOrder.forEach(t => {
-			const key = `${t.a}:${t.b}`;
-			const count = remaining.get(key) || 0;
-			if (count > 0) {
-				newHandOrder.push(t);
-				remaining.set(key, count - 1);
-			}
-		});
-		// any tiles from the new hand not already accounted for above.
-		player.hand.forEach(t => {
-			const key = `${t.a}:${t.b}`;
-			const count = remaining.get(key) || 0;
-			if (count > 0) {
-				newHandOrder.push(t);
-				remaining.set(key, count - 1);
-			}
-		});
-
-		setHandOrder(newHandOrder);
-	}, [player]);
+	}
 
 	const tileClicked = useCallback((tile) => {
 		setHoveredSquares(new Set([]));
@@ -474,21 +473,15 @@ function Hand({
 		}
 	}, [draggedTile]);
 
-	const [selectedTileRotation, setSelectedTileRotation] = useState("rotate-0");
-	useEffect(() => {
-		switch (dragOrientation) {
-			case "down": setSelectedTileRotation("rotate-0"); break;
-			case "right": setSelectedTileRotation("-rotate-90"); break;
-			case "up": setSelectedTileRotation("rotate-180"); break;
-			case "left": setSelectedTileRotation("rotate-90"); break;
-		}
-	}, [dragOrientation]);
+	let selectedTileRotation = "rotate-0";
+	switch (dragOrientation) {
+		case "right": selectedTileRotation = "-rotate-90"; break;
+		case "up": selectedTileRotation = "rotate-180"; break;
+		case "left": selectedTileRotation = "rotate-90"; break;
+	}
 
-	const [killedPlayers, setKilledPlayers] = useState([]);
-	useEffect(() => {
-		setKilledPlayers(player?.kills?.map(k =>  players.find(p => p.name === k)));
-	}, [player, players]);
-	
+	const killedPlayers = player?.kills?.map(k => players.find(p => p.name === k));
+
 	const scrollToTop = useCallback(() => {
 		setSelectedTile(undefined);
 		scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
