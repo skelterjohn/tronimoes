@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Pips from "./Pips";
 
 const TileHalf = ({ pips, back, orientation, tileRotation }) => {
@@ -70,76 +69,66 @@ export default function Tile({pipsa, pipsb, orientation, back = false, color = "
 		tileRotation = -90;
 	}
 
-	const [isLineHead, setIsLineHead] = useState(false);
-	useEffect(() => {
-		setIsLineHead(false);
-		lineHeads?.forEach((lt) => {
-			if (lt.tile.pips_a !== pipsa || lt.tile.pips_b !== pipsb) {
-				return;
-			}
-			setIsLineHead(true);
-		});
-	}, [pipsa, pipsb, lineHeads])
-
-	const [bgcolor, setBgcolor] = useState("bg-gray-500");
-	const [bordercolor, setBordercolor] = useState("border-black");
-
-	const [hinted, setHinted] = useState(false);
-	useEffect(() => {
-		let h = false;
-		hintedTiles && hintedTiles.forEach((ht) => {
-			if (ht.a == pipsa && ht.b == pipsb) {
-				h = true;
-			}
-		});
-		setHinted(h);
-	}, [hintedTiles, pipsa, pipsb]);
-
-	useEffect(() => {
-		const selectedColorMap = {
-			red: "bg-red-500",
-			blue: "bg-blue-500",
-			green: "bg-green-500",
-			yellow: "bg-yellow-400",
-			orange: "bg-orange-500",
-			fuchsia: "bg-fuchsia-500",
-			white: "bg-white"
-		};
-		const borderColorMap = {
-			red: "border-red-500",
-			blue: "border-blue-500",
-			green: "border-green-500",
-			yellow: "border-yellow-400",
-			orange: "border-orange-500",
-			fuchsia: "border-fuchsia-500",
-			white: "border-white"
-		};
-		const colorMap = {
-			red: "bg-red-700",
-			blue: "bg-blue-700",
-			green: "bg-green-700",
-			yellow: "bg-yellow-600",
-			orange: "bg-orange-700",
-			fuchsia: "bg-fuchsia-700",
-			white: "bg-gray-200"
-		};
-		const lineHeadColorMap = selectedColorMap;
-		
-		if (dead) {
-			setBgcolor("bg-gray-500");
-			setBordercolor(borderColorMap[color]);
-		} else if (indicated?.a == pipsa && indicated?.b == pipsb) {
-			// this is only for within the hand.
-			setBgcolor(selected ? selectedColorMap[color] : colorMap[color]);
-			setBordercolor("border-white")
-		} else if (isLineHead) {
-			setBgcolor(lineHeadColorMap[color]);
-			setBordercolor("border-black")
-		} else {
-			setBgcolor(selected ? selectedColorMap[color] : colorMap[color]);
-			setBordercolor("border-black")
+	let isLineHead = false;
+	lineHeads?.forEach((lt) => {
+		if (lt.tile.pips_a !== pipsa || lt.tile.pips_b !== pipsb) {
+			return;
 		}
-	}, [selected, dead, isLineHead, indicated, color, pipsa, pipsb]);
+		isLineHead = true;
+	});
+
+	let hinted = false;
+	hintedTiles && hintedTiles.forEach((ht) => {
+		if (ht.a == pipsa && ht.b == pipsb) {
+			hinted = true;
+		}
+	});
+
+	const selectedColorMap = {
+		red: "bg-red-500",
+		blue: "bg-blue-500",
+		green: "bg-green-500",
+		yellow: "bg-yellow-400",
+		orange: "bg-orange-500",
+		fuchsia: "bg-fuchsia-500",
+		white: "bg-white"
+	};
+	const borderColorMap = {
+		red: "border-red-500",
+		blue: "border-blue-500",
+		green: "border-green-500",
+		yellow: "border-yellow-400",
+		orange: "border-orange-500",
+		fuchsia: "border-fuchsia-500",
+		white: "border-white"
+	};
+	const colorMap = {
+		red: "bg-red-700",
+		blue: "bg-blue-700",
+		green: "bg-green-700",
+		yellow: "bg-yellow-600",
+		orange: "bg-orange-700",
+		fuchsia: "bg-fuchsia-700",
+		white: "bg-gray-200"
+	};
+	const lineHeadColorMap = selectedColorMap;
+
+	let bgcolor;
+	let bordercolor;
+	if (dead) {
+		bgcolor = "bg-gray-500";
+		bordercolor = borderColorMap[color];
+	} else if (indicated?.a == pipsa && indicated?.b == pipsb) {
+		// this is only for within the hand.
+		bgcolor = selected ? selectedColorMap[color] : colorMap[color];
+		bordercolor = "border-white";
+	} else if (isLineHead) {
+		bgcolor = lineHeadColorMap[color];
+		bordercolor = "border-black";
+	} else {
+		bgcolor = selected ? selectedColorMap[color] : colorMap[color];
+		bordercolor = "border-black";
+	}
 
 	function tileClicked() {
 		if (!isLineHead || dead) {
