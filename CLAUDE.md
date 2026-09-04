@@ -278,10 +278,17 @@ stored at `envs/<env>/issues/<docId>` (`env` is `prod` or `qa`) with fields
 
 ## Dev environment version mismatches (this machine)
 
-- Node is 18.17.0, but `tronapp`'s Next.js (16.x) requires >=20.9.0 for `npm run build` --
-  it hard-fails immediately with just a version-check message, not a real compile
-  attempt. `npm run dev` still works fine on 18.17. Don't rely on `npm run build` for
-  verification here; use `npx eslint` plus live testing via `npm run dev` instead.
+- The `node` resolved by a default shell (e.g. a fresh Bash tool call) is 18.17.0, which
+  is below Next.js (16.x)'s required >=20.9.0 -- **both** `npm run build` and `npm run dev`
+  hard-fail immediately on it (a version-check message, not a real attempt). But there's
+  also a second, newer Node (22.23.2) installed via `fnm` at
+  `~/AppData/Roaming/fnm/node-versions/v22.23.2/installation/` that isn't on the default
+  shell's PATH -- prepend that directory to PATH to get a working `node`/`npm`. A
+  long-running `npm run dev` you find already listening on :3000 was likely started this
+  way (check `(Get-CimInstance Win32_Process -Filter "ProcessId = <pid>").CommandLine` via
+  PowerShell before assuming it's misconfigured or restarting it) -- don't kill and
+  restart it via a shell with the wrong `node` on PATH, or you'll be unable to bring it
+  back up the same way.
 - Go installed is 1.23.2, but `tronserv/go.mod` declares `go 1.24.11`. This hasn't
   actually broken `go build`/`go test`/`go run` in practice, but is worth knowing if a
   build ever complains about the toolchain version.
@@ -292,3 +299,10 @@ stored at `envs/<env>/issues/<docId>` (`env` is `prod` or `qa`) with fields
   around line 143, `leaveOrQuit`'s catch around line 544) -- the underlying error shape
   from `Client.js`'s `doRequest` isn't useful for debugging on at least some failure paths
   (e.g. an HTTP 408 during heavy polling). Being tracked/fixed separately.
+- At narrow viewports (confirmed on desktop Chrome at 360px and 320px widths, e.g.
+  iPhone SE/mini-class or many Android phones), `Game.js`'s header row (game code title +
+  "rules" link + ready/quit buttons + settings gear) doesn't fit and forces the whole page
+  wider than the viewport -- horizontal scroll/clipping. Reproduces without any Safari
+  involvement, just a narrow-enough screen; root cause is `Game.js`'s outermost div having
+  no `w-full` (so it's sized to its widest child's content rather than clamped to the
+  viewport) combined with that header row's content not wrapping/shrinking. Not yet fixed.
